@@ -35,17 +35,17 @@ const SpecialEvent = () => {
           ref={containerRef}
         >
           {list.map((index) => (
-            <img src={index} className="rounded-lg" />
+            <img src={index} className="rounded-lg w-[50%] " />
           ))}
           <div
             onClick={scrollLeft}
-            className="absolute hidden md:block bg-black/60 top-[50%] cursor-pointer p-2 left-0"
+            className="absolute hidden lg:block bg-black/60 top-[50%] cursor-pointer p-2 left-0"
           >
             <FaAngleLeft size={20} />
           </div>
           <div
             onClick={scrollRight}
-            className="absolute hidden md:block bg-black/60 top-[50%] cursor-pointer p-2 right-0"
+            className="absolute hidden lg:block bg-black/60 top-[50%] cursor-pointer p-2 right-0"
           >
             <FaAngleRight size={20} />
           </div>
