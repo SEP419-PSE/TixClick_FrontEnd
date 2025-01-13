@@ -1,4 +1,4 @@
-import ProfileForm from "./pages/ProfilePage/ProfileForm";
+import HomePage from "./pages/HomePage";
 
 export default function App() {
   return (
