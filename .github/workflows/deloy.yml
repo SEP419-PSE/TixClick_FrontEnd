@@ -1,4 +1,5 @@
-name: My Jobs
+name: Build and Deploy React App
+
 on:
   push:
     branches:
@@ -8,34 +9,37 @@ jobs:
   build_and_deploy:
     runs-on: [self-hosted]
     env:
-      CONTAINER_NAME: reactAppContainer  # Đổi tên container nếu cần
+      CONTAINER_NAME: reactAppContainer  # Container name, adjust if needed
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
       - name: Build Docker Image
-        run: docker build -t myapp:latest -f ./Dockerfile .
+        run: |
+          echo "Building Docker image..."
+          docker build -t myapp:latest -f ./Dockerfile .
 
-      - name: Manage Docker Container and Build
+      - name: Manage Docker Container
         run: |
           CNAME=${{ env.CONTAINER_NAME }}
 
           # Check if the container exists
           if [ "$(docker ps -aq -f name=$CNAME)" ]; then
+              # Check if the container is stopped or exited
               if [ "$(docker ps -aq -f status=exited -f name=$CNAME)" ]; then
                   echo ":: Container $CNAME exists and is exited"
-                  echo ":: Removing exited container - $CNAME"
+                  echo ":: Removing exited container $CNAME"
                   docker rm $CNAME
               else
                   echo ":: Container $CNAME exists and is running"
-                  echo ":: Stopping running container - $CNAME"
+                  echo ":: Stopping and removing running container $CNAME"
                   docker stop $CNAME
-                  echo ":: Removing stopped container - $CNAME"
                   docker rm $CNAME
               fi
           else
               echo ":: No existing container named $CNAME"
           fi
 
-          # Run new container
-          echo ":: Running new container - $CNAME"
-          docker run -d -p 3000:3000 --name $CNAME myapp:latest
+          # Run the new container
+          echo ":: Running new container $CNAME"
+          docker run -d -p 5173:5173 --name $CNAME myapp:latest
