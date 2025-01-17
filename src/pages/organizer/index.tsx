@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react'
-import { Header } from './components/header'
 import { useLanguage } from './components/LanguageContext'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
+import { Header } from './components/Header'
 
 export default function OrganizerPage() {
   const { t } = useLanguage()
