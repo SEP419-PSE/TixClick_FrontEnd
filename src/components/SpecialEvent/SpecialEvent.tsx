@@ -17,13 +17,13 @@ const SpecialEvent = () => {
 
   const scrollLeft = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: -1120, behavior: "smooth" });
+      containerRef.current.scrollBy({ left: -948, behavior: "smooth" });
     }
   };
 
   const scrollRight = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: 1120, behavior: "smooth" });
+      containerRef.current.scrollBy({ left: 948, behavior: "smooth" });
     }
   };
   return (
@@ -31,12 +31,25 @@ const SpecialEvent = () => {
       <div className="text-[16px] my-2">Sự kiện đặc biệt</div>
       <div className="relative">
         <div
-          className="flex gap-4 overflow-auto md:overflow-hidden"
+          className="flex gap-4 overflow-x-scroll lg:overflow-hidden "
           ref={containerRef}
         >
           {list.map((index) => (
-            <img src={index} className="rounded-lg w-[50%] " />
+            <div>
+              <div className="lg:relative group w-[300px] overflow-hidden cursor-pointer">
+                <img
+                  src={index}
+                  className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
+                />
+                <div className="lg:absolute inset-0 flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
+                    Mua vé
+                  </span>
+                </div>
+              </div>
+            </div>
           ))}
+
           <div
             onClick={scrollLeft}
             className="absolute hidden lg:block bg-black/60 top-[50%] cursor-pointer p-2 left-0"
