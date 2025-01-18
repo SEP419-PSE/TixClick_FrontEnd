@@ -13,7 +13,6 @@ const HomePage = () => {
       <HeroSlider />
       <SpecialEvent />
       <TabEvent />
-
       <Footer />
     </div>
   );
