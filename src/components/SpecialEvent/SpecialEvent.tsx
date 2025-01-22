@@ -9,6 +9,7 @@ import SE7 from "../../assets/a611bc0f0562598572a92225f62ec244.webp";
 import SE8 from "../../assets/d6997bd78df37aa54e1b6283080e0909.webp";
 import { FaAngleRight } from "react-icons/fa6";
 import { FaAngleLeft } from "react-icons/fa6";
+import { NavLink } from "react-router";
 
 const list = [SE1, SE2, SE3, SE4, SE5, SE6, SE7, SE8];
 
@@ -36,17 +37,19 @@ const SpecialEvent = () => {
         >
           {list.map((index) => (
             <div>
-              <div className="lg:relative group w-[300px] overflow-hidden cursor-pointer">
-                <img
-                  src={index}
-                  className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
-                />
-                <div className="lg:absolute inset-0 flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
-                    Mua vé
-                  </span>
+              <NavLink to="event-detail">
+                <div className="lg:relative group w-[300px] overflow-hidden cursor-pointer">
+                  <img
+                    src={index}
+                    className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
+                  />
+                  <div className="lg:absolute inset-0 flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
+                      Mua vé
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </NavLink>
             </div>
           ))}
 
