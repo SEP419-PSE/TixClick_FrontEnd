@@ -8,6 +8,7 @@ import Img6 from "../../assets/c86cf8cf40fbba952fb5c31376e8486b.webp";
 import { CiCalendar } from "react-icons/ci";
 import { FaAngleRight } from "react-icons/fa6";
 import { FaAngleLeft } from "react-icons/fa6";
+import { NavLink } from "react-router";
 
 const thisWeekList = [
   {
@@ -130,16 +131,27 @@ const TabEvent = () => {
         >
           {thisWeekList.map((item) => (
             <div>
-              <div className="w-[300px]">
-                <img className="rounded-lg" src={item.img} />
-                <div className="mt-2">{item.tittle}</div>
-                <div className="text-pse-green">Từ {item.price}đ</div>
-                <div className="flex items-center gap-1">
-                  <span>
-                    <CiCalendar size={18} />
-                  </span>
-                  {item.date}
+              <NavLink to="event-detail">
+                <div className="lg:relative group w-[300px] overflow-hidden cursor-pointer">
+                  <img
+                    className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
+                    src={item.img}
+                  />
+
+                  <div className="lg:absolute hidden inset-0 lg:flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
+                      Mua vé
+                    </span>
+                  </div>
                 </div>
+              </NavLink>
+              <div className="mt-2">{item.tittle}</div>
+              <div className="text-pse-green">Từ {item.price}đ</div>
+              <div className="flex items-center gap-1">
+                <span>
+                  <CiCalendar size={18} />
+                </span>
+                {item.date}
               </div>
               <div
                 onClick={scrollLeft}
