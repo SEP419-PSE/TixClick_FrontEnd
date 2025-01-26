@@ -13,7 +13,7 @@ const IntroduceEvent = () => {
   return (
     <div className="bg-white/80 px-3 py-3 lg:py-9  text-pse-black flex justify-center">
       <div
-        className={`relative pt-3 pb-14 bg-white rounded-lg max-w-[1000px] ${
+        className={`relative pt-3 pb-14 bg-white rounded-lg max-w-[700px] ${
           isExpanded ? "max-h-auto" : "max-h-[400px]"
         } overflow-hidden ease-in-out transition-all duration-700`}
       >
@@ -78,13 +78,13 @@ const IntroduceEvent = () => {
         >
           {isExpanded ? (
             <MdExpandLess
-              className="hover:bg-pse-green h-8 w-8 rounded-full"
+              className="hover:-translate-y-2 transition-transform duration-500 h-8 w-8 rounded-full"
               size={30}
               color="black"
             />
           ) : (
             <MdExpandMore
-              className="hover:bg-pse-green h-8 w-8 rounded-full"
+              className="hover:translate-y-2 transition-transform duration-500 h-8 w-8 rounded-full"
               size={30}
               color="black"
             />
