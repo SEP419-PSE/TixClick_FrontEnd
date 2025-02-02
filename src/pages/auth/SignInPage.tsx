@@ -33,14 +33,20 @@ const SignInPage = () => {
     // console.log(formData);
     authApi
       .signIn(formData)
-      .then((response) =>
+      .then((response) => {
+        localStorage.clear();
+        console.log(response.data);
+        localStorage.setItem("accessToken", response.data.result.accessToken);
+        localStorage.setItem("refreshToken", response.data.result.refreshToken);
         toast.success("Đăng nhập thành công", {
           onAutoClose: () => {
             navigate("/");
           },
-        })
-      )
-      .catch((error) => toast.error(error.response.data))
+        });
+      })
+      .catch((error) => {
+        toast.error(error.response.data);
+      })
       .finally(() => {
         setIsLoading(false);
       });
