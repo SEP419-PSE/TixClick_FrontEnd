@@ -27,7 +27,7 @@ const SignInPage = () => {
         initial={{ y: -1000 }} // Vị trí ban đầu bên trái ngoài màn hình
         animate={{ y: 0 }} // Vị trí cuối cùng
         transition={{ duration: 1.5 }}
-        className="px-3 py-6 lg:px-8 lg:py-12 w-[456px] h-screen"
+        className="px-3 py-6 lg:px-8 lg:py-12 w-[550px] h-screen"
       >
         <div className="hidden lg:flex items-center mb-12 gap-2 font-bold text-[20px]">
           <img src={GoogleImg} width={64} />
