@@ -7,13 +7,17 @@ import SignInImg from "../../assets/pexels-wendywei-1190297.jpg";
 import { motion } from "framer-motion";
 import authApi from "../../services/authApi";
 import { LoginRequest } from "../../interface/AuthInterface";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 const SignInPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginRequest>({
     userName: "",
     password: "",
   });
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onChangeShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -25,11 +29,21 @@ const SignInPage = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     // console.log(formData);
     authApi
       .signIn(formData)
-      .then((response) => console.log(response.data))
-      .catch((error) => console.log(error.response.data));
+      .then((response) =>
+        toast.success("Đăng nhập thành công", {
+          onAutoClose: () => {
+            navigate("/");
+          },
+        })
+      )
+      .catch((error) => toast.error(error.response.data))
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
   return (
     <div className="flex justify-center bg-white text-pse-black text-[16px] h-screen">
@@ -104,10 +118,11 @@ const SignInPage = () => {
             </div>
           </div>
           <button
+            disabled={isLoading && true}
             type="submit"
             className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80"
           >
-            Đăng nhập
+            {isLoading ? "..." : "Đăng nhập"}
           </button>
         </form>
         <div className="my-8">

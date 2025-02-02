@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router";
 import Footer from "../components/Footer/Footer";
 import Header from "../components/Header/Header";
 import { PATHNAME_EXCEPT } from "../constants/constants";
+import { Toaster } from "sonner";
 
 const RootLayout = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const RootLayout = () => {
       </main>
       <footer>
         {!PATHNAME_EXCEPT.includes(location.pathname) && <Footer />}
+        <Toaster />
       </footer>
     </>
   );
