@@ -1,10 +1,7 @@
 import axios from "axios";
-// import { isEmpty } from "lodash";
-
-const apiUrl = import.meta.env.VITE_API_URL as string;
 
 const axiosClient = axios.create({
-  baseURL: apiUrl,
+  baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,10 +10,10 @@ const axiosClient = axios.create({
 // Add a request interceptor
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // const token = localStorage.getItem("token");
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
     return config;
   },
   (error) => {
