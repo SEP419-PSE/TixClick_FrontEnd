@@ -33,7 +33,7 @@ const SignInPage = () => {
           <img src={GoogleImg} width={64} />
           <p>Event booking</p>
         </div>
-        <p className="font-bold text-[22px]">Chào mừng bạn trở lại</p>
+        <p className="font-bold text-[22px] my-4">Chào mừng bạn trở lại</p>
         <div className="my-4">
           <input
             placeholder="Nhập Email"
