@@ -2,17 +2,55 @@ import { LuEye } from "react-icons/lu";
 import CustomDivider from "../../components/Divider/CustomDivider";
 import { LuEyeClosed } from "react-icons/lu";
 import GoogleImg from "../../assets/google.png";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import SignInImg from "../../assets/pexels-wendywei-1190297.jpg";
 import { motion } from "framer-motion";
+import authApi from "../../services/authApi";
+import { LoginRequest } from "../../interface/AuthInterface";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 const SignInPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<LoginRequest>({
+    userName: "",
+    password: "",
+  });
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onChangeShowPassword = () => {
     setIsShowPassword(!isShowPassword);
   };
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // console.log(formData);
+    authApi
+      .signIn(formData)
+      .then((response) => {
+        localStorage.clear();
+        console.log(response.data);
+        localStorage.setItem("accessToken", response.data.result.accessToken);
+        localStorage.setItem("refreshToken", response.data.result.refreshToken);
+        toast.success("Đăng nhập thành công", {
+          onAutoClose: () => {
+            navigate("/");
+          },
+        });
+      })
+      .catch((error) => {
+        toast.error(error.response.data);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   return (
     <div className="flex justify-center bg-white text-pse-black text-[16px] h-screen">
       <motion.div
@@ -34,53 +72,65 @@ const SignInPage = () => {
           <p>Event booking</p>
         </div>
         <p className="font-bold text-[22px] my-4">Chào mừng bạn trở lại</p>
-        <div className="my-4">
-          <input
-            placeholder="Nhập Email"
-            className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
-          />
-          <div className="flex items-center my-2 bg-[#e5e5e5] rounded-md px-4 py-2 text-[#808080] w-full">
+        <form onSubmit={handleSubmit}>
+          <div className="my-4">
             <input
-              type={isShowPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu"
-              className="w-full bg-[#e5e5e5] outline-none"
+              name="userName"
+              value={formData.userName}
+              onChange={handleChange}
+              placeholder="Tên đăng nhập"
+              className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
             />
-            <span>
-              {isShowPassword ? (
-                <LuEyeClosed
-                  onClick={onChangeShowPassword}
-                  size={20}
-                  className="text-[#4d4d4d]"
-                />
-              ) : (
-                <LuEye
-                  onClick={onChangeShowPassword}
-                  size={20}
-                  className="text-[#4d4d4d]"
-                />
-              )}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-[14px] font-semibold">
-            <div className="flex items-center gap-2">
-              <label className="relative inline-block h-7 w-[48px] cursor-pointer rounded-full bg-[#e5e5e5] transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-pse-green">
-                <input
-                  type="checkbox"
-                  id="AcceptConditions"
-                  className="peer sr-only"
-                />
-                <span className="absolute inset-y-0 start-0 m-1 size-5 rounded-full ring-[5px] ring-inset ring-white transition-all peer-checked:start-7 bg-gray-900 peer-checked:w-2 peer-checked:bg-white peer-checked:ring-transparent"></span>
-              </label>
-              <p>Nhớ mật khẩu</p>
+            <div className="flex items-center my-2 bg-[#e5e5e5] rounded-md px-4 py-2 text-[#808080] w-full">
+              <input
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                type={isShowPassword ? "text" : "password"}
+                placeholder="Nhập mật khẩu"
+                className="w-full bg-[#e5e5e5] outline-none"
+              />
+              <span>
+                {isShowPassword ? (
+                  <LuEyeClosed
+                    onClick={onChangeShowPassword}
+                    size={20}
+                    className="text-[#4d4d4d]"
+                  />
+                ) : (
+                  <LuEye
+                    onClick={onChangeShowPassword}
+                    size={20}
+                    className="text-[#4d4d4d]"
+                  />
+                )}
+              </span>
             </div>
-            <div className="text-pse-green cursor-pointer hover:underline">
-              Quên mật khẩu?
+            <div className="flex items-center justify-between text-[14px] font-semibold">
+              <div className="flex items-center gap-2">
+                <label className="relative inline-block h-7 w-[48px] cursor-pointer rounded-full bg-[#e5e5e5] transition [-webkit-tap-highlight-color:_transparent] has-[:checked]:bg-pse-green">
+                  <input
+                    type="checkbox"
+                    id="AcceptConditions"
+                    className="peer sr-only"
+                  />
+                  <span className="absolute inset-y-0 start-0 m-1 size-5 rounded-full ring-[5px] ring-inset ring-white transition-all peer-checked:start-7 bg-gray-900 peer-checked:w-2 peer-checked:bg-white peer-checked:ring-transparent"></span>
+                </label>
+                <p>Nhớ mật khẩu</p>
+              </div>
+              <div className="text-pse-green cursor-pointer hover:underline">
+                Quên mật khẩu?
+              </div>
             </div>
           </div>
-        </div>
-        <button className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80">
-          Đăng nhập
-        </button>
+          <button
+            disabled={isLoading && true}
+            type="submit"
+            className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80"
+          >
+            {isLoading ? "..." : "Đăng nhập"}
+          </button>
+        </form>
         <div className="my-8">
           <CustomDivider />
         </div>
