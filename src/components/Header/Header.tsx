@@ -1,6 +1,7 @@
 import { LuSearch } from "react-icons/lu";
 import { LuTicketCheck } from "react-icons/lu";
 import SearchBar from "../SearchBar/SearchBar";
+import { NavLink } from "react-router";
 const Header = () => {
   return (
     <header className="p-4 lg:px-14 bg-pse-green flex items-center text-white">
@@ -20,7 +21,11 @@ const Header = () => {
           Vé đã mua
         </div>
         <div className="font-semibold flex items-center cursor-pointer">
-          Đăng nhập <span className="md:block hidden ml-1"> | Đăng ký</span>
+          <NavLink to="/signin">
+            <span className="hover:border-b-2">Đăng nhập</span>
+          </NavLink>
+          <span className="md:block hidden mx-1">|</span>
+          <span className="md:block hidden hover:border-b-2">Đăng ký</span>
         </div>
       </div>
     </header>

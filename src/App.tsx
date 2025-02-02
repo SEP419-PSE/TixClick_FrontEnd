@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import EventDetail from "./pages/EventDetail";
 import RootLayout from "./layout/RootLayout";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import SignInPage from "./pages/auth/SignInPage";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail" element={<EventDetail />} />
+            <Route path="signin" element={<SignInPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
