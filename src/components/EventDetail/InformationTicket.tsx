@@ -72,7 +72,7 @@ const InformationTicket = () => {
               <p className="flex flex-col">
                 {ticket.time}, <span>{ticket.date}</span>
               </p>
-              <button className="ml-auto bg-pse-green px-4 py-2 rounded-md">
+              <button className="ml-auto bg-pse-green px-4 py-2 rounded-md hover:bg-white hover:text-pse-black transition-all duration-300">
                 Mua vé ngay
               </button>
             </div>
