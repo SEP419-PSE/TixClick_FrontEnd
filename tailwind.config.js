@@ -8,7 +8,8 @@ export default {
     extend: {
       colors: {
         "pse-green": "#2dc275",
-        "pse-footer": "#393f4e"
+        "pse-footer": "#393f4e",
+        "pse-black": "#27272a",
       },
       fontFamily: {
         "inter": "inter"
