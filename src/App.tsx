@@ -4,6 +4,8 @@ import EventDetail from "./pages/EventDetail";
 import RootLayout from "./layout/RootLayout";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import SignInPage from "./pages/auth/SignInPage";
+import SignInForm from "./components/SignInForm/SignInForm";
+import SignUpForm from "./components/SingUpForm/SignUpForm";
 
 export default function App() {
   return (
@@ -14,7 +16,10 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail" element={<EventDetail />} />
-            <Route path="signin" element={<SignInPage />} />
+            <Route path="auth" element={<SignInPage />}>
+              <Route index path="signin" element={<SignInForm />} />
+              <Route path="signup" element={<SignUpForm />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

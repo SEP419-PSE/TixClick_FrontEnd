@@ -1,2 +1,2 @@
-export const PATHNAME_EXCEPT = ["/signin", "/signup"];
+export const PATHNAME_EXCEPT = ["/auth/signin", "/auth/signup"];
 export const BASEURL_API = "http://localhost:8080";

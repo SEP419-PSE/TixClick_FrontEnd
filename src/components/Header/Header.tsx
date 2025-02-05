@@ -75,7 +75,7 @@ const Header = () => {
             </div>
           ) : (
             <>
-              <NavLink to="/signin">
+              <NavLink to="/auth/signin">
                 <span className="hover:border-b-2">Đăng nhập</span>
               </NavLink>
               <span className="md:block hidden mx-1">|</span>

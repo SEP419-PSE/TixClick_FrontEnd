@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import axiosClient from "../services/axiosClient";
+import { toast } from "sonner";
 
 type Props = {
   children: React.ReactNode;
@@ -35,8 +36,9 @@ const AuthProvider = ({ children }: Props) => {
 
   const logout = async () => {
     await localStorage.clear();
-    delete axiosClient.defaults.headers.common["Authorization"];
-    setAccessToken(null);
+    await delete axiosClient.defaults.headers.common["Authorization"];
+    await setAccessToken(null);
+    await toast.success("Đăng xuất thành công");
     setIsLogin(false);
   };
   const value = {
