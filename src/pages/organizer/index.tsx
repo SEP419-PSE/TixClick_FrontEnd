@@ -1,7 +1,9 @@
 import { Search } from 'lucide-react'
+import { Header } from './components/Header'
 import { useLanguage } from './components/LanguageContext'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
-import { Header } from './components/Header'
+import { SidebarNav } from './components/Sidebar-nav'
+import { EventFilter } from './components/EventFilter'
 
 export default function OrganizerPage() {
   const { t } = useLanguage()
@@ -9,7 +11,7 @@ export default function OrganizerPage() {
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
       <Header />
-      
+      <SidebarNav />
 
       <main className="ml-64 pt-16 p-6">
         <h1 className="text-2xl font-bold text-white mb-6">{t.title}</h1>
@@ -23,7 +25,7 @@ export default function OrganizerPage() {
             />
             <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
-
+          <EventFilter />
           
         </div>
 
