@@ -29,6 +29,13 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      
+{/* 
+      <LanguageProvider>
+      <RootLayout>
+        <OrganizerPage />
+      </RootLayout>
+    </LanguageProvider> */}
     </div>
   );
 }
