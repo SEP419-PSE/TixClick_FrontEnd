@@ -46,7 +46,7 @@ const Header = () => {
               <div
                 className={`absolute ${
                   openMennu ? "block" : "hidden"
-                } top-10 right-0 bg-white rounded-lg text-pse-black w-[200px] transition-all duration-500`}
+                } top-10 right-0 bg-white rounded-lg text-pse-black w-[200px] transition-all duration-500 z-10`}
               >
                 <ul className="rounded-lg">
                   <li className="flex items-center gap-2 p-3 hover:bg-pse-black/20 rounded-tl-lg rounded-tr-lg">
