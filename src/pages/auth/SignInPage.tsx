@@ -2,15 +2,17 @@ import { LuEye } from "react-icons/lu";
 import CustomDivider from "../../components/Divider/CustomDivider";
 import { LuEyeClosed } from "react-icons/lu";
 import GoogleImg from "../../assets/google.png";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import SignInImg from "../../assets/pexels-wendywei-1190297.jpg";
 import { motion } from "framer-motion";
 import authApi from "../../services/authApi";
 import { LoginRequest } from "../../interface/AuthInterface";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../../contexts/AuthProvider";
 
 const SignInPage = () => {
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginRequest>({
     userName: "",
@@ -38,13 +40,12 @@ const SignInPage = () => {
         console.log(response.data);
         localStorage.setItem("accessToken", response.data.result.accessToken);
         localStorage.setItem("refreshToken", response.data.result.refreshToken);
-        toast.success("Đăng nhập thành công", {
-          onAutoClose: () => {
-            navigate("/");
-          },
-        });
+        authContext?.login();
+        navigate("/");
+        toast.success("Đăng nhập thành công");
       })
       .catch((error) => {
+        console.log(error);
         toast.error(error.response.data);
       })
       .finally(() => {
