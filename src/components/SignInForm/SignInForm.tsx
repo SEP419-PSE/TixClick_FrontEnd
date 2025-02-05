@@ -37,13 +37,20 @@ const SignInForm = () => {
     authApi
       .signIn(formData)
       .then((response) => {
-        localStorage.clear();
-        console.log(response.data);
-        localStorage.setItem("accessToken", response.data.result.accessToken);
-        localStorage.setItem("refreshToken", response.data.result.refreshToken);
-        authContext?.login();
-        navigate("/");
-        toast.success("Đăng nhập thành công");
+        if (response.data.result.status == true) {
+          localStorage.clear();
+          console.log(response.data);
+          localStorage.setItem("accessToken", response.data.result.accessToken);
+          localStorage.setItem(
+            "refreshToken",
+            response.data.result.refreshToken
+          );
+          authContext?.login();
+          navigate("/");
+          toast.success("Đăng nhập thành công");
+        } else {
+          navigate("/auth/verify");
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -56,8 +63,8 @@ const SignInForm = () => {
 
   return (
     <motion.div
-      initial={{ y: -1000 }} // Vị trí ban đầu bên trái ngoài màn hình
-      animate={{ y: 0 }} // Vị trí cuối cùng
+      initial={{ x: 500 }} // Vị trí ban đầu bên trái ngoài màn hình
+      animate={{ x: 0 }} // Vị trí cuối cùng
       transition={{ duration: 1.5 }}
       className="px-3 py-6 lg:px-8 lg:py-12 w-[550px] h-screen"
     >
