@@ -17,7 +17,7 @@ jobs:
       - name: Build Docker Image
         run: |
           echo "Building Docker image..."
-          docker build -t myapp:latest -f ./Dockerfile .
+          docker build -t fe_tixclick:latest -f ./Dockerfile .
 
       - name: Manage Docker Container
         run: |
@@ -42,4 +42,4 @@ jobs:
 
           # Run the new container
           echo ":: Running new container $CNAME"
-          docker run -d -p 5173:5173 --name $CNAME myapp:latest
+          docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
