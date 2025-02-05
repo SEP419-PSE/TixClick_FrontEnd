@@ -37,15 +37,12 @@ const SignInForm = () => {
     authApi
       .signIn(formData)
       .then((response) => {
+        localStorage.clear();
+        console.log(response.data);
+        localStorage.setItem("accessToken", response.data.result.accessToken);
+        localStorage.setItem("refreshToken", response.data.result.refreshToken);
+        authContext?.login();
         if (response.data.result.status == true) {
-          localStorage.clear();
-          console.log(response.data);
-          localStorage.setItem("accessToken", response.data.result.accessToken);
-          localStorage.setItem(
-            "refreshToken",
-            response.data.result.refreshToken
-          );
-          authContext?.login();
           navigate("/");
           toast.success("Đăng nhập thành công");
         } else {
