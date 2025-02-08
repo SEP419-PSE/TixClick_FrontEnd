@@ -1,6 +1,6 @@
 import { ChevronDown, FileText, LogOut, ShoppingBag, User } from 'lucide-react'
+import Logo from "../../../assets/LogoWithWhiteLine.png"
 import { useLanguage } from './LanguageContext'
-
 
 export function Header() {
   const { t } = useLanguage()
@@ -8,9 +8,7 @@ export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-pse-green px-4 flex items-center justify-between z-50">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-          <img src="/logo.svg" alt="Logo" className="w-6 h-6" />
-        </div>
+      <img src={Logo} alt="Logo" className="h-12 w-13"/>
         <h1 className="text-white text-xl font-medium">Organizer Center</h1>
       </div>
 
