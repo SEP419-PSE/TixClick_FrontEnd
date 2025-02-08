@@ -1,3 +1,5 @@
+import English from "../../../assets/Eng-flag.png"
+import Vietnam from "../../../assets/Vie-flag.png"
 import { useLanguage } from "./LanguageContext"
 
 export function LanguageSwitcher() {
@@ -12,7 +14,7 @@ export function LanguageSwitcher() {
       >
         {language === 'vi' ? 'Vie' : 'Eng'}
         <img 
-          src={`/${language}-flag.png`}
+          src={language === 'vi' ? Vietnam : English}
           alt={language === 'vi' ? 'Vietnamese' : 'English'}
           className="w-4 h-3 object-cover"
         />
@@ -20,4 +22,3 @@ export function LanguageSwitcher() {
     </div>
   )
 }
-
