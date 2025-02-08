@@ -6,7 +6,7 @@ const ErrorPage = () => {
   return (
     <div className="h-screen bg-white flex flex-col">
       <div className="flex justify-center items-center">
-        <img src={Img} width={500} />
+        <img src={Img} width={500} loading="lazy" alt="Không có gì ở đây" />
       </div>
       <div className="flex flex-col items-center gap-4 text-pse-black font-extrabold text-[22px] text-center uppercase">
         Không có gì ở đây!
