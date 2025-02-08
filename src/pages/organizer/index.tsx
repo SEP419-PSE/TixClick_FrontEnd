@@ -1,10 +1,10 @@
 import { Search } from 'lucide-react'
+import NoEvent from "../../assets/NoEvent.png"
+import { EventFilter } from './components/EventFilter'
 import { Header } from './components/Header'
 import { useLanguage } from './components/LanguageContext'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { SidebarNav } from './components/Sidebar-nav'
-import { EventFilter } from './components/EventFilter'
-
 export default function OrganizerPage() {
   const { t } = useLanguage()
 
@@ -13,7 +13,7 @@ export default function OrganizerPage() {
       <Header />
       <SidebarNav />
 
-      <main className="ml-64 pt-16 p-6">
+      <main className="ml-64 pt-20 p-6">
         <h1 className="text-2xl font-bold text-white mb-6">{t.title}</h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
@@ -32,7 +32,7 @@ export default function OrganizerPage() {
         <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
           <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
             <img 
-              src="/empty-state.svg" 
+              src={NoEvent} 
               alt="No events" 
               className="w-16 h-16 opacity-50"
             />
