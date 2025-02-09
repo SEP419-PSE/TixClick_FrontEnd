@@ -13,15 +13,17 @@ const Header = () => {
   const [openMennu, setOpenMenu] = useState<boolean>(false);
   return (
     <header className="p-4 lg:px-14 bg-pse-green flex items-center text-white">
-      <p className="font-bold text-[18px]">Event booking</p>
+      <p className="font-bold text-[25px]">Tixclick</p>
       <div className="ml-auto flex items-center gap-4">
         <SearchBar />
         <span className="lg:hidden p-[6px] border rounded-full">
           <LuSearch size={24} />
         </span>
-        <div className="hidden md:block px-4 py-2 border rounded-lg hover:bg-white hover:text-black transition-all duration-300 cursor-pointer">
-          Tạo sự kiện
-        </div>
+        <NavLink to="/organizer">
+          <button className="hidden md:block px-4 py-2 border rounded-lg hover:bg-white hover:text-black transition-all duration-300">
+            Tạo sự kiện
+          </button>
+        </NavLink>
         {/* <div className="hidden px-4 py-2 md:flex items-center cursor-pointer">
           <span className="mr-2">
             <LuTicketCheck size={24} />
@@ -79,7 +81,11 @@ const Header = () => {
                 <span className="hover:border-b-2">Đăng nhập</span>
               </NavLink>
               <span className="md:block hidden mx-1">|</span>
-              <span className="md:block hidden hover:border-b-2">Đăng ký</span>
+              <NavLink to="/auth/signup">
+                <span className="md:block hidden hover:border-b-2">
+                  Đăng ký
+                </span>
+              </NavLink>
             </>
           )}
         </div>

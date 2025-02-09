@@ -1,12 +1,13 @@
 import { FaRegCopyright } from "react-icons/fa6";
+import CustomDivider from "../Divider/CustomDivider";
 
 const Footer = () => {
   return (
-    <div className="bg-pse-footer">
-      <div className="px-4 py-2 lg:px-14 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between gap-3 bg-pse-footer">
+    <div className="bg-white text-pse-black">
+      <div className="px-4 py-2 lg:px-14 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between gap-3 bg-white">
         <div className="leading-8">
-          <p className="uppercase font-semibold">Giới thiệu</p>
-          <ul className="font-extralight">
+          <p className="uppercase font-bold">Giới thiệu</p>
+          <ul className="font-normal">
             <li>Về Chúng Tôi</li>
             <li>Thỏa Thuận Sử Dụng</li>
             <li>Quy Chế Hoạt Động</li>
@@ -41,7 +42,7 @@ const Footer = () => {
             <li>Youtube</li>
           </ul>
         </div>
-        <div className="w-full h-[2px] bg-white rounded-full"></div>
+        <CustomDivider />
       </div>
       <div className="font-extralight pb-2 text-center flex items-center justify-center">
         <span className="mr-1">

@@ -3,5 +3,6 @@ export const PATHNAME_EXCEPT = [
   "/auth/signup",
   "/auth/verify",
   "/auth/code",
+  "/organizer",
 ];
 export const BASEURL_API = "http://localhost:8080";

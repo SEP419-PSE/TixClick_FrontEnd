@@ -9,6 +9,8 @@ import SignUpForm from "./components/SingUpForm/SignUpForm";
 import OTPVerify from "./components/OTP/OTPVerify";
 import EnterCode from "./components/OTP/EnterCode";
 import ErrorPage from "./pages/errors/ErrorPage";
+import OrganizerPage from "./pages/organizer";
+import Stepper from "./components/CreateEvent/Stepper";
 
 export default function App() {
   return (
@@ -19,18 +21,22 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail" element={<EventDetail />} />
+            <Route path="create-event" element={<Stepper />} />
+            {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
               <Route index path="signin" element={<SignInForm />} />
               <Route path="signup" element={<SignUpForm />} />
               <Route path="verify" element={<OTPVerify />} />
               <Route path="code" element={<EnterCode />} />
             </Route>
+            {/* Organizer route */}
+            <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
-      
-{/* 
+
+      {/* 
       <LanguageProvider>
       <RootLayout>
         <OrganizerPage />
