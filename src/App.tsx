@@ -9,6 +9,7 @@ import SignUpForm from "./components/SingUpForm/SignUpForm";
 import OTPVerify from "./components/OTP/OTPVerify";
 import EnterCode from "./components/OTP/EnterCode";
 import ErrorPage from "./pages/errors/ErrorPage";
+import OrganizerCenter from "./pages/organizer";
 
 export default function App() {
   return (
@@ -26,16 +27,13 @@ export default function App() {
               <Route path="code" element={<EnterCode />} />
             </Route>
             <Route path="404" element={<ErrorPage />} />
+            <Route path="organizerCenter" element={<OrganizerCenter />} />
+
           </Route>
         </Routes>
       </BrowserRouter>
       
-{/* 
-      <LanguageProvider>
-      <RootLayout>
-        <OrganizerPage />
-      </RootLayout>
-    </LanguageProvider> */}
+
     </div>
   );
 }
