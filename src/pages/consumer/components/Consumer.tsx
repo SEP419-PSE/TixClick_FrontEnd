@@ -1,20 +1,16 @@
 'use client'
 
 import { Search } from 'lucide-react'
+import NoEvent from '../../../assets/NoEvent.png'
 import { EventFilter } from '../../organizer/components/EventFilter'
 import { useLanguage } from '../../organizer/components/LanguageContext'
-import { LanguageSwitcher } from '../../organizer/components/LanguageSwitcher'
-import { ConsumerSidebar } from './ConsumerSidebar'
-
 
 export default function Consumer() {
   const { t } = useLanguage()
 
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
-      <ConsumerSidebar />
-
-      <main className="ml-64 pt-16 p-6">
+      <main className="pt-16 p-6">
         <h1 className="text-2xl font-bold text-white mb-6">{t.title}</h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
@@ -33,7 +29,7 @@ export default function Consumer() {
         <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
           <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
             <img 
-              src="/empty-state.svg" 
+              src={NoEvent} 
               alt="No events" 
               className="w-16 h-16 opacity-50"
             />
@@ -42,7 +38,6 @@ export default function Consumer() {
         </div>
       </main>
 
-      <LanguageSwitcher />
     </div>
   )
 }

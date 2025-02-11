@@ -1,5 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@radix-ui/react-accordion"
-import { useLanguage } from "../../organizer/components/LanguageContext"
+import { useLanguage } from "../../../organizer/components/LanguageContext"
 
 
 export default function Policy() {

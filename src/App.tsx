@@ -6,8 +6,10 @@ import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
 import SignInPage from "./pages/auth/SignInPage";
-import ConsumerCenter from "./pages/consumer";
-import MyEvents from "./pages/consumer/components/MyEvent";
+import Consumer from "./pages/consumer/components/Consumer";
+import Policy from "./pages/consumer/components/Policy/Policy";
+import ReportsPage from "./pages/consumer/components/Report/Report";
+import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
@@ -30,11 +32,13 @@ export default function App() {
             </Route>
             <Route path="404" element={<ErrorPage />} />
             <Route path="organizerCenter" element={<OrganizerCenter />} />
-            <Route path="consumerCenter" element={<ConsumerCenter />} />
-            <Route path="/my-events" element={<MyEvents />} />
+            <Route path="consumerCenter" element={<RootLayouts />}>
+              <Route index element={<Consumer />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="policies" element={<Policy />} />
 
-
-
+            </Route>
+            {/* <Route path="/my-events" element={<MyEventPage />} /> */}
           </Route>
         </Routes>
       </BrowserRouter>
