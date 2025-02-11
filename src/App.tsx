@@ -1,14 +1,16 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import HomePage from "./pages/HomePage";
-import EventDetail from "./pages/EventDetail";
-import RootLayout from "./layout/RootLayout";
+import EnterCode from "./components/OTP/EnterCode";
+import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
-import SignInPage from "./pages/auth/SignInPage";
 import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
-import OTPVerify from "./components/OTP/OTPVerify";
-import EnterCode from "./components/OTP/EnterCode";
+import RootLayout from "./layout/RootLayout";
+import SignInPage from "./pages/auth/SignInPage";
+import ConsumerCenter from "./pages/consumer";
+import MyEvents from "./pages/consumer/components/MyEvent";
 import ErrorPage from "./pages/errors/ErrorPage";
+import EventDetail from "./pages/EventDetail";
+import HomePage from "./pages/HomePage";
 import OrganizerCenter from "./pages/organizer";
 
 export default function App() {
@@ -28,6 +30,10 @@ export default function App() {
             </Route>
             <Route path="404" element={<ErrorPage />} />
             <Route path="organizerCenter" element={<OrganizerCenter />} />
+            <Route path="consumerCenter" element={<ConsumerCenter />} />
+            <Route path="/my-events" element={<MyEvents />} />
+
+
 
           </Route>
         </Routes>

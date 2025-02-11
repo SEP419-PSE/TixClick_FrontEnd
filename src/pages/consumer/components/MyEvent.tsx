@@ -2,7 +2,7 @@ import { Search } from "lucide-react"
 
 
 
-export default function MyEventsPage() {
+export default function MyEvents() {
 
   return (
     <div className="flex gap-6 p-6">
