@@ -10,7 +10,7 @@ export default function Consumer() {
 
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
-      <main className="pt-16 p-6">
+      <main className="pt-10 p-6">
         <h1 className="text-2xl font-bold text-white mb-6">{t.title}</h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">

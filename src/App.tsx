@@ -38,7 +38,6 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
 
             </Route>
-            {/* <Route path="/my-events" element={<MyEventPage />} /> */}
           </Route>
         </Routes>
       </BrowserRouter>

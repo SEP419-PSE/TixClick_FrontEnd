@@ -6,7 +6,7 @@ import { useLanguage } from "../../organizer/components/LanguageContext";
 
 export function ConsumerSidebar() {
   const { t } = useLanguage();
-  const { pathname } = useLocation();  // Use useLocation to get pathname
+  const { pathname } = useLocation(); 
 
   const navigation = [
     { name: t.sidebar.myEvents, href: "/consumerCenter", icon: FileText },

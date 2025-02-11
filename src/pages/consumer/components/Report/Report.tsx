@@ -14,7 +14,7 @@ export default function ReportsPage() {
 
   return (
     <div className="p-6">
-      <div className="bg-[#f2f0f0] rounded-lg p-4">
+      <div className="bg-[#f6f4f4] rounded-lg p-4">
         <Table>
           <TableHeader>
             <TableRow>
