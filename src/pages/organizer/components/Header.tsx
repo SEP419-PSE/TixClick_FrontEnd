@@ -6,7 +6,7 @@ export function Header() {
   const { t } = useLanguage()
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-pse-green px-4 flex items-center justify-between z-50">
+    <header className="fixed top-0 left-0 right-0 h-20 bg-pse-green px-4 flex items-center justify-between z-50">
       <div className="flex items-center gap-2">
       <img src={Logo} alt="Logo" className="h-12 w-13"/>
         <h1 className="text-white text-xl font-medium">Organizer Center</h1>

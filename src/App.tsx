@@ -1,14 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import HomePage from "./pages/HomePage";
-import EventDetail from "./pages/EventDetail";
-import RootLayout from "./layout/RootLayout";
+import EnterCode from "./components/OTP/EnterCode";
+import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
-import SignInPage from "./pages/auth/SignInPage";
 import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
-import OTPVerify from "./components/OTP/OTPVerify";
-import EnterCode from "./components/OTP/EnterCode";
+import RootLayout from "./layout/RootLayout";
+import SignInPage from "./pages/auth/SignInPage";
+import Consumer from "./pages/consumer/components/Consumer";
+import Policy from "./pages/consumer/components/Policy/Policy";
+import ReportsPage from "./pages/consumer/components/Report/Report";
+import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
+import EventDetail from "./pages/EventDetail";
+import HomePage from "./pages/HomePage";
+import OrganizerCenter from "./pages/organizer";
 
 export default function App() {
   return (
@@ -26,16 +31,18 @@ export default function App() {
               <Route path="code" element={<EnterCode />} />
             </Route>
             <Route path="404" element={<ErrorPage />} />
+            <Route path="organizerCenter" element={<OrganizerCenter />} />
+            <Route path="consumerCenter" element={<RootLayouts />}>
+              <Route index element={<Consumer />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="policies" element={<Policy />} />
+
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>
       
-{/* 
-      <LanguageProvider>
-      <RootLayout>
-        <OrganizerPage />
-      </RootLayout>
-    </LanguageProvider> */}
+
     </div>
   );
 }
