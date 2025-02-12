@@ -14,6 +14,7 @@ import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
 import OrganizerCenter from "./pages/organizer";
+import TicketPage from "./pages/ticketManagement/ticketPage";
 
 export default function App() {
   return (
@@ -30,14 +31,16 @@ export default function App() {
               <Route path="verify" element={<OTPVerify />} />
               <Route path="code" element={<EnterCode />} />
             </Route>
-            <Route path="404" element={<ErrorPage />} />
-            <Route path="organizerCenter" element={<OrganizerCenter />} />
+            <Route path="404" element={<ErrorPage />} />            
+          </Route>
+          <Route>
+          <Route path="organizerCenter" element={<OrganizerCenter />} />
             <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
-
-            </Route>
+          </Route>
+          <Route path="ticketManagement" element={<TicketPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

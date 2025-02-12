@@ -13,7 +13,7 @@ export default function ReportsPage() {
   ]
 
   return (
-    <div className="p-6">
+    <div className="p-6 pt-20">
       <div className="bg-[#f6f4f4] rounded-lg p-4">
         <Table>
           <TableHeader>
