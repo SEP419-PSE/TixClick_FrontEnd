@@ -82,7 +82,7 @@ export default function Stepper() {
         ></motion.div>
       </div>
 
-      <div className="min-h-screen max-w-[1000px] py-28 mx-auto p-6 bg-gradient-to-b from-pse-green/60 via-pse-green/40 to-pse-black/50 shadow-lg rounded-lg">
+      <div className="min-h-screen max-w-[1000px] pt-24 pb-10 mx-auto p-6 bg-gradient-to-b from-pse-green/60 via-pse-green/40 to-pse-black/50 shadow-lg rounded-lg">
         <div className="text-center text-lg font-semibold mb-4">
           {currentStep === 0 && (
             <StepOne onValidationChange={handleValidationChange} />
