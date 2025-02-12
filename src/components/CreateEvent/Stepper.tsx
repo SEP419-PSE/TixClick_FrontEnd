@@ -1,55 +1,51 @@
-import { useState } from "react";
+import { toast } from "sonner";
+import { TOAST_WARNING } from "../../constants/constants";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import ImageUpload from "./ImageUpload";
-import TextInput from "./InputText";
+import { useEffect, useState } from "react";
+import StepOne from "./StepOne";
 
-const steps = ["Step 1", "Step 2", "Step 3", "Step 4"];
+const steps = [
+  "Thông tin sự kiện",
+  "Thời gian & Loại vé",
+  "Cài đặt",
+  "Thông tin thanh toán",
+];
 
-function StepOne() {
-  const [eventName, setEventName] = useState<string>("");
-  return (
-    <div className="text-black">
-      <section className="bg-pse-footer p-4 rounded-lg">
-        <p className="text-white">Upload hình ảnh</p>
-        <div className="flex flex-wrap py-5 justify-center gap-20">
-          <ImageUpload width={720} height={958} label="Thêm logo sự kiện" />
-          <ImageUpload width={1280} height={720} label="Thêm ảnh nền sự kiện" />
-        </div>
-        <TextInput
-          maxLength={100}
-          label="Tên sự kiện"
-          text={eventName}
-          setText={setEventName}
-        />
-      </section>
-    </div>
-  );
-}
-
-function StepTwo() {
-  return <div>Content for Step 2</div>;
-}
-
-function StepThree() {
-  return <div>Content for Step 3</div>;
-}
-
-function StepFour() {
-  return <div>Content for Step 4</div>;
-}
-
-const stepComponents = [StepOne, StepTwo, StepThree, StepFour];
+// const stepComponents = [StepOne, StepTwo, StepThree, StepFour];
 
 export default function Stepper() {
   const [currentStep, setCurrentStep] = useState(0);
-  const CurrentComponent = stepComponents[currentStep];
+  const [isStepValid, setIsStepValid] = useState(false);
+
+  // useEffect(() => {
+  //   setIsStepValid(false);
+  // }, [currentStep]);
+
+  const handleNext = () => {
+    if (!isStepValid) {
+      toast.warning(TOAST_WARNING, {
+        position: "top-center",
+      });
+      return;
+    }
+    setCurrentStep((prev) => prev + 1); // Chuyển step nếu hợp lệ
+  };
+
+  const handleValidationChange = (isValid: boolean) => {
+    setIsStepValid(isValid);
+  };
+
+  console.log(isStepValid);
 
   return (
-    <div className="min-h-screen max-w-[1000px] mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <div className="relative flex justify-between items-center mb-6 w-[90%] mx-auto">
+    <>
+      <div className="fixed left-1/2 top-2 z-10 flex justify-between items-center text-[14px] w-[90%] max-w-[500px] mx-auto px-2 transform -translate-x-1/2 overflow-hidden">
         {steps.map((step, index) => (
-          <div key={index} className="flex flex-col items-center relative z-10">
+          <div
+            key={index}
+            className="flex flex-col items-center relative z-10 gap-1 md:gap-2"
+          >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -70,29 +66,41 @@ export default function Stepper() {
                 index + 1
               )}
             </motion.div>
-            <span className="text-sm mt-2 text-gray-700">{step}</span>
+            <span className="text-[10px] md:text-sm mt-1 text-gray-300">
+              {step}
+            </span>
           </div>
         ))}
-        <motion.div className="absolute top-5 left-0 right-1 h-1 bg-gray-300 z-0"></motion.div>
+        {/* Thanh nền */}
+        <motion.div className="absolute top-5 left-2 right-2 h-1 bg-gray-300 z-0"></motion.div>
+        {/* Thanh tiến trình */}
         <motion.div
-          className="absolute top-5 left-0 h-1 bg-[#2dc275] z-0"
+          className="absolute top-5 left-2 h-1 bg-[#2dc275] z-10"
           initial={{ width: 0 }}
-          animate={{ width: `${(currentStep / (steps.length - 1)) * 98}%` }}
+          animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         ></motion.div>
       </div>
-      <div className="text-center text-lg font-semibold mb-4">
-        <CurrentComponent />
+
+      <div className="min-h-screen max-w-[1000px] py-28 mx-auto p-6 bg-gradient-to-b from-pse-green/60 via-pse-green/40 to-pse-black/50 shadow-lg rounded-lg">
+        <div className="text-center text-lg font-semibold mb-4">
+          {currentStep === 0 && (
+            <StepOne onValidationChange={handleValidationChange} />
+          )}
+          {currentStep === 1 && <div>Step 2</div>}
+          {currentStep === 2 && <div>Step 3</div>}
+          {currentStep === 3 && <div>Step 4</div>}
+        </div>
+
+        <div className="flex flex-col items-end">
+          <button
+            className="px-4 py-2 bg-[#2dc275] text-white rounded"
+            onClick={handleNext}
+          >
+            Next
+          </button>
+        </div>
       </div>
-      <div className="flex justify-end">
-        <button
-          className="px-4 py-2 bg-[#2dc275] text-white rounded disabled:opacity-50"
-          disabled={currentStep === steps.length - 1}
-          onClick={() => setCurrentStep((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

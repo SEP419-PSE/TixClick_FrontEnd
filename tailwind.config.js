@@ -13,7 +13,10 @@ export default {
       },
       fontFamily: {
         "inter": "inter"
-      }
+      },
+      boxShadow: {
+        'neon-green': '0 0 10px rgba(45, 194, 117, 0.6), 0 0 20px rgba(45, 194, 117, 0.8)',
+      },
     },
   },
   plugins: [],

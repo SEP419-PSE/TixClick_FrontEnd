@@ -5,14 +5,17 @@ interface ImageUploadProps {
   width: number;
   height: number;
   label: string;
+  image: string | null;
+  setImage: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function ImageUpload({
   width,
   height,
   label,
+  image,
+  setImage,
 }: ImageUploadProps) {
-  const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +36,7 @@ export default function ImageUpload({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-gray-500 p-6 rounded-lg w-80 text-center">
+    <div className="flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-gray-500 p-6 rounded-lg w-[300px] text-center">
       <label className="cursor-pointer flex flex-col items-center">
         <UploadCloud className="w-12 h-12 text-pse-green" />
         <span className="text-white font-extralight mt-2">{label}</span>
