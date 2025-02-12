@@ -5,8 +5,8 @@ interface ImageUploadProps {
   width: number;
   height: number;
   label: string;
-  image: string | null;
-  setImage: React.Dispatch<React.SetStateAction<string | null>>;
+  image: File | null;
+  setImage: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 export default function ImageUpload({
@@ -16,6 +16,7 @@ export default function ImageUpload({
   image,
   setImage,
 }: ImageUploadProps) {
+  const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,10 +27,16 @@ export default function ImageUpload({
     img.src = URL.createObjectURL(file);
     img.onload = () => {
       if (img.width === width && img.height === height) {
-        setImage(img.src);
+        setImage(file);
         setError(null);
+
+        // Tạo preview từ file
+        const reader = new FileReader();
+        reader.onloadend = () => setPreview(reader.result as string);
+        reader.readAsDataURL(file);
       } else {
         setImage(null);
+        setPreview(null);
         setError(`Image must be ${width}x${height} pixels.`);
       }
     };
@@ -40,7 +47,7 @@ export default function ImageUpload({
       <label className="cursor-pointer flex flex-col items-center">
         <UploadCloud className="w-12 h-12 text-pse-green" />
         <span className="text-white font-extralight mt-2">{label}</span>
-        <span className="text-white">{width + "x" + height}</span>
+        <span className="text-white">{`${width}x${height}`}</span>
         <input
           type="file"
           accept="image/*"
@@ -49,10 +56,10 @@ export default function ImageUpload({
         />
       </label>
       {error && <p className="text-red-500 text-sm">{error}</p>}
-      {image && (
+      {preview && (
         <img
-          src={image}
-          alt="Uploaded"
+          src={preview}
+          alt="Uploaded preview"
           className="border rounded-lg max-w-full"
         />
       )}

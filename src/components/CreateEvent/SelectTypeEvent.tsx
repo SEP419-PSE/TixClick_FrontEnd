@@ -1,6 +1,8 @@
+import { EventType } from "../../interface/EventInterface";
+
 type Props = {
   label: string;
-  listType: string[];
+  listType: EventType[];
   choice: string;
   setChoice: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -27,12 +29,12 @@ const SelectTypeEvent = ({ label, listType, choice, setChoice }: Props) => {
         {listType.map((type, index) => (
           <option
             className={`hover:bg-gray-200 ${
-              choice === type && "font-semibold text-white bg-pse-green"
+              choice === type.name && "font-semibold text-white bg-pse-green"
             }`}
             key={index}
-            value={type}
+            value={type.id}
           >
-            {type}
+            {type.name}
           </option>
         ))}
       </select>
