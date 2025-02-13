@@ -1,6 +1,6 @@
 import { BarChart3, Book, FileText } from "lucide-react";
 import { Link, useLocation } from "react-router";
-import Logo from "../../../assets/logo.png";
+import Logo from "../../../assets/Logo.png";
 import { cn } from "../../../lib/utils";
 import { useLanguage } from "../../organizer/components/LanguageContext";
 
