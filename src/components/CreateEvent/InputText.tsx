@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface TextInputProps {
   maxLength: number;
   label: string;
@@ -11,7 +13,13 @@ export default function TextInput({
   text,
   setText,
 }: TextInputProps) {
+  const [nullError, setNullError] = useState<boolean>(false);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value.length === 0) {
+      setNullError(true);
+    } else {
+      setNullError(false);
+    }
     if (event.target.value.length <= maxLength) {
       setText(event.target.value);
     }
@@ -26,8 +34,15 @@ export default function TextInput({
         placeholder={label}
         className="px-2 py-1 outline-none text-[14px] w-full rounded-md"
       />
-      <div className="text-left text-sm text-gray-400 mt-1">
-        {text.length}/{maxLength}
+      <div className="flex justify-between w-full text-sm text-gray-400 mt-1">
+        {nullError ? (
+          <p className="text-red-500">Vui lòng điền thông tin</p>
+        ) : (
+          <p></p>
+        )}
+        <p>
+          {text.length}/{maxLength}
+        </p>
       </div>
     </div>
   );

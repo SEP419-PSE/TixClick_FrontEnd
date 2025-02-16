@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import ImageUpload from "./ImageUpload";
 import TextInput from "./InputText";
@@ -6,6 +6,8 @@ import SelectTypeEvent from "./SelectTypeEvent";
 import TextEditor from "./TextEditor";
 import eventApi from "../../services/eventApi";
 import { EventType } from "../../interface/EventInterface";
+import { toast } from "sonner";
+
 const eventTypes: EventType[] = [
   {
     id: 1,
@@ -25,11 +27,14 @@ const eventTypes: EventType[] = [
   },
 ];
 
-export default function StepOne({
-  onValidationChange,
-}: {
-  onValidationChange: (isValid: boolean) => void;
-}) {
+type StepOneProps = {
+  step: number;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+  isStepValid: boolean;
+  setIsStepValid: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
   const [logoImage, setLogoImage] = useState<File | null>(null);
   const [background, setBackGround] = useState<File | null>(null);
   const [logoOrganizer, setLogoOrganizer] = useState<File | null>(null);
@@ -42,33 +47,54 @@ export default function StepOne({
   const [editorContent, setEditorContent] = useState<string>("");
 
   // Kiểm tra điều kiện hợp lệ
-  useEffect(() => {
-    const isValid =
+  // useEffect(() => {
+  //   const isValid =
+  //     editorContent.trim() !== "<p><br></p>" &&
+  //     logoImage !== null &&
+  //     background !== null &&
+  //     logoOrganizer !== null &&
+  //     eventName.trim() !== "" &&
+  //     locationEvent.trim() !== "" &&
+  //     address.trim() !== "" &&
+  //     typeEvent.trim() !== "" &&
+  //     organizerName.trim() !== "";
+
+  //   onValidationChange(isValid);
+  // }, [
+  //   editorContent,
+  //   eventName,
+  //   locationEvent,
+  //   address,
+  //   typeEvent,
+  //   organizerName,
+  //   onValidationChange,
+  //   logoImage,
+  //   background,
+  //   logoOrganizer,
+  // ]);
+
+  // const imageFile = [logoImage, background, logoOrganizer];
+
+  const checkValid = () => {
+    if (
       editorContent.trim() !== "<p><br></p>" &&
-      logoImage !== null &&
-      background !== null &&
-      logoOrganizer !== null &&
       eventName.trim() !== "" &&
       locationEvent.trim() !== "" &&
       address.trim() !== "" &&
       typeEvent.trim() !== "" &&
-      organizerName.trim() !== "";
-
-    onValidationChange(isValid);
-  }, [
-    editorContent,
-    eventName,
-    locationEvent,
-    address,
-    typeEvent,
-    organizerName,
-    onValidationChange,
-    logoImage,
-    background,
-    logoOrganizer,
-  ]);
-
-  // const imageFile = [logoImage, background, logoOrganizer];
+      organizerName.trim() !== "" &&
+      logoImage !== null &&
+      background !== null &&
+      logoOrganizer !== null
+    ) {
+      setIsStepValid(true);
+    } else {
+      toast.warning("Vui lòng nhập đầy đủ thông tin", {
+        position: "top-center",
+      });
+      return;
+    }
+  };
   const fetchData = async () => {
     try {
       const formData = new FormData();
@@ -82,15 +108,21 @@ export default function StepOne({
       if (logoImage) formData.append("logoURL", logoImage);
       if (background) formData.append("bannerURL", background);
       if (logoOrganizer) formData.append("logoOrganizeURL", logoOrganizer);
+      // for (const [key, value] of formData.entries()) {
+      //   console.log(key, value);
+      // }
 
       const response = await eventApi.create(formData);
       console.log(response);
+      toast.success("Tạo sự kiện thành công", { position: "top-center" });
+      setStep(1);
     } catch (error) {
       console.error("Error creating event:", error);
     }
   };
 
   const createEvent = () => {
+    checkValid();
     fetchData();
   };
 
@@ -176,7 +208,14 @@ export default function StepOne({
           />
         </div>
       </section>
-      <button onClick={createEvent}>Create</button>
+      <div className="flex flex-col items-end">
+        <button
+          className="px-4 py-2 bg-[#2dc275] text-white rounded"
+          onClick={createEvent}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

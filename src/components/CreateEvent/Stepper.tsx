@@ -1,8 +1,6 @@
-import { toast } from "sonner";
-import { TOAST_WARNING } from "../../constants/constants";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import StepOne from "./StepOne";
 
 const steps = [
@@ -22,25 +20,25 @@ export default function Stepper() {
   //   setIsStepValid(false);
   // }, [currentStep]);
 
-  const handleNext = () => {
-    if (!isStepValid) {
-      toast.warning(TOAST_WARNING, {
-        position: "top-center",
-      });
-      return;
-    }
-    setCurrentStep((prev) => prev + 1); // Chuyển step nếu hợp lệ
-  };
+  // const handleNext = () => {
+  //   if (!isStepValid) {
+  //     toast.warning(TOAST_WARNING, {
+  //       position: "top-center",
+  //     });
+  //     return;
+  //   }
+  //   setCurrentStep((prev) => prev + 1); // Chuyển step nếu hợp lệ
+  // };
 
-  const handleValidationChange = (isValid: boolean) => {
-    setIsStepValid(isValid);
-  };
+  // const handleValidationChange = (isValid: boolean) => {
+  //   setIsStepValid(isValid);
+  // };
 
-  console.log(isStepValid);
+  // console.log(isStepValid);
 
   return (
     <>
-      <div className="fixed left-1/2 top-2 z-10 flex justify-between items-center text-[14px] w-[90%] max-w-[500px] mx-auto px-2 transform -translate-x-1/2 overflow-hidden">
+      <div className="fixed left-1/2 top-2 z-20 flex justify-between items-center text-[14px] w-[90%] max-w-[500px] mx-auto px-2 transform -translate-x-1/2 overflow-hidden">
         {steps.map((step, index) => (
           <div
             key={index}
@@ -85,20 +83,16 @@ export default function Stepper() {
       <div className="min-h-screen max-w-[1000px] pt-24 pb-10 mx-auto p-6 bg-gradient-to-b from-pse-green/60 via-pse-green/40 to-pse-black/50 shadow-lg rounded-lg">
         <div className="text-center text-lg font-semibold mb-4">
           {currentStep === 0 && (
-            <StepOne onValidationChange={handleValidationChange} />
+            <StepOne
+              step={currentStep}
+              setStep={setCurrentStep}
+              isStepValid={isStepValid}
+              setIsStepValid={setIsStepValid}
+            />
           )}
           {currentStep === 1 && <div>Step 2</div>}
           {currentStep === 2 && <div>Step 3</div>}
           {currentStep === 3 && <div>Step 4</div>}
-        </div>
-
-        <div className="flex flex-col items-end">
-          <button
-            className="px-4 py-2 bg-[#2dc275] text-white rounded"
-            onClick={handleNext}
-          >
-            Next
-          </button>
         </div>
       </div>
     </>

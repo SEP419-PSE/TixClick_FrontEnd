@@ -13,7 +13,6 @@ export default function ImageUpload({
   width,
   height,
   label,
-  image,
   setImage,
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
@@ -30,7 +29,6 @@ export default function ImageUpload({
         setImage(file);
         setError(null);
 
-        // Tạo preview từ file
         const reader = new FileReader();
         reader.onloadend = () => setPreview(reader.result as string);
         reader.readAsDataURL(file);
@@ -43,9 +41,20 @@ export default function ImageUpload({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-gray-500 p-6 rounded-lg w-[300px] text-center">
-      <label className="cursor-pointer flex flex-col items-center">
-        <UploadCloud className="w-12 h-12 text-pse-green" />
+    <div className="relative flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-gray-500 p-6 rounded-lg w-[300px] h-[300px] text-center overflow-hidden group">
+      {preview && (
+        <img
+          src={preview}
+          alt="Uploaded preview"
+          className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-300 group-hover:opacity-75"
+        />
+      )}
+      <label
+        className={`absolute inset-0 flex flex-col items-center justify-center cursor-pointer z-10 transition-opacity duration-300 bg-black bg-opacity-50 rounded-lg ${
+          preview ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+        }`}
+      >
+        <UploadCloud className="w-12 h-12 text-white" />
         <span className="text-white font-extralight mt-2">{label}</span>
         <span className="text-white">{`${width}x${height}`}</span>
         <input
@@ -55,14 +64,7 @@ export default function ImageUpload({
           className="hidden"
         />
       </label>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {preview && (
-        <img
-          src={preview}
-          alt="Uploaded preview"
-          className="border rounded-lg max-w-full"
-        />
-      )}
+      {error && <p className="text-red-500 text-sm z-10">{error}</p>}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { CreateEvent } from "../interface/EventInterface";
 import axiosClient from "./axiosClient";
 
 const baseURL = "/event";
