@@ -10,7 +10,7 @@ export default function Consumer() {
 
   return (
     <div className="min-h-screen bg-[#1a1a1a]">
-      <main className="pt-20 p-6">
+      <main className="p-6">
         <h1 className="text-2xl font-bold text-white mb-6">{t.title}</h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
@@ -34,7 +34,7 @@ export default function Consumer() {
               className="w-16 h-16 opacity-50"
             />
           </div>
-          <p className="text-white/60">No events foundjnvjbvkfjvbfjvb nffffffffffffffffffffff</p>
+          <p className="text-white/60">No events found</p>
         </div>
       </main>
 
