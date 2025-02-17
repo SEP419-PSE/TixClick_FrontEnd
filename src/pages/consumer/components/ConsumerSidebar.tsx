@@ -16,7 +16,7 @@ export function ConsumerSidebar() {
 
   return (
     <nav className="w-64 bg-[#0a0a0a] min-h-screen">
-      <div className="flex items-center gap-2 p-4 pt-10">
+      <div className="flex items-center gap-2 p-4">
           <img src={Logo} alt="Logo" className="h-12 w-13" />
         <span className="text-white text-lg font-medium">{t.sidebar.title}</span>
       </div>
