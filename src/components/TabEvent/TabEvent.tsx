@@ -112,10 +112,10 @@ const TabEvent = () => {
           <button
             key={index}
             onClick={() => setActiveTab(index)}
-            className={`py-2 text-sm font-medium focus:outline-none ${
+            className={`py-2 text-[16px]  lg:text-[19px] font-medium focus:outline-none ${
               activeTab === index
-                ? "text-white border-b-2 border-pse-green transition-all duration-300"
-                : "text-white border-b-2 border-transparent hover:text-pse-green"
+                ? "text-pse-green border-b-2 border-pse-green  transition-all duration-300"
+                : "text-white border-b-2 border-transparent hover:"
             }`}
           >
             {tab.label}
@@ -139,14 +139,16 @@ const TabEvent = () => {
                   />
 
                   <div className="lg:absolute hidden inset-0 lg:flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
+                    <span className="text-white text-[14px] font-semibold px-4 py-2 rounded-sm bg-pse-green-third">
                       Mua vé
                     </span>
                   </div>
                 </div>
               </NavLink>
-              <div className="mt-2">{item.tittle}</div>
-              <div className="text-pse-green">Từ {item.price}đ</div>
+              <div className="mt-2 text">{item.tittle}</div>
+              <div className="text-pse-green-second font-semibold">
+                Từ {item.price}đ
+              </div>
               <div className="flex items-center gap-1">
                 <span>
                   <CiCalendar size={18} />

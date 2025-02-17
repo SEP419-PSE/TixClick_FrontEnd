@@ -51,8 +51,8 @@ const InformationTicket = () => {
 
   return (
     <div className="p-3 bg-white/80 ">
-      <div className="bg-pse-black space-y-4 rounded-md w-full max-w-[700px] mx-auto">
-        <div className="p-3 border-b text-[18px] border-white font-extrabold">
+      <div className="bg-pse-black-light space-y-4 rounded-md w-full max-w-[700px] mx-auto">
+        <div className="p-3 border-b text-[18px] text-pse-green-second border-white font-extrabold">
           Thông tin vé
         </div>
         {tickets.map((ticket) => (
@@ -72,7 +72,7 @@ const InformationTicket = () => {
               <p className="flex flex-col">
                 {ticket.time}, <span>{ticket.date}</span>
               </p>
-              <button className="ml-auto bg-pse-green px-4 py-2 rounded-md hover:bg-white hover:text-pse-black transition-all duration-300">
+              <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
                 Mua vé ngay
               </button>
             </div>
@@ -82,10 +82,10 @@ const InformationTicket = () => {
                   {ticket.ticketType.map((type) => (
                     <li
                       key={type.type}
-                      className="odd:bg-pse-black/80 even:bg-pse-black/95 py-4 pl-11 pr-4 flex justify-between"
+                      className="odd:bg-pse-black-light/80 even:bg-pse-black-light/95 py-4 pl-11 pr-4 flex justify-between"
                     >
                       <span className="font-semibold">{type.type}</span>
-                      <span className="text-pse-green font-semibold ">
+                      <span className="text-pse-green-second font-semibold ">
                         {type.price} VND
                       </span>
                     </li>

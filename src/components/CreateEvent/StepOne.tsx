@@ -115,7 +115,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
       const response = await eventApi.create(formData);
       console.log(response);
       toast.success("Tạo sự kiện thành công", { position: "top-center" });
-      setStep(1);
+      setStep(2);
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -128,8 +128,8 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
 
   // console.log(editorContent);
   return (
-    <div className="text-black text-[14px]">
-      <section className="bg-pse-footer p-4 rounded-lg mb-8 shadow-neon-green">
+    <div className="text-black text-[16px]">
+      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -155,7 +155,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-pse-footer p-4 rounded-lg mb-8 shadow-neon-green">
+      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-white">Địa chỉ sự kiện</p>
         <TextInput
           maxLength={80}
@@ -171,7 +171,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-pse-footer p-4 rounded-lg mb-8 shadow-neon-green">
+      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <SelectTypeEvent
           choice={typeEvent}
           setChoice={setTypeEvent}
@@ -179,11 +179,11 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
           listType={eventTypes}
         />
       </section>
-      <section className="bg-pse-footer p-4 rounded-lg mb-8 shadow-neon-green">
+      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
       </section>
-      <section className="md:flex md:flex-row-reverse md:items-center md:gap-2 bg-pse-footer p-4 rounded-lg mb-8 shadow-neon-green">
+      <section className=" bg-pse-green-third md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-box">
         <div className="md:w-[70%]">
           <TextInput
             label="Tên ban tổ chức"
@@ -210,7 +210,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
       </section>
       <div className="flex flex-col items-end">
         <button
-          className="px-4 py-2 bg-[#2dc275] text-white rounded"
+          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded-md shadow-box"
           onClick={createEvent}
         >
           Next

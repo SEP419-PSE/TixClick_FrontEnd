@@ -29,7 +29,9 @@ const SpecialEvent = () => {
   };
   return (
     <div className="my-8 mx-4 lg:mx-14">
-      <div className="text-[16px] my-2">Sự kiện đặc biệt</div>
+      <div className="text-[16px] lg:text-[19px] uppercase font-bold text-pse-green my-2">
+        Sự kiện đặc biệt
+      </div>
       <div className="relative">
         <div
           className="flex gap-4 overflow-x-scroll lg:overflow-hidden "
@@ -44,7 +46,7 @@ const SpecialEvent = () => {
                     className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
                   />
                   <div className="lg:absolute inset-0 flex items-center justify-center opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-white text-[14px] font-bold px-4 py-2 rounded-sm bg-pse-green">
+                    <span className="text-white text-[14px] font-semibold px-4 py-2 rounded-sm bg-pse-green-third">
                       Mua vé
                     </span>
                   </div>

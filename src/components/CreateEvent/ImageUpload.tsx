@@ -41,7 +41,7 @@ export default function ImageUpload({
   };
 
   return (
-    <div className="relative flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-gray-500 p-6 rounded-lg w-[300px] h-[300px] text-center overflow-hidden group">
+    <div className="relative flex flex-col items-center space-y-4 border-2 border-dashed border-white bg-pse-gray p-6 rounded-lg w-[300px] h-[300px] text-center overflow-hidden group">
       {preview && (
         <img
           src={preview}
@@ -54,9 +54,9 @@ export default function ImageUpload({
           preview ? "opacity-0 group-hover:opacity-100" : "opacity-100"
         }`}
       >
-        <UploadCloud className="w-12 h-12 text-white" />
-        <span className="text-white font-extralight mt-2">{label}</span>
-        <span className="text-white">{`${width}x${height}`}</span>
+        <UploadCloud className="w-12 h-12 text-pse-green-second" />
+        <span className="text-white font-normal mt-2">{label}</span>
+        <span className="text-white font-bold">{`${width}x${height}`}</span>
         <input
           type="file"
           accept="image/*"

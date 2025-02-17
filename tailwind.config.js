@@ -7,15 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        "pse-green": "#2dc275",
-        "pse-footer": "#393f4e",
-        "pse-black": "#27272a",
+        "pse-green": "#ff8a00",
+        "pse-green-second": "#ff9601",
+        "pse-green-third": "#ff9601bf",
+        "pse-black": "#1a1a1a",
+        "pse-black-light": "#252525",
+        "pse-gray": "#828282",
+        "pse-header": "#111111",
+        "pse-footer": "#060606",
+        "pse-text": "#ffffff",
+        "pse-error": "#ff0000"
       },
       fontFamily: {
         "inter": "inter"
       },
       boxShadow: {
-        'neon-green': '0 0 10px rgba(45, 194, 117, 0.6), 0 0 20px rgba(45, 194, 117, 0.8)',
+        'neon-green': '0 0 10px #ff9601, 0 0 20px #ff9601bf',
+        "box": "4.0px 8.0px 8.0px rgba(0,0,0,0.38)"
       },
     },
   },

@@ -9,3 +9,10 @@ export const PATHNAME_EXCEPT = [
 export const BASEURL_API = "http://localhost:8080";
 
 export const TOAST_WARNING = "Vui lòng điền đầy đủ thông tin";
+
+export const ball = {
+  width: 100,
+  height: 100,
+  backgroundColor: "#dd00ee",
+  borderRadius: "50%",
+};
