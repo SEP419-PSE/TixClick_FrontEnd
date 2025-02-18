@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { EventDetails } from "./EventDetails";
 import { EventList } from "./EventList";
+import { ManagerHeader } from "./ManagerHeader";
 import { Sidebar } from "./ManagerSidebar";
 
 export function ManagerDashboard() {
@@ -9,6 +10,7 @@ export function ManagerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#1E1E1E]">
+      <ManagerHeader />
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-8">
