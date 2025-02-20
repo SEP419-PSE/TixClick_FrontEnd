@@ -1,5 +1,3 @@
-
-
 import { LanguageProvider } from '../../pages/organizer/components/LanguageContext'
 
 export default function RootLayout({

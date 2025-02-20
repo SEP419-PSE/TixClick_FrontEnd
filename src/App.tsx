@@ -13,6 +13,7 @@ import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
+import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import OrganizerCenter from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticketManagement/ticketPage";
@@ -43,6 +44,8 @@ export default function App() {
           <Route>
           <Route path="organizerCenter" element={<OrganizerCenter />} />
           <Route path="profileForm" element={<ProfileForm />} />
+          <Route path="manager" element={<ManagerDashboardPage />} />
+
 
           
           
