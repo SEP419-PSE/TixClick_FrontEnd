@@ -17,7 +17,6 @@ export function TicketManagement() {
 
   return (
     <div className="min-h-screen bg-[#1E1E1E]">
-      {/* Breadcrumb */}
       <div className="px-6 py-4 border-b border-gray-800">
         <nav className="text-sm text-gray-400">
           <span className="hover:text-white">Trang chủ</span>
@@ -67,7 +66,6 @@ export function TicketManagement() {
           </Button>
         </div>
 
-        {/* Empty State */}
         <div className="flex flex-col items-center justify-center py-16">
           <div className="w-64 h-64 mb-6">
             <img

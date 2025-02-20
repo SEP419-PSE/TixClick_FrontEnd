@@ -1,8 +1,5 @@
-
-
+import { TicketManagement } from "../ticketManagement/components/TicketManagement"
 import { SidebarProfile } from "./components/SidebarProfile"
-import { TicketManagement } from "./components/TicketManagement"
-
 
 
 export default function TicketPage() {
