@@ -4,7 +4,7 @@ import { Button } from "../../../components/ui/button"
 import { cn } from "../../../lib/utils"
 
 
-export function TicketManagement() {
+export default function TicketManagement() {
   const [status, setStatus] = useState("all")
   const [timeFilter, setTimeFilter] = useState("upcoming")
 
