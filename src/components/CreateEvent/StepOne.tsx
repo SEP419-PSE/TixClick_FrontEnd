@@ -129,7 +129,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
   // console.log(editorContent);
   return (
     <div className="text-black text-[16px]">
-      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -155,7 +155,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-white">Địa chỉ sự kiện</p>
         <TextInput
           maxLength={80}
@@ -171,7 +171,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <SelectTypeEvent
           choice={typeEvent}
           setChoice={setTypeEvent}
@@ -179,11 +179,11 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
           listType={eventTypes}
         />
       </section>
-      <section className="bg-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
       </section>
-      <section className=" bg-pse-green-third md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-box">
+      <section className=" bg-gradient-to-br from-pse-green-third md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-box">
         <div className="md:w-[70%]">
           <TextInput
             label="Tên ban tổ chức"

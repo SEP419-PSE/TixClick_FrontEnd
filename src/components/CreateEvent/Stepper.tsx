@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useState } from "react";
 import StepOne from "./StepOne";
+import StepTwo from "./StepTwo";
 
 const steps = [
   "Thông tin sự kiện",
@@ -13,7 +14,7 @@ const steps = [
 // const stepComponents = [StepOne, StepTwo, StepThree, StepFour];
 
 export default function Stepper() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(2);
   const [isStepValid, setIsStepValid] = useState(false);
 
   // useEffect(() => {
@@ -80,7 +81,7 @@ export default function Stepper() {
         ></motion.div>
       </div>
 
-      <div className="min-h-screen max-w-[1000px] pt-24 pb-10 mx-auto p-6 bg-pse-black-light shadow-lg rounded-lg">
+      <div className="min-h-screen max-w-[1000px] pt-24 pb-10 mx-auto p-6 bg-gradient-to-r from-pse-green-second/70 via-pse-green-second/50 rounded-lg">
         <div className="text-center text-lg font-semibold mb-4">
           {currentStep === 1 && (
             <StepOne
@@ -90,7 +91,7 @@ export default function Stepper() {
               setIsStepValid={setIsStepValid}
             />
           )}
-          {currentStep === 2 && <div>Step 2</div>}
+          {currentStep === 2 && <StepTwo />}
           {currentStep === 3 && <div>Step 3</div>}
           {currentStep === 4 && <div>Step 4</div>}
         </div>
