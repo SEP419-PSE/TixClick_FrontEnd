@@ -1,7 +1,7 @@
 
 
 import { SidebarProfile } from "./components/SidebarProfile"
-import TicketManagement from "./components/TicketManagement"
+import { TicketManagement } from "./components/TicketManagement"
 
 
 

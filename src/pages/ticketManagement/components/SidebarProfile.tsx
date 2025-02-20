@@ -39,7 +39,6 @@ export function SidebarProfile() {
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="space-y-1">
         {menuItems.map((item) => {
           const isActive = pathname === item.href
