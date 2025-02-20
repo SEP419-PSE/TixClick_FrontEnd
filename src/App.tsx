@@ -16,7 +16,7 @@ import HomePage from "./pages/HomePage";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import OrganizerCenter from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
-import TicketPage from "./pages/ticketManagement/ticketPage";
+import TicketPage from "./pages/ticketManagement/TicketPage";
 
 export default function App() {
   return (
