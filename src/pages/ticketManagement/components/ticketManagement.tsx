@@ -4,7 +4,7 @@ import { Button } from "../../../components/ui/button"
 import { cn } from "../../../lib/utils"
 
 
-export default function TicketManagement() {
+export function TicketManagement() {
   const [status, setStatus] = useState("all")
   const [timeFilter, setTimeFilter] = useState("upcoming")
 
@@ -26,11 +26,9 @@ export default function TicketManagement() {
         </nav>
       </div>
 
-      {/* Main Content */}
       <div className="p-6">
         <h1 className="text-2xl font-bold text-white mb-6">Vé đã mua</h1>
 
-        {/* Status Tabs */}
         <div className="grid grid-cols-4 gap-px bg-gray-800 rounded-lg p-1 mb-6">
           {statusTabs.map((tab) => (
             <button
@@ -46,7 +44,6 @@ export default function TicketManagement() {
           ))}
         </div>
 
-        {/* Time Filter */}
         <div className="flex justify-center gap-8 mb-8">
           <Button
             variant="underline"
