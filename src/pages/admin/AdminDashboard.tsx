@@ -11,7 +11,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-[#1E1E1E] text-white">
-      {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
