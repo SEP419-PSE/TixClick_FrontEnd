@@ -40,7 +40,14 @@ export default function App() {
           <Route>
           <Route path="organizerCenter" element={<OrganizerCenter />} />
           <Route path="profileForm" element={<ProfileForm />} />
-          <Route path="manager" element={<ManagerDashboardPage />} />
+           <Route
+            path="manager"
+            element={              
+                <ManagerDashboardPage />
+            }
+          /> 
+          {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+
           <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />

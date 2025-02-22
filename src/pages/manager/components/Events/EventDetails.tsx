@@ -1,7 +1,8 @@
 import { Calendar, DollarSign, MapPin, Users } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { Event } from "../../../interface/manager/EventType";
+import { Event } from "../../../../interface/manager/EventType";
+import { Button } from "../../../../components/ui/button";
+
 
 
 interface EventDetailsProps {
