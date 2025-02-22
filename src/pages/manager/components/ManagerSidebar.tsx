@@ -10,21 +10,36 @@ export function Sidebar() {
           className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white  hover:bg-gray-800 hover:text-white"
         >
           <Home className="w-5 h-5" />
-          <span>Dashboard</span>
+          <span>Overview</span>
         </Link>
         <Link
           to="/manager/events"
           className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white hover:bg-gray-800 hover:text-white"
         >
           <Calendar className="w-5 h-5" />
-          <span>Sự kiện</span>
+          <span>Events</span>
+        </Link>
+        
+        <Link
+          to="/manager/events"
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white hover:bg-gray-800 hover:text-white"
+        >
+          <Calendar className="w-5 h-5" />
+          <span>Companies</span>
         </Link>
         <Link
-          to="/manager/settings"
+          to="/manager/contracts"
           className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white hover:bg-gray-800 hover:text-white"
         >
           <Settings className="w-5 h-5" />
-          <span>Cài đặt</span>
+          <span>Contract</span>
+        </Link>
+        <Link
+          to="/manager/payments"
+          className="flex items-center space-x-3 px-3 py-2 rounded-lg text-white hover:bg-gray-800 hover:text-white"
+        >
+          <Settings className="w-5 h-5" />
+          <span>Payment</span>
         </Link>
       </nav>
     </aside>
