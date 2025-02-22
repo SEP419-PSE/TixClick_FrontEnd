@@ -16,7 +16,7 @@ import HomePage from "./pages/HomePage";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import OrganizerCenter from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
-import TicketPage from "./pages/ticketManagement/TicketPage";
+import TicketPage from "./pages/ticket/TicketPage";
 
 export default function App() {
   return (
@@ -34,18 +34,18 @@ export default function App() {
               <Route path="code" element={<EnterCode />} />
             </Route>
             <Route path="404" element={<ErrorPage />} />  
-            <Route path="consumerCenter" element={<RootLayouts />}>
-              <Route index element={<Consumer />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="policies" element={<Policy />} />
-            </Route>          
+           
             <Route path="ticketManagement" element={<TicketPage />} />
           </Route>
           <Route>
           <Route path="organizerCenter" element={<OrganizerCenter />} />
           <Route path="profileForm" element={<ProfileForm />} />
           <Route path="manager" element={<ManagerDashboardPage />} />
-
+          <Route path="consumerCenter" element={<RootLayouts />}>
+              <Route index element={<Consumer />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="policies" element={<Policy />} />
+            </Route>          
 
           
           
