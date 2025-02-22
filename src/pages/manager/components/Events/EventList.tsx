@@ -1,7 +1,8 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "../../../components/ui/button";
-import { EventType } from "../../../interface/manager/EventType";
+import { EventType } from "../../../../interface/manager/EventType";
+import { Button } from "../../../../components/ui/button";
+
 
 
 const mockEvents: EventType[] = [

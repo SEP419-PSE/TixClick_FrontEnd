@@ -1,11 +1,11 @@
-// ManagerDashboard.tsx
 import { useState } from "react";
+import { ManagerHeader } from "../ManagerHeader";
+import { Sidebar } from "../ManagerSidebar";
 import { EventDetails } from "./EventDetails";
 import { EventList } from "./EventList";
-import { ManagerHeader } from "./ManagerHeader";
-import { Sidebar } from "./ManagerSidebar";
 
-export function ManagerDashboard() {
+
+export default function ManagerDashboard() {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
 
   return (
