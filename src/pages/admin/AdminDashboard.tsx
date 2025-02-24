@@ -1,4 +1,4 @@
-import { BarChart, Menu, Settings, ShoppingCart, Users, X } from "lucide-react"
+import { BarChart, Calendar, DollarSign, Menu, ShoppingCart, Ticket, User, Users, X } from "lucide-react"
 import { useState } from "react"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -24,13 +24,13 @@ export default function AdminDashboard() {
         </div>
         <nav className="mt-8">
           <NavItem icon={BarChart} label="Dashboard" active />
-          <NavItem icon={Users} label="Users" />
-          <NavItem icon={ShoppingCart} label="Products" />
-          <NavItem icon={Settings} label="Settings" />
+          <NavItem icon={Calendar} label="Events" />
+          <NavItem icon={Ticket} label="Tickets" />
+          <NavItem icon={User} label="Attendees" />
+          <NavItem icon={DollarSign} label="Revenue" />
         </nav>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
         <header className="flex items-center justify-between p-4 bg-[#2A2A2A]">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
