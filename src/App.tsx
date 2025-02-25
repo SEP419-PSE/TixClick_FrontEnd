@@ -21,6 +21,7 @@ import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
 import OrganizerPage from "./pages/organizer";
 import Stepper from "./components/CreateEvent/Stepper";
+import CreateCompany from "./pages/company/CreateCompany";
 
 export default function App() {
   return (
@@ -44,6 +45,9 @@ export default function App() {
             <Route path="404" element={<ErrorPage />} />
 
             <Route path="ticketManagement" element={<TicketPage />} />
+
+            {/*Company route */}
+            <Route path="create-company" element={<CreateCompany />} />
           </Route>
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
@@ -59,6 +63,7 @@ export default function App() {
           </Route>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
+          <Route path="404" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>
