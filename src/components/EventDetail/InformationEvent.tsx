@@ -4,15 +4,15 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 
 const InformationEvent = () => {
   return (
-    <div className="mx-3 my-4 lg:my-8 lg:flex lg:justify-center">
+    <div className="mx-3 my-4 lg:my-8 lg:flex lg:justify-center bg-pse-black ">
       <div>
         <img src={Img1} className="w-full" />
       </div>
-      <div className="relative bg-[#2a2d34] p-4 leading-10">
+      <div className="relative bg-pse-black-light p-4 leading-10 shadow-box">
         <p className="font-extrabold text-[18px] leading-6">
           Liveshow "Hơn 1000 Năm Sau Chưa Quên Người Yêu Cũ"
         </p>
-        <p className="flex items-center text-pse-green font-bold">
+        <p className="flex items-center text-pse-green-second font-bold">
           <span>
             <CiCalendar size={18} color="white" className="mr-1" />
           </span>
@@ -29,9 +29,9 @@ const InformationEvent = () => {
         </p>
         <div className="max-[1150px]:hidden absolute bottom-28 w-[95%] h-[1px] bg-white rounded-full">
           <div className="text-[20px] font-extrabold my-2">
-            Giá từ <span className="text-pse-green">800.000 VND</span>
+            Giá từ <span className="text-pse-green-second">800.000 VND</span>
           </div>
-          <button className="bg-pse-green w-full rounded-lg font-bold hover:bg-white hover:text-pse-black transition-all duration-500">
+          <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
             Mua vé ngay
           </button>
         </div>

@@ -19,6 +19,8 @@ import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import OrganizerCenter from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
+import OrganizerPage from "./pages/organizer";
+import Stepper from "./components/CreateEvent/Stepper";
 
 export default function App() {
   return (
@@ -29,44 +31,36 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail" element={<EventDetail />} />
+            <Route path="create-event" element={<Stepper />} />
+            {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
               <Route index path="signin" element={<SignInForm />} />
               <Route path="signup" element={<SignUpForm />} />
               <Route path="verify" element={<OTPVerify />} />
               <Route path="code" element={<EnterCode />} />
             </Route>
-            <Route path="404" element={<ErrorPage />} />  
-           
+            {/* Organizer route */}
+            <Route path="organizer" element={<OrganizerPage />} />
+            <Route path="404" element={<ErrorPage />} />
+
             <Route path="ticketManagement" element={<TicketPage />} />
           </Route>
           <Route>
-          <Route path="organizerCenter" element={<OrganizerCenter />} />
-          <Route path="profileForm" element={<ProfileForm />} />
-           <Route
-            path="manager"
-            element={              
-                <ManagerDashboardPage />
-            }
-          /> 
-          {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+            <Route path="organizerCenter" element={<OrganizerCenter />} />
+            <Route path="profileForm" element={<ProfileForm />} />
+            <Route path="manager" element={<ManagerDashboardPage />} />
+            {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
 
-          <Route path="consumerCenter" element={<RootLayouts />}>
+            <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
-            </Route>          
-
-          
-          
+            </Route>
           </Route>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
-
-
         </Routes>
       </BrowserRouter>
-      
-
     </div>
   );
 }
