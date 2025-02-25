@@ -1,13 +1,11 @@
-import { LuSearch } from "react-icons/lu";
-import { LuTicketCheck } from "react-icons/lu";
-import SearchBar from "../SearchBar/SearchBar";
-import { NavLink } from "react-router";
 import { useContext, useState } from "react";
-import { AuthContext } from "../../contexts/AuthProvider";
-import Avatar from "../../assets/boy.png";
-import { RiCalendarEventLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
-import { LuLogOut } from "react-icons/lu";
+import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
+import { RiCalendarEventLine } from "react-icons/ri";
+import { NavLink } from "react-router";
+import Avatar from "../../assets/boy.png";
+import { AuthContext } from "../../contexts/AuthProvider";
+import SearchBar from "../SearchBar/SearchBar";
 const Header = () => {
   const authContext = useContext(AuthContext);
   const [openMennu, setOpenMenu] = useState<boolean>(false);

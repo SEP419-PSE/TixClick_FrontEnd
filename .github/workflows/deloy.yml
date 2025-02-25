@@ -1,45 +1,42 @@
-name: Build and Deploy React App
+name: Deploy Frontend to Server
 
 on:
   push:
     branches:
-      - main
+      - main  # Chạy khi có code mới trên nhánh main
 
 jobs:
-  build_and_deploy:
-    runs-on: [self-hosted]
-    env:
-      CONTAINER_NAME: reactAppContainer  # Container name, adjust if needed
+  deploy:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Build Docker Image
-        run: |
-          echo "Building Docker image..."
-          docker build -t fe_tixclick:latest -f ./Dockerfile .
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Đổi version nếu cần
 
-      - name: Manage Docker Container
-        run: |
-          CNAME=${{ env.CONTAINER_NAME }}
+      - name: Install dependencies
+        run: npm install
 
-          # Check if the container exists
-          if [ "$(docker ps -aq -f name=$CNAME)" ]; then
-              # Check if the container is stopped or exited
-              if [ "$(docker ps -aq -f status=exited -f name=$CNAME)" ]; then
-                  echo ":: Container $CNAME exists and is exited"
-                  echo ":: Removing exited container $CNAME"
-                  docker rm $CNAME
-              else
-                  echo ":: Container $CNAME exists and is running"
-                  echo ":: Stopping and removing running container $CNAME"
-                  docker stop $CNAME
-                  docker rm $CNAME
-              fi
-          else
-              echo ":: No existing container named $CNAME"
-          fi
+      - name: Build project
+        run: npm run build
 
-          # Run the new container
-          echo ":: Running new container $CNAME"
-          docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
+      - name: Deploy to Server via SSH (Password)
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}  # Dùng mật khẩu thay vì SSH key
+          source: "dist/*"
+          target: "/var/www/frontend/"
+      
+      - name: Restart Nginx
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: sudo systemctl restart nginx

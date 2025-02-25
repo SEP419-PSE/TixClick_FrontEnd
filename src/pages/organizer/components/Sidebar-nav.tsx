@@ -6,7 +6,7 @@ export function SidebarNav() {
   const { t } = useLanguage()
   
   return (
-    <nav className="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] bg-[#0a0a0a] text-white p-4">
+    <nav className="fixed left-0 top-20 w-64 h-[calc(100vh-64px)] bg-[#0a0a0a] text-white p-4">
       <div className="space-y-1">
         <a 
           href="/MyEvent" 

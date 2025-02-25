@@ -1,5 +1,6 @@
 import { Camera, X } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router'
 import HuyAvatar from "../../assets/AvatarHuy.jpg"
 
 
@@ -9,9 +10,11 @@ export default function ProfileForm() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-inter">
       <div className="w-full max-w-md bg-white rounded-lg shadow p-6 relative">
-        <button className="absolute right-4 top-4">
+        <Link to="/">
+        <button className="absolute top-4">
           <X className="w-6 h-6 text-gray-400" />
         </button>
+        </Link>
 
         <div className="flex justify-center mb-6">
           <div className="relative">
@@ -49,6 +52,8 @@ export default function ProfileForm() {
             <div className="flex gap-2">
               <select className="p-3 rounded-lg bg-gray-50 border border-gray-200 w-24 text-gray-700">
                 <option>+84</option>
+                <option>+61</option>
+
               </select>
               <input
                 type="tel"
