@@ -19,7 +19,7 @@ const Header = () => {
         <span className="lg:hidden p-[6px] border rounded-full">
           <LuSearch size={24} />
         </span>
-        <NavLink to="/organizer">
+        <NavLink to="/create-event">
           <button className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500 ">
             Tạo sự kiện
           </button>
