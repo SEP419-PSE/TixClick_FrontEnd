@@ -13,17 +13,14 @@ import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
 import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
-<<<<<<< HEAD
-import OrganizerPage from "./pages/organizer";
-import Stepper from "./components/CreateEvent/Stepper";
-=======
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import OrganizerCenter from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
->>>>>>> 8de48146ad932bf708cdca80e11251bf0d30ef59
+import OrganizerPage from "./pages/organizer";
+import Stepper from "./components/CreateEvent/Stepper";
 
 export default function App() {
   return (
@@ -42,54 +39,28 @@ export default function App() {
               <Route path="verify" element={<OTPVerify />} />
               <Route path="code" element={<EnterCode />} />
             </Route>
-<<<<<<< HEAD
             {/* Organizer route */}
             <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
-=======
-            <Route path="404" element={<ErrorPage />} />  
-           
+
             <Route path="ticketManagement" element={<TicketPage />} />
->>>>>>> 8de48146ad932bf708cdca80e11251bf0d30ef59
           </Route>
           <Route>
-          <Route path="organizerCenter" element={<OrganizerCenter />} />
-          <Route path="profileForm" element={<ProfileForm />} />
-           <Route
-            path="manager"
-            element={              
-                <ManagerDashboardPage />
-            }
-          /> 
-          {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+            <Route path="organizerCenter" element={<OrganizerCenter />} />
+            <Route path="profileForm" element={<ProfileForm />} />
+            <Route path="manager" element={<ManagerDashboardPage />} />
+            {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
 
-          <Route path="consumerCenter" element={<RootLayouts />}>
+            <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
-            </Route>          
-
-          
-          
+            </Route>
           </Route>
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
-
-
         </Routes>
       </BrowserRouter>
-<<<<<<< HEAD
-
-      {/* 
-      <LanguageProvider>
-      <RootLayout>
-        <OrganizerPage />
-      </RootLayout>
-    </LanguageProvider> */}
-=======
-      
-
->>>>>>> 8de48146ad932bf708cdca80e11251bf0d30ef59
     </div>
   );
 }
