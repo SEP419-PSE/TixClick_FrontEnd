@@ -1,5 +1,3 @@
-"use client"
-
 import { BarChartIcon, Calendar, DollarSign, Menu, Ticket, Users, X } from "lucide-react"
 import { useState } from "react"
 
@@ -50,7 +48,6 @@ export default function ProfessionalDashboard() {
 
   return (
     <div className="flex h-screen bg-[#1E1E1E] text-white">
-      {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -186,20 +183,20 @@ export default function ProfessionalDashboard() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-white">Event Name</TableHead>
-                    <TableHead className="text-white">Date</TableHead>
-                    <TableHead className="text-white">Tickets Sold</TableHead>
-                    <TableHead className="text-white">Revenue</TableHead>
+                  <TableRow className="font-medium bg-white text-black">
+                    <TableHead className="text-black font-bold">Event Name</TableHead>
+                    <TableHead className="text-black font-bold">Date</TableHead>
+                    <TableHead className="text-black font-bold">Tickets Sold</TableHead>
+                    <TableHead className="text-black font-bold">Revenue</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {upcomingEvents.map((event) => (
                     <TableRow key={event.id}>
-                      <TableCell className="font-medium">{event.name}</TableCell>
-                      <TableCell>{event.date}</TableCell>
-                      <TableCell>{event.ticketsSold}</TableCell>
-                      <TableCell>${event.revenue.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.name}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.date}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.ticketsSold}</TableCell>
+                      <TableCell className="font-medium bg-white">${event.revenue.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
