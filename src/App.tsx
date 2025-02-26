@@ -5,7 +5,6 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProfessionalDashboard from "./pages/admin/ProfessionalStatistic";
 import SignInPage from "./pages/auth/SignInPage";
 import Consumer from "./pages/consumer/components/Consumer";
@@ -21,6 +20,7 @@ import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
 import OrganizerPage from "./pages/organizer";
 import Stepper from "./components/CreateEvent/Stepper";
+import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 
 export default function App() {
   return (
@@ -49,7 +49,10 @@ export default function App() {
             <Route path="organizerCenter" element={<OrganizerCenter />} />
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
+            <Route path="managerContracts" element={<ContractsPage />} />
+
             {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+
 
             <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
@@ -57,7 +60,6 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
             </Route>
           </Route>
-          <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
         </Routes>
       </BrowserRouter>
