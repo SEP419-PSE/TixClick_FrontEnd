@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
+import Stepper from "./components/CreateEvent/Stepper";
 import EnterCode from "./components/OTP/EnterCode";
 import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -14,13 +15,13 @@ import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
+import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
+import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
+import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
-import OrganizerCenter from "./pages/organizer";
+import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
-import OrganizerPage from "./pages/organizer";
-import Stepper from "./components/CreateEvent/Stepper";
-import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 
 export default function App() {
   return (
@@ -49,7 +50,16 @@ export default function App() {
             <Route path="organizerCenter" element={<OrganizerCenter />} />
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
-            <Route path="managerContracts" element={<ContractsPage />} />
+            {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
+
+
+            <Route path="manager-dashboard" element={<DashboardLayout />}>
+              <Route path="manager-dashboard/contracts" element={<ContractsPage />} />
+              <Route path="manager-dashboard/company-approvals" element={<CompanyApprovalsPage />} />
+ 
+
+            </Route>
+
 
             {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
 
