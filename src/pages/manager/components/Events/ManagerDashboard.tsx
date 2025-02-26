@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ManagerHeader } from "../ManagerHeader";
-import { Sidebar } from "../ManagerSidebar";
 import { EventDetails } from "./EventDetails";
 import { EventList } from "./EventList";
+import { Sidebar } from "../ManagerSidebar";
 
 
 export default function ManagerDashboard() {

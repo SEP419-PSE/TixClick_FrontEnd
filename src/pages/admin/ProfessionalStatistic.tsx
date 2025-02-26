@@ -68,7 +68,6 @@ export default function ProfessionalDashboard() {
         </nav>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
         <header className="flex items-center justify-between p-4 bg-[#2A2A2A]">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
