@@ -38,7 +38,7 @@ export function DashboardSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="manager-dashboard" className="flex items-center">
+              <Link to="" className="flex items-center">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
                 <span>Overview</span>
               </Link>
@@ -47,7 +47,7 @@ export function DashboardSidebar() {
           
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="manager-dashboard/company-approvals" className="flex items-center">
+              <Link to="company-approvals" className="flex items-center">
                 <UserCheck className="mr-2 h-5 w-5" />
                 <span>Company Approvals</span>
               </Link>
@@ -55,7 +55,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="manager-dashboard/events" className="flex items-center">
+              <Link to="events" className="flex items-center">
                 <CalendarDays className="mr-2 h-5 w-5" />
                 <span>Event Approvals</span>
               </Link>
@@ -63,7 +63,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="manager-dashboard/contracts" className="flex items-center">
+              <Link to="contracts" className="flex items-center">
                 <ClipboardSignature className="mr-2 h-5 w-5" />
                 <span>Contracts</span>
               </Link>
@@ -71,7 +71,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="manager-dashboard/payments" className="flex items-center">
+              <Link to="payments" className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
                 <span>Payments</span>
               </Link>

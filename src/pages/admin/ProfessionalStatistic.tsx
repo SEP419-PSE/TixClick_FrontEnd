@@ -2,6 +2,7 @@ import { BarChartIcon, Calendar, DollarSign, Menu, Ticket, Users, X } from "luci
 import { useState } from "react"
 
 import { Select } from "@radix-ui/react-select"
+import { Link } from "react-router"
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -60,11 +61,21 @@ export default function ProfessionalDashboard() {
           </Button>
         </div>
         <nav className="mt-8">
-          <NavItem icon={BarChartIcon} label="Dashboard" active />
-          <NavItem icon={Calendar} label="Events" />
-          <NavItem icon={Ticket} label="Tickets" />
-          <NavItem icon={Users} label="Attendees" />
-          <NavItem icon={DollarSign} label="Revenue" />
+          <Link to="chart">
+            <NavItem icon={BarChartIcon} label="Dashboard" active />
+          </Link>
+          <Link to="events">
+            <NavItem icon={Calendar} label="Events" />
+          </Link>
+          <Link to="tickets">
+            <NavItem icon={Ticket} label="Tickets" />
+          </Link>
+          <Link to="attendees">
+            <NavItem icon={Users} label="Attendees" />
+          </Link>
+          <Link to="revenue">
+            <NavItem icon={DollarSign} label="Revenue" />
+          </Link>
         </nav>
       </aside>
 

@@ -5,6 +5,21 @@ export interface EventType {
     date: string;
   };
 
+  export interface EventReview {
+    eventId: number;
+    eventName: string;
+    location: string;
+    logoURL: string;
+    bannerURL: string;
+    status: "PENDING" | "APPROVED" | "REJECTED"; 
+    typeEvent: "ONLINE" | "OFFLINE"; 
+    description: string;
+    categoryId: number;
+    organizerId: number;
+    companyId: number;
+  }
+  
+
 export interface Event  {
     name: string;
     date: string;
@@ -13,5 +28,12 @@ export interface Event  {
     priceRange: string;
     status: "pending" | "approved" | "rejected";
   };
+
+
+export interface EventManagement {
+  id : string;
+  name: string;
+  date: Date;
+}
   
   
