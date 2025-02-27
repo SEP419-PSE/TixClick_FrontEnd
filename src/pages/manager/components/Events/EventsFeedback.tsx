@@ -24,41 +24,13 @@ export default function EventFeedbackPage() {
 
   return (
 
-      <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-        
-          {/* <SidebarHeader className="border-b border-[#333333] px-6 py-4">
-            <h2 className="text-2xl font-bold text-white">Manager Dashboard</h2>
-          </SidebarHeader> */}
+      <div className="grid min-h-screen w-full ">
+        <div className="w-[80px] border-r border-[#333333] bg-[#1E1E1E]">
+
           <SidebarContent>
           </SidebarContent>
-          {/* <SidebarFooter className="border-t border-[#333333] p-6">
-            <p className="text-xs text-gray-400">© 2023 Your Company</p>
-          </SidebarFooter> */}
+        </div>
         <div className="flex flex-col">
-          {/* <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b border-[#333333] bg-[#1E1E1E] px-6">
-            <SidebarTrigger />
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 rounded-full">
-                  <img
-                    src="/placeholder.svg?height=32&width=32"
-                    alt="Avatar"
-                    className="rounded-full"
-                    height={32}
-                    width={32}
-                  />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </header> */}
           <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
             <div className="mb-6">
               <Select onValueChange={(value) => setSelectedEvent(events.find((e) => e.id === value))}>

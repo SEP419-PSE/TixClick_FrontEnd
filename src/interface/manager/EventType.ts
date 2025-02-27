@@ -35,5 +35,21 @@ export interface EventManagement {
   name: string;
   date: Date;
 }
+
+export interface SelectedEvent {
+  id: number;
+  name: string;
+  date: string;
+  location: string;
+  organizer: string;
+  attendees: number;
+  status: string;
+  type: string;
+  description: string;
+  budget: number;
+  sponsors: string[];
+  speakers: string[];
+}
+
   
   
