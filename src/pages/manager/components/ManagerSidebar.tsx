@@ -9,11 +9,11 @@ import {
 import { useState } from "react"
 import { Link } from "react-router"
 import { toast } from "sonner"
+import Logo from "../../../assets/Logo.png"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../../../components/ui/sidebar"
-
 
 export function DashboardSidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -26,14 +26,19 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar>
+      
       <SidebarHeader className="border-b border-[#333333] px-6 py-4">
-        <h2 className="text-2xl font-bold text-white">Manager Dashboard</h2>
+
+      <div className="flex items-center gap-2">
+      <img src={Logo} alt="Logo" className="h-12 w-13"/>
+        <h1 className="text-xl font-bold text-black">Manager Dashboard</h1>
+      </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard" className="flex items-center">
+              <Link to="manager-dashboard" className="flex items-center">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
                 <span>Overview</span>
               </Link>
@@ -42,7 +47,7 @@ export function DashboardSidebar() {
           
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard/company-approvals" className="flex items-center">
+              <Link to="manager-dashboard/company-approvals" className="flex items-center">
                 <UserCheck className="mr-2 h-5 w-5" />
                 <span>Company Approvals</span>
               </Link>
@@ -50,7 +55,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard/events" className="flex items-center">
+              <Link to="manager-dashboard/events" className="flex items-center">
                 <CalendarDays className="mr-2 h-5 w-5" />
                 <span>Event Approvals</span>
               </Link>
@@ -58,7 +63,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard/contracts" className="flex items-center">
+              <Link to="manager-dashboard/contracts" className="flex items-center">
                 <ClipboardSignature className="mr-2 h-5 w-5" />
                 <span>Contracts</span>
               </Link>
@@ -66,7 +71,7 @@ export function DashboardSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard/payments" className="flex items-center">
+              <Link to="manager-dashboard/payments" className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
                 <span>Payments</span>
               </Link>
@@ -102,10 +107,10 @@ export function DashboardSidebar() {
                 </div>
               </div>
               <div className="space-y-4">
-                <Button className="w-full" variant="outline">
+                <Button className="w-full text-black  hover:bg-orange-300" variant="outline">
                   Edit Profile
                 </Button>
-                <Button className="w-full" variant="outline">
+                <Button className="w-full text-black hover:bg-orange-300" variant="outline">
                   Change Password
                 </Button>
               </div>
