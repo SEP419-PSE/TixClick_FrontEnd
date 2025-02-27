@@ -22,6 +22,12 @@ import TicketPage from "./pages/ticket/TicketPage";
 import OrganizerPage from "./pages/organizer";
 import Stepper from "./components/CreateEvent/Stepper";
 import CreateCompany from "./pages/company/CreateCompany";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageTickets from "./pages/company/components/ManageTickets";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageContract from "./pages/company/components/ManageContract";
 
 export default function App() {
   return (
@@ -61,6 +67,16 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
             </Route>
           </Route>
+
+          {/* Account Company */}
+          <Route path="company" element={<CompanyDashBoard />}>
+            <Route index element={<HomeCompany />} />
+            <Route path="events" element={<ManageEvents />} />
+            <Route path="tickets" element={<ManageTickets />} />
+            <Route path="members" element={<ManageMember />} />
+            <Route path="contracts" element={<ManageContract />} />
+          </Route>
+
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
           <Route path="404" element={<ErrorPage />} />

@@ -4,7 +4,6 @@ import ImageUpload from "../../components/CreateEvent/ImageUpload";
 import ButtonNeon from "../../components/Button/ButtonNeon";
 import { toast } from "sonner";
 import companyApi from "../../services/companyApi";
-import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 
 const CreateCompany = () => {
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
