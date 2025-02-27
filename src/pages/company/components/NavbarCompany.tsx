@@ -32,7 +32,7 @@ const NavbarCompany = () => {
         <ul className="flex flex-col gap-10 text-[#787486]">
           <NavLink to="/company">
             <li
-              className={`flex items-center gap-2c ${
+              className={`flex items-center gap-2 ${
                 location.pathname == "/company" &&
                 "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
               }`}

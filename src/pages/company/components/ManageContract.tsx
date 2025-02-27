@@ -20,7 +20,9 @@ const ManageContract = () => {
         <CompanyAccount />
       </div>
       <div className="w-full h-[1px] mt-3 mb-3 bg-[#dbdbdb]"></div>
-      <div className="text-[46px] font-semibold">Contract</div>
+      <div className="text-[46px] font-semibold">
+        <p>Contract</p>
+      </div>
     </div>
   );
 };
