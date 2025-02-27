@@ -17,6 +17,8 @@ import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
 import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
+import EventFeedbackPage from "./pages/manager/components/Events/EventsFeedback";
+import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
@@ -55,11 +57,13 @@ export default function App() {
 
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
-            <Route path="manager-dashboard" element={<ManagerOverview />} />
+              <Route index element={<ManagerOverview />} />
+              <Route path="contracts" element={<ContractsPage />} />
+              {/* <Route path="events" element={<EventsPage />} /> */}
+              <Route path="events" element={<EventFeedbackPage />} />
 
-              <Route path="manager-dashboard/contracts" element={<ContractsPage />} />
-              <Route path="manager-dashboard/company-approvals" element={<CompanyApprovalsPage />} />
- 
+              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
+
 
             </Route>
 
@@ -72,8 +76,13 @@ export default function App() {
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
             </Route>
+
+            <Route path="proAdmin" element={<ProfessionalDashboard />} >
+              <Route index element={<ProfessionalDashboard />} />
+              <Route path="proAdmin/events" element={<EventsPage />} />
+            </Route>
           </Route>
-          <Route path="proAdmin" element={<ProfessionalDashboard />} />
+          
         </Routes>
       </BrowserRouter>
     </div>
