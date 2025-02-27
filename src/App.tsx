@@ -18,6 +18,7 @@ import HomePage from "./pages/HomePage";
 import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
+import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
 import ProfileForm from "./pages/profile/ProfileForm";
@@ -54,6 +55,8 @@ export default function App() {
 
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
+            <Route path="manager-dashboard" element={<ManagerOverview />} />
+
               <Route path="manager-dashboard/contracts" element={<ContractsPage />} />
               <Route path="manager-dashboard/company-approvals" element={<CompanyApprovalsPage />} />
  
