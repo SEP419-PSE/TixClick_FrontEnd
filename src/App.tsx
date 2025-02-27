@@ -17,7 +17,6 @@ import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
 import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
-import EventFeedbackPage from "./pages/manager/components/Events/EventsFeedback";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
@@ -59,8 +58,7 @@ export default function App() {
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
-              {/* <Route path="events" element={<EventsPage />} /> */}
-              <Route path="events" element={<EventFeedbackPage />} />
+              <Route path="events" element={<EventsPage />} />
 
               <Route path="company-approvals" element={<CompanyApprovalsPage />} />
 

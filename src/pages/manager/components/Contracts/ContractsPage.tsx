@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { Contracts } from "../../../../interface/manager/Contracts"
+import { ManagerHeader } from "../ManagerHeader"
 
 
 export default function ContractsPage() {
@@ -183,7 +184,7 @@ export default function ContractsPage() {
 
   return (
     <>
-      {/* <ManagerHeader heading="Contracts" text="Manage and track all contracts" /> */}
+      <ManagerHeader heading="Contracts" text="Manage and track all contracts" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
