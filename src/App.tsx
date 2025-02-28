@@ -15,13 +15,13 @@ import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
-import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
+import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
 
@@ -53,6 +53,7 @@ export default function App() {
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
+            <Route path="payment" element={<PaymentPage />} />
 
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
@@ -60,7 +61,7 @@ export default function App() {
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="events" element={<EventsPage />} />
 
-              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
+              {/* <Route path="company-approvals" element={<CompanyApprovalsPage />} /> */}
 
 
             </Route>
