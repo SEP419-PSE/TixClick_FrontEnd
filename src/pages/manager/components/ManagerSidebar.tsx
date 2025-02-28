@@ -88,7 +88,7 @@ export function DashboardSidebar() {
                   <AvatarImage src="/placeholder-avatar.jpg" alt="Admin" />
                   <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
-                <span>Admin Account</span>
+                <span>Manager Account</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-[#2A2A2A] text-white">
