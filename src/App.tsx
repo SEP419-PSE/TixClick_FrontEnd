@@ -19,6 +19,7 @@ import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
+import PaymentsPage from "./pages/manager/components/payments/Payments";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
@@ -60,6 +61,8 @@ export default function App() {
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="events" element={<EventsPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+
 
               {/* <Route path="company-approvals" element={<CompanyApprovalsPage />} /> */}
 
