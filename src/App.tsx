@@ -6,7 +6,7 @@ import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
-import ProfessionalDashboard from "./pages/admin/ProfessionalStatistic";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import SignInPage from "./pages/auth/SignInPage";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -76,8 +76,8 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
             </Route>
 
-            <Route path="proAdmin" element={<ProfessionalDashboard />} >
-              <Route index element={<ProfessionalDashboard />} />
+            <Route path="proAdmin" element={<AdminDashboard />} >
+              <Route index element={<AdminDashboard />} />
               <Route path="proAdmin/events" element={<EventsPage />} />
             </Route>
           </Route>
