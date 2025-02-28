@@ -398,7 +398,7 @@ export default function EventsPage() {
               <TableHead className="text-white">Date</TableHead>
               <TableHead className="text-white">Location</TableHead>
               <TableHead className="text-white">Organizer</TableHead>
-              <TableHead className="text-white">Attendees</TableHead>
+              {/* <TableHead className="text-white">Attendees</TableHead> */}
               <TableHead className="text-white">Type</TableHead>
               <TableHead className="text-white">Status</TableHead>
               <TableHead className="text-white text-right">Actions</TableHead>
@@ -411,7 +411,7 @@ export default function EventsPage() {
                 <TableCell className="text-white">{event.date}</TableCell>
                 <TableCell className="text-white">{event.location}</TableCell>
                 <TableCell className="text-white">{event.organizer}</TableCell>
-                <TableCell className="text-white">{event.attendees}</TableCell>
+                {/* <TableCell className="text-white">{event.attendees}</TableCell> */}
                 <TableCell className="text-white">{event.type}</TableCell>
                 <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>
                 <TableCell className="text-right">
@@ -495,7 +495,7 @@ export default function EventsPage() {
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-2">Attendee Information</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <Card className="bg-[#1E1E1E]">
+                    <Card className="bg-[#1E1E1E] text-white">
                       <CardHeader>
                         <CardTitle>Total Attendees</CardTitle>
                       </CardHeader>
@@ -503,7 +503,7 @@ export default function EventsPage() {
                         <div className="text-4xl font-bold">{selectedEvent.attendees}</div>
                       </CardContent>
                     </Card>
-                    <Card className="bg-[#1E1E1E]">
+                    <Card className="bg-[#1E1E1E] text-white">
                       <CardHeader>
                         <CardTitle>Speakers</CardTitle>
                       </CardHeader>
@@ -522,7 +522,7 @@ export default function EventsPage() {
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-2">Budget Information</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <Card className="bg-[#1E1E1E]">
+                    <Card className="bg-[#1E1E1E] text-white">
                       <CardHeader>
                         <CardTitle>Total Budget</CardTitle>
                       </CardHeader>
@@ -530,7 +530,7 @@ export default function EventsPage() {
                         <div className="text-4xl font-bold">${selectedEvent.budget.toLocaleString()}</div>
                       </CardContent>
                     </Card>
-                    <Card className="bg-[#1E1E1E]">
+                    <Card className="bg-[#1E1E1E] text-white">
                       <CardHeader>
                         <CardTitle>Sponsors</CardTitle>
                       </CardHeader>
