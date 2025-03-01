@@ -213,20 +213,20 @@ const SeatMapContainer: React.FC<SeatMapContainerProps> = ({
   const [startWidth, setStartWidth] = useState(0);
 
   // Handle height resize start
-  const handleHeightResizeStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizingHeight(true);
-    setStartY(e.clientY);
-    setStartHeight(containerHeight);
-  };
+  //   const handleHeightResizeStart = (e: React.MouseEvent) => {
+  //     e.preventDefault();
+  //     setIsResizingHeight(true);
+  //     setStartY(e.clientY);
+  //     setStartHeight(containerHeight);
+  //   };
 
-  // Handle width resize start
-  const handleWidthResizeStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizingWidth(true);
-    setStartX(e.clientX);
-    setStartWidth(containerWidth);
-  };
+  //   // Handle width resize start
+  //   const handleWidthResizeStart = (e: React.MouseEvent) => {
+  //     e.preventDefault();
+  //     setIsResizingWidth(true);
+  //     setStartX(e.clientX);
+  //     setStartWidth(containerWidth);
+  //   };
 
   // Handle resize movement
   const handleResizeMove = (e: React.MouseEvent) => {
