@@ -26,14 +26,15 @@ jobs:
           echo ":: Saving Docker image as tar file..."
           docker save -o fe-tixclick.tar ${{ env.IMAGE_NAME }}
 
-      - name: Upload Docker Image to Server
+      - name: Upload Docker Image lên Server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "fe-tixclick.tar"
+          source: "/home/runner/work/fe-tixclick.tar"
           target: "/home/${{ secrets.SSH_USER }}/"
+
 
       - name: Deploy and Run Container on Server
         uses: appleboy/ssh-action@master
