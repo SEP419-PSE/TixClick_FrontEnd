@@ -1,5 +1,3 @@
-"use client"
-
 import { Label } from "@headlessui/react"
 import {
   AlertCircle,
