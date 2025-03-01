@@ -1,23 +1,21 @@
-name: Deploy Frontend to Server
-
+name: Deploy Frontend
 on:
   push:
     branches:
-      - main  # Chạy khi có code mới trên nhánh main
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build_and_deploy:
+    runs-on: [self-hosted]
     env:
-      CONTAINER_NAME: fe-tixclick
-      
+      CONTAINER_NAME: frontendContainer
     steps:
       - uses: actions/checkout@v3
 
       - name: Build Docker Image
         run: |
-          echo "Building Docker image..."
-          docker build -t myapp:latest -f ./Dockerfile .
+          echo "Building Docker image for frontend..."
+          docker build -t fe_tixclick:latest -f ./Dockerfile .
 
       - name: Stop and Remove Existing Container if Any
         run: |
@@ -42,5 +40,5 @@ jobs:
       - name: Run New Docker Container
         run: |
           CNAME=${{ env.CONTAINER_NAME }}
-          echo ":: Running new container - $CNAME"
-          docker run -d -p 5173:5173 --name $CNAME myapp:latest
+          echo ":: Running new frontend container - $CNAME"
+          docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
