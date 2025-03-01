@@ -20,25 +20,14 @@ jobs:
       - name: Stop and Remove Existing Container if Any
         run: |
           CNAME=${{ env.CONTAINER_NAME }}
-
-          # Check if the container exists
           if [ "$(docker ps -aq -f name=$CNAME)" ]; then
-              if [ "$(docker ps -aq -f status=exited -f name=$CNAME)" ]; then
-                  echo ":: Container $CNAME exists and is exited"
-                  echo ":: Removing exited container - $CNAME"
-                  docker rm $CNAME
-              else
-                  echo ":: Container $CNAME exists and is running"
-                  echo ":: Stopping and removing running container - $CNAME"
-                  docker stop $CNAME
-                  docker rm $CNAME
-              fi
-          else
-              echo ":: No existing container named $CNAME"
+              echo ":: Stopping and removing existing container - $CNAME"
+              docker stop $CNAME
+              docker rm $CNAME
           fi
 
       - name: Run New Docker Container
         run: |
           CNAME=${{ env.CONTAINER_NAME }}
           echo ":: Running new frontend container - $CNAME"
-          docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
+          docker run -d -p 5173:80 --name $CNAME fe_tixclick:latest
