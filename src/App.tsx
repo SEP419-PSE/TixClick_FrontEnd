@@ -16,6 +16,7 @@ import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
+import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
@@ -63,9 +64,7 @@ export default function App() {
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
-
-
-              {/* <Route path="company-approvals" element={<CompanyApprovalsPage />} /> */}
+              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
 
 
             </Route>
