@@ -10,56 +10,37 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONTAINER_NAME: fe-tixclick
-      IMAGE_NAME: fe-tixclick:latest
-
+      
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Build Docker Image
         run: |
-          echo ":: Building Docker image..."
-          docker build -t ${{ env.IMAGE_NAME }} .
+          echo "Building Docker image..."
+          docker build -t myapp:latest -f ./Dockerfile .
 
-      - name: Save and Transfer Docker Image
+      - name: Stop and Remove Existing Container if Any
         run: |
-          echo ":: Saving Docker image as tar file..."
-          docker save -o fe-tixclick.tar ${{ env.IMAGE_NAME }}
+          CNAME=${{ env.CONTAINER_NAME }}
 
-      - name: Upload Docker Image lên Server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          source: "/home/runner/work/fe-tixclick.tar"
-          target: "/home/${{ secrets.SSH_USER }}/"
+          # Check if the container exists
+          if [ "$(docker ps -aq -f name=$CNAME)" ]; then
+              if [ "$(docker ps -aq -f status=exited -f name=$CNAME)" ]; then
+                  echo ":: Container $CNAME exists and is exited"
+                  echo ":: Removing exited container - $CNAME"
+                  docker rm $CNAME
+              else
+                  echo ":: Container $CNAME exists and is running"
+                  echo ":: Stopping and removing running container - $CNAME"
+                  docker stop $CNAME
+                  docker rm $CNAME
+              fi
+          else
+              echo ":: No existing container named $CNAME"
+          fi
 
-
-      - name: Deploy and Run Container on Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            echo ":: Loading Docker image..."
-            docker load -i /home/${{ secrets.SSH_USER }}/fe-tixclick.tar
-
-            echo ":: Stopping and removing old container..."
-            docker stop fe-tixclick || true
-            docker rm fe-tixclick || true
-
-            echo ":: Running new container..."
-            docker run -d --name fe-tixclick -p 5173:80 fe-tixclick:latest
-
-            echo ":: Cleaning up..."
-            rm /home/${{ secrets.SSH_USER }}/fe-tixclick.tar
-
-      - name: Restart Nginx
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: sudo systemctl restart nginx
+      - name: Run New Docker Container
+        run: |
+          CNAME=${{ env.CONTAINER_NAME }}
+          echo ":: Running new container - $CNAME"
+          docker run -d -p 5173:5173 --name $CNAME myapp:latest
