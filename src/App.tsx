@@ -28,6 +28,8 @@ import HomeCompany from "./pages/company/components/HomeCompany";
 import ManageTickets from "./pages/company/components/ManageTickets";
 import ManageMember from "./pages/company/components/ManageMember";
 import ManageContract from "./pages/company/components/ManageContract";
+import SeatMap from "./pages/seatmap/Seatmap";
+import DraggableArea from "./pages/seatmap/DragandDrop";
 
 export default function App() {
   return (
@@ -76,6 +78,9 @@ export default function App() {
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
           </Route>
+
+          <Route path="seatmap" element={<SeatMap />} />
+          <Route path="drag" element={<DraggableArea />} />
 
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
