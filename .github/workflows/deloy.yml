@@ -8,31 +8,53 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      CONTAINER_NAME: fe-tixclick
+      IMAGE_NAME: fe-tixclick:latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18 # Đổi version nếu cần
+      - name: Build Docker Image
+        run: |
+          echo ":: Building Docker image..."
+          docker build -t ${{ env.IMAGE_NAME }} .
 
-      - name: Install dependencies
-        run: npm install
+      - name: Save and Transfer Docker Image
+        run: |
+          echo ":: Saving Docker image as tar file..."
+          docker save -o fe-tixclick.tar ${{ env.IMAGE_NAME }}
 
-      - name: Build project
-        run: npm run build
-
-      - name: Deploy to Server via SSH (Password)
+      - name: Upload Docker Image to Server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}  # Dùng mật khẩu thay vì SSH key
-          source: "dist/*"
-          target: "/var/www/frontend/"
-      
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "fe-tixclick.tar"
+          target: "/home/${{ secrets.SSH_USER }}/"
+
+      - name: Deploy and Run Container on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            echo ":: Loading Docker image..."
+            docker load -i /home/${{ secrets.SSH_USER }}/fe-tixclick.tar
+
+            echo ":: Stopping and removing old container..."
+            docker stop fe-tixclick || true
+            docker rm fe-tixclick || true
+
+            echo ":: Running new container..."
+            docker run -d --name fe-tixclick -p 5173:80 fe-tixclick:latest
+
+            echo ":: Cleaning up..."
+            rm /home/${{ secrets.SSH_USER }}/fe-tixclick.tar
+
       - name: Restart Nginx
         uses: appleboy/ssh-action@master
         with:
