@@ -30,4 +30,4 @@ jobs:
         run: |
           CNAME=${{ env.CONTAINER_NAME }}
           echo ":: Running new frontend container - $CNAME"
-          docker run -d -p 5173:80 --name $CNAME fe_tixclick:latest
+          docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
