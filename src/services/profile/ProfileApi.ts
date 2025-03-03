@@ -2,9 +2,9 @@ import axiosClient from "../axiosClient";
 
 const profileApi = {
 
-    getProfile(headers = {}) {
+    getProfile() {
         const url = "/account/my-profile";
-        return axiosClient.get(url, { headers });
+        return axiosClient.get(url);
       }
       
 }

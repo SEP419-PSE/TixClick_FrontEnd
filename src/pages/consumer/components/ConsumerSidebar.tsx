@@ -1,6 +1,5 @@
 import { BarChart3, Book, FileText } from "lucide-react";
 import { Link, useLocation } from "react-router";
-import Logo from "../../../assets/Logo.png";
 import { cn } from "../../../lib/utils";
 import { useLanguage } from "../../organizer/components/LanguageContext";
 
@@ -16,10 +15,10 @@ export function ConsumerSidebar() {
 
   return (
     <nav className="w-64 bg-[#0a0a0a] min-h-screen">
-      <div className="flex items-center gap-2 p-4">
+      {/* <div className="flex items-center gap-2 p-4">
           <img src={Logo} alt="Logo" className="h-12 w-13" />
         <span className="text-white text-lg font-medium">{t.sidebar.title}</span>
-      </div>
+      </div> */}
 
       <div className="px-2 py-2">
         {navigation.map((item) => {

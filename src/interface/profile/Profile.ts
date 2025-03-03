@@ -4,10 +4,10 @@ export interface Profile {
     lastName: string;
     userName: string;
     email: string;
-    phone: string | null;
+    phone: string;
     active: boolean;
     avatarURL: string | null;
-    dob: string | null;
+    dob: Date;
     roleId: number;
   }
   

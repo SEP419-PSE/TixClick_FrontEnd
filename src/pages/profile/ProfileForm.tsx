@@ -9,7 +9,7 @@ import profileApi from "../../services/profile/ProfileApi";
 
 export default function ProfileForm() {
   const [profile, setProfile] = useState<Profile>()
-  const [gender, setGender] = useState<string>("");
+  console.log("first:", profile);
   const [avatar, setAvatar] = useState<string>(HuyAvatar);
   const [image, setImage] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -34,19 +34,45 @@ export default function ProfileForm() {
 
   const fetchProfile = async () => {
     console.log(localStorage);
-    const res: any = await profileApi.getProfile();
-    console.log("Profile:", res.data.result);
+    const res: any = (await profileApi.getProfile()).data.result;
+    console.log("Profile:", res);
+    
 
-    if (res.data.result && res.data.result.length > 0) {
-      setProfile(res.data.result[0]);
+    if (res && res.length > 0) {
+      setProfile(res);
     }
   };
+  
   useEffect(() => {
     const initUseEffect = async () => {
       await fetchProfile();
     };
     initUseEffect();
-  }, []);
+  });
+
+  // useEffect(() => {
+  //   const fetchProfile = async () => {
+  //     try {
+  //       const res: any = await profileApi.getProfile();
+  //       console.log("Dữ liệu từ API:", res.data); 
+  
+  //       if (res.data.result && res.data.result.length > 0) {
+  //         const profileData = res.data.result[0];
+  //         console.log("Dữ liệu profile đã chọn:", profileData);
+  //         setProfile(profileData);
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khi lấy profile:", error);
+  //     }
+  //   };
+  
+  //   fetchProfile();
+  // }, []);
+  
+
+
+ 
+
 
   const countryCodes = [
     { code: "+84", name: "Vietnam" },
@@ -135,7 +161,7 @@ export default function ProfileForm() {
 
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Ngày sinh
             </label>
@@ -146,7 +172,7 @@ export default function ProfileForm() {
             >
               {profile?.dob}
             </input>
-          </div>
+          </div> */}
 
 
           <div className="space-y-2">
@@ -195,7 +221,7 @@ export default function ProfileForm() {
             </input>
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Giới tính
             </label>
@@ -234,7 +260,7 @@ export default function ProfileForm() {
                 <span>Khác</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <button
             type="submit"
