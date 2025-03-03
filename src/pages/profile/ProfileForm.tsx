@@ -1,10 +1,11 @@
 import { Camera, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Cropper from "react-easy-crop";
 import { Link } from "react-router";
 import HuyAvatar from "../../assets/AvatarHuy.jpg";
 import { Profile } from "../../interface/profile/Profile";
+import profileApi from "../../services/profile/ProfileApi";
 
 export default function ProfileForm() {
   const [profile, setProfile] = useState<Profile>()
@@ -30,6 +31,22 @@ export default function ProfileForm() {
       setImage(null); 
     }
   };
+
+  const fetchProfile = async () => {
+    console.log(localStorage);
+    const res: any = await profileApi.getProfile();
+    console.log("Profile:", res.data.result);
+
+    if (res.data.result && res.data.result.length > 0) {
+      setProfile(res.data.result[0]);
+    }
+  };
+  useEffect(() => {
+    const initUseEffect = async () => {
+      await fetchProfile();
+    };
+    initUseEffect();
+  }, []);
 
   const countryCodes = [
     { code: "+84", name: "Vietnam" },
@@ -112,10 +129,10 @@ export default function ProfileForm() {
             </label>
             <input
               type="text"
+              value={`${profile?.lastName || ""} ${profile?.firstName || ""}`}
               className="w-full p-3 rounded-lg bg-gray-50 border border-gray-200 text-gray-700"
-            >
-              {profile?.lastName} {profile?.firstName}
-            </input>
+            />
+
           </div>
 
           <div className="space-y-2">
@@ -228,7 +245,6 @@ export default function ProfileForm() {
         </form>
       </div>
 
-      {/* Modal chỉnh sửa avatar */}
       {image && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-4 w-96">
