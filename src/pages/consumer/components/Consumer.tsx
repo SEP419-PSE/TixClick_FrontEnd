@@ -140,22 +140,18 @@ export default function Consumer() {
     setFilteredEvents(result)
   }, [searchTerm, activeFilter])
 
-  // Handle search input change
   const handleSearch = (e:any) => {
     setSearchTerm(e.target.value)
   }
 
-  // Handle filter change from EventFilter component
   const handleFilterChange = (filter:any) => {
     setActiveFilter(filter)
   }
 
-  // Handle event click to show details
   const handleEventClick = (event:any) => {
     setSelectedEvent(event)
   }
 
-  // Close event details
   const closeEventDetails = () => {
     setSelectedEvent(null)
   }

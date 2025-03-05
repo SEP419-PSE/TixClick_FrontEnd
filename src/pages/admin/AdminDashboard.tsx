@@ -101,10 +101,10 @@ export default function AdminDashboard() {
           </Button>
         </div>
         <nav className="mt-8">
-          <NavItem icon={BarChartIcon} label="Dashboard" href="/" />
+          <NavItem icon={BarChartIcon} label="Overview" href="/" />
           <NavItem icon={Calendar} label="Events" href="/events" />
-          <NavItem icon={Ticket} label="Tickets" href="/tickets" />
-          <NavItem icon={Users} label="Attendees" href="/attendees" />
+          <NavItem icon={Ticket} label="Companies" href="/companies" />
+          <NavItem icon={Users} label="Manager Management" href="/managerManagement" />
           <NavItem icon={DollarSign} label="Revenue" href="/revenue" />
         </nav>
         <div className="absolute bottom-0 left-0 right-0 p-4">
