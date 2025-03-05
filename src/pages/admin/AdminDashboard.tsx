@@ -1,17 +1,13 @@
-import { BarChartIcon, Calendar, DollarSign, LogOut, Menu, Settings, Ticket, User, Users, X } from "lucide-react"
+import { Calendar, DollarSign, Ticket, Users } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import { Select } from "@radix-ui/react-select"
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import Logo from "../../assets/Logo.png"
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../components/ui/dropdown-menu"
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import DashboardCard from "./DashboardCard"
-import NavItem from "./NavItem"
 
 
 const generateDailyData = (days:any) => {
@@ -43,7 +39,7 @@ const generateYearlyData = (years:any) => {
 
 
 export default function AdminDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  // const [sidebarOpen, setSidebarOpen] = useState(false)
   const [timeRange, setTimeRange] = useState("month")
   const [chartData, setChartData] = useState([
     {
@@ -87,68 +83,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-[#1E1E1E] text-white">
-      <aside
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-y-0 left-0 z-50 w-64 bg-[#2A2A2A] transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
-      >
-        <div className="flex items-center justify-between p-4">
-      <img src={Logo} alt="Logo" className="h-12 w-13"/>
-
-          <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <Button variant="ghost" size="icon" className="lg:hidden text-white" onClick={() => setSidebarOpen(false)}>
-            <X className="h-6 w-6" />
-          </Button>
-        </div>
-        <nav className="mt-8">
-          <NavItem icon={BarChartIcon} label="Overview" href="/" />
-          <NavItem icon={Calendar} label="Events" href="/events" />
-          <NavItem icon={Ticket} label="Companies" href="/companies" />
-          <NavItem icon={Users} label="Manager Management" href="/managerManagement" />
-          <NavItem icon={DollarSign} label="Revenue" href="/revenue" />
-        </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start px-2">
-                <Avatar className="h-8 w-8 mr-2">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="Admin" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <span>Admin User</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Admin User</p>
-                  <p className="text-xs leading-none text-muted-foreground">admin@example.com</p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </aside>
+      
 
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
         <header className="flex items-center justify-between p-4 bg-[#2A2A2A]">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+          {/* <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-6 w-6" />
-          </Button>
+          </Button> */}
           <div className="flex items-center space-x-4">
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-[180px] bg-[#3A3A3A] border-[#4A4A4A] text-white">

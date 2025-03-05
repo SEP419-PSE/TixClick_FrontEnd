@@ -7,6 +7,7 @@ import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLayout from "./pages/admin/AdminLayout";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
@@ -80,18 +81,18 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
             </Route>
 
-            <Route path="proAdmin" element={<AdminDashboard />} >
+            <Route path="proAdmin" element={<AdminLayout />} >  
               <Route index element={<AdminDashboard />} />
               <Route path="events" element={<EventsPage />} />
-              <Route path="managerManagementss" element={<AccountsPage />} />
+              <Route path="managerManagement" element={<AccountsPage />} />
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
 
-            
+{/*             
             <Route path="managerManagement" element={<AccountsPage />} />
             <Route path="event" element={<EventsPage />} />
 
-            <Route path="proAdmin/revenue" element={<RevenuePage />} />
+            <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
           
         </Routes>

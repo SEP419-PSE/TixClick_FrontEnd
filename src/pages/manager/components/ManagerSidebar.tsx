@@ -7,70 +7,94 @@ import {
   UserCheck
 } from "lucide-react"
 import { useState } from "react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 import { toast } from "sonner"
 import Logo from "../../../assets/Logo.png"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../../../components/ui/sidebar"
+import { cn } from "../../../lib/utils"
 
 export function DashboardSidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const location = useLocation()
+
+  const isActive = (path: string) => {
+    if (path === "" && location.pathname === "/manager") {
+      return true
+    }
+    return location.pathname.includes(`/manager/${path}`)
+  }
 
   const handleLogout = () => {
-    toast.success(
-       "Logged out",{ description: "You have been successfully logged out.",
-  })
+    toast.success("Logged out", {
+      description: "You have been successfully logged out.",
+    })
   }
+
+
 
   return (
     <Sidebar>
-      
       <SidebarHeader className="border-b border-[#333333] px-6 py-4">
-
-      <div className="flex items-center gap-2">
-      <img src={Logo} alt="Logo" className="h-12 w-13"/>
-        <h1 className="text-xl font-bold text-black">Manager Dashboard</h1>
-      </div>
+        <div className="flex items-center gap-2">
+          <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-12 w-13" />
+          <h1 className="text-xl font-bold text-black">Manager Dashboard</h1>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild className={cn(isActive("") && "bg-orange-100 text-orange-600 font-medium")}>
               <Link to="" className="flex items-center">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
                 <span>Overview</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          
+
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("company-approvals") && "bg-orange-100 text-orange-600 font-medium")}
+            >
               <Link to="company-approvals" className="flex items-center">
                 <UserCheck className="mr-2 h-5 w-5" />
                 <span>Company Approvals</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("events") && "bg-orange-100 text-orange-600 font-medium")}
+            >
               <Link to="events" className="flex items-center">
                 <CalendarDays className="mr-2 h-5 w-5" />
                 <span>Event Approvals</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("contracts") && "bg-orange-100 text-orange-600 font-medium")}
+            >
               <Link to="contracts" className="flex items-center">
                 <ClipboardSignature className="mr-2 h-5 w-5" />
                 <span>Contracts</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("payments") && "bg-orange-100 text-orange-600 font-medium")}
+            >
               <Link to="payments" className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
                 <span>Payments</span>
@@ -107,7 +131,7 @@ export function DashboardSidebar() {
                 </div>
               </div>
               <div className="space-y-4">
-                <Button className="w-full text-black  hover:bg-orange-300" variant="outline">
+                <Button className="w-full text-black hover:bg-orange-300" variant="outline">
                   Edit Profile
                 </Button>
                 <Button className="w-full text-black hover:bg-orange-300" variant="outline">
@@ -121,7 +145,7 @@ export function DashboardSidebar() {
             <span>Logout</span>
           </Button>
         </div>
-        <p className="text-xs text-gray-400 mt-4">© 2023 Your Company</p>
+        <p className="text-xs text-gray-400 mt-4">© 2025 TixClick</p>
       </SidebarFooter>
     </Sidebar>
   )
