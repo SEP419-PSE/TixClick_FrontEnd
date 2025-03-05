@@ -1,8 +1,7 @@
-import { BarChartIcon, Calendar, DollarSign, Menu, Ticket, Users, X } from "lucide-react"
+import { Calendar, DollarSign, Menu, Ticket, Users, X } from "lucide-react"
 import { useState } from "react"
 
 import { Select } from "@radix-ui/react-select"
-import { Link } from "react-router"
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -10,7 +9,6 @@ import { Input } from "../../components/ui/input"
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import DashboardCard from "./DashboardCard"
-import NavItem from "./NavItem"
 
 const revenueData = [
   { name: "Jan", revenue: 4000 },
@@ -60,7 +58,7 @@ export default function ProfessionalDashboard() {
             <X className="h-6 w-6" />
           </Button>
         </div>
-        <nav className="mt-8">
+        {/* <nav className="mt-8">
           <Link to="chart">
             <NavItem icon={BarChartIcon} label="Dashboard" active />
           </Link>
@@ -76,7 +74,7 @@ export default function ProfessionalDashboard() {
           <Link to="revenue">
             <NavItem icon={DollarSign} label="Revenue" />
           </Link>
-        </nav>
+        </nav> */}
       </aside>
 
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
