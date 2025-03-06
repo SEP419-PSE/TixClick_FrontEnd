@@ -1,25 +1,25 @@
-import { useState, useEffect } from "react"
-import { DollarSign, TrendingUp, Calendar, Filter, Download, Loader2 } from "lucide-react"
+import { Calendar, DollarSign, Download, Filter, Loader2, TrendingUp } from "lucide-react"
+import { useEffect, useState } from "react"
 
+import { addDays, format } from "date-fns"
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  Legend,
 } from "recharts"
-import { addDays, format } from "date-fns"
 import { Button } from "../../../components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table"
 
 const generateRevenueData = (days:any) => {
@@ -116,7 +116,7 @@ export default function RevenuePage() {
             <DollarSign className="h-4 w-4 text-[#00B14F]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-white">${totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card className="bg-[#2A2A2A] border-[#3A3A3A]">
@@ -125,7 +125,7 @@ export default function RevenuePage() {
             <TrendingUp className="h-4 w-4 text-[#00B14F]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${averageDailyRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-white">${averageDailyRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card className="bg-[#2A2A2A] border-[#3A3A3A]">
@@ -134,7 +134,7 @@ export default function RevenuePage() {
             <Calendar className="h-4 w-4 text-[#00B14F]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{topEvents.length}</div>
+            <div className="text-2xl font-bold text-white">{topEvents.length}</div>
           </CardContent>
         </Card>
         <Card className="bg-[#2A2A2A] border-[#3A3A3A]">
@@ -230,7 +230,7 @@ export default function RevenuePage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-[#2A2A2A] border-[#3A3A3A]">
+      <Card className="bg-[#2A2A2A] border-[#3A3A3A] text-white">
         <CardHeader>
           <CardTitle className="text-white">Top Performing Events</CardTitle>
         </CardHeader>
@@ -238,9 +238,9 @@ export default function RevenuePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-white">Event Name</TableHead>
-                <TableHead className="text-white">Revenue</TableHead>
-                <TableHead className="text-white">Tickets Sold</TableHead>
+                <TableHead className="text-white font-bold">Event Name</TableHead>
+                <TableHead className="text-white font-bold">Revenue</TableHead>
+                <TableHead className="text-white font-bold">Tickets Sold</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

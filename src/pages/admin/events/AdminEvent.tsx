@@ -1,30 +1,30 @@
 import React from "react"
 
-import { useState, useEffect } from "react"
-import { Calendar, BarChart3, PieChart, TrendingUp, Map, Users, Ticket, DollarSign, Download, Badge } from "lucide-react"
+import { Badge, BarChart3, Calendar, DollarSign, Download, Map, PieChart, Ticket, TrendingUp, Users } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import {
-  BarChart,
+  Area,
+  AreaChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart as RePieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
 } from "recharts"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { Button } from "../../../components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Progress } from "../../../components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 
 const eventsByMonth = [
   { name: "Jan", events: 4, revenue: 12000 },
@@ -165,7 +165,7 @@ export default function AdminEvent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 ">
         <MetricCard
           title="Total Events"
           value="65"

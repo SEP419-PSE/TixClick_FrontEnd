@@ -60,7 +60,7 @@ export default function AccountsPage() {
   }
 
   return (
-    <div>
+    <div className="p-6 bg-[#1E1E1E] text-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Account Management</h1>
         <Dialog>
@@ -82,7 +82,7 @@ export default function AccountsPage() {
                 handleAddAccount(newAccount)
               }}
             >
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-4 py-4 text-white">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">
                     Name
@@ -117,11 +117,11 @@ export default function AccountsPage() {
         </Dialog>
       </div>
 
-      <Card className="bg-[#2A2A2A] border-[#3A3A3A] mb-6">
+      <Card className="bg-[#2A2A2A] border-[#3A3A3A] mb-6 text-white">
         <CardHeader>
           <CardTitle className="text-white">Account Statistics</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Total Accounts</span>
             <span className="text-2xl font-bold">{accounts.length}</span>
@@ -160,14 +160,14 @@ export default function AccountsPage() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="text-white">
                 <TableHead className="text-white">Name</TableHead>
                 <TableHead className="text-white">Email</TableHead>
                 <TableHead className="text-white">Role</TableHead>
                 <TableHead className="text-white">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="text-white">
               {filteredAccounts.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell className="font-medium">{account.name}</TableCell>
