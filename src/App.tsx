@@ -8,6 +8,8 @@ import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLayout from "./pages/admin/AdminLayout";
+import AdminCompany from "./pages/admin/companies/AdminCompany";
+import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
@@ -29,7 +31,6 @@ import { default as OrganizerCenter, default as OrganizerPage } from "./pages/or
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import TicketPage from "./pages/ticket/TicketPage";
-import AdminEvent from "./pages/admin/events/AdminEvent";
 
 export default function App() {
   return (
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="proAdmin" element={<AdminLayout />} >  
               <Route index element={<AdminDashboard />} />
               <Route path="events" element={<AdminEvent />} />
+              <Route path="companies" element={<AdminCompany />} />
               <Route path="managerManagement" element={<AccountsPage />} />
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
