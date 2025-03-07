@@ -1,14 +1,8 @@
-export interface Account {
-  accountId: number;
+export interface customAccount {
   firstName: string;
   lastName: string;
-  userName: string;
   email: string;
-  phone: string | null;
-  active: boolean;
-  avatarURL: string | null;
-  dob: string | null;
-  roleId: number;
+  phoneNumber: string | null;
 }
 
 export interface Company {
@@ -21,6 +15,17 @@ export interface Company {
   logoURL: string;
   description: string;
   status: "PENDING" | "ACTIVE" | "INACTIVE";
-  representativeId: number;
-  accountDTO: Account;
+  companyVerificationId: number;
+  customAccount: customAccount;
+}
+
+
+
+export interface Document {
+  contract_id: number
+  file_name: string
+  file_type: string
+  uploaded_date: string
+  file_url?: string
+  company_id: number
 }
