@@ -1,8 +1,12 @@
 import { useState } from "react";
 import CompanyAccount from "./CompanyAccount";
 import SearchBar from "./SearchBar";
+import EmptyList from "../../../components/EmptyList/EmptyList";
+import { Button } from "../../../components/ui/button";
+import { NavLink, useNavigate } from "react-router";
 
 const ManageEvents = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
@@ -20,9 +24,11 @@ const ManageEvents = () => {
         <CompanyAccount />
       </div>
       <div className="w-full h-[1px] mt-3 mb-3 bg-[#dbdbdb]"></div>
-      <div className="text-[46px] font-semibold">
+      <div className="flex justify-between items-center text-[46px] font-semibold">
         <p>Events</p>
+        <Button onClick={() => navigate("/create-event")}>Tạo sự kiện</Button>
       </div>
+      <EmptyList label="Không có sự kiện nào" />
     </div>
   );
 };

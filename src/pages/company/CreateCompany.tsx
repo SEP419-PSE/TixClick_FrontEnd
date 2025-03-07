@@ -5,6 +5,14 @@ import ButtonNeon from "../../components/Button/ButtonNeon";
 import { toast } from "sonner";
 import companyApi from "../../services/companyApi";
 
+import { XCircle } from "lucide-react";
+
+interface FileItem {
+  name: string;
+  type: string;
+  size: number;
+}
+
 const CreateCompany = () => {
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -14,6 +22,24 @@ const CreateCompany = () => {
   const [bankingCode, setBankingCode] = useState("");
   const [cccd, setCccd] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [files, setFiles] = useState<FileItem[]>([]);
+  console.log(files);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      const newFiles = Array.from(selectedFiles).map((file) => ({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      }));
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    }
+  };
+
+  const handleRemoveFile = (fileName: string) => {
+    setFiles(files.filter((file) => file.name !== fileName));
+  };
 
   const handleRegisterCompany = async () => {
     setLoading(true);
@@ -98,6 +124,50 @@ const CreateCompany = () => {
           text={cccd}
           setText={setCccd}
         />
+        <div className="w-full mx-auto my-4 p-5 bg-white rounded-lg shadow-lg border">
+          <h2 className="text-lg font-bold mb-4 text-gray-800">
+            📂 Tài liệu xác thưc (PDF, DOC)
+          </h2>
+
+          {/* File Input */}
+          <input
+            type="file"
+            multiple
+            accept=".pdf, .doc, .docx"
+            onChange={handleFileChange}
+            className="mb-4 w-full text-sm text-gray-700 file:bg-blue-500 file:text-white file:px-3 file:py-2 file:rounded-lg file:border-none file:cursor-pointer hover:file:bg-blue-600"
+          />
+
+          {/* File List */}
+          {files.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-md font-semibold mb-2 text-gray-800">
+                📑 Danh sách file đã chọn:
+              </h3>
+              <ul>
+                {files.map((file) => (
+                  <li
+                    key={file.name}
+                    className="flex justify-between items-center bg-gray-200 hover:bg-blue-100 p-3 mb-2 rounded-lg transition-all"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{file.name}</p>
+                      <p className="text-sm text-gray-700">
+                        {file.type} • {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                    <button onClick={() => handleRemoveFile(file.name)}>
+                      <XCircle
+                        size={22}
+                        className="text-red-600 hover:text-red-800 transition-all"
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
         <ButtonNeon onClick={handleRegisterCompany}>
           {loading ? "Đang thực hiện ..." : "Đăng ký"}
         </ButtonNeon>

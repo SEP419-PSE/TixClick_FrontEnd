@@ -30,6 +30,7 @@ import ManageMember from "./pages/company/components/ManageMember";
 import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
 
 export default function App() {
   return (
@@ -77,6 +78,7 @@ export default function App() {
             <Route path="tickets" element={<ManageTickets />} />
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
+            <Route path="profile" element={<ProfileCompany />} />
           </Route>
 
           <Route path="seatmap" element={<SeatMap />} />

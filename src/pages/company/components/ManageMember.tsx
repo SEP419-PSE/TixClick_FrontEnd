@@ -1,6 +1,8 @@
 import { useState } from "react";
 import CompanyAccount from "./CompanyAccount";
 import SearchBar from "./SearchBar";
+import EmptyList from "../../../components/EmptyList/EmptyList";
+import { Button } from "../../../components/ui/button";
 
 const ManageMember = () => {
   const [query, setQuery] = useState("");
@@ -20,8 +22,12 @@ const ManageMember = () => {
         <CompanyAccount />
       </div>
       <div className="w-full h-[1px] mt-3 mb-3 bg-[#dbdbdb]"></div>
-      <div className="text-[46px] font-semibold">
+      <div className="flex justify-between items-center text-[46px] font-semibold">
         <p>Members</p>
+        <Button>Thêm thành viên</Button>
+      </div>
+      <div>
+        <EmptyList label="Không có thành viên nào" />
       </div>
     </div>
   );
