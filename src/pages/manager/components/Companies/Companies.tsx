@@ -56,6 +56,7 @@ export default function CompanyApprovalsPage() {
   const handleApproveCompany =  (status:string, companyVerificationId: number) => {
     const response = managerApi.approveCompany(status, companyVerificationId);
     console.log("res ver:",response);
+    fetchCompaniesList();
     if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
       setIsReviewModalOpen(false)
       setIsDocumentModalOpen(true)
