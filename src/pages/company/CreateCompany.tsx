@@ -7,12 +7,6 @@ import companyApi from "../../services/companyApi";
 
 import { XCircle } from "lucide-react";
 
-interface FileItem {
-  name: string;
-  type: string;
-  size: number;
-}
-
 const CreateCompany = () => {
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -22,55 +16,85 @@ const CreateCompany = () => {
   const [bankingCode, setBankingCode] = useState("");
   const [cccd, setCccd] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [files, setFiles] = useState<FileItem[]>([]);
-  console.log(files);
+  const [files, setFiles] = useState<File[]>([]);
+  // console.log(files);
 
+  // Xử lý khi chọn file
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      const newFiles = Array.from(selectedFiles).map((file) => ({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      }));
+    if (event.target.files) {
+      const selectedFiles = Array.from(event.target.files);
+
+      // Loại bỏ file trùng lặp
+      const newFiles = selectedFiles.filter(
+        (file) => !files.some((f) => f.name === file.name)
+      );
+
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
 
+  // Xóa file khỏi danh sách
   const handleRemoveFile = (fileName: string) => {
-    setFiles(files.filter((file) => file.name !== fileName));
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
   };
 
   const handleRegisterCompany = async () => {
     setLoading(true);
+
+    // Kiểm tra dữ liệu đầu vào
     if (
-      logoCompany == null ||
-      companyName == "" ||
-      description == "" ||
-      codeTax == "" ||
-      bankingName == "" ||
-      bankingCode == "" ||
-      cccd == ""
+      !logoCompany ||
+      !companyName ||
+      !description ||
+      !codeTax ||
+      !bankingName ||
+      !bankingCode ||
+      !cccd ||
+      files.length === 0
     ) {
       toast.error("Vui lòng điền đầy đủ thông tin", { position: "top-center" });
       setLoading(false);
       return;
     }
-    try {
-      const data = new FormData();
-      if (logoCompany) data.append("file", logoCompany);
-      data.append("companyName", companyName);
-      data.append("description", description);
-      data.append("codeTax", codeTax);
-      data.append("bankingName", bankingName);
-      data.append("bankingCode", bankingCode);
-      data.append("nationalId", cccd);
 
-      const response = await companyApi.create(data);
-      // console.log(response);
-      toast.success(response.data.message, { position: "top-center" });
+    try {
+      // Tạo FormData để gửi API tạo công ty
+      const companyData = new FormData();
+      companyData.append("file", logoCompany);
+      companyData.append("companyName", companyName);
+      companyData.append("description", description);
+      companyData.append("codeTax", codeTax);
+      companyData.append("bankingName", bankingName);
+      companyData.append("bankingCode", bankingCode);
+      companyData.append("nationalId", cccd);
+
+      // Gửi API đầu tiên (tạo công ty) và chờ kết quả
+      const response = await companyApi.create(companyData);
+      console.log(response);
+      const companyId = response.data.result.companyId;
+
+      // Hiển thị thông báo nếu thành công
+      toast.success("Tạo công ty thành công", { position: "top-center" });
+
+      // Tạo FormData để upload tài liệu
+      const documentData = new FormData();
+      files.forEach((file) => {
+        documentData.append("files", file);
+      });
+      documentData.append("companyId", companyId);
+      documentData.append("uploadDate", new Date().toISOString());
+
+      // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
+      await companyApi.createDocumentCompany(documentData);
+
+      toast.success("Tài liệu đã được tải lên thành công!", {
+        position: "top-center",
+      });
     } catch (error) {
-      console.log("Error create company", error);
+      console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: "top-center",
+      });
     } finally {
       setLoading(false);
     }
@@ -126,7 +150,7 @@ const CreateCompany = () => {
         />
         <div className="w-full mx-auto my-4 p-5 bg-white rounded-lg shadow-lg border">
           <h2 className="text-lg font-bold mb-4 text-gray-800">
-            📂 Tài liệu xác thưc (PDF, DOC)
+            📂 Tài liệu xác thực (PDF, DOC)
           </h2>
 
           {/* File Input */}

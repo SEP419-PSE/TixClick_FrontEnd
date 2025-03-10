@@ -10,6 +10,14 @@ const companyApi = {
       },
     });
   },
+  createDocumentCompany: (data: FormData) => {
+    const url = `/company-document/create`;
+    return axiosClient.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };
 
 export default companyApi;
