@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 
 import GoogleImg from "../../assets/google.png";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { ERROR_RESPONSE } from "../../constants/constants";
 
 const SignInForm = () => {
   const authContext = useContext(AuthContext);
@@ -51,6 +52,8 @@ const SignInForm = () => {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response.data === ERROR_RESPONSE.invalidAccount())
+          navigate("/auth/verify");
         toast.error(error.response.data);
       })
       .finally(() => {

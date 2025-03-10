@@ -2,19 +2,20 @@ import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SearchBar from "../SearchBar/SearchBar";
 
 const Header = () => {
+  const location = useLocation();
   const authContext = useContext(AuthContext);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > window.innerHeight - 100) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -31,8 +32,8 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 w-full p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
-      }`}
+        location.pathname !== "/" && "translate-y-0"
+      } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >
       <p className="text-[24px] font-semibold text-pse-green">TixClick</p>
       <div className="ml-auto flex items-center gap-4">
@@ -68,13 +69,13 @@ const Header = () => {
                     <RiCalendarEventLine size={24} />
                     Sự kiện của tôi
                   </li>
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
+                  <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
                     <CgProfile size={24} />
                     Trang cá nhân
                   </li>
                   <li
                     onClick={() => authContext.logout()}
-                    className="flex items-center p-3 gap-2 hover:bg-pse-black/20 rounded-bl-lg rounded-br-lg"
+                    className="flex items-center p-3 gap-2 hover:bg-pse-gray rounded-bl-lg rounded-br-lg"
                   >
                     <LuLogOut size={24} />
                     Đăng xuất
