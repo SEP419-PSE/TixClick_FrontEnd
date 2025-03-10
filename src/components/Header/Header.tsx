@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
@@ -6,11 +6,34 @@ import { NavLink } from "react-router";
 import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SearchBar from "../SearchBar/SearchBar";
+
 const Header = () => {
   const authContext = useContext(AuthContext);
-  const [openMennu, setOpenMenu] = useState<boolean>(false);
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+        setOpenMenu(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <header className="p-4 lg:px-14 bg-pse-header flex items-center text-pse-text shadow-neon-green">
+    <header
+      className={`fixed top-0 left-0 w-full p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <p className="text-[24px] font-semibold text-pse-green">Tixclick</p>
       <div className="ml-auto flex items-center gap-4">
         <SearchBar />
@@ -18,34 +41,22 @@ const Header = () => {
           <LuSearch size={24} />
         </span>
         <NavLink to="/create-event">
-          <button className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500 ">
+          <button className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500">
             Tạo sự kiện
           </button>
         </NavLink>
-        {/* <div className="hidden px-4 py-2 md:flex items-center cursor-pointer">
-          <span className="mr-2">
-            <LuTicketCheck size={24} />
-          </span>
-          Vé đã mua
-        </div> */}
         <div className="font-semibold flex items-center cursor-pointer">
           {authContext?.isLogin ? (
             <div
-              onMouseEnter={() => {
-                setOpenMenu(true);
-              }}
-              onClick={() => {
-                setOpenMenu(true);
-              }}
+              onMouseEnter={() => setOpenMenu(true)}
+              onClick={() => setOpenMenu(true)}
               className="relative p-[6px] rounded-full border border-pse-text"
             >
               <img src={Avatar} width={24} />
               <div
-                onMouseLeave={() => {
-                  setOpenMenu(false);
-                }}
+                onMouseLeave={() => setOpenMenu(false)}
                 className={`absolute ${
-                  openMennu ? "block" : "hidden"
+                  openMenu ? "block" : "hidden"
                 } top-10 right-0 bg-white rounded-lg text-black w-[200px] transition-all duration-500 z-10`}
               >
                 <ul className="rounded-lg">
@@ -62,9 +73,7 @@ const Header = () => {
                     Trang cá nhân
                   </li>
                   <li
-                    onClick={() => {
-                      authContext.logout();
-                    }}
+                    onClick={() => authContext.logout()}
                     className="flex items-center p-3 gap-2 hover:bg-pse-black/20 rounded-bl-lg rounded-br-lg"
                   >
                     <LuLogOut size={24} />
