@@ -30,6 +30,7 @@ import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
+import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
 
 export default function App() {
@@ -74,7 +75,7 @@ export default function App() {
             </Route>
 
 
-            {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+            <Route path="superLogin" element={<SuperLogin />} />
 
 
             <Route path="consumerCenter" element={<RootLayouts />}>
