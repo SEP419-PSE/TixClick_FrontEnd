@@ -34,7 +34,7 @@ const Header = () => {
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <p className="text-[24px] font-semibold text-pse-green">Tixclick</p>
+      <p className="text-[24px] font-semibold text-pse-green">TixClick</p>
       <div className="ml-auto flex items-center gap-4">
         <SearchBar />
         <span className="lg:hidden p-[6px] border rounded-full">

@@ -10,6 +10,7 @@ import { XCircle } from "lucide-react";
 const CreateCompany = () => {
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
+  const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [codeTax, setCodeTax] = useState("");
   const [bankingName, setBankingName] = useState("");
@@ -44,6 +45,7 @@ const CreateCompany = () => {
     // Kiểm tra dữ liệu đầu vào
     if (
       !logoCompany ||
+      !address ||
       !companyName ||
       !description ||
       !codeTax ||
@@ -62,6 +64,7 @@ const CreateCompany = () => {
       const companyData = new FormData();
       companyData.append("file", logoCompany);
       companyData.append("companyName", companyName);
+      companyData.append("address", address);
       companyData.append("description", description);
       companyData.append("codeTax", codeTax);
       companyData.append("bankingName", bankingName);
@@ -77,19 +80,19 @@ const CreateCompany = () => {
       toast.success("Tạo công ty thành công", { position: "top-center" });
 
       // Tạo FormData để upload tài liệu
-      const documentData = new FormData();
-      files.forEach((file) => {
-        documentData.append("files", file);
-      });
-      documentData.append("companyId", companyId);
-      documentData.append("uploadDate", new Date().toISOString());
+      // const documentData = new FormData();
+      // files.forEach((file) => {
+      //   documentData.append("files", file);
+      // });
+      // documentData.append("companyId", companyId);
+      // documentData.append("uploadDate", new Date().toISOString());
 
-      // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
-      await companyApi.createDocumentCompany(documentData);
+      // // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
+      // await companyApi.createDocumentCompany(documentData);
 
-      toast.success("Tài liệu đã được tải lên thành công!", {
-        position: "top-center",
-      });
+      // toast.success("Tài liệu đã được tải lên thành công!", {
+      //   position: "top-center",
+      // });
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
@@ -116,6 +119,13 @@ const CreateCompany = () => {
           maxLength={50}
           text={companyName}
           setText={setCompanyName}
+          className="mt-4"
+        />
+        <TextInput
+          label="Địa chỉ"
+          maxLength={100}
+          text={address}
+          setText={setAddress}
           className="mt-4"
         />
         <TextInput

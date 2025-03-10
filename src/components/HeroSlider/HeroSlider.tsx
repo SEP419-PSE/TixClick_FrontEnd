@@ -17,7 +17,7 @@ const HeroSlider = () => {
             type="video/mp4"
           />
         </video>
-        <div className="absolute top-0 left-0 p-6 lg:px-10 text-white">
+        <div className="absolute top-0 left-0 py-6 px-4 lg:px-14 text-white">
           <p className="font-semibold text-2xl">TixClick</p>
         </div>
         <button className="absolute text-xl z-10 px-4 py-2 bg-transparent hover:bg-pse-black rounded-lg transition-all duration-300 border border-white top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2">
