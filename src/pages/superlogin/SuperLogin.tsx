@@ -1,25 +1,22 @@
-"use client"
-
-import type React from "react"
-
 import { Eye, EyeOff, Lock, LogIn, User } from "lucide-react"
-import { useState } from "react"
+import type React from "react"
+import { useContext, useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
+import { LoginRequest } from "../../interface/superLogin/Login"
+import superLoginApi from "../../services/superLogin/SuperLoginApi"
+import { AuthContext } from "../../contexts/AuthProvider"
 
 
-interface LoginCredentials {
-  username: string
-  password: string
-}
 
 export default function SuperLogin() {
+  const authContext = useContext(AuthContext);
     const navigate = useNavigate()
-    const [credentials, setCredentials] = useState<LoginCredentials>({
+    const [credentials, setCredentials] = useState<LoginRequest>({
     username: "",
     password: "",
   })
@@ -39,7 +36,6 @@ export default function SuperLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Basic validation
     if (!credentials.username || !credentials.password) {
       setError("Please enter both username and password")
       toast.error("Login failed", {
@@ -52,52 +48,47 @@ export default function SuperLogin() {
     setError("")
 
     try {
-     
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await superLoginApi.login(credentials)
 
-      let userRole = null
+      localStorage.clear()
 
-      if (credentials.username === "admin" && credentials.password === "admin123") {
-        userRole = 3 // Admin role
-      } else if (credentials.username === "manager" && credentials.password === "manager123") {
-        userRole = 4 // Manager role
-      } else if (credentials.username === "user" && credentials.password === "user123") {
-        userRole = 2 // Some other role (will be rejected)
-      } else {
-        throw new Error("Invalid credentials")
-      }
+      localStorage.setItem("accessToken", response.data.result.accessToken)
+      localStorage.setItem("refreshToken", response.data.result.refreshToken)
 
-      if (userRole !== 3 && userRole !== 4) {
-        throw new Error("Unauthorized role")
-      }
+      const userRole = response.data.result.roleId 
 
       localStorage.setItem("userRole", userRole.toString())
       localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("userName", credentials.username)
 
-      toast.success("Login successful", {
-        description: `Welcome back, ${credentials.username}!`,
-      })
+      authContext?.login()
 
-      if (userRole === 3) {
-        navigate("/admin/dashboard")
-      } else if (userRole === 4) {
-        navigate("/manager/company-approvals")
-      }
-    } catch (error: any) {
-      console.error("Login error:", error)
-
-      if (error.message === "Unauthorized role") {
-        setError("You don't have permission to access this system")
-        toast.error("Access denied", {
-          description: "Your account doesn't have permission to access this system.",
-        })
+      if (response.data.result.status === true) {
+        if (userRole === 3) {
+          toast.success("Login successful", {
+            description: "Welcome to Admin Dashboard",
+          })
+          navigate("/proAdmin") 
+        } else if (userRole === 4) {
+          toast.success("Login successful", {
+            description: "Welcome to Manager Dashboard",
+          })
+          navigate("/manager-dashboard") 
+        } else {
+          toast.error("Access denied", {
+            description: "Your account doesn't have permission to access this system.",
+          })
+          localStorage.clear()
+          authContext?.logout()
+        }
       } else {
-        setError("Invalid username or password")
-        toast.error("Login failed", {
-          description: "Please check your credentials and try again.",
-        })
+        navigate("/auth/verify")
       }
+    } catch (error) {
+      console.error("Login error:", error)
+      setError("Invalid username or password")
+      toast.error("Login failed", {
+        description: "Please check your credentials and try again.",
+      })
     } finally {
       setIsLoading(false)
     }
