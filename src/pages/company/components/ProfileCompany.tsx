@@ -1,17 +1,14 @@
 import {
-  Building2,
-  FileText,
-  CreditCard,
-  Banknote,
-  ClipboardList,
   BadgePercent,
+  Banknote,
+  Building2,
+  ClipboardList,
+  CreditCard,
+  FileText,
 } from "lucide-react";
-import InputCanEdit from "./InputCanEdit";
+import { NavLink } from "react-router";
 import CompanyAvt from "../../../assets/AvatarHuy.jpg";
 import { Button } from "../../../components/ui/button";
-import { NavLink } from "react-router";
-import { useState } from "react";
-import Popup from "../../../components/Popup/Popup";
 
 interface AccountCompanyInterface {
   id: number;
@@ -65,6 +62,7 @@ const accountInfor: AccountCompanyInterface[] = [
     canEdit: false,
   },
 ];
+console.log(accountInfor)
 
 const ProfileCompany = () => {
   return (
