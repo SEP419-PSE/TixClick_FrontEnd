@@ -1,8 +1,8 @@
-import { Badge, MoreHorizontal, Plus, Search, Send } from "lucide-react"
+import { Badge, MoreHorizontal, Search, Send } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
 import { Label } from "../../../../components/ui/label"
@@ -136,34 +136,41 @@ export default function PaymentsPage() {
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false)
   const [reminderMessage, setReminderMessage] = useState("")
 
-  const handleAddPayment = () => {
-    // const paymentToAdd = {
-    //   ...newPayment,
-    //   id: payments.length + 1,
-    //   totalAmount: Number.parseFloat(newPayment.totalAmount),
-    //   paidAmount: 0,
-    //   remainingAmount: Number.parseFloat(newPayment.totalAmount),
-    //   installments: newPayment.paymentType === "Installments" ? [] : undefined,
-    // }
-    // setPayments([...payments, paymentToAdd])
-    console.log(setSelectedPayment)
-    console.log(setPayments)
-    setNewPayment({
-      invoiceNumber: "",
-      company: "",
-      totalAmount: "",
-      date: "",
-      dueDate: "",
-      status: "Pending",
-      paymentMethod: "",
-      currency: "USD",
-      paymentType: "Full Payment",
-    })
-    toast.success(
-      "Payment Added",{
-      description: "The new payment has been successfully added.",
-    })
-  }
+  console.log(setPayments);
+  console.log(newPayment);
+  console.log(setNewPayment);
+  console.log(setSelectedPayment);
+
+
+
+  // const handleAddPayment = () => {
+  //   // const paymentToAdd = {
+  //   //   ...newPayment,
+  //   //   id: payments.length + 1,
+  //   //   totalAmount: Number.parseFloat(newPayment.totalAmount),
+  //   //   paidAmount: 0,
+  //   //   remainingAmount: Number.parseFloat(newPayment.totalAmount),
+  //   //   installments: newPayment.paymentType === "Installments" ? [] : undefined,
+  //   // }
+  //   // setPayments([...payments, paymentToAdd])
+  //   console.log(setSelectedPayment)
+  //   console.log(setPayments)
+  //   setNewPayment({
+  //     invoiceNumber: "",
+  //     company: "",
+  //     totalAmount: "",
+  //     date: "",
+  //     dueDate: "",
+  //     status: "Pending",
+  //     paymentMethod: "",
+  //     currency: "USD",
+  //     paymentType: "Full Payment",
+  //   })
+  //   toast.success(
+  //     "Payment Added",{
+  //     description: "The new payment has been successfully added.",
+  //   })
+  // }
 
   const handleSendReminder = () => {
     console.log(`Sending reminder for invoice ${selectedPayment.invoiceNumber}: ${reminderMessage}`)
@@ -230,7 +237,7 @@ export default function PaymentsPage() {
                 <SelectItem value="installments">Installments</SelectItem>
               </SelectContent>
             </Select>
-            <Dialog>
+            {/* <Dialog>
               <DialogTrigger asChild>
                 <Button className="bg-[#00B14F] text-white">
                   <Plus className="mr-2 h-4 w-4" /> Add Payment
@@ -352,7 +359,7 @@ export default function PaymentsPage() {
                   </Button>
                 </DialogFooter>
               </DialogContent>
-            </Dialog>
+            </Dialog> */}
           </div>
         </div>
         <Table>

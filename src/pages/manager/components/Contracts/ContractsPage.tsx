@@ -7,15 +7,14 @@ import {
   Clock,
   Download,
   MoreHorizontal,
-  Plus,
   Search,
   Upload,
-  XCircle,
+  XCircle
 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
 import { Progress } from "../../../../components/ui/progress"
@@ -116,22 +115,26 @@ export default function ContractsPage() {
   })
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
 
-  const handleAddContract = () => {
-    setContracts([
-      ...contracts,
-      {
-        ...newContract,
-        id: contracts.length + 1,
-        value: Number.parseFloat(newContract.value),
-        progress: 0,
-        documents: [],
-      },
-    ])
-    setNewContract({ name: "", company: "", type: "", startDate: "", endDate: "", value: "", status: "Draft" })
-    toast.success("Contract Added", {
-      description: "The new contract has been successfully added.",
-    });
-  }
+  // const handleAddContract = () => {
+  //   setContracts([
+  //     ...contracts,
+  //     {
+  //       ...newContract,
+  //       id: contracts.length + 1,
+  //       value: Number.parseFloat(newContract.value),
+  //       progress: 0,
+  //       documents: [],
+  //     },
+  //   ])
+  //   setNewContract({ name: "", company: "", type: "", startDate: "", endDate: "", value: "", status: "Draft" })
+  //   toast.success("Contract Added", {
+  //     description: "The new contract has been successfully added.",
+  //   });
+  // }
+  console.log(setContracts);
+  console.log(newContract);
+  console.log(setNewContract);
+  
 
   const handleUploadDocument = (id :any) => {
     toast.success("Document Uploaded", {
@@ -215,7 +218,7 @@ export default function ContractsPage() {
                 <SelectItem value="consulting">Consulting Agreement</SelectItem>
               </SelectContent>
             </Select>
-            <Dialog>
+            {/* <Dialog>
               <DialogTrigger asChild>
                 <Button className="bg-[#00B14F] text-white">
                   <Plus className="mr-2 h-4 w-4" /> Add Contract
@@ -309,7 +312,7 @@ export default function ContractsPage() {
                   </Button>
                 </DialogFooter>
               </DialogContent>
-            </Dialog>
+            </Dialog> */}
           </div>
         </div>
         <Table>

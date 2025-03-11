@@ -7,8 +7,8 @@ import {
   UserCheck
 } from "lucide-react"
 import { useState } from "react"
-import { Link, useLocation } from "react-router"
-import { toast } from "sonner"
+import { Link, useLocation, useNavigate } from "react-router"
+import { toast, Toaster } from "sonner"
 import Logo from "../../../assets/Logo.png"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Button } from "../../../components/ui/button"
@@ -19,6 +19,7 @@ import { cn } from "../../../lib/utils"
 export function DashboardSidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   const isActive = (path: string) => {
     if (path === "" && location.pathname === "/manager") {
@@ -28,15 +29,24 @@ export function DashboardSidebar() {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem("userRole")
+    localStorage.removeItem("isAuthenticated")
+    localStorage.removeItem("userName")
     toast.success("Logged out", {
       description: "You have been successfully logged out.",
+      duration:2000,
     })
+
+    setTimeout(() => {
+      navigate("/superLogin")
+    }, 1000)
   }
 
 
 
   return (
     <Sidebar>
+      <Toaster position="top-right" />
       <SidebarHeader className="border-b border-[#333333] px-6 py-4">
         <div className="flex items-center gap-2">
           <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-12 w-13" />
@@ -109,7 +119,7 @@ export function DashboardSidebar() {
             <DialogTrigger asChild>
               <Button variant="ghost" className="w-full justify-start px-2">
                 <Avatar className="h-8 w-8 mr-2">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="Admin" />
+                  <AvatarImage src="/" alt="Manager" />
                   <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
                 <span>Manager Account</span>
@@ -117,8 +127,8 @@ export function DashboardSidebar() {
             </DialogTrigger>
             <DialogContent className="bg-[#2A2A2A] text-white">
               <DialogHeader>
-                <DialogTitle>Admin Profile</DialogTitle>
-                <DialogDescription>View and manage your admin account details.</DialogDescription>
+                <DialogTitle>Manager Profile</DialogTitle>
+                <DialogDescription>View and manage your manager account details.</DialogDescription>
               </DialogHeader>
               <div className="flex items-center space-x-4 py-4">
                 <Avatar className="h-16 w-16">
@@ -126,8 +136,8 @@ export function DashboardSidebar() {
                   <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-lg font-semibold">Admin User</h3>
-                  <p className="text-sm text-gray-400">admin@example.com</p>
+                  <h3 className="text-lg font-semibold">Manager User</h3>
+                  <p className="text-sm text-gray-400">manager@example.com</p>
                 </div>
               </div>
               <div className="space-y-4">

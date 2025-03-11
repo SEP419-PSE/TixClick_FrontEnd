@@ -1,6 +1,7 @@
 import { BarChartIcon, Calendar, DollarSign, LogOut, Settings, Ticket, User, Users, X } from "lucide-react"
 import { useState } from "react"
-import { Outlet } from "react-router"
+import { Outlet, useNavigate } from "react-router"
+import { toast, Toaster } from "sonner"
 import Logo from "../../assets/Logo.png"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import { Button } from "../../components/ui/button"
@@ -10,9 +11,22 @@ import NavItem from "./NavItem"
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-  
+    const navigate = useNavigate()
+
+    const handleLogOut = () => {
+      localStorage.removeItem("userRole")
+      localStorage.removeItem("isAuthenticated")
+      localStorage.removeItem("userName")
+
+      toast.success("Logged out", {
+        description: "You have been successfully logged out.",
+      })
+
+      navigate("/superLogin")
+    }
     return (
       <div className="flex h-screen bg-[#1E1E1E] text-white">
+        <Toaster position="top-right" />
         <aside
           className={`${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -60,7 +74,7 @@ export default function AdminLayout() {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

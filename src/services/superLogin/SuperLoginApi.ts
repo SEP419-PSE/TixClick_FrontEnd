@@ -3,7 +3,7 @@ import axiosClient from "../axiosClient";
 
 const superLoginApi = {
     login(data: LoginRequest){
-        const url = `/auth/login`;
+        const url = "/auth/login";
         return axiosClient.post(url, data);
     }
 }

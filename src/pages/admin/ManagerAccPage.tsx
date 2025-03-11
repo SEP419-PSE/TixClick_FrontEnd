@@ -250,10 +250,10 @@ export default function AccountsPage() {
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="edit-name" className="text-right">
-                    Name
+                    Username
                   </Label>
                   <Input
-                    id="edit-name"
+                    id="edit-username"
                     name="name"
                     defaultValue={editingAccount.name}
                     className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
