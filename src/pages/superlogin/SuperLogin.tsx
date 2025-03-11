@@ -1,15 +1,15 @@
 import { Eye, EyeOff, Lock, LogIn, User } from "lucide-react"
 import type React from "react"
-import { useContext, useState } from "react"
+import { FormEvent, useContext, useState } from "react"
 import { useNavigate } from "react-router"
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
+import { AuthContext } from "../../contexts/AuthProvider"
 import { LoginRequest } from "../../interface/superLogin/Login"
 import superLoginApi from "../../services/superLogin/SuperLoginApi"
-import { AuthContext } from "../../contexts/AuthProvider"
 
 
 
@@ -17,7 +17,7 @@ export default function SuperLogin() {
   const authContext = useContext(AuthContext);
     const navigate = useNavigate()
     const [credentials, setCredentials] = useState<LoginRequest>({
-    username: "",
+    userName: "",
     password: "",
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -25,77 +25,53 @@ export default function SuperLogin() {
   const [error, setError] = useState("")
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setCredentials({
-      ...credentials,
+    const { name, value } = e.target;
+    console.log(`Updating ${name}:`, value); 
+  
+    setCredentials((prev) => ({
+      ...prev,
       [name]: value,
-    })
-    if (error) setError("")
-  }
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!credentials.username || !credentials.password) {
-      setError("Please enter both username and password")
-      toast.error("Login failed", {
-        description: "Please enter both username and password.",
-      })
-      return
-    }
-
-    setIsLoading(true)
-    setError("")
-
+    }));
+  };
+  
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+  
     try {
-      const response = await superLoginApi.login(credentials)
-
-      localStorage.clear()
-
-      localStorage.setItem("accessToken", response.data.result.accessToken)
-      localStorage.setItem("refreshToken", response.data.result.refreshToken)
-
-      const userRole = response.data.result.roleId 
-
-      localStorage.setItem("userRole", userRole.toString())
-      localStorage.setItem("isAuthenticated", "true")
-
-      authContext?.login()
-
-      if (response.data.result.status === true) {
-        if (userRole === 3) {
-          toast.success("Login successful", {
-            description: "Welcome to Admin Dashboard",
-          })
-          navigate("/proAdmin") 
-        } else if (userRole === 4) {
-          toast.success("Login successful", {
-            description: "Welcome to Manager Dashboard",
-          })
-          navigate("/manager-dashboard") 
+      console.log("Submitting credentials:", credentials);
+      const response = await superLoginApi.login(credentials);
+      console.log("API Response:", response);
+  
+      if (response.data?.result?.accessToken) {
+        localStorage.setItem("accessToken", response.data.result.accessToken);
+        localStorage.setItem("refreshToken", response.data.result.refreshToken);
+       
+  
+        authContext?.login();
+  
+        if (response.data.result.status == true) {
+          toast.success("Login successful");
+          navigate(response.data.result.roleId === 1 ? "/proAdmin" : "/manager-dashboard");
         } else {
-          toast.error("Access denied", {
-            description: "Your account doesn't have permission to access this system.",
-          })
-          localStorage.clear()
-          authContext?.logout()
+          setError("Access denied");
         }
       } else {
-        navigate("/auth/verify")
+        setError("Invalid credentials");
       }
     } catch (error) {
-      console.error("Login error:", error)
-      setError("Invalid username or password")
-      toast.error("Login failed", {
-        description: "Please check your credentials and try again.",
-      })
+      console.error("Login error:", error);
+      setError("Invalid username or password");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1E1E1E] p-4">
+      <Toaster position="top-right" />
       <Card className="w-full max-w-md bg-[#2A2A2A] text-white border-[#333333]">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Admin Portal</CardTitle>
@@ -112,11 +88,11 @@ export default function SuperLogin() {
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="username"
-                  name="username"
+                  id="userName"
+                  name="userName"
                   placeholder="Enter your username"
                   className="bg-[#1E1E1E] border-[#333333] pl-10"
-                  value={credentials.username}
+                  value={credentials.userName}
                   onChange={handleInputChange}
                   autoComplete="username"
                 />
