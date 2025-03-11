@@ -32,9 +32,6 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-<<<<<<< HEAD
-import OrganizerPage from "./pages/organizer";
-import Stepper from "./components/CreateEvent/Stepper";
 import CreateCompany from "./pages/company/CreateCompany";
 import CompanyDashBoard from "./pages/company/CompanyDashBoard";
 import ManageEvents from "./pages/company/components/ManageEvents";
@@ -45,8 +42,6 @@ import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
-=======
->>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
 
 export default function App() {
   return (
@@ -116,7 +111,6 @@ export default function App() {
 
             <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
-<<<<<<< HEAD
 
           {/* Account Company */}
           <Route path="company" element={<CompanyDashBoard />}>
@@ -131,12 +125,8 @@ export default function App() {
           <Route path="seatmap" element={<SeatMap />} />
           <Route path="drag" element={<DraggableArea />} />
 
-          <Route path="admin" element={<AdminDashboard />} />
-          <Route path="proAdmin" element={<ProfessionalDashboard />} />
-          <Route path="404" element={<ErrorPage />} />
-=======
           
->>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
+          <Route path="404" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>
     </div>
