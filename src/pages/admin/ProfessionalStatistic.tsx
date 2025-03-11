@@ -1,6 +1,4 @@
-"use client"
-
-import { BarChartIcon, Calendar, DollarSign, Menu, Ticket, Users, X } from "lucide-react"
+import { Calendar, DollarSign, Menu, Ticket, Users, X } from "lucide-react"
 import { useState } from "react"
 
 import { Select } from "@radix-ui/react-select"
@@ -11,7 +9,6 @@ import { Input } from "../../components/ui/input"
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import DashboardCard from "./DashboardCard"
-import NavItem from "./NavItem"
 
 const revenueData = [
   { name: "Jan", revenue: 4000 },
@@ -50,7 +47,6 @@ export default function ProfessionalDashboard() {
 
   return (
     <div className="flex h-screen bg-[#1E1E1E] text-white">
-      {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -62,16 +58,25 @@ export default function ProfessionalDashboard() {
             <X className="h-6 w-6" />
           </Button>
         </div>
-        <nav className="mt-8">
-          <NavItem icon={BarChartIcon} label="Dashboard" active />
-          <NavItem icon={Calendar} label="Events" />
-          <NavItem icon={Ticket} label="Tickets" />
-          <NavItem icon={Users} label="Attendees" />
-          <NavItem icon={DollarSign} label="Revenue" />
-        </nav>
+        {/* <nav className="mt-8">
+          <Link to="chart">
+            <NavItem icon={BarChartIcon} label="Dashboard" active />
+          </Link>
+          <Link to="events">
+            <NavItem icon={Calendar} label="Events" />
+          </Link>
+          <Link to="tickets">
+            <NavItem icon={Ticket} label="Tickets" />
+          </Link>
+          <Link to="attendees">
+            <NavItem icon={Users} label="Attendees" />
+          </Link>
+          <Link to="revenue">
+            <NavItem icon={DollarSign} label="Revenue" />
+          </Link>
+        </nav> */}
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
         <header className="flex items-center justify-between p-4 bg-[#2A2A2A]">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -186,20 +191,20 @@ export default function ProfessionalDashboard() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-white">Event Name</TableHead>
-                    <TableHead className="text-white">Date</TableHead>
-                    <TableHead className="text-white">Tickets Sold</TableHead>
-                    <TableHead className="text-white">Revenue</TableHead>
+                  <TableRow className="font-medium bg-white text-black">
+                    <TableHead className="text-black font-bold">Event Name</TableHead>
+                    <TableHead className="text-black font-bold">Date</TableHead>
+                    <TableHead className="text-black font-bold">Tickets Sold</TableHead>
+                    <TableHead className="text-black font-bold">Revenue</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {upcomingEvents.map((event) => (
                     <TableRow key={event.id}>
-                      <TableCell className="font-medium">{event.name}</TableCell>
-                      <TableCell>{event.date}</TableCell>
-                      <TableCell>{event.ticketsSold}</TableCell>
-                      <TableCell>${event.revenue.toLocaleString()}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.name}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.date}</TableCell>
+                      <TableCell className="font-medium bg-white">{event.ticketsSold}</TableCell>
+                      <TableCell className="font-medium bg-white">${event.revenue.toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

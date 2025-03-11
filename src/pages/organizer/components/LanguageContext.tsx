@@ -27,7 +27,7 @@ const translations = {
     account: 'Tài khoản',
     language: 'Ngôn ngữ',
     sidebar: {
-      title: "Organizer Center",
+      title: "Consumer Center",
       myEvents: "Sự kiện của tôi",
       reports: "Quản lý báo cáo",
       terms: "Điều khoản cho Ban tổ chức",
@@ -127,7 +127,7 @@ const translations = {
     account: 'Account',
     language: 'Language',
     sidebar: {
-      title: "Organizer Center",
+      title: "Consumer Center",
       myEvents: "My Events",
       reports: "Reports Management",
       terms: "Organizer Terms",

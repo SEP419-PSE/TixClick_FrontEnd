@@ -35,7 +35,7 @@ export default function TicketManagement() {
               onClick={() => setStatus(tab.value)}
               className={cn(
                 "py-2 text-sm font-medium rounded-md transition-colors",
-                status === tab.value ? "bg-[#00B14F] text-white" : "text-gray-400 hover:text-white",
+                status === tab.value ? "bg-pse-green text-white" : "text-gray-400 hover:text-white",
               )}
             >
               {tab.label}
@@ -49,7 +49,7 @@ export default function TicketManagement() {
             onClick={() => setTimeFilter("upcoming")}
             className={cn(
               "pb-2 px-0",
-              timeFilter === "upcoming" ? "text-[#00B14F] border-b-2 border-[#00B14F]" : "text-gray-400",
+              timeFilter === "upcoming" ? "text-[#ff8a00] border-b-2 border-[#ff8a00]" : "text-white hover:text-[#ff8a00]",
             )}
           >
             Sắp diễn ra
@@ -59,7 +59,7 @@ export default function TicketManagement() {
             onClick={() => setTimeFilter("ended")}
             className={cn(
               "pb-2 px-0",
-              timeFilter === "ended" ? "text-[#00B14F] border-b-2 border-[#00B14F]" : "text-gray-400",
+              timeFilter === "ended" ? "text-[#ff8a00] border-b-2 border-[#ff8a00]" : "text-white hover:text-[#ff8a00]",
             )}
           >
             Đã kết thúc
@@ -75,7 +75,7 @@ export default function TicketManagement() {
             />
           </div>
           <p className="text-gray-400 mb-6">Bạn chưa có vé nào</p>
-          <Button className="bg-[#00B14F] hover:bg-[#00B14F]/90">Mua vé ngay</Button>
+          <Button className="bg-pse-green hover:bg-[#00B14F]/90">Mua vé ngay</Button>
         </div>
       </div>
     </div>

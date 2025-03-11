@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
+import Stepper from "./components/CreateEvent/Stepper";
 import EnterCode from "./components/OTP/EnterCode";
 import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -6,7 +7,11 @@ import SignInForm from "./components/SignInForm/SignInForm";
 import SignUpForm from "./components/SingUpForm/SignUpForm";
 import RootLayout from "./layout/RootLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import ProfessionalDashboard from "./pages/admin/ProfessionalStatistic";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminCompany from "./pages/admin/companies/AdminCompany";
+import AdminEvent from "./pages/admin/events/AdminEvent";
+import AccountsPage from "./pages/admin/ManagerAccPage";
+import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -15,10 +20,19 @@ import RootLayouts from "./pages/consumer/Layout";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
+import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
+import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
+import EventsPage from "./pages/manager/components/Events/EventsPage";
+import DashboardLayout from "./pages/manager/components/ManagerLayout";
+import ManagerOverview from "./pages/manager/components/ManagerOverview";
+import PaymentsPage from "./pages/manager/components/payments/Payments";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
-import OrganizerCenter from "./pages/organizer";
+import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
+import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
+import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
+<<<<<<< HEAD
 import OrganizerPage from "./pages/organizer";
 import Stepper from "./components/CreateEvent/Stepper";
 import CreateCompany from "./pages/company/CreateCompany";
@@ -31,6 +45,8 @@ import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
+=======
+>>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
 
 export default function App() {
   return (
@@ -62,14 +78,45 @@ export default function App() {
             <Route path="organizerCenter" element={<OrganizerCenter />} />
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
-            {/* <Route path="manager" element={<ManagerDashboardPage />} /> */}
+            {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
+            <Route path="payment" element={<PaymentPage />} />
+
+
+            <Route path="manager-dashboard" element={<DashboardLayout />}>
+              <Route index element={<ManagerOverview />} />
+              <Route path="contracts" element={<ContractsPage />} />
+              <Route path="events" element={<EventsPage />} />
+              <Route path="payments" element={<PaymentsPage />} />
+              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
+
+
+            </Route>
+
+
+            <Route path="superLogin" element={<SuperLogin />} />
+
 
             <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
             </Route>
+
+            <Route path="proAdmin" element={<AdminLayout />} >  
+              <Route index element={<AdminDashboard />} />
+              <Route path="events" element={<AdminEvent />} />
+              <Route path="companies" element={<AdminCompany />} />
+              <Route path="managerManagement" element={<AccountsPage />} />
+              <Route path="revenues" element={<RevenuePage />} />
+            </Route>
+
+{/*             
+            <Route path="managerManagement" element={<AccountsPage />} />
+            <Route path="event" element={<EventsPage />} />
+
+            <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
+<<<<<<< HEAD
 
           {/* Account Company */}
           <Route path="company" element={<CompanyDashBoard />}>
@@ -87,6 +134,9 @@ export default function App() {
           <Route path="admin" element={<AdminDashboard />} />
           <Route path="proAdmin" element={<ProfessionalDashboard />} />
           <Route path="404" element={<ErrorPage />} />
+=======
+          
+>>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
         </Routes>
       </BrowserRouter>
     </div>
