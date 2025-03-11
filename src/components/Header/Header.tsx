@@ -2,11 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-<<<<<<< HEAD
-import { NavLink, useLocation } from "react-router";
-=======
-import { Link, NavLink } from "react-router";
->>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
+import { Link, NavLink, useLocation } from "react-router";
 import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SearchBar from "../SearchBar/SearchBar";
@@ -76,13 +72,9 @@ const Header = () => {
                     <RiCalendarEventLine size={24} />
                     Sự kiện của tôi
                   </li>
-<<<<<<< HEAD
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
-=======
                   </Link>
                   <Link to="/profileForm">
                   <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
->>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
                     <CgProfile size={24} />
                     Trang cá nhân
                   </li>
