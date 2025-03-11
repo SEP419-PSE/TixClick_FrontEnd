@@ -18,6 +18,7 @@ export default {
 				"pse-footer": "#060606",
 				"pse-text": "#ffffff",
 				"pse-error": "#ff0000",
+				"pse-success": "#23C10A",
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {

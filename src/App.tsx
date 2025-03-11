@@ -32,6 +32,21 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
+<<<<<<< HEAD
+import OrganizerPage from "./pages/organizer";
+import Stepper from "./components/CreateEvent/Stepper";
+import CreateCompany from "./pages/company/CreateCompany";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageTickets from "./pages/company/components/ManageTickets";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageContract from "./pages/company/components/ManageContract";
+import SeatMap from "./pages/seatmap/Seatmap";
+import DraggableArea from "./pages/seatmap/DragandDrop";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
+=======
+>>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
 
 export default function App() {
   return (
@@ -55,6 +70,9 @@ export default function App() {
             <Route path="404" element={<ErrorPage />} />
 
             <Route path="ticketManagement" element={<TicketPage />} />
+
+            {/*Company route */}
+            <Route path="create-company" element={<CreateCompany />} />
           </Route>
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
@@ -98,7 +116,27 @@ export default function App() {
 
             <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
+<<<<<<< HEAD
+
+          {/* Account Company */}
+          <Route path="company" element={<CompanyDashBoard />}>
+            <Route index element={<HomeCompany />} />
+            <Route path="events" element={<ManageEvents />} />
+            <Route path="tickets" element={<ManageTickets />} />
+            <Route path="members" element={<ManageMember />} />
+            <Route path="contracts" element={<ManageContract />} />
+            <Route path="profile" element={<ProfileCompany />} />
+          </Route>
+
+          <Route path="seatmap" element={<SeatMap />} />
+          <Route path="drag" element={<DraggableArea />} />
+
+          <Route path="admin" element={<AdminDashboard />} />
+          <Route path="proAdmin" element={<ProfessionalDashboard />} />
+          <Route path="404" element={<ErrorPage />} />
+=======
           
+>>>>>>> 0008a325682ac73f27fa9ce829199868b93c45f5
         </Routes>
       </BrowserRouter>
     </div>

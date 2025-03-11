@@ -16,3 +16,9 @@ export const ball = {
   backgroundColor: "#dd00ee",
   borderRadius: "50%",
 };
+
+export const ERROR_RESPONSE = {
+  invalidAccount: () => {
+    return "Tài khoản chưa được kích hoạt";
+  },
+};

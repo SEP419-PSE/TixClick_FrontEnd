@@ -4,7 +4,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 
 const InformationEvent = () => {
   return (
-    <div className="mx-3 my-4 lg:my-8 lg:flex lg:justify-center bg-pse-black ">
+    <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-pse-black ">
       <div>
         <img src={Img1} className="w-full" />
       </div>

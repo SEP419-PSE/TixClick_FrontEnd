@@ -5,6 +5,7 @@ interface TextInputProps {
   label: string;
   text: string;
   setText: React.Dispatch<React.SetStateAction<string>>;
+  className?: string;
 }
 
 export default function TextInput({
@@ -12,6 +13,7 @@ export default function TextInput({
   label,
   text,
   setText,
+  className,
 }: TextInputProps) {
   const [nullError, setNullError] = useState<boolean>(false);
   const [isMaxLength, setIsMaxLength] = useState<boolean>(false);
@@ -32,14 +34,16 @@ export default function TextInput({
   };
 
   return (
-    <div className="flex flex-col w-full items-start rounded-lg p-2 gap-1">
-      <label className="text-white">{label}</label>
+    <div
+      className={`flex flex-col w-full items-start rounded-lg p-1 ${className}`}
+    >
+      <label className="text-white mb-[2px]">{label}</label>
       <input
         type="text"
         value={text}
         onChange={handleChange}
         placeholder={label}
-        className="px-2 py-1 outline-none text-[14px] w-full rounded-md"
+        className="px-2 py-1 outline-none text-[14px] text-pse-black-light w-full rounded-md"
         maxLength={maxLength} // Thêm thuộc tính maxLength trực tiếp vào input
       />
       <div className="flex justify-between w-full text-sm text-white/80 mt-1">
