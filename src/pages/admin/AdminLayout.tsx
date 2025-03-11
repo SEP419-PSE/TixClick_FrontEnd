@@ -17,16 +17,18 @@ export default function AdminLayout() {
       localStorage.removeItem("userRole")
       localStorage.removeItem("isAuthenticated")
       localStorage.removeItem("userName")
-
       toast.success("Logged out", {
         description: "You have been successfully logged out.",
+        duration: 5000,
       })
-
-      navigate("/superLogin")
+  
+      setTimeout(() => {
+        navigate("/superLogin")
+      }, 1000)
     }
     return (
       <div className="flex h-screen bg-[#1E1E1E] text-white">
-        <Toaster position="top-right" />
+        
         <aside
           className={`${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -47,6 +49,7 @@ export default function AdminLayout() {
             <NavItem icon={DollarSign} label="Revenue" href="/proAdmin/revenues" />
           </nav>
           <div className="absolute bottom-0 left-0 right-0 p-4">
+          <Toaster position="top-right" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start px-2">
