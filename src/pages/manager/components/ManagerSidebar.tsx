@@ -34,7 +34,7 @@ export function DashboardSidebar() {
     localStorage.removeItem("userName")
     toast.success("Logged out", {
       description: "You have been successfully logged out.",
-      duration:2000,
+      duration: 5000,
     })
 
     setTimeout(() => {
