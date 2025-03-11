@@ -14,7 +14,7 @@ const steps = [
 // const stepComponents = [StepOne, StepTwo, StepThree, StepFour];
 
 export default function Stepper() {
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(1);
   const [isStepValid, setIsStepValid] = useState(false);
 
   // useEffect(() => {

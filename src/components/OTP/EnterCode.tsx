@@ -36,6 +36,7 @@ const EnterCode = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const convertOTP = otp.join("");
+    // console.log(state, convertOTP);
     authApi
       .verifyOTP(state, convertOTP)
       .then((response) => {
@@ -46,7 +47,7 @@ const EnterCode = () => {
         }
       })
       .catch((error) => {
-        // console.log(error);
+        console.log(error);
         toast.error(error.response.data.message);
       });
   };
