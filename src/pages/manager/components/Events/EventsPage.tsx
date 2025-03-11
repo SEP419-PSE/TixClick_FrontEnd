@@ -2,7 +2,6 @@
 
 import { Badge, Filter, MoreHorizontal, Plus, Search } from "lucide-react"
 import { useEffect, useState } from "react"
-import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
@@ -101,6 +100,8 @@ export default function EventsPage() {
     },
   ])
 
+  console.log(setEvents)
+
   const [newEvent, setNewEvent] = useState({
     name: "",
     date: "",
@@ -160,33 +161,33 @@ export default function EventsPage() {
     setFilteredEvents(result)
   }, [searchQuery, events, filterStatus, filterType, sortBy, sortOrder])
 
-  const handleAddEvent = () => {
-    const eventToAdd = {
-      ...newEvent,
-      id: events.length + 1,
-      attendees: Number.parseInt(newEvent.attendees),
-      budget: Number.parseFloat(newEvent.budget),
-    }
-    setEvents([...events, eventToAdd])
-    setIsAddEventModalOpen(false)
-    setNewEvent({
-      name: "",
-      date: "",
-      location: "",
-      organizer: "",
-      attendees: "",
-      status: "Planning",
-      type: "",
-      description: "",
-      budget: "",
-      sponsors: [],
-      speakers: [],
-    })
-    toast.success(
-      "Event Added",{
-      description: "The new event has been successfully added.",
-    })
-  }
+  // const handleAddEvent = () => {
+  //   const eventToAdd = {
+  //     ...newEvent,
+  //     id: events.length + 1,
+  //     attendees: Number.parseInt(newEvent.attendees),
+  //     budget: Number.parseFloat(newEvent.budget),
+  //   }
+  //   setEvents([...events, eventToAdd])
+  //   setIsAddEventModalOpen(false)
+  //   setNewEvent({
+  //     name: "",
+  //     date: "",
+  //     location: "",
+  //     organizer: "",
+  //     attendees: "",
+  //     status: "Planning",
+  //     type: "",
+  //     description: "",
+  //     budget: "",
+  //     sponsors: [],
+  //     speakers: [],
+  //   })
+  //   toast.success(
+  //     "Event Added",{
+  //     description: "The new event has been successfully added.",
+  //   })
+  // }
 
   const getStatusBadge = (status :any) => {
     switch (status) {
@@ -382,11 +383,11 @@ export default function EventsPage() {
                     />
                   </div>
                 </div>
-                <DialogFooter>
+                {/* <DialogFooter>
                   <Button type="submit" onClick={handleAddEvent} className="bg-[#00B14F] text-white">
                     Add Event
-                  </Button>
-                </DialogFooter>
+                  </Button
+                </DialogFooter> */}
               </DialogContent>
             </Dialog>
           </div>

@@ -307,7 +307,7 @@ export default function CompanyApprovalsPage() {
                   <Label className="text-sm font-medium text-gray-400">Location</Label>
                   <div className="text-lg flex items-center">
                     <MapPin className="mr-2 h-5 w-5 text-[#00B14F]" />
-                    {selectedCompany.companyName}
+                    {selectedCompany.address}
                   </div>
                 </div>
               </div>

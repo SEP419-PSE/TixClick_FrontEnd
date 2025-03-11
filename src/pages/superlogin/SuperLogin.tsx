@@ -3,6 +3,7 @@ import type React from "react"
 import { FormEvent, useContext, useState } from "react"
 import { useNavigate } from "react-router"
 import { toast, Toaster } from "sonner"
+import Logo from "../../assets/Logo.png"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
 import { Input } from "../../components/ui/input"
@@ -52,8 +53,10 @@ export default function SuperLogin() {
         authContext?.login();
   
         if (response.data.result.status == true) {
-          toast.success("Login successful");
-          navigate(response.data.result.roleId === 1 ? "/proAdmin" : "/manager-dashboard");
+          toast.success("Login successful", {duration:2000});
+          setTimeout(() => {
+            navigate(response.data.result.roleName == "ADMIN" ? "/proAdmin" : "/manager-dashboard");
+          }, 1000)
         } else {
           setError("Access denied");
         }
@@ -72,8 +75,12 @@ export default function SuperLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1E1E1E] p-4">
       <Toaster position="top-right" />
+      
       <Card className="w-full max-w-md bg-[#2A2A2A] text-white border-[#333333]">
         <CardHeader className="space-y-1">
+              <div className="flex items-center gap-2">
+                <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-16 w-13" />
+              </div>
           <CardTitle className="text-2xl font-bold text-center">Admin Portal</CardTitle>
           <CardDescription className="text-center text-gray-400">
             Enter your credentials to access the management system
