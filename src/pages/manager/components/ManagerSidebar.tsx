@@ -1,4 +1,5 @@
 import {
+  Bell,
   CalendarDays,
   ClipboardSignature,
   CreditCard,
@@ -108,6 +109,14 @@ export function DashboardSidebar() {
               <Link to="payments" className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
                 <span>Payments</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link to="/manager-dashboard/notifications" className="flex items-center">
+                <Bell className="mr-2 h-5 w-5" />
+                <span>Notifications</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
