@@ -57,9 +57,9 @@ const HeroSlider = () => {
               </ul>
             ) : (
               <NavLink to="/auth/signin">
-                <span>
-                  <CircleUserRound size={26} />
-                </span>
+                <button className="px-4 py-1 border rounded-md">
+                  Đăng nhập
+                </button>
               </NavLink>
             )}
           </div>
