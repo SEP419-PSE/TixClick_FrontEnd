@@ -1,4 +1,4 @@
-import { CircleUserRound, Menu, Search, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { useContext, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";

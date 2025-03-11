@@ -1,8 +1,8 @@
 import { useState } from "react";
-import TextInput from "../../components/CreateEvent/InputText";
-import ImageUpload from "../../components/CreateEvent/ImageUpload";
-import ButtonNeon from "../../components/Button/ButtonNeon";
 import { toast } from "sonner";
+import ButtonNeon from "../../components/Button/ButtonNeon";
+import ImageUpload from "../../components/CreateEvent/ImageUpload";
+import TextInput from "../../components/CreateEvent/InputText";
 import companyApi from "../../services/companyApi";
 
 import { XCircle } from "lucide-react";
@@ -74,7 +74,7 @@ const CreateCompany = () => {
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
       const response = await companyApi.create(companyData);
       console.log(response);
-      const companyId = response.data.result.companyId;
+      // const companyId = response.data.result.companyId;
 
       // Hiển thị thông báo nếu thành công
       toast.success("Tạo công ty thành công", { position: "top-center" });

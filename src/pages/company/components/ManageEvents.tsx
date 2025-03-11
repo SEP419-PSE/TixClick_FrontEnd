@@ -3,7 +3,7 @@ import CompanyAccount from "./CompanyAccount";
 import SearchBar from "./SearchBar";
 import EmptyList from "../../../components/EmptyList/EmptyList";
 import { Button } from "../../../components/ui/button";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 const ManageEvents = () => {
   const navigate = useNavigate();
