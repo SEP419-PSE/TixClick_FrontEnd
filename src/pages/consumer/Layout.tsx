@@ -10,7 +10,7 @@ export default function RootLayouts({ children }: { children?: ReactNode }) {
     <>
     <Header />
     <LanguageProvider>
-      <div className="flex min-h-screen bg-[#1a1a1a]">
+      <div className="flex min-h-screen bg-[#1a1a1a] pt-16">
         <ConsumerSidebar />
         <main className="flex-1">{children || <Outlet />}</main>
         <LanguageSwitcher />

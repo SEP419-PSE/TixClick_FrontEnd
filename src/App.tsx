@@ -13,6 +13,14 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageContract from "./pages/company/components/ManageContract";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageTickets from "./pages/company/components/ManageTickets";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
+import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
@@ -30,18 +38,10 @@ import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
+import DraggableArea from "./pages/seatmap/DragandDrop";
+import SeatMap from "./pages/seatmap/Seatmap";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import CreateCompany from "./pages/company/CreateCompany";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageTickets from "./pages/company/components/ManageTickets";
-import ManageMember from "./pages/company/components/ManageMember";
-import ManageContract from "./pages/company/components/ManageContract";
-import SeatMap from "./pages/seatmap/Seatmap";
-import DraggableArea from "./pages/seatmap/DragandDrop";
-import ProfileCompany from "./pages/company/components/ProfileCompany";
 
 export default function App() {
   return (
@@ -64,14 +64,12 @@ export default function App() {
             <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
 
-            <Route path="ticketManagement" element={<TicketPage />} />
 
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
-            <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
@@ -95,6 +93,10 @@ export default function App() {
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
+            <Route path="ticketManagement" element={<TicketPage />} />
+            <Route path="profileForm" element={<ProfileForm />} />
+            
+
             </Route>
 
             <Route path="proAdmin" element={<AdminLayout />} >  
