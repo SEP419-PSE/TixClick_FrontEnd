@@ -10,25 +10,25 @@ interface AuthInterface {
   isLogin: boolean;
   login: () => void;
   logout: () => void;
-  accessToken: string | null;
+  accessTokenAdminPortal: string | null;
 }
 
-const AuthContext = createContext<AuthInterface | undefined>(undefined);
+const AuthContextAdminPortal = createContext<AuthInterface | undefined>(undefined);
 
-const AuthProvider = ({ children }: Props) => {
+const AuthProviderAdminPortal = ({ children }: Props) => {
   const [isLogin, setIsLogin] = useState<boolean>(false);
-  const [accessToken, setAccessToken] = useState<string | null>(
-    localStorage.getItem("accessToken")
+  const [accessTokenAdminPortal, setAccessTokenAdminPortal] = useState<string | null>(
+    localStorage.getItem("accessTokenAdminPortal")
   );
   useEffect(() => {
     //Kiểm tra token ở localStorage
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessTokenAdminPortal");
     if (token) {
       setIsLogin(true);
-      setAccessToken(token);
+      setAccessTokenAdminPortal(token);
       axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
-  }, [isLogin, accessToken]);
+  }, [isLogin, accessTokenAdminPortal]);
 
   const login = () => {
     setIsLogin(true);
@@ -37,18 +37,18 @@ const AuthProvider = ({ children }: Props) => {
   const logout = async () => {
     await localStorage.clear();
     await delete axiosClient.defaults.headers.common["Authorization"];
-    await setAccessToken(null);
+    await setAccessTokenAdminPortal(null);
     await toast.success("Đăng xuất thành công");
     setIsLogin(false);
   };
   const value = {
-    accessToken,
+    accessTokenAdminPortal,
     isLogin,
     login,
     logout,
   };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContextAdminPortal.Provider value={value}>{children}</AuthContextAdminPortal.Provider>;
 };
 
-export { AuthContext, AuthProvider };
+export { AuthContextAdminPortal, AuthProviderAdminPortal };
 

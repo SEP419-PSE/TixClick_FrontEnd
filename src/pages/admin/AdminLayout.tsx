@@ -1,7 +1,7 @@
 import { BarChartIcon, Calendar, DollarSign, LogOut, Settings, Ticket, User, Users, X } from "lucide-react"
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router"
-import { toast, Toaster } from "sonner"
+import { toast } from "sonner"
 import Logo from "../../assets/Logo.png"
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import { Button } from "../../components/ui/button"
@@ -49,7 +49,6 @@ export default function AdminLayout() {
             <NavItem icon={DollarSign} label="Revenue" href="/proAdmin/revenues" />
           </nav>
           <div className="absolute bottom-0 left-0 right-0 p-4">
-          <Toaster position="top-right" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start px-2">

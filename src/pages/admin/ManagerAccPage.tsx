@@ -1,6 +1,6 @@
 import { Edit, MoreHorizontal, Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../../components/ui/alert-dialog"
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -10,6 +10,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
+import adminApi from "../../services/admin/AdminApi"
 
 const mockAccounts = [
   { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
@@ -33,7 +34,12 @@ export default function AccountsPage() {
   )
 
   const handleAddAccount = (newAccount:any) => {
-    setAccounts([...accounts, { id: accounts.length + 1, ...newAccount, role: "Manager" }])
+
+    adminApi.createManager(newAccount).then(
+      
+    )
+    
+    setAccounts([...accounts, { id: accounts.length + 1, ...newAccount, role: "MANAGER" }])
     toast.success(
       "Account Created",{
       description: "New manager account has been successfully created.",
@@ -61,6 +67,8 @@ export default function AccountsPage() {
 
   return (
     <div className="p-6 bg-[#1E1E1E] text-white min-h-screen">
+      <Toaster position="top-right" />
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Account Management</h1>
         <Dialog>
