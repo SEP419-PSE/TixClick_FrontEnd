@@ -1,5 +1,5 @@
 import { Edit, MoreHorizontal, Plus, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast, Toaster } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../../components/ui/alert-dialog"
 import { Button } from "../../components/ui/button"
@@ -10,28 +10,25 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
+import { AdminAccount } from "../../interface/admin/Account"
 import adminApi from "../../services/admin/AdminApi"
 
-const mockAccounts = [
-  { id: 1, name: "John Doe", email: "john@example.com", role: "Admin" },
-  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Manager" },
-  { id: 3, name: "Bob Johnson", email: "bob@example.com", role: "Manager" },
-]
 
 export default function AccountsPage() {
-  const [accounts, setAccounts] = useState(mockAccounts)
+  const [accounts, setAccounts] = useState<AdminAccount[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [filterRole, setFilterRole] = useState("all")
-  const [editingAccount, setEditingAccount] = useState<{ id: number; name: string; email: string; role: string } | null>(null);
-
+  const [editingAccount, setEditingAccount] = useState<AdminAccount | null>(null);
+  const [countAdmin, setCountAdmin] = useState<number | null | undefined>();
+  const [countManager, setCountManager] = useState<number | null | undefined>()
   
 
-  const filteredAccounts = accounts.filter(
-    (account) =>
-      (account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        account.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterRole === "all" || account.role === filterRole),
-  )
+  // const filteredAccounts = accounts.filter(
+  //   (account) =>
+  //     (account.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       account.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
+  //     (filterRole === "all"),
+  // )
 
   const handleAddAccount = (newAccount:any) => {
 
@@ -48,7 +45,7 @@ export default function AccountsPage() {
 
   const handleEditAccount = (updatedAccount:any) => {
     setAccounts(
-      accounts.map((account) => (account.id === updatedAccount.id ? { ...account, ...updatedAccount } : account)),
+      accounts.map((account) => (account.accountId === updatedAccount.id ? { ...account, ...updatedAccount } : account)),
     )
     setEditingAccount(null)
     toast.success(
@@ -58,13 +55,53 @@ export default function AccountsPage() {
   }
 
   const handleDeleteAccount = (id:any) => {
-    setAccounts(accounts.filter((account) => account.id !== id))
+    setAccounts(accounts.filter((account) => account.accountId !== id))
     toast.success(
       "Account Deleted",{
       description: "The account has been successfully deleted."
     })
   }
 
+  const fetchCountAll = async () => {
+      try {
+        const res: any = await adminApi.countAll()
+        console.log("CountAll:", res.data.result)
+        setCountAdmin(res.data.result)
+
+
+        const response : any = await adminApi.countManager()
+        console.log("CountManager:", response.data.result)
+        setCountManager(response.data.result)
+
+      } catch (error) {
+        console.error("Error fetching:", error)
+        toast.error("Failed to fetch")
+      }
+    }
+    
+    const fetchAccountList = async () => {
+      try {
+        const res: any = await adminApi.getAllAccount()
+        console.log("Account List:", res.data.result)
+        if (res.data.result && res.data.result.length > 0) {
+          setAccounts(res.data.result)
+        }
+      } catch (error) {
+        console.error("Error fetching account:", error)
+        toast.error("Failed to fetch account")
+      }
+    }
+  
+
+  
+    useEffect(() => {
+      const initUseEffect = async () => {
+        await fetchCountAll()
+        await fetchAccountList()
+      }
+      initUseEffect()
+    }, [])
+  
   return (
     <div className="p-6 bg-[#1E1E1E] text-white min-h-screen">
       <Toaster position="top-right" />
@@ -132,15 +169,15 @@ export default function AccountsPage() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Total Accounts</span>
-            <span className="text-2xl font-bold">{accounts.length}</span>
+            <span className="text-2xl font-bold">{countAdmin?? + (countManager ?? 0)}</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Admins</span>
-            <span className="text-2xl font-bold">{accounts.filter((a) => a.role === "Admin").length}</span>
+            <span className="text-2xl font-bold">{countAdmin}</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Managers</span>
-            <span className="text-2xl font-bold">{accounts.filter((a) => a.role === "Manager").length}</span>
+            <span className="text-2xl font-bold">{countManager}</span>
           </div>
         </CardContent>
       </Card>
@@ -176,17 +213,17 @@ export default function AccountsPage() {
               </TableRow>
             </TableHeader>
             <TableBody className="text-white">
-              {filteredAccounts.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell className="font-medium">{account.name}</TableCell>
+              {accounts.map((account) => (
+                <TableRow key={account.accountId}>
+                  <TableCell className="font-medium">{account.lastName} {account.firstName}</TableCell>
                   <TableCell>{account.email}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        account.role === "Admin" ? "bg-purple-500/20 text-purple-500" : "bg-blue-500/20 text-blue-500"
+                        account.roleId === 1 ? "bg-purple-500/20 text-purple-500" : "bg-blue-500/20 text-blue-500"
                       }`}
                     >
-                      {account.role}
+                      {account.roleId}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -223,7 +260,7 @@ export default function AccountsPage() {
                               </AlertDialogCancel>
                               <AlertDialogAction
                                 className="bg-red-600 text-white hover:bg-red-700"
-                                onClick={() => handleDeleteAccount(account.id)}
+                                onClick={() => handleDeleteAccount(account.accountId)}
                               >
                                 Delete
                               </AlertDialogAction>
@@ -263,7 +300,7 @@ export default function AccountsPage() {
                   <Input
                     id="edit-username"
                     name="name"
-                    defaultValue={editingAccount.name}
+                    defaultValue={editingAccount.lastName}
                     className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
                   />
                 </div>
@@ -279,12 +316,12 @@ export default function AccountsPage() {
                     className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
                   />
                 </div>
-                {editingAccount.role === "Manager" && (
+                {editingAccount.roleId === 4 && (
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="edit-role" className="text-right">
                       Role
                     </Label>
-                    <Select name="role" defaultValue={editingAccount.role}>
+                    <Select name="role" defaultValue={editingAccount.lastName}>
                       <SelectTrigger className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
