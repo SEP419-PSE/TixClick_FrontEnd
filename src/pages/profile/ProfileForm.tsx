@@ -23,6 +23,8 @@ export default function ProfileForm() {
     email: "",
   })
 
+  console.log(formData)
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -78,7 +80,6 @@ export default function ProfileForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-indigo-950 flex flex-col">
-      {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center text-indigo-600 dark:text-indigo-400">
@@ -98,7 +99,7 @@ export default function ProfileForm() {
 
       <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left sidebar */}
+
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-32 relative">
@@ -165,7 +166,6 @@ export default function ProfileForm() {
             </div>
           </div>
 
-          {/* Main content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="profile" className="w-full">
               <TabsList className="w-full bg-white dark:bg-gray-800 rounded-xl p-1 mb-6">
@@ -197,13 +197,14 @@ export default function ProfileForm() {
                       <div className="relative">
                         <Input
                           name="fullName"
-                          value={formData.fullName}
+                          value={`${profile?.lastName || ""} ${profile?.firstName || ""}`}
                           onChange={handleInputChange}
                           disabled={!editMode}
                           className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
                         />
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
+
                     </div>
 
                     <div className="space-y-1">
@@ -212,7 +213,7 @@ export default function ProfileForm() {
                         <Input
                           name="phone"
                           type="tel"
-                          value={formData.phone}
+                          value={profile?.phone}
                           onChange={handleInputChange}
                           disabled={!editMode}
                           className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
@@ -227,7 +228,7 @@ export default function ProfileForm() {
                         <Input
                           name="email"
                           type="email"
-                          value={formData.email}
+                          value={profile?.email}
                           onChange={handleInputChange}
                           disabled={!editMode}
                           className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
