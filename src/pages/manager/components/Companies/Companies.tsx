@@ -22,24 +22,7 @@ export default function CompanyApprovalsPage() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false)
 
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      contract_id: 1,
-      file_name: "Contract A",
-      file_type: "PDF",
-      uploaded_date: "2021-10-01",
-      file_url: "https://example.com/contractA.pdf",
-      company_id: 1,
-    },
-    {
-      contract_id: 2,
-      file_name: "Contract B",
-      file_type: "PDF",
-      uploaded_date: "2021-10-05",
-      file_url: "https://example.com/contractB.pdf",
-      company_id: 1,
-    }
-  ])
+  const [documents, setDocuments] = useState<Document[]>([])
   const [newDocument, setNewDocument] = useState({
     name: "",
     description: "",
@@ -56,6 +39,9 @@ export default function CompanyApprovalsPage() {
   const handleApproveCompany =  (status:string, companyVerificationId: number) => {
     const response = managerApi.approveCompany(status, companyVerificationId);
     console.log("res ver:",response);
+    console.log("status:", status)
+    console.log("CompanyId:", companyVerificationId)
+
     fetchCompaniesList();
     if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
       setIsReviewModalOpen(false)
@@ -353,7 +339,7 @@ export default function CompanyApprovalsPage() {
               <X className="mr-2 h-4 w-4" /> Reject Company
             </Button>
             <Button 
-              onClick={() => handleApproveCompany("approved", selectedCompany?.companyVerificationId ?? 0)}
+              onClick={() => handleApproveCompany("APPROVED", selectedCompany?.companyVerificationId ?? 0)}
               className="bg-[#00B14F] text-white">
               <Check className="mr-2 h-4 w-4" /> Approve Company
             </Button> 

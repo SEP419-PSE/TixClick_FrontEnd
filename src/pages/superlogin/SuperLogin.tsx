@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "../../components/ui/checkbox"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
-import { AuthContext } from "../../contexts/AuthProvider"
+import { AuthContextAdminPortal } from "../../contexts/AuthProviderAdminPortal"
 import { LoginRequest } from "../../interface/superLogin/Login"
 import { cn } from "../../lib/utils"
 import superLoginApi from "../../services/superLogin/SuperLoginApi"
@@ -17,7 +17,7 @@ import superLoginApi from "../../services/superLogin/SuperLoginApi"
 
 
 export default function SuperLogin() {
-  const authContext = useContext(AuthContext);
+  const authContext = useContext(AuthContextAdminPortal);
     const navigate = useNavigate()
     const [credentials, setCredentials] = useState<LoginRequest>({
     userName: "",
@@ -60,8 +60,8 @@ export default function SuperLogin() {
       console.log("API Response:", response);
   
       if (response.data?.result?.accessToken) {
-        localStorage.setItem("accessToken", response.data.result.accessToken);
-        localStorage.setItem("refreshToken", response.data.result.refreshToken);
+        localStorage.setItem("accessTokenAdminPortal", response.data.result.accessToken);
+        localStorage.setItem("refreshTokenAdminPortal", response.data.result.refreshToken);
        
   
         authContext?.login();
