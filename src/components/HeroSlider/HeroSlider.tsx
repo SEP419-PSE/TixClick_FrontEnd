@@ -1,5 +1,5 @@
 import { CircleUserRound, Menu, Search, X } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
@@ -12,6 +12,30 @@ import { NavLink } from "react-router";
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
   const [openMobileMenu, setOpenMobileMenu] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [isBackDrop, setIsBackDrop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsBackDrop(true);
+      } else {
+        setIsBackDrop(false);
+      }
+
+      if (window.scrollY > window.innerHeight - 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const handleOpenMobileMenu = () => {
     setOpenMobileMenu(!openMobileMenu);
     document.body.style.overflow = openMobileMenu ? "auto" : "hidden";
@@ -27,7 +51,7 @@ const HeroSlider = () => {
           loop
           muted
           playsInline
-          className="w-[100%] h-screen object-cover brightness-50"
+          className="w-[100%] h-screen object-cover brightness-90 contrast-125"
         >
           <source
             src="https://videos.pexels.com/video-files/4043988/4043988-hd_1920_1080_24fps.mp4"
@@ -36,21 +60,24 @@ const HeroSlider = () => {
         </video>
 
         {/* Header  */}
-        <header className="fixed flex items-center top-0 left-0 w-full p-4 lg:px-14 lg:py-6 text-white">
+        <header
+          className={`fixed flex items-center top-0 left-0 w-full p-4 lg:px-14 lg:py-6 text-white transition-all duration-500 z-10 ${
+            isVisible ? "translate-y-0 " : "-translate-y-full"
+          } ${isBackDrop && "backdrop-blur-[20px] bg-black bg-opacity-30"}`}
+        >
           <p className="font-semibold text-2xl">TixClick</p>
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
-                <li className="px-4 py-2 hover:text-pse-green">Vé của tôi</li>
-                <li className="px-4 py-2 hover:text-pse-green">
-                  Sự kiện của tôi
-                </li>
-                <li className="px-4 py-2 hover:text-pse-green">
-                  Trang cá nhân
+                <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
+                <li className="px-4 py-2 hover:opacity-60">Sự kiện của tôi</li>
+                <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                <li className="px-4 py-2 border rounded-md hover:opacity-60">
+                  Tạo sự kiện
                 </li>
                 <li
                   onClick={() => authContext?.logout()}
-                  className="px-4 py-2 hover:text-pse-green"
+                  className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-60"
                 >
                   Đăng xuất
                 </li>

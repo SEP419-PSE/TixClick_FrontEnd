@@ -41,7 +41,7 @@ const Header = () => {
         <span className="lg:hidden p-[6px] border rounded-full">
           <LuSearch size={24} />
         </span>
-        <NavLink to="/create-event">
+        <NavLink to="/create-company">
           <button className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500">
             Tạo sự kiện
           </button>
@@ -62,22 +62,22 @@ const Header = () => {
               >
                 <ul className="rounded-lg">
                   <Link to="/ticketManagement">
-                  <li className="flex items-center gap-2 p-3 hover:bg-pse-gray rounded-tl-lg rounded-tr-lg">
-                    <LuTicketCheck size={24} />
-                    Vé đã mua
-                  </li>
+                    <li className="flex items-center gap-2 p-3 hover:bg-pse-gray rounded-tl-lg rounded-tr-lg">
+                      <LuTicketCheck size={24} />
+                      Vé đã mua
+                    </li>
                   </Link>
                   <Link to="/consumerCenter">
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
-                    <RiCalendarEventLine size={24} />
-                    Sự kiện của tôi
-                  </li>
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
+                      <RiCalendarEventLine size={24} />
+                      Sự kiện của tôi
+                    </li>
                   </Link>
                   <Link to="/profileForm">
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
-                    <CgProfile size={24} />
-                    Trang cá nhân
-                  </li>
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
+                      <CgProfile size={24} />
+                      Trang cá nhân
+                    </li>
                   </Link>
                   <li
                     onClick={() => authContext.logout()}

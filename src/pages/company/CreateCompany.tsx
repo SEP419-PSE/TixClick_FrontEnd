@@ -74,25 +74,40 @@ const CreateCompany = () => {
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
       const response = await companyApi.create(companyData);
       console.log(response);
-      const companyId = response.data.result.companyId;
+      const companyId = await response.data.result.companyId;
+      const companyVerificationId = await response.data.result
+        .companyVerificationId;
 
       // Hiển thị thông báo nếu thành công
       toast.success("Tạo công ty thành công", { position: "top-center" });
 
       // Tạo FormData để upload tài liệu
-      // const documentData = new FormData();
-      // files.forEach((file) => {
-      //   documentData.append("files", file);
-      // });
-      // documentData.append("companyId", companyId);
-      // documentData.append("uploadDate", new Date().toISOString());
+      const documentData = new FormData();
+      files.forEach((file) => {
+        documentData.append("files", file);
+      });
+      documentData.append("companyId", companyId as string);
+      documentData.append(
+        "companyVerificationId",
+        companyVerificationId as string
+      );
+      documentData.append(
+        "uploadDate",
+        new Date().toISOString().replace("T", " ").split(".")[0]
+      );
 
-      // // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
-      // await companyApi.createDocumentCompany(documentData);
+      documentData.forEach((value, key) => {
+        console.log(key, value);
+      });
 
-      // toast.success("Tài liệu đã được tải lên thành công!", {
-      //   position: "top-center",
-      // });
+      // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
+      const responseDocument = await companyApi.createDocumentCompany(
+        documentData
+      );
+      console.log(responseDocument);
+      toast.success("Tài liệu đã được tải lên thành công!", {
+        position: "top-center",
+      });
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
@@ -104,7 +119,7 @@ const CreateCompany = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen mt-16 flex items-center justify-center">
       <div className="bg-pse-black-light flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
         <p className="font-semibold text-[18px] mb-4">Đăng ký công ty</p>
         <ImageUpload
