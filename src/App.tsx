@@ -27,7 +27,10 @@ import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
-import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
+import {
+  default as OrganizerCenter,
+  default as OrganizerPage,
+} from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
@@ -42,6 +45,7 @@ import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
+import ChatApp from "./pages/chat/ChatApp";
 
 export default function App() {
   return (
@@ -76,20 +80,18 @@ export default function App() {
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
 
-
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
-              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
-
-
+              <Route
+                path="company-approvals"
+                element={<CompanyApprovalsPage />}
+              />
             </Route>
 
-
             <Route path="superLogin" element={<SuperLogin />} />
-
 
             <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
@@ -97,7 +99,7 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
             </Route>
 
-            <Route path="proAdmin" element={<AdminLayout />} >  
+            <Route path="proAdmin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="events" element={<AdminEvent />} />
               <Route path="companies" element={<AdminCompany />} />
@@ -105,7 +107,7 @@ export default function App() {
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
 
-{/*             
+            {/*             
             <Route path="managerManagement" element={<AccountsPage />} />
             <Route path="event" element={<EventsPage />} />
 
@@ -125,8 +127,9 @@ export default function App() {
           <Route path="seatmap" element={<SeatMap />} />
           <Route path="drag" element={<DraggableArea />} />
 
-          
           <Route path="404" element={<ErrorPage />} />
+          {/* Chat app */}
+          <Route path="chat" element={<ChatApp />} />
         </Routes>
       </BrowserRouter>
     </div>
