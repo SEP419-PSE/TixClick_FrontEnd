@@ -10,3 +10,13 @@ export interface Contracts{
     progress: number; 
     documents: string[]; 
 }
+
+// export interface Contracts {
+//     contractId: number;
+//     totalAmount: number;
+//     commission: string;
+//     contractType: string;
+//     accountId: number;
+//     eventId: number;
+//     companyId: number;
+//   }

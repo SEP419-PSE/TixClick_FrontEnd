@@ -1,5 +1,4 @@
 // import React, { createContext, useEffect, useState } from "react";
-// import { toast } from "sonner";
 // import axiosClient from "../services/axiosClient";
 
 // type Props = {
@@ -8,7 +7,7 @@
 
 // interface AuthInterface {
 //   isLogin: boolean;
-//   login: () => void;
+//   login: (token: string) => void;
 //   accessTokenAdminPortal: string | null;
 // }
 
@@ -17,10 +16,10 @@
 // const AuthProviderAdminPortal = ({ children }: Props) => {
 //   const [isLogin, setIsLogin] = useState<boolean>(false);
 //   const [accessTokenAdminPortal, setAccessTokenAdminPortal] = useState<string | null>(
-//     localStorage.getItem("accessTokenAdminPortal")
+//     localStorage.getItem("accessToken")
 //   );
 //   useEffect(() => {
-//     const token = localStorage.getItem("accessTokenAdminPortal");
+//     const token = localStorage.getItem("accessToken");
 //     if (token) {
 //       setIsLogin(true);
 //       setAccessTokenAdminPortal(token);
@@ -28,8 +27,11 @@
 //     }
 //   }, [isLogin, accessTokenAdminPortal]);
 
-//   const login = () => {
+//   const login = (token: string) => {
 //     setIsLogin(true);
+//     setAccessTokenAdminPortal(token);
+//     localStorage.setItem("accessToken", token);
+//     axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 //   };
 
 //   const value = {
