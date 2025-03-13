@@ -11,7 +11,7 @@ import {
   Upload,
   XCircle
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { Contracts } from "../../../../interface/manager/Contracts"
+import managerApi from "../../../../services/manager/ManagerApi"
 import { ManagerHeader } from "../ManagerHeader"
 
 
@@ -182,6 +183,29 @@ export default function ContractsPage() {
         return null
     }
   }
+
+  const fetchContractList = async () => {
+    try {
+      const res: any = await managerApi.getAllContract()
+      console.log("Contract List:", res.data.result)
+      if (res.data.result && res.data.result.length > 0) {
+        setContracts(res.data.result)
+      }
+    } catch (error) {
+      console.error("Error fetching contract:", error)
+      toast.error("Failed to fetch contract")
+    }
+  }
+
+
+
+  useEffect(() => {
+    const initUseEffect = async () => {
+      await fetchContractList()
+    }
+    initUseEffect()
+  }, [])
+
 
   return (
     <>

@@ -8,6 +8,10 @@ const managerApi = {
         return axiosClient.get(url);
     },
 
+    getAllContract(){
+        const url = "/contract/all";
+        return axiosClient.get(url);
+    },
     // approveCompany(status:string, companyVerificationId:number){
     // const url = `/company-verification/${companyVerificationId}/approve?status=${status}`
     //     return axiosClient.patch(url, {header});
