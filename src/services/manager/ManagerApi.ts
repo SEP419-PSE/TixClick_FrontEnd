@@ -12,6 +12,11 @@ const managerApi = {
         const url = "/contract/all";
         return axiosClient.get(url);
     },
+
+    getAllPayment(){
+        const url = "/payment/all";
+        return axiosClient.get(url);
+    },
     // approveCompany(status:string, companyVerificationId:number){
     // const url = `/company-verification/${companyVerificationId}/approve?status=${status}`
     //     return axiosClient.patch(url, {header});
