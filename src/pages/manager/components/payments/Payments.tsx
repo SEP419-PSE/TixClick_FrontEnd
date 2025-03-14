@@ -1,5 +1,5 @@
 import { Badge, MoreHorizontal, Search, Send } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
@@ -11,93 +11,94 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { Textarea } from "../../../../components/ui/textarea"
-import { ManagerPayment } from "../../../../interface/manager/Payment"
+import { ManagerPayment, Payments } from "../../../../interface/manager/Payment"
+import managerApi from "../../../../services/manager/ManagerApi"
 import { ManagerHeader } from "../ManagerHeader"
 
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState([
-    {
-      id: 1,
-      invoiceNumber: "INV-001",
-      company: "Acme Inc",
-      totalAmount: 10000,
-      paidAmount: 10000,
-      remainingAmount: 0,
-      date: "2023-06-15",
-      dueDate: "2023-07-15",
-      status: "Paid",
-      paymentMethod: "Credit Card",
-      currency: "USD",
-      paymentType: "Full Payment",
-      installments: [],
-    },
-    {
-      id: 2,
-      invoiceNumber: "INV-002",
-      company: "Globex Corporation",
-      totalAmount: 25000,
-      paidAmount: 12500,
-      remainingAmount: 12500,
-      date: "2023-06-20",
-      dueDate: "2023-09-20",
-      status: "Partial",
-      paymentMethod: "Bank Transfer",
-      currency: "EUR",
-      paymentType: "Installments",
-      installments: [
-        { date: "2023-06-20", amount: 12500 },
-        { date: "2023-09-20", amount: 12500, status: "Pending" },
-      ],
-    },
-    {
-      id: 3,
-      invoiceNumber: "INV-003",
-      company: "Initech",
-      totalAmount: 15000,
-      paidAmount: 5000,
-      remainingAmount: 10000,
-      date: "2023-06-25",
-      dueDate: "2023-09-25",
-      status: "Partial",
-      paymentMethod: "PayPal",
-      currency: "USD",
-      paymentType: "Installments",
-      installments: [
-        { date: "2023-06-25", amount: 5000 },
-        { date: "2023-07-25", amount: 5000, status: "Pending" },
-        { date: "2023-08-25", amount: 5000, status: "Pending" },
-      ],
-    },
-    {
-      id: 4,
-      invoiceNumber: "INV-004",
-      company: "Umbrella Corporation",
-      totalAmount: 50000,
-      paidAmount: 50000,
-      remainingAmount: 0,
-      date: "2023-06-30",
-      dueDate: "2023-07-30",
-      status: "Paid",
-      paymentMethod: "Wire Transfer",
-      currency: "GBP",
-      paymentType: "Full Payment",
-      installments: [],
-    },
-    {
-      id: 5,
-      invoiceNumber: "INV-005",
-      company: "Soylent Corp",
-      totalAmount: 30000,
-      paidAmount: 0,
-      remainingAmount: 30000,
-      date: "2023-07-05",
-      dueDate: "2023-08-05",
-      status: "Pending",
-      paymentMethod: "Credit Card",
-      currency: "USD",
-      paymentType: "Full Payment",
-      installments: [],
-    },
+  const [payments, setPayments] = useState<Payments[]>([
+    // {
+    //   id: 1,
+    //   invoiceNumber: "INV-001",
+    //   company: "Acme Inc",
+    //   totalAmount: 10000,
+    //   paidAmount: 10000,
+    //   remainingAmount: 0,
+    //   date: "2023-06-15",
+    //   dueDate: "2023-07-15",
+    //   status: "Paid",
+    //   paymentMethod: "Credit Card",
+    //   currency: "USD",
+    //   paymentType: "Full Payment",
+    //   installments: [],
+    // },
+    // {
+    //   id: 2,
+    //   invoiceNumber: "INV-002",
+    //   company: "Globex Corporation",
+    //   totalAmount: 25000,
+    //   paidAmount: 12500,
+    //   remainingAmount: 12500,
+    //   date: "2023-06-20",
+    //   dueDate: "2023-09-20",
+    //   status: "Partial",
+    //   paymentMethod: "Bank Transfer",
+    //   currency: "EUR",
+    //   paymentType: "Installments",
+    //   installments: [
+    //     { date: "2023-06-20", amount: 12500 },
+    //     { date: "2023-09-20", amount: 12500, status: "Pending" },
+    //   ],
+    // },
+    // {
+    //   id: 3,
+    //   invoiceNumber: "INV-003",
+    //   company: "Initech",
+    //   totalAmount: 15000,
+    //   paidAmount: 5000,
+    //   remainingAmount: 10000,
+    //   date: "2023-06-25",
+    //   dueDate: "2023-09-25",
+    //   status: "Partial",
+    //   paymentMethod: "PayPal",
+    //   currency: "USD",
+    //   paymentType: "Installments",
+    //   installments: [
+    //     { date: "2023-06-25", amount: 5000 },
+    //     { date: "2023-07-25", amount: 5000, status: "Pending" },
+    //     { date: "2023-08-25", amount: 5000, status: "Pending" },
+    //   ],
+    // },
+    // {
+    //   id: 4,
+    //   invoiceNumber: "INV-004",
+    //   company: "Umbrella Corporation",
+    //   totalAmount: 50000,
+    //   paidAmount: 50000,
+    //   remainingAmount: 0,
+    //   date: "2023-06-30",
+    //   dueDate: "2023-07-30",
+    //   status: "Paid",
+    //   paymentMethod: "Wire Transfer",
+    //   currency: "GBP",
+    //   paymentType: "Full Payment",
+    //   installments: [],
+    // },
+    // {
+    //   id: 5,
+    //   invoiceNumber: "INV-005",
+    //   company: "Soylent Corp",
+    //   totalAmount: 30000,
+    //   paidAmount: 0,
+    //   remainingAmount: 30000,
+    //   date: "2023-07-05",
+    //   dueDate: "2023-08-05",
+    //   status: "Pending",
+    //   paymentMethod: "Credit Card",
+    //   currency: "USD",
+    //   paymentType: "Full Payment",
+    //   installments: [],
+    // },
   ])
 
   const [newPayment, setNewPayment] = useState({
@@ -204,6 +205,28 @@ export default function PaymentsPage() {
         return null
     }
   }
+
+  const fetchPaymentList = async () => {
+    try {
+      const res: any = await managerApi.getAllPayment()
+      console.log("Contract List:", res.data.result)
+      if (res.data.result && res.data.result.length > 0) {
+        setPayments(res.data.result)
+      }
+    } catch (error) {
+      console.error("Error fetching contract:", error)
+      toast.error("Failed to fetch contract")
+    }
+  }
+
+
+
+  useEffect(() => {
+    const initUseEffect = async () => {
+      await fetchPaymentList()
+    }
+    initUseEffect()
+  }, [])
 
   return (
     <>
@@ -378,21 +401,21 @@ export default function PaymentsPage() {
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} className="border-[#333333] hover:bg-[#2A2A2A]">
-                <TableCell className="font-medium text-white">{payment.invoiceNumber}</TableCell>
-                <TableCell className="text-white">{payment.company}</TableCell>
+              <TableRow key={payment.paymentId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                <TableCell className="font-medium text-white">{payment.amount}</TableCell>
+                <TableCell className="text-white">{payment.orderCode}</TableCell>
                 <TableCell className="text-white">
-                  {payment.currency} {payment.totalAmount.toLocaleString()}
+                  {payment.amount.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-white">
-                  {payment.currency} {payment.paidAmount.toLocaleString()}
+                   {payment.paymentMethod.toLocaleString()}
                 </TableCell>
                 <TableCell className="text-white">
-                  {payment.currency} {payment.remainingAmount.toLocaleString()}
+                  {payment.orderCode.toLocaleString()}
                 </TableCell>
-                <TableCell className="text-white">{payment.dueDate}</TableCell>
+                <TableCell className="text-white">{payment.paymentDate}</TableCell>
                 <TableCell className="text-white">{getStatusBadge(payment.status)}</TableCell>
-                <TableCell className="text-white">{payment.paymentType}</TableCell>
+                {/* <TableCell className="text-white">{payment}</TableCell> */}
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -500,7 +523,7 @@ export default function PaymentsPage() {
                   <h3 className="text-lg font-semibold mb-2">Payment Timeline</h3>
                   {selectedPayment.paymentType === "Installments" ? (
                     <div className="space-y-4">
-                      {selectedPayment.installments.map((installment, index) => (
+                      {selectedPayment.installments.map((installment:any, index:any) => (
                         <div key={index} className="flex items-center">
                           <div className="w-24 text-right mr-4 text-sm text-gray-500">{installment.dueDate}</div>
                           <div
