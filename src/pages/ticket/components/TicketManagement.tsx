@@ -1,8 +1,10 @@
-import { Badge, Calendar, Clock, MapPin, Tag, Ticket } from "lucide-react"
+import { ArrowUpDown, Badge, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
 import { useState } from "react"
 import NoEvent from "../../../assets/NoEvent.png"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog"
+import { Input } from "../../../components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { cn } from "../../../lib/utils"
 
 
@@ -60,9 +62,9 @@ const mockTickets = [
 export default function TicketManagement() {
   const [status, setStatus] = useState("all")
   const [timeFilter, setTimeFilter] = useState("upcoming")
-  // const [sortBy, setSortBy] = useState("date")
-  // const [sortOrder, setSortOrder] = useState("asc")
-  // const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState("date")
+  const [sortOrder, setSortOrder] = useState("asc")
+  const [searchQuery, setSearchQuery] = useState("")
   const [selectedTicket, setSelectedTicket] = useState({
     id: "",
     eventName: "",
@@ -100,9 +102,9 @@ export default function TicketManagement() {
     return true
   })
 
-  // const toggleSortOrder = () => {
-  //   setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-  // }
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+  }
 
   const handleTicketClick = (ticket:any) => {
     setSelectedTicket(ticket)
@@ -146,9 +148,37 @@ export default function TicketManagement() {
       </div>
 
       <div className="p-6">
+        <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-white mb-6">Vé đã mua</h1>
+        <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+              <Input
+                placeholder="Tìm kiếm vé..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-[#2a2a2a] border-gray-800 text-white w-64"
+              />
+            </div>
 
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px] bg-[#2a2a2a] border-gray-800 text-white">
+                <SelectValue placeholder="Sắp xếp theo" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#2a2a2a] border-gray-800 text-white">
+                <SelectItem value="date">Ngày sự kiện</SelectItem>
+                <SelectItem value="price">Giá vé</SelectItem>
+                <SelectItem value="name">Tên sự kiện</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button variant="outline" size="icon" onClick={toggleSortOrder} className="border-gray-800">
+              <ArrowUpDown className={cn("h-4 w-4", sortOrder === "asc" ? "text-gray-400" : "text-white")} />
+            </Button>
+          </div>
+      </div>
         <div className="grid grid-cols-4 gap-px bg-gray-800 rounded-lg p-1 mb-6">
+
           {statusTabs.map((tab) => (
             <button
               key={tab.value}
@@ -164,8 +194,9 @@ export default function TicketManagement() {
           
         </div>
         
-        <div className="flex justify-center gap-8 mb-8">
-          
+
+
+    <div className="flex justify-center gap-8 mb-8">
       <Button
         variant="underline"
         onClick={() => setTimeFilter("upcoming")}
