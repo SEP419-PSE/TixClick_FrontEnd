@@ -4,28 +4,28 @@ type Language = 'en' | 'vi'
 
 const translations = {
   vi: {
-    title: 'Sự kiện đã tạo',
-    search: 'Tìm kiếm sự kiện',
+    title: "Sự kiện đã tạo",
+    search: "Tìm kiếm sự kiện",
     filters: {
-      all: 'Tất cả',
-      upcoming: 'SẮP DIỄN RA',
-      past: 'ĐÃ QUA',
-      pending: 'CHỜ DUYỆT'
+      all: "Tất cả",
+      upcoming: "SẮP DIỄN RA",
+      past: "ĐÃ QUA",
+      pending: "CHỜ DUYỆT",
     },
     menu: {
-      tickets: 'Vé đã mua',
-      myEvents: 'Sự kiện của tôi',
-      profile: 'Trang cá nhân',
-      signOut: 'Đăng xuất'
+      tickets: "Vé đã mua",
+      myEvents: "Sự kiện của tôi",
+      profile: "Trang cá nhân",
+      signOut: "Đăng xuất",
     },
     nav: {
-      events: 'Sự kiện đã tạo',
-      fileManagement: 'Quản lý xuất file',
-      createEvent: 'Tạo sự kiện',
-      terms: 'Điều khoản cho Ban tổ chức'
+      events: "Sự kiện đã tạo",
+      fileManagement: "Quản lý xuất file",
+      createEvent: "Tạo sự kiện",
+      terms: "Điều khoản cho Ban tổ chức",
     },
-    account: 'Tài khoản',
-    language: 'Ngôn ngữ',
+    account: "Tài khoản",
+    language: "Ngôn ngữ",
     sidebar: {
       title: "Consumer Center",
       myEvents: "Sự kiện của tôi",
@@ -64,17 +64,23 @@ const translations = {
         {
           id: "1",
           title: "Danh mục hàng hoá, dịch vụ cấm kinh doanh",
-          content: "...",
+          content:
+            "Các mặt hàng và dịch vụ sau đây bị cấm kinh doanh trên nền tảng của chúng tôi:\n\n- Vũ khí, chất nổ và các vật phẩm nguy hiểm\n- Chất cấm và dược phẩm không được phép\n- Hàng giả, hàng nhái thương hiệu\n- Các dịch vụ tài chính bất hợp pháp\n- Dịch vụ đánh bạc và cờ bạc\n- Nội dung khiêu dâm hoặc người lớn\n- Dịch vụ vi phạm pháp luật\n\nVi phạm các quy định này có thể dẫn đến việc đình chỉ hoặc chấm dứt tài khoản của bạn.",
+          category: "prohibited",
         },
         {
           id: "2",
           title: "Danh mục hàng hoá, dịch vụ cấm quảng cáo",
-          content: "...",
+          content:
+            "Các mặt hàng và dịch vụ sau đây bị cấm quảng cáo trên nền tảng của chúng tôi:\n\n- Thuốc lá và các sản phẩm liên quan đến thuốc lá\n- Đồ uống có cồn khi nhắm đến người dưới tuổi quy định\n- Dịch vụ y tế không được cấp phép\n- Sản phẩm làm đẹp chưa được kiểm chứng\n- Dịch vụ tài chính đa cấp\n- Nội dung chính trị gây chia rẽ\n- Quảng cáo có nội dung phân biệt đối xử\n\nTất cả quảng cáo phải tuân thủ luật pháp địa phương và quốc gia.",
+          category: "advertising",
         },
         {
           id: "3",
           title: "Quy định kiểm duyệt nội dung & hình ảnh",
-          content: "...",
+          content:
+            "Quy định kiểm duyệt nội dung và hình ảnh trên nền tảng của chúng tôi:\n\n- Nội dung phải phù hợp với thuần phong mỹ tục\n- Không chứa ngôn từ thù địch hoặc kích động bạo lực\n- Không vi phạm bản quyền hoặc sở hữu trí tuệ\n- Hình ảnh phải rõ ràng và không gây hiểu lầm\n- Không sử dụng hình ảnh người khác mà không được phép\n- Không chứa thông tin cá nhân nhạy cảm\n- Nội dung phải trung thực và chính xác\n\nTất cả nội dung sẽ được kiểm duyệt trước khi xuất hiện công khai trên nền tảng.",
+          category: "content",
         },
       ],
     },
@@ -104,28 +110,28 @@ const translations = {
     },
   },
   en: {
-    title: 'Created Events',
-    search: 'Search events',
+    title: "Created Events",
+    search: "Search events",
     filters: {
-      all: 'All',
-      upcoming: 'UPCOMING',
-      past: 'PAST',
-      pending: 'PENDING'
+      all: "All",
+      upcoming: "UPCOMING",
+      past: "PAST",
+      pending: "PENDING",
     },
     menu: {
-      tickets: 'My Tickets',
-      myEvents: 'My Events',
-      profile: 'Profile',
-      signOut: 'Sign out'
+      tickets: "My Tickets",
+      myEvents: "My Events",
+      profile: "Profile",
+      signOut: "Sign out",
     },
     nav: {
-      events: 'Created Events',
-      fileManagement: 'File Management',
-      createEvent: 'Create Event',
-      terms: 'Organizer Terms'
+      events: "Created Events",
+      fileManagement: "File Management",
+      createEvent: "Create Event",
+      terms: "Organizer Terms",
     },
-    account: 'Account',
-    language: 'Language',
+    account: "Account",
+    language: "Language",
     sidebar: {
       title: "Consumer Center",
       myEvents: "My Events",
@@ -164,17 +170,23 @@ const translations = {
         {
           id: "1",
           title: "Prohibited Goods and Services",
-          content: "...",
+          content:
+            "The following goods and services are prohibited from being sold on our platform:\n\n- Weapons, explosives, and dangerous items\n- Illegal substances and unauthorized pharmaceuticals\n- Counterfeit goods and brand imitations\n- Illegal financial services\n- Gambling services\n- Pornographic or adult content\n- Services that violate the law\n\nViolation of these regulations may result in suspension or termination of your account.",
+          category: "prohibited",
         },
         {
           id: "2",
           title: "Prohibited Advertising Items",
-          content: "...",
+          content:
+            "The following goods and services are prohibited from being advertised on our platform:\n\n- Tobacco and tobacco-related products\n- Alcoholic beverages targeting underage individuals\n- Unlicensed medical services\n- Unverified beauty products\n- Multi-level financial services\n- Divisive political content\n- Advertisements with discriminatory content\n\nAll advertisements must comply with local and national laws.",
+          category: "advertising",
         },
         {
           id: "3",
           title: "Content & Image Review Policy",
-          content: "...",
+          content:
+            "Content and image review policy on our platform:\n\n- Content must be appropriate and in good taste\n- No hostile language or incitement to violence\n- No copyright or intellectual property violations\n- Images must be clear and not misleading\n- No unauthorized use of others' images\n- No sensitive personal information\n- Content must be honest and accurate\n\nAll content will be reviewed before appearing publicly on the platform.",
+          category: "content",
         },
       ],
     },
@@ -202,7 +214,7 @@ const translations = {
       },
       applyFilter: "Apply Filter",
     },
-  }
+  },
 }
 
 interface LanguageContextType {
@@ -214,14 +226,14 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('vi')
+  const [language, setLanguage] = useState<Language>("vi")
 
   return (
-    <LanguageContext.Provider 
-      value={{ 
-        language, 
-        t: translations[language], 
-        setLanguage 
+    <LanguageContext.Provider
+      value={{
+        language,
+        t: translations[language],
+        setLanguage,
       }}
     >
       {children}
@@ -236,4 +248,3 @@ export function useLanguage() {
   }
   return context
 }
-
