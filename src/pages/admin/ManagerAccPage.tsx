@@ -19,8 +19,8 @@ export default function AccountsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterRole, setFilterRole] = useState("all")
   const [editingAccount, setEditingAccount] = useState<AdminAccount | null>(null);
-  const [countAdmin, setCountAdmin] = useState<number | null | undefined>();
-  const [countManager, setCountManager] = useState<number | null | undefined>()
+  const [countAdmin, setCountAdmin] = useState<number>(0);
+  const [countManager, setCountManager] = useState<number>(0)
   
 
   // const filteredAccounts = accounts.filter(
@@ -169,7 +169,7 @@ export default function AccountsPage() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Total Accounts</span>
-            <span className="text-2xl font-bold">{countAdmin?? + (countManager ?? 0)}</span>
+            <span className="text-2xl font-bold">{countAdmin + countManager}</span>
           </div>
           <div className="flex flex-col">
             <span className="text-sm text-gray-400">Admins</span>

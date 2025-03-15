@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useLanguage } from "../../../organizer/components/LanguageContext"
 
@@ -50,7 +48,6 @@ export default function Policy() {
     },
   }
 
-  // Filter terms based on search query
   const filteredTerms = t.terms.items.filter(
     (term) =>
       term.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

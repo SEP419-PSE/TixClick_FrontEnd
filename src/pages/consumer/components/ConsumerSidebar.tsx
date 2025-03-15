@@ -20,7 +20,7 @@ export function ConsumerSidebar() {
         <span className="text-white text-lg font-medium">{t.sidebar.title}</span>
       </div> */}
 
-      <div className="px-2 py-2">
+      <div className="px-2 py-2 pt-10">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           return (

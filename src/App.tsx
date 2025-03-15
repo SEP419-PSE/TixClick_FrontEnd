@@ -84,7 +84,6 @@ export default function App() {
 
 
             </Route>
-            <Route path="ticketManagement" element={<TicketPage />} />
             <Route path="profileForm" element={<ProfileForm />} />
 
             <Route path="superLogin" element={<SuperLogin />} />
@@ -94,10 +93,10 @@ export default function App() {
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
-           
-            
-
             </Route>
+
+            <Route path="ticketManagement" element={<TicketPage />} />
+
 
             <Route path="proAdmin" element={<AdminLayout />} >  
               <Route index element={<AdminDashboard />} />
