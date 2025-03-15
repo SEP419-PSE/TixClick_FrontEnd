@@ -8,17 +8,17 @@ const menuItems = [
   {
     icon: User,
     label: "Thông tin tài khoản",
-    href: "/account",
+    href: "/profileForm",
   },
   {
     icon: Ticket,
     label: "Vé đã mua",
-    href: "/tickets",
+    href: "/ticketManagement",
   },
   {
     icon: Calendar,
     label: "Sự kiện của tôi",
-    href: "/my-events",
+    href: "/consumerCenter",
   },
 ]
 
@@ -28,7 +28,6 @@ export function SidebarProfile() {
 
   return (
     <div className="w-64 min-h-screen bg-[#1E1E1E] p-6 border-r border-gray-800">
-      {/* User Profile */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <img src={Huy} alt="" className="w-12 h-12 rounded-full object-cover" />
