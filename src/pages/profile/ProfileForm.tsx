@@ -70,11 +70,9 @@ export default function ProfileForm() {
     e.preventDefault()
     // setLoading(true)
 
-    // Simulate API call
     setTimeout(() => {
       // setLoading(false)
       setEditMode(false)
-      // Show success notification
     }, 1000)
   }
 

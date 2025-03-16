@@ -80,7 +80,7 @@ export default function Policy() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-6">
         <Tabs defaultValue="content" className="w-full">
           <TabsList className="bg-[#1E1E1E] border-b border-gray-800 w-full justify-start overflow-x-auto mb-6">
             <TabsTrigger value="content" className="data-[state=active]:bg-[#ff8a00] data-[state=active]:text-white">
@@ -244,7 +244,7 @@ export default function Policy() {
               <Button className="bg-pse-green hover:bg-[#00B14F]/90 flex-1">
                 {t.language === "en" ? "Contact Support" : "Liên hệ hỗ trợ"}
               </Button>
-              <Button variant="outline" className="border-gray-800 text-gray-400 hover:text-white flex-1">
+              <Button variant="outline" className="border-gray-800 text-gray-400 hover:text-black flex-1">
                 {t.language === "en" ? "FAQ" : "Câu hỏi thường gặp"}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
