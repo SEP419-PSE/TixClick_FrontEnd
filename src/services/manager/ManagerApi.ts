@@ -1,3 +1,4 @@
+import { ContractDocumentResponse } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
 
@@ -40,6 +41,11 @@ const managerApi = {
             console.error("❌ Approval failed:", error.response?.data || error.message);
             throw error;
         });
+    },
+
+    uploadContractDocument(request: ContractDocumentResponse){
+        const url = "/contract-document/upload";
+        return axiosClient.post(url, request);
     }
 }
 

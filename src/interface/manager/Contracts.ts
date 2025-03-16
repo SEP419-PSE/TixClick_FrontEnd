@@ -20,3 +20,19 @@ export interface Contracts{
 //     eventId: number;
 //     companyId: number;
 //   }
+
+export interface ContractUpload {
+    contractId: number;
+    file: string
+}
+
+export interface ContractDocumentResponse {
+    contractDocumentId: number;
+    contractId: number;
+    fileName: string;
+    fileURL: string;
+    fileType: string;
+    uploadedBy: number;
+    uploadDate: string; 
+  }
+  
