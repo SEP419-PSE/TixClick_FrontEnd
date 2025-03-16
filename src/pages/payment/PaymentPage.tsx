@@ -7,6 +7,7 @@ import payOs from "../../assets/payOs.svg"
 import { Button } from "../../components/ui/button"
 import { Checkbox } from "../../components/ui/checkbox"
 
+import { Link } from "react-router"
 import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
@@ -23,15 +24,20 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center sticky top-0 z-10">
+        <Link to="/">
         <div className="flex items-center ml-4">
        
           <img src={Logo} alt="Event Ticket" className="h-16 w-auto mr-4" />
           <div className="text-[#FF8A00] font-bold text-2xl">TixClick</div>
         </div>
+        </Link>
+        <Link to="/">
         <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
           <X className="h-4 w-4 mr-2" />
           Hủy giao dịch
         </Button>
+        </Link>
+        
       </header>
 
       <div className="relative h-60 md:h-80 bg-[#1A1A1A] overflow-hidden">

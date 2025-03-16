@@ -363,12 +363,12 @@ export default function Consumer() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={closeEventDetails}>
+              {/* <div className="flex justify-end gap-4">
+                <Button variant="outline" className="text-black hover:bg-gray-400" onClick={closeEventDetails}>
                   Đóng
                 </Button>
                 <Button className="bg-[#00B14F] hover:bg-[#00B14F]/90">Chỉnh sửa sự kiện</Button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
