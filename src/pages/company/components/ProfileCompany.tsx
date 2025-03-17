@@ -6,13 +6,10 @@ import {
   ClipboardList,
   BadgePercent,
 } from "lucide-react";
-import InputCanEdit from "./InputCanEdit";
+
 import CompanyAvt from "../../../assets/AvatarHuy.jpg";
 import { Button } from "../../../components/ui/button";
 import { NavLink } from "react-router";
-import { useState } from "react";
-import Popup from "../../../components/Popup/Popup";
-
 interface AccountCompanyInterface {
   id: number;
   label: string;

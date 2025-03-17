@@ -39,7 +39,6 @@ import CreateCompany from "./pages/company/CreateCompany";
 import CompanyDashBoard from "./pages/company/CompanyDashBoard";
 import ManageEvents from "./pages/company/components/ManageEvents";
 import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageTickets from "./pages/company/components/ManageTickets";
 import ManageMember from "./pages/company/components/ManageMember";
 import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
@@ -118,7 +117,6 @@ export default function App() {
           <Route path="company" element={<CompanyDashBoard />}>
             <Route index element={<HomeCompany />} />
             <Route path="events" element={<ManageEvents />} />
-            <Route path="tickets" element={<ManageTickets />} />
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />

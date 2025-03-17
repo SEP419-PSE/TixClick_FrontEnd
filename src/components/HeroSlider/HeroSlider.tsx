@@ -54,7 +54,7 @@ const HeroSlider = () => {
           className="w-[100%] h-screen object-cover brightness-90 contrast-125"
         >
           <source
-            src="https://videos.pexels.com/video-files/4043988/4043988-hd_1920_1080_24fps.mp4"
+            src="https://videos.pexels.com/video-files/2022395/2022395-hd_1920_1080_30fps.mp4"
             type="video/mp4"
           />
         </video>

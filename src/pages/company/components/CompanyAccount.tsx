@@ -11,17 +11,8 @@ const CompanyAccount = () => {
   };
 
   return (
-    <div className="flex gap-2 items-center">
-      <p className="relative text-sm mr-4 text-pse-error text-opacity-70">
-        Tài khoản chưa được kích hoạt !
-        <button
-          onClick={() => setIsOpenVerify(true)}
-          className="absolute right-0 top-5 bg-pse-green-second text-white px-2 bg-opacity-70 hover:scale-110 transition-all duration-500 rounded-[6px]"
-        >
-          Kích hoạt{" "}
-        </button>
-      </p>
-      <p className="flex flex-col items-end text-pse-black text-[16px]">
+    <div className="flex flex-row gap-2 items-center">
+      <p className="flex flex-col items-end text-white text-[16px]">
         Công ty ABC
         <span className="text-[14px] text-pse-gray">29 Lê Thánh Tôn</span>
       </p>

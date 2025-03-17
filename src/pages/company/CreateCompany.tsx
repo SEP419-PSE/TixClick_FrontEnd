@@ -62,7 +62,7 @@ const CreateCompany = () => {
     try {
       // Tạo FormData để gửi API tạo công ty
       const companyData = new FormData();
-      companyData.append("file", logoCompany);
+      companyData.append("logoURL", logoCompany);
       companyData.append("companyName", companyName);
       companyData.append("address", address);
       companyData.append("description", description);
@@ -70,44 +70,52 @@ const CreateCompany = () => {
       companyData.append("bankingName", bankingName);
       companyData.append("bankingCode", bankingCode);
       companyData.append("nationalId", cccd);
+      Array.from(files).forEach((file) => {
+        companyData.append("companyDocument", file); // Append từng file
+      });
+
+      // companyData.forEach((key, value) => {
+      //   console.log(key, value);
+      // });
 
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
-      const response = await companyApi.create(companyData);
+      const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
-      const companyId = await response.data.result.companyId;
-      const companyVerificationId = await response.data.result
-        .companyVerificationId;
+      // const companyId = await response.data.result.companyId;
+      // const companyVerificationId = await response.data.result
+      //   .companyVerificationId;
 
       // Hiển thị thông báo nếu thành công
       toast.success("Tạo công ty thành công", { position: "top-center" });
 
-      // Tạo FormData để upload tài liệu
-      const documentData = new FormData();
-      files.forEach((file) => {
-        documentData.append("files", file);
-      });
-      documentData.append("companyId", companyId as string);
-      documentData.append(
-        "companyVerificationId",
-        companyVerificationId as string
-      );
-      documentData.append(
-        "uploadDate",
-        new Date().toISOString().replace("T", " ").split(".")[0]
-      );
+      // // Tạo FormData để upload tài liệu
 
-      documentData.forEach((value, key) => {
-        console.log(key, value);
-      });
+      // const documentData = new FormData();
+      // files.forEach((file) => {
+      //   documentData.append("files", file);
+      // });
+      // documentData.append("companyId", companyId as string);
+      // documentData.append(
+      //   "companyVerificationId",
+      //   companyVerificationId as string
+      // );
+      // documentData.append(
+      //   "uploadDate",
+      //   new Date().toISOString().replace("T", " ").split(".")[0]
+      // );
 
-      // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
-      const responseDocument = await companyApi.createDocumentCompany(
-        documentData
-      );
-      console.log(responseDocument);
-      toast.success("Tài liệu đã được tải lên thành công!", {
-        position: "top-center",
-      });
+      // documentData.forEach((value, key) => {
+      //   console.log(key, value, typeof value);
+      // });
+
+      // // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
+      // const responseDocument = await companyApi.createDocumentCompany(
+      //   documentData
+      // );
+      // console.log(responseDocument);
+      // toast.success("Tài liệu đã được tải lên thành công!", {
+      //   position: "top-center",
+      // });
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
@@ -175,14 +183,14 @@ const CreateCompany = () => {
         />
         <div className="w-full mx-auto my-4 p-5 bg-white rounded-lg shadow-lg border">
           <h2 className="text-lg font-bold mb-4 text-gray-800">
-            📂 Tài liệu xác thực (PDF, DOC)
+            📂 Tài liệu xác thực (PDF)
           </h2>
 
           {/* File Input */}
           <input
             type="file"
             multiple
-            accept=".pdf, .doc, .docx"
+            accept=".pdf"
             onChange={handleFileChange}
             className="mb-4 w-full text-sm text-gray-700 file:bg-blue-500 file:text-white file:px-3 file:py-2 file:rounded-lg file:border-none file:cursor-pointer hover:file:bg-blue-600"
           />
