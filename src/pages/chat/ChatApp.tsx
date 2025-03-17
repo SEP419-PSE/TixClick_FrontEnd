@@ -16,7 +16,7 @@ const ChatApp: React.FC = () => {
     // Nếu có token, lấy username từ token
     if (context?.accessToken) {
       try {
-        const tokenParts = context.accessToken.split('.');
+        const tokenParts = context.accessToken.split(".");
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           setCurrentUser(payload.sub || "unknown");
@@ -40,10 +40,7 @@ const ChatApp: React.FC = () => {
   }, [context?.accessToken]);
 
   const connectWebSocket = () => {
-    const brokerURL = context?.accessToken
-      ? `ws://localhost:8080/ws?token=${context.accessToken}`
-      : `ws://localhost:8080/ws`;
-
+    const brokerURL = `ws://160.191.175.172:8080/ws?token=${context?.accessToken}`;
     console.log("🔗 WebSocket URL:", brokerURL);
 
     const client = new Client({
@@ -53,17 +50,6 @@ const ChatApp: React.FC = () => {
         console.log("✅ Connected to WebSocket:", frame);
         setConnectionStatus("Connected");
 
-        // Đăng ký nhận tin nhắn chung
-        client.subscribe("/all/messages", (message: any) => {
-          try {
-            const messageData = JSON.parse(message.body);
-            console.log("📢 Received broadcast message:", messageData);
-            setMessages((prev) => [...prev, `Broadcast: ${messageData.text}`]);
-          } catch (e) {
-            console.error("Error parsing broadcast message:", e);
-          }
-        });
-
         // Đăng ký nhận tin nhắn riêng tư
         client.subscribe("/user/specific/messages", (message: any) => {
           try {
@@ -71,8 +57,8 @@ const ChatApp: React.FC = () => {
             const messageData = JSON.parse(message.body);
             // Format: From {sender}: {content}
             setMessages((prev) => [
-              ...prev, 
-              `From ${messageData.sender}: ${messageData.content}`
+              ...prev,
+              `From ${messageData.sender}: ${messageData.content}`,
             ]);
           } catch (e) {
             console.error("Error parsing private message:", e);
@@ -119,25 +105,36 @@ const ChatApp: React.FC = () => {
           body: JSON.stringify({ text: privateMessage, to: toUser }),
         });
         console.log(`📤 Sent private message to ${toUser}:`, privateMessage);
-        setMessages((prev) => [...prev, `Sent to ${toUser}: ${privateMessage}`]);
+        setMessages((prev) => [
+          ...prev,
+          `Sent to ${toUser}: ${privateMessage}`,
+        ]);
         setPrivateMessage("");
       } catch (error) {
         console.error("❌ Error sending private message:", error);
       }
     } else {
-      console.warn("⚠️ StompClient not connected or message/recipient is empty");
+      console.warn(
+        "⚠️ StompClient not connected or message/recipient is empty"
+      );
     }
   };
 
   return (
     <div className="p-6 max-w-lg mx-auto bg-white shadow-lg rounded-xl space-y-4">
       <div className="text-center space-y-2">
-        <span className={`px-2 py-1 rounded text-white ${
-          connectionStatus === "Connected" ? "bg-green-500" : "bg-red-500"
-        }`}>
+        <span
+          className={`px-2 py-1 rounded text-white ${
+            connectionStatus === "Connected" ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
           {connectionStatus}
         </span>
-        {currentUser && <div className="text-sm">Logged in as: <strong>{currentUser}</strong></div>}
+        {currentUser && (
+          <div className="text-sm">
+            Logged in as: <strong>{currentUser}</strong>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -188,7 +185,10 @@ const ChatApp: React.FC = () => {
         <div className="border p-4 rounded bg-gray-100 max-h-60 overflow-y-auto">
           {messages.length > 0 ? (
             messages.map((msg, index) => (
-              <p key={index} className="p-2 mb-2 bg-white shadow rounded text-black">
+              <p
+                key={index}
+                className="p-2 mb-2 bg-white shadow rounded text-black"
+              >
                 {msg}
               </p>
             ))
