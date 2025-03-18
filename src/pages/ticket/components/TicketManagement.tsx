@@ -1,4 +1,4 @@
-import { ArrowUpDown, Badge, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
+import { ArrowUpDown, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
 import { useState } from "react"
 import NoEvent from "../../../assets/NoEvent.png"
 import { Button } from "../../../components/ui/button"
@@ -59,6 +59,7 @@ const mockTickets = [
   },
 ]
 
+
 export default function TicketManagement() {
   const [status, setStatus] = useState("all")
   const [timeFilter, setTimeFilter] = useState("upcoming")
@@ -106,35 +107,39 @@ export default function TicketManagement() {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc")
   }
 
-  const handleTicketClick = (ticket:any) => {
+  const handleTicketClick = (ticket: any) => {
     setSelectedTicket(ticket)
     setIsDialogOpen(true)
   }
 
-  const getStatusColor = (status:any) => {
-    switch (status) {
-      case "success":
-        return "bg-green-500"
-      case "processing":
-        return "bg-yellow-500"
-      case "cancelled":
-        return "bg-red-500"
-      default:
-        return "bg-gray-500"
-    }
-  }
+  const StatusIndicator = ({ status }: { status: string }) => {
+    let bgColor = ""
+    let textColor = ""
+    let statusText = ""
 
-  const getStatusText = (status:any) => {
     switch (status) {
       case "success":
-        return "Thành công"
+        bgColor = "bg-blue-300"
+        textColor = "text-black"
+        // statusText = "Thành công"
+        break
       case "processing":
-        return "Đang xử lý"
+        bgColor = "bg-yellow-500"
+        textColor = "text-black"
+        // statusText = "Đang xử lý"
+        break
       case "cancelled":
-        return "Đã hủy"
+        bgColor = "bg-red-500"
+        textColor = "text-white"
+        // statusText = "Đã hủy"
+        break
       default:
-        return "Không xác định"
+        bgColor = "bg-gray-500"
+        textColor = "text-white"
+        // statusText = "Không xác định"
     }
+
+    return <div className={`px-3 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>{statusText}</div>
   }
 
   return (
@@ -149,8 +154,8 @@ export default function TicketManagement() {
 
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-white mb-6">Vé đã mua</h1>
-        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-white mb-6">Vé đã mua</h1>
+          <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
               <Input
@@ -176,9 +181,8 @@ export default function TicketManagement() {
               <ArrowUpDown className={cn("h-4 w-4", sortOrder === "asc" ? "text-gray-400" : "text-white")} />
             </Button>
           </div>
-      </div>
+        </div>
         <div className="grid grid-cols-4 gap-px bg-gray-800 rounded-lg p-1 mb-6">
-
           {statusTabs.map((tab) => (
             <button
               key={tab.value}
@@ -191,35 +195,32 @@ export default function TicketManagement() {
               {tab.label}
             </button>
           ))}
-          
         </div>
-        
 
-
-    <div className="flex justify-center gap-8 mb-8">
-      <Button
-        variant="underline"
-        onClick={() => setTimeFilter("upcoming")}
-        className={cn(
-          "pb-2 px-0",
-          timeFilter === "upcoming" ? "text-[#ff8a00] border-b-2 border-[#ff8a00]" : "text-white hover:text-[#ff8a00]",
-        )}
-      >
-        Sắp diễn ra
-      </Button>
-      <Button
-        variant="underline"
-        onClick={() => setTimeFilter("ended")}
-        className={cn(
-          "pb-2 px-0",
-          timeFilter === "ended" ? "text-[#ff8a00] border-b-2 border-[#ff8a00]" : "text-white hover:text-[#ff8a00]",
-        )}
-      >
-        Đã kết thúc
-      </Button>
-
-      
-    </div>
+        <div className="flex justify-center gap-8 mb-8">
+          <Button
+            variant="underline"
+            onClick={() => setTimeFilter("upcoming")}
+            className={cn(
+              "pb-2 px-0",
+              timeFilter === "upcoming"
+                ? "text-[#ff8a00] border-b-2 border-[#ff8a00]"
+                : "text-white hover:text-[#ff8a00]",
+            )}
+          >
+            Sắp diễn ra
+          </Button>
+          <Button
+            variant="underline"
+            onClick={() => setTimeFilter("ended")}
+            className={cn(
+              "pb-2 px-0",
+              timeFilter === "ended" ? "text-[#ff8a00] border-b-2 border-[#ff8a00]" : "text-white hover:text-[#ff8a00]",
+            )}
+          >
+            Đã kết thúc
+          </Button>
+        </div>
 
         {filteredTickets.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -232,9 +233,7 @@ export default function TicketManagement() {
                 <div className="p-4 border-b border-gray-800">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-white font-medium text-lg">{ticket.eventName}</h3>
-                    <Badge className={cn("text-white", getStatusColor(ticket.status))}>
-                      {getStatusText(ticket.status)}
-                    </Badge>
+                    <StatusIndicator status={ticket.status} />
                   </div>
                   <div className="space-y-2 text-sm text-gray-400">
                     <div className="flex items-center gap-2">
@@ -286,9 +285,7 @@ export default function TicketManagement() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-medium text-white mb-1">{selectedTicket.eventName}</h3>
-                  <Badge className={cn("text-white", getStatusColor(selectedTicket.status))}>
-                    {getStatusText(selectedTicket.status)}
-                  </Badge>
+                  <StatusIndicator status={selectedTicket.status} />
                 </div>
 
                 <div className="space-y-3 text-gray-300">
@@ -346,7 +343,7 @@ export default function TicketManagement() {
             </div>
 
             <div className="flex justify-end gap-4 mt-6">
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-800">
+              <Button variant="outline" className="border-gray-700 text-black hover:bg-gray-400">
                 Hủy vé
               </Button>
               <Button className="bg-pse-green hover:bg-[#00B14F]/90">Tải vé</Button>
