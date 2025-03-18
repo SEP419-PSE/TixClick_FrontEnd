@@ -1,5 +1,3 @@
-'use client'
-
 import { Calendar, Clock, DollarSign, MapPin, Search, Ticket, Users, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import NoEvent from '../../../assets/NoEvent.png'
