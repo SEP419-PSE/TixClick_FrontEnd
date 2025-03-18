@@ -3,7 +3,6 @@
 import { Calendar, Clock, DollarSign, MapPin, Search, Ticket, Users, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import NoEvent from '../../../assets/NoEvent.png'
-import { Button } from '../../../components/ui/button'
 import { Event } from '../../../interface/organizer/Organizer'
 import { EventFilter } from '../../organizer/components/EventFilter'
 import { useLanguage } from '../../organizer/components/LanguageContext'

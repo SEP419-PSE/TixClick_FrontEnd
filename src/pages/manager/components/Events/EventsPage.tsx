@@ -1,10 +1,10 @@
-"use client"
 
-import { Badge, Filter, MoreHorizontal, Plus, Search } from "lucide-react"
+import { Badge, CheckCircle, FileText, Filter, MoreHorizontal, Search, XCircle } from "lucide-react"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../../components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
 import { Label } from "../../../../components/ui/label"
@@ -102,19 +102,7 @@ export default function EventsPage() {
 
   console.log(setEvents)
 
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    date: "",
-    location: "",
-    organizer: "",
-    attendees: "",
-    status: "Planning",
-    type: "",
-    description: "",
-    budget: "",
-    sponsors: [],
-    speakers: [],
-  })
+  
 
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredEvents, setFilteredEvents] = useState(events)
@@ -131,9 +119,10 @@ export default function EventsPage() {
     budget: 0,
     sponsors: [],
     speakers: [],
+
   })
   const [isEventModalOpen, setIsEventModalOpen] = useState(false)
-  const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false)
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("date")
@@ -202,6 +191,34 @@ export default function EventsPage() {
     }
   }
 
+  const handleApprove = () => {
+    const updatedEvents = events.map((event) =>
+      event.id === selectedEvent.id ? { ...event, status: "Approved" } : event,
+    )
+    setEvents(updatedEvents)
+    setSelectedEvent({ ...selectedEvent, status: "Approved" })
+    toast.success(
+      "Event Approved",{
+      description: "The event has been successfully approved.",
+    })
+  }
+
+  const handleReject = () => {
+    const updatedEvents = events.map((event) =>
+      event.id === selectedEvent.id ? { ...event, status: "Rejected" } : event,
+    )
+    setEvents(updatedEvents)
+    setSelectedEvent({ ...selectedEvent, status: "Rejected" })
+    toast.success(
+      "Event Rejected",{
+      description: "The event has been rejected.",
+    })
+  }
+
+  const handleCreateContract = () => {
+    setIsContractModalOpen(true)
+  }
+
   return (
     <>
       <ManagerHeader heading="Events" text="Manage and view all events" />
@@ -258,138 +275,7 @@ export default function EventsPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Dialog open={isAddEventModalOpen} onOpenChange={setIsAddEventModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-[#00B14F] text-white">
-                  <Plus className="mr-2 h-4 w-4" /> Add Event
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-[#2A2A2A] text-white">
-                <DialogHeader>
-                  <DialogTitle>Add New Event</DialogTitle>
-                  <DialogDescription>Enter the details of the new event here.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Event Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={newEvent.name}
-                      onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="date" className="text-right">
-                      Date
-                    </Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={newEvent.date}
-                      onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="location" className="text-right">
-                      Location
-                    </Label>
-                    <Input
-                      id="location"
-                      value={newEvent.location}
-                      onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="organizer" className="text-right">
-                      Organizer
-                    </Label>
-                    <Input
-                      id="organizer"
-                      value={newEvent.organizer}
-                      onChange={(e) => setNewEvent({ ...newEvent, organizer: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="attendees" className="text-right">
-                      Expected Attendees
-                    </Label>
-                    <Input
-                      id="attendees"
-                      type="number"
-                      value={newEvent.attendees}
-                      onChange={(e) => setNewEvent({ ...newEvent, attendees: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">
-                      Event Type
-                    </Label>
-                    <Select onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}>
-                      <SelectTrigger className="col-span-3 bg-[#1E1E1E]">
-                        <SelectValue placeholder="Select event type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {eventTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="status" className="text-right">
-                      Status
-                    </Label>
-                    <Select onValueChange={(value) => setNewEvent({ ...newEvent, status: value })}>
-                      <SelectTrigger className="col-span-3 bg-[#1E1E1E]">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Planning">Planning</SelectItem>
-                        <SelectItem value="Upcoming">Upcoming</SelectItem>
-                        <SelectItem value="Completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="description" className="text-right">
-                      Description
-                    </Label>
-                    <Input
-                      id="description"
-                      value={newEvent.description}
-                      onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="budget" className="text-right">
-                      Budget
-                    </Label>
-                    <Input
-                      id="budget"
-                      type="number"
-                      value={newEvent.budget}
-                      onChange={(e) => setNewEvent({ ...newEvent, budget: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                </div>
-                {/* <DialogFooter>
-                  <Button type="submit" onClick={handleAddEvent} className="bg-[#00B14F] text-white">
-                    Add Event
-                  </Button
-                </DialogFooter> */}
-              </DialogContent>
-            </Dialog>
+           
           </div>
         </div>
         <Table>
@@ -549,7 +435,87 @@ export default function EventsPage() {
             </Tabs>
           )}
           <DialogFooter>
-            <Button onClick={() => setIsEventModalOpen(false)}>Close</Button>
+          <div className="flex gap-2">
+          {selectedEvent.status === "Upcoming" && (
+            <>
+              <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700 text-white">
+                <CheckCircle className="mr-2 h-4 w-4" /> Approve
+              </Button>
+              <Button onClick={handleReject} className="bg-red-600 hover:bg-red-700 text-white">
+                <XCircle className="mr-2 h-4 w-4" /> Reject
+              </Button>
+            </>
+          )}
+          {selectedEvent.status === "Planning" && (
+            <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <FileText className="mr-2 h-4 w-4" /> Create Contract
+            </Button>
+          )}
+        </div>
+
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
+        <DialogContent className="bg-[#2A2A2A] text-white">
+          <DialogHeader>
+            <DialogTitle>Create Contract</DialogTitle>
+            <DialogDescription>Create a new contract for the approved event: {selectedEvent.name}</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="contractTitle">Contract Title</Label>
+                <input
+                  id="contractTitle"
+                  className="w-full p-2 mt-1 bg-[#1E1E1E] border border-[#333333] rounded"
+                  defaultValue={`Contract for ${selectedEvent.name}`}
+                />
+              </div>
+              <div>
+                <Label htmlFor="contractAmount">Contract Amount ($)</Label>
+                <input
+                  id="contractAmount"
+                  type="number"
+                  className="w-full p-2 mt-1 bg-[#1E1E1E] border border-[#333333] rounded"
+                  defaultValue={selectedEvent.budget}
+                />
+              </div>
+              <div>
+                <Label htmlFor="contractDuration">Contract Duration (days)</Label>
+                <input
+                  id="contractDuration"
+                  type="number"
+                  className="w-full p-2 mt-1 bg-[#1E1E1E] border border-[#333333] rounded"
+                  defaultValue={30}
+                />
+              </div>
+              <div>
+                <Label htmlFor="contractTerms">Contract Terms</Label>
+                <textarea
+                  id="contractTerms"
+                  className="w-full p-2 mt-1 bg-[#1E1E1E] border border-[#333333] rounded h-24"
+                  defaultValue={`Standard terms for ${selectedEvent.type} event.`}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsContractModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => {
+                setIsContractModalOpen(false)
+                toast.success(
+                  "Contract Created",{
+                  description: "The contract has been successfully created.",
+                })
+              }}
+            >
+              Create Contract
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

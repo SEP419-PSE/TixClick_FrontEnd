@@ -49,6 +49,7 @@ export interface SelectedEvent {
   budget: number;
   sponsors: string[];
   speakers: string[];
+
 }
 
   
