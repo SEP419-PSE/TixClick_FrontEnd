@@ -6,7 +6,12 @@ import axiosClient from "../axiosClient";
 const managerApi = {
     getAllCompany() {
         const url = "/company/manager";
-        return axiosClient.get(url);
+        const token = localStorage.getItem('accessToken');
+        return axiosClient.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
     },
 
     getAllContract(){
@@ -30,12 +35,11 @@ const managerApi = {
 
     approveCompany(status: string, companyVerificationId: number) {
         const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
-
-        return axiosClient.patch(url, {}, {
+        console.log("url:", url);
+        const token = localStorage.getItem('accessToken');
+        return axiosClient.post(url, {}, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Gửi token
-                "Content-Type": "application/json",
-                Role: "manager" // Nếu server yêu cầu role
+                Authorization: `Bearer ${token}`
             }
         })
         .then(response => {

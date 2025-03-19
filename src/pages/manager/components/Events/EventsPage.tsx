@@ -1,22 +1,22 @@
 
-import { AlertCircle, Badge, CheckCircle, FileText, Filter, Loader2, MoreHorizontal, Search, Upload, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, FileText, Filter, Loader2, MoreHorizontal, Search, Upload, XCircle } from "lucide-react"
+import * as pdfjs from "pdfjs-dist"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
+import { createWorker } from "tesseract.js"
 import { Button } from "../../../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
 import { Label } from "../../../../components/ui/label"
+import { Progress } from "../../../../components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { SelectedEvent } from "../../../../interface/manager/EventType"
 import { ManagerHeader } from "../ManagerHeader"
-import { Progress } from "../../../../components/ui/progress"
-import { useDropzone } from "react-dropzone";
-import { createWorker } from "tesseract.js";
-import * as pdfjs from "pdfjs-dist"
 
 
 
@@ -132,7 +132,7 @@ export default function EventsPage() {
       location: "London, UK",
       organizer: "Initech",
       attendees: 1000,
-      status: "Planning",
+      status: "Pending",
       type: "Product Launch",
       description: "Launching our revolutionary new product to the European market.",
       budget: 200000,
@@ -146,7 +146,7 @@ export default function EventsPage() {
       location: "Paris, France",
       organizer: "Umbrella Corporation",
       attendees: 750,
-      status: "Planning",
+      status: "Pending",
       type: "Networking",
       description: "End-of-year gala to celebrate achievements and network with industry leaders.",
       budget: 150000,
@@ -160,7 +160,7 @@ export default function EventsPage() {
       location: "Berlin, Germany",
       organizer: "Soylent Corp",
       attendees: 200,
-      status: "Planning",
+      status: "Pending",
       type: "Networking",
       description: "An evening for startups to pitch their ideas to potential investors.",
       budget: 50000,
@@ -519,14 +519,15 @@ export default function EventsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "Upcoming":
-        return <Badge className="bg-blue-500/20 text-blue-500">Upcoming</Badge>
-      case "Planning":
-        return <Badge className="bg-yellow-500/20 text-yellow-500">Planning</Badge>
+        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Upcoming</span>;
+      case "Pending":
+        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>;
       case "Completed":
-        return <Badge className="bg-green-500/20 text-green-500">Completed</Badge>
+        return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-md">Completed</span>;
       default:
-        return null
+        return null;
     }
+    
   }
 
   const handleApprove = () => {
@@ -583,7 +584,7 @@ export default function EventsPage() {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="Upcoming">Upcoming</SelectItem>
-                <SelectItem value="Planning">Planning</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
             </Select>
@@ -775,7 +776,7 @@ export default function EventsPage() {
           )}
           <DialogFooter>
             <div className="flex gap-2">
-              {selectedEvent.status === "Upcoming" && (
+              {selectedEvent.status === "Pending" && (
                 <>
                   <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700 text-white">
                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
@@ -785,7 +786,7 @@ export default function EventsPage() {
                   </Button>
                 </>
               )}
-              {selectedEvent.status === "Planning" && (
+              {selectedEvent.status === "Upcoming" && (
                 <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
                   <FileText className="mr-2 h-4 w-4" /> Create Contract
                 </Button>
@@ -885,7 +886,7 @@ export default function EventsPage() {
                     </div>
                   )}
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 text-black">
                     <Button onClick={() => setShowRegions(!showRegions)} variant="outline">
                       {showRegions ? "Hide Regions" : "Show Regions"}
                     </Button>
@@ -954,7 +955,7 @@ export default function EventsPage() {
                         We couldn't extract structured data from this document. Try processing again or use a clearer
                         scan.
                       </p>
-                      <Button onClick={processDocument} variant="outline">
+                      <Button className="text-black" onClick={processDocument} variant="outline">
                         Try Again
                       </Button>
                     </div>
@@ -966,6 +967,7 @@ export default function EventsPage() {
 
           <DialogFooter>
             <Button
+            className="text-black"
               variant="outline"
               onClick={() => {
                 setIsContractModalOpen(false)

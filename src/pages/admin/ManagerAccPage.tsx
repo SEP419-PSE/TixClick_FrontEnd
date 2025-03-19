@@ -10,7 +10,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
-import { AdminAccount } from "../../interface/admin/Account"
+import { AdminAccount, ManagerAccount } from "../../interface/admin/Account"
 import adminApi from "../../services/admin/AdminApi"
 
 
@@ -30,17 +30,29 @@ export default function AccountsPage() {
   //     (filterRole === "all"),
   // )
 
-  const handleAddAccount = (newAccount:any) => {
-
-    adminApi.createManager(newAccount).then(
-      
-    )
+  const handleAddAccount = (newAccount: ManagerAccount) => {
+    const requestBody = {
+      email: newAccount.email,
+      username: newAccount.username, 
+      role: "MANAGER" 
+    };
+  
+    adminApi.createManager(requestBody)
+      .then(response => {
+        const createdAccount = response.data.result;
+        console.log("Account created:", createdAccount);
     
-    setAccounts([...accounts, { id: accounts.length + 1, ...newAccount, role: "MANAGER" }])
-    toast.success(
-      "Account Created",{
-      description: "New manager account has been successfully created.",
-    })
+        setAccounts([...accounts, createdAccount]);
+        
+        toast.success(
+          "Account Created", {
+          description: "New manager account has been successfully created.",
+        });
+      })
+      .catch(error => {
+        console.error("Error creating account:", error);
+        toast.error("Failed to create account");
+      });
   }
 
   const handleEditAccount = (updatedAccount:any) => {
@@ -115,49 +127,56 @@ export default function AccountsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] bg-[#2A2A2A] text-white">
-            <DialogHeader>
-              <DialogTitle>Add New Manager Account</DialogTitle>
-              <DialogDescription>Create a new account for a manager. Fill in the details below.</DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                const formData = new FormData(e.target as HTMLFormElement)
-                const newAccount = Object.fromEntries(formData)
-                handleAddAccount(newAccount)
-              }}
-            >
-              <div className="grid gap-4 py-4 text-white">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
-                    required
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" className="bg-[#00B14F] hover:bg-[#00963F]">
-                  Add Manager
-                </Button>
-              </DialogFooter>
-            </form>
+          <DialogHeader>
+      <DialogTitle>Add New Manager Account</DialogTitle>
+      <DialogDescription>Create a new account for a manager. Fill in the details below.</DialogDescription>
+    </DialogHeader>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        
+        // Create a properly typed ManagerAccount object
+        const newAccount: ManagerAccount = {
+          email: formData.get('email') as string,
+          username: formData.get('name') as string,
+          role: "MANAGER"
+        };
+        
+        handleAddAccount(newAccount);
+      }}
+    >
+      <div className="grid gap-4 py-4 text-white">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="name" className="text-right">
+            Username
+          </Label>
+          <Input
+            id="name"
+            name="name"
+            className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
+            required
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="email" className="text-right">
+            Email
+          </Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
+            required
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <Button type="submit" className="bg-[#00B14F] hover:bg-[#00963F]">
+          Add Manager
+        </Button>
+      </DialogFooter>
+    </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -206,25 +225,29 @@ export default function AccountsPage() {
           <Table>
             <TableHeader>
               <TableRow className="text-white">
-                <TableHead className="text-white">Name</TableHead>
+                <TableHead className="text-white">Username</TableHead>
                 <TableHead className="text-white">Email</TableHead>
                 <TableHead className="text-white">Role</TableHead>
                 <TableHead className="text-white">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="text-white">
-              {accounts.map((account) => (
-                <TableRow key={account.accountId}>
-                  <TableCell className="font-medium">{account.lastName} {account.firstName}</TableCell>
-                  <TableCell>{account.email}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        account.roleId === 1 ? "bg-purple-500/20 text-purple-500" : "bg-blue-500/20 text-blue-500"
-                      }`}
-                    >
-                      {account.roleId}
-                    </span>
+            {accounts.map((account) => (
+              <TableRow key={account.accountId}>
+                <TableCell className="font-medium">{account.userName}</TableCell>
+                <TableCell>{account.email}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      account.roleId === 1
+                        ? "bg-purple-500/20 text-purple-500"
+                        : account.roleId === 4
+                        ? "bg-blue-500/20 text-blue-500"
+                        : "bg-gray-500/20 text-gray-500"
+                    }`}
+                  >
+                    {account.roleId === 1 ? "Admin" : account.roleId === 4 ? "Manager" : "User"}
+                  </span>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

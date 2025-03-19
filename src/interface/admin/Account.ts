@@ -10,4 +10,10 @@ export interface AdminAccount {
     dob: string | null; 
     roleId: number;
   }
+
+  export interface ManagerAccount {
+    email: string;
+    username: string;
+    role: string;
+  }
   
