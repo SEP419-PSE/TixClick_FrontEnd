@@ -17,9 +17,9 @@ import superLoginApi from "../../services/superLogin/SuperLoginApi"
 
 
 export default function SuperLogin() {
-  const authContext = useContext(AuthContext);
-    const navigate = useNavigate()
-    const [credentials, setCredentials] = useState<LoginRequest>({
+  const authContext = useContext(AuthContext)
+  const navigate = useNavigate()
+  const [credentials, setCredentials] = useState<LoginRequest>({
     userName: "",
     password: "",
   })
@@ -32,17 +32,17 @@ export default function SuperLogin() {
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    console.log(`Updating ${name}:`, value); 
-  
+    const { name, value } = e.target
+    console.log(`Updating ${name}:`, value)
+
     setCredentials((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-  
+    }))
+  }
+
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!credentials.userName || !credentials.password) {
       setFormTouched({
         userName: true,
@@ -51,59 +51,57 @@ export default function SuperLogin() {
       setError("Please fill in all required fields")
       return
     }
-    setIsLoading(true);
-    setError("");
-  
+    setIsLoading(true)
+    setError("")
+
     try {
-      console.log("Submitting credentials:", credentials);
-      const response = await superLoginApi.login(credentials);
-      console.log("API Response:", response);
-  
+      console.log("Submitting credentials:", credentials)
+      const response = await superLoginApi.login(credentials)
+      console.log("API Response:", response)
+
       if (response.data?.result?.accessToken) {
-        localStorage.setItem("accessToken", response.data.result.accessToken);
-        localStorage.setItem("refreshToken", response.data.result.refreshToken);
-       
-  
-        authContext?.login();
-  
+        localStorage.setItem("accessToken", response.data.result.accessToken)
+        localStorage.setItem("refreshToken", response.data.result.refreshToken)
+
+        authContext?.login()
+
         if (response.data.result.status == true) {
-          toast.success("Login successful", {duration:2000});
+          toast.success("Login successful", { duration: 2000 })
           setTimeout(() => {
-            navigate(response.data.result.roleName == "ADMIN" ? "/proAdmin" : "/manager-dashboard");
+            navigate(response.data.result.roleName == "ADMIN" ? "/proAdmin" : "/manager-dashboard")
           }, 1000)
         } else {
-          setError("Access denied");
+          setError("Access denied")
         }
       } else {
-        setError("Invalid credentials");
+        setError("Invalid credentials")
       }
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Invalid username or password");
+      console.error("Login error:", error)
+      setError("Invalid username or password")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-  
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#121212] to-[#1E1E1E] p-4">
       <Toaster position="top-right" />
 
       <div className="w-full max-w-md relative">
-        <div className="absolute -top-20 -left-20 w-40 h-40 bg-[#00B14F]/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[#00B14F]/10 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-[#FF8A00]/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-[#FF8A00]/10 rounded-full blur-3xl" />
 
-        <Card className="w-full backdrop-blur-sm bg-[#2A2A2A]/90 text-white border-[#333333] shadow-2xl overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#00B14F]/70 via-[#00D160] to-[#00B14F]/70" />
+        <Card className="w-full backdrop-blur-sm bg-[#1A1A1A]/90 text-white border-[#2A2A2A] shadow-2xl overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FF8A00]/70 via-[#FF9A20] to-[#FF8A00]/70" />
 
           <CardHeader className="space-y-1 pt-8">
             <div className="flex justify-center mb-2">
               <div className="relative">
-                {/* <div className="absolute inset-0 bg-[#00B14F]/20 rounded-full blur-md" /> */}
+                {/* <div className="absolute inset-0 bg-[#FF8A00]/20 rounded-full blur-md" /> */}
                 <div className="absolute inset-0 " />
 
-                {/* <div className="relative bg-[#00B14F] text-white p-3 rounded-full"> */}
+                {/* <div className="relative bg-[#FF8A00] text-white p-3 rounded-full"> */}
                 <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-18 w-16" />
                 {/* </div> */}
               </div>
@@ -118,7 +116,7 @@ export default function SuperLogin() {
             <CardContent className="space-y-5 pt-2">
               <div className="space-y-2">
                 <Label htmlFor="userName" className="text-gray-300 flex items-center gap-1.5">
-                  <User className="h-3.5 w-3.5 text-[#00B14F]" />
+                  <User className="h-3.5 w-3.5 text-[#FF8A00]" />
                   Username
                 </Label>
                 <div className="relative group">
@@ -127,7 +125,7 @@ export default function SuperLogin() {
                     name="userName"
                     placeholder="Enter your username"
                     className={cn(
-                      "bg-[#1E1E1E] border-[#333333] focus:border-[#00B14F] focus:ring-[#00B14F]/10 transition-all",
+                      "bg-[#2A2A2A] border-[#3A3A3A] focus:border-[#FF8A00] focus:ring-[#FF8A00]/10 transition-all",
                       formTouched.userName && !credentials.userName ? "border-red-500" : "",
                     )}
                     value={credentials.userName}
@@ -142,7 +140,7 @@ export default function SuperLogin() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-300 flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-[#00B14F]" />
+                  <Lock className="h-3.5 w-3.5 text-[#FF8A00]" />
                   Password
                 </Label>
                 <div className="relative group">
@@ -152,7 +150,7 @@ export default function SuperLogin() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     className={cn(
-                      "bg-[#1E1E1E] border-[#333333] focus:border-[#00B14F] focus:ring-[#00B14F]/10 transition-all",
+                      "bg-[#2A2A2A] border-[#3A3A3A] focus:border-[#FF8A00] focus:ring-[#FF8A00]/10 transition-all",
                       formTouched.password && !credentials.password ? "border-red-500" : "",
                     )}
                     value={credentials.password}
@@ -185,13 +183,13 @@ export default function SuperLogin() {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="remember"
-                    className="border-gray-500 text-[#00B14F] data-[state=checked]:bg-[#00B14F] data-[state=checked]:border-[#00B14F]"
+                    className="border-gray-500 text-[#FF8A00] data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00]"
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-300 cursor-pointer">
                     Remember me
                   </Label>
                 </div>
-                <a href="#" className="text-sm text-[#00B14F] hover:text-[#00D160] hover:underline transition-colors">
+                <a href="#" className="text-sm text-[#FF8A00] hover:text-[#FF9A20] hover:underline transition-colors">
                   Forgot password?
                 </a>
               </div>
@@ -200,7 +198,7 @@ export default function SuperLogin() {
             <CardFooter className="pb-8">
               <Button
                 type="submit"
-                className="w-full bg-[#00B14F] hover:bg-[#00D160] text-white shadow-lg shadow-[#00B14F]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#00B14F]/30 h-11"
+                className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white shadow-lg shadow-[#FF8A00]/20 transition-all duration-300 hover:shadow-xl hover:shadow-[#FF8A00]/30 h-11"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -226,6 +224,7 @@ export default function SuperLogin() {
     </div>
   )
 }
+
 
 
 

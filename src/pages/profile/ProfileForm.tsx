@@ -11,11 +11,11 @@ import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 
 export default function ProfileForm() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [image, setImage] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [image, setImage] = useState<string | null>(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState({
     fullName: "",
@@ -33,25 +33,24 @@ export default function ProfileForm() {
     }
   }
 
-
   const handleCropComplete = () => {
-    setImage(null);
-  };
+    setImage(null)
+  }
 
   const fetchProfile = async () => {
     try {
-      const res = await profileApi.getProfile();
+      const res = await profileApi.getProfile()
       if (res.data.result) {
-        setProfile(res.data.result);
+        setProfile(res.data.result)
       }
     } catch (error) {
-      console.error("Lỗi khi lấy profile:", error);
+      console.error("Lỗi khi lấy profile:", error)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    fetchProfile()
+  }, [])
 
   const getInitials = (firstName?: string, lastName?: string) => {
     if (!firstName && !lastName) return "U"
@@ -77,18 +76,14 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-indigo-950 flex flex-col">
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-indigo-600 dark:text-indigo-400">
+    <div className="min-h-screen bg-[#121212] text-gray-200 flex flex-col">
+      <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
+        <div className="container mx-auto px-4 py-1 flex items-center justify-between">
+          <Link to="/" className="flex items-center text-[#FF8A00]">
             <ChevronLeft className="h-5 w-5 mr-1" />
             <span className="font-medium">Quay lại</span>
           </Link>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-          >
+          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-[#2A2A2A]">
             <LogOut className="h-4 w-4 mr-2" />
             Đăng xuất
           </Button>
@@ -97,10 +92,9 @@ export default function ProfileForm() {
 
       <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-32 relative">
+            <div className="bg-[#1A1A1A] rounded-2xl shadow-xl overflow-hidden border border-[#2A2A2A]">
+              <div className="bg-gradient-to-r from-[#FF8A00]/20 to-[#FF8A00]/5 h-32 relative">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -113,9 +107,9 @@ export default function ProfileForm() {
 
               <div className="px-6 pb-6 -mt-16 flex flex-col items-center">
                 <div className="relative">
-                  <Avatar className="h-32 w-32 border-4 border-white dark:border-gray-800 shadow-lg">
+                  <Avatar className="h-32 w-32 border-4 border-[#1A1A1A] shadow-lg">
                     <AvatarImage src={profile?.avatarURL || ""} alt="Avatar" />
-                    <AvatarFallback className="text-3xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+                    <AvatarFallback className="text-3xl bg-gradient-to-br from-[#FF8A00] to-[#FF9A20] text-white">
                       {getInitials(profile?.firstName, profile?.lastName)}
                     </AvatarFallback>
                   </Avatar>
@@ -123,7 +117,7 @@ export default function ProfileForm() {
                   <div className="absolute -right-2 bottom-0">
                     <label
                       htmlFor="avatar-upload"
-                      className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-600 text-white shadow-md cursor-pointer hover:bg-indigo-700 transition-colors"
+                      className="flex items-center justify-center h-10 w-10 rounded-full bg-[#FF8A00] text-white shadow-md cursor-pointer hover:bg-[#FF9A20] transition-colors"
                     >
                       <Camera className="h-5 w-5" />
                     </label>
@@ -138,25 +132,23 @@ export default function ProfileForm() {
                   </div>
                 </div>
 
-                <h2 className="mt-4 text-xl font-bold text-gray-800 dark:text-white">
-                  {profile?.userName || "Người dùng"}
-                </h2>
-
-                
+                <h2 className="mt-4 text-xl font-bold text-white">{profile?.userName || "Người dùng"}</h2>
 
                 <div className="w-full mt-6 space-y-4">
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <User className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
-                    <span>{profile?.lastName} {profile?.firstName}</span>
+                  <div className="flex items-center text-gray-400">
+                    <User className="h-5 w-5 mr-3 text-[#FF8A00]" />
+                    <span>
+                      {profile?.lastName} {profile?.firstName}
+                    </span>
                   </div>
 
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <Phone className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
+                  <div className="flex items-center text-gray-400">
+                    <Phone className="h-5 w-5 mr-3 text-[#FF8A00]" />
                     <span>{profile?.phone}</span>
                   </div>
 
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <Mail className="h-5 w-5 mr-3 text-indigo-500 dark:text-indigo-400" />
+                  <div className="flex items-center text-gray-400">
+                    <Mail className="h-5 w-5 mr-3 text-[#FF8A00]" />
                     <span>{profile?.email}</span>
                   </div>
                 </div>
@@ -166,14 +158,23 @@ export default function ProfileForm() {
 
           <div className="lg:col-span-2">
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="w-full bg-white dark:bg-gray-800 rounded-xl p-1 mb-6">
-                <TabsTrigger value="profile" className="flex-1 rounded-lg">
+              <TabsList className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-1 mb-6">
+                <TabsTrigger
+                  value="profile"
+                  className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
+                >
                   Thông tin cá nhân
                 </TabsTrigger>
-                <TabsTrigger value="security" className="flex-1 rounded-lg">
+                <TabsTrigger
+                  value="security"
+                  className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
+                >
                   Bảo mật
                 </TabsTrigger>
-                <TabsTrigger value="preferences" className="flex-1 rounded-lg">
+                <TabsTrigger
+                  value="preferences"
+                  className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
+                >
                   Tùy chọn
                 </TabsTrigger>
               </TabsList>
@@ -183,30 +184,29 @@ export default function ProfileForm() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6"
+                  className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 border border-[#2A2A2A]"
                 >
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
+                  <h3 className="text-xl font-bold text-white mb-6">
                     {editMode ? "Chỉnh sửa thông tin" : "Thông tin cá nhân"}
                   </h3>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Họ và tên</label>
+                      <label className="text-sm font-medium text-gray-300">Họ và tên</label>
                       <div className="relative">
                         <Input
                           name="fullName"
                           value={`${profile?.lastName || ""} ${profile?.firstName || ""}`}
                           onChange={handleInputChange}
                           disabled={!editMode}
-                          className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
+                          className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
                         />
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
-
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Số điện thoại</label>
+                      <label className="text-sm font-medium text-gray-300">Số điện thoại</label>
                       <div className="relative">
                         <Input
                           name="phone"
@@ -214,14 +214,14 @@ export default function ProfileForm() {
                           value={profile?.phone}
                           onChange={handleInputChange}
                           disabled={!editMode}
-                          className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
+                          className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
                         />
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                      <label className="text-sm font-medium text-gray-300">Email</label>
                       <div className="relative">
                         <Input
                           name="email"
@@ -229,7 +229,7 @@ export default function ProfileForm() {
                           value={profile?.email}
                           onChange={handleInputChange}
                           disabled={!editMode}
-                          className={`pl-10 ${!editMode ? "bg-gray-50 dark:bg-gray-700/50" : ""}`}
+                          className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
                         />
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       </div>
@@ -238,7 +238,7 @@ export default function ProfileForm() {
                     {editMode && (
                       <Button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                        className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                         // disabled={loading}
                       >
                         {/* {loading ? (
@@ -259,14 +259,14 @@ export default function ProfileForm() {
               </TabsContent>
 
               <TabsContent value="security">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
+                <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
+                  <p className="text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
                 </div>
               </TabsContent>
 
               <TabsContent value="preferences">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
+                <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
+                  <p className="text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
                 </div>
               </TabsContent>
             </Tabs>
@@ -279,14 +279,14 @@ export default function ProfileForm() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+            className="bg-[#1A1A1A] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-[#2A2A2A]"
           >
-            <div className="p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <div className="p-4 bg-gradient-to-r from-[#FF8A00] to-[#FF9A20] text-white">
               <h3 className="text-lg font-semibold text-center">Chỉnh sửa ảnh đại diện</h3>
             </div>
 
             <div className="p-6">
-              <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden mb-6">
+              <div className="relative w-full h-64 bg-[#2A2A2A] rounded-xl overflow-hidden mb-6">
                 <Cropper
                   image={image}
                   crop={crop}
@@ -302,8 +302,8 @@ export default function ProfileForm() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Phóng to</label>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{zoom.toFixed(1)}x</span>
+                    <label className="text-sm font-medium text-gray-300">Phóng to</label>
+                    <span className="text-sm text-gray-400">{zoom.toFixed(1)}x</span>
                   </div>
                   <Sliders
                     // value={[zoom]}
@@ -316,11 +316,15 @@ export default function ProfileForm() {
                 </div>
 
                 <div className="flex justify-between gap-4">
-                  <Button variant="outline" className="flex-1" onClick={() => setImage(null)}>
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-[#2A2A2A] text-gray-200 hover:bg-[#2A2A2A] hover:text-white"
+                    onClick={() => setImage(null)}
+                  >
                     Hủy
                   </Button>
                   <Button
-                    className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700"
+                    className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                     onClick={handleCropComplete}
                     // disabled={loading}
                   >

@@ -1,7 +1,6 @@
 import { Label } from "@headlessui/react"
 import {
   AlertCircle,
-  Badge,
   Bell,
   CheckCircle,
   Clock,
@@ -157,16 +156,17 @@ export default function ContractsPage() {
   const getStatusBadge = (status : any ) => {
     switch (status) {
       case "Active":
-        return <Badge className="bg-green-500/20 text-green-500">Active</Badge>
+        return <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">Active</span>
       case "Pending":
-        return <Badge className="bg-yellow-500/20 text-yellow-500">Pending</Badge>
+        return <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">Pending</span>
       case "Draft":
-        return <Badge className="bg-blue-500/20 text-blue-500">Draft</Badge>
+        return <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">Draft</span>
       case "Expired":
-        return <Badge className="bg-red-500/20 text-red-500">Expired</Badge>
+        return <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">Expired</span>
       default:
         return null
     }
+    
   }
 
   const getStatusIcon = (status:any) => {

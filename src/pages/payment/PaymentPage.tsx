@@ -27,8 +27,8 @@ export default function PaymentPage() {
         <Link to="/">
         <div className="flex items-center ml-4">
        
-          <img src={Logo} alt="Event Ticket" className="h-16 w-auto mr-4" />
-          <div className="text-[#FF8A00] font-bold text-2xl">TixClick</div>
+          <img src={Logo} alt="Event Ticket" className="h-12 w-auto mr-4" />
+          <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
         </div>
         </Link>
         <Link to="/">
@@ -202,7 +202,7 @@ export default function PaymentPage() {
               <div className="mt-6 flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
+                  className="flex-1 border-[#2A2A2A] text-black hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Quay lại
