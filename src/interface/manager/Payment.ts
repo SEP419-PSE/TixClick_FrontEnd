@@ -20,7 +20,7 @@ export interface Installment {
 }
 
 export interface Payments {
-    paymentId: number;
+  paymentId: number;
   paymentMethod: string;
   amount: number;
   paymentDate: string;
@@ -28,4 +28,10 @@ export interface Payments {
   orderCode: string;
   orderId: number;
   accountId: number;
+}
+
+export interface AccountGroup {
+  accountId: number
+  payments: Payments[]
+  isExpanded: boolean
 }
