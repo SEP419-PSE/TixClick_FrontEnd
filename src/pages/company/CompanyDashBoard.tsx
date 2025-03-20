@@ -1,11 +1,12 @@
 import { Outlet, useLocation } from "react-router";
 import NavbarCompany from "./components/NavbarCompany";
 import CompanyAccount from "./components/CompanyAccount";
-import { Bell } from "lucide-react";
+import { Badge, Bell } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthProvider";
 import { Client } from "@stomp/stompjs";
 import Avatar from "../../assets/AvatarHuy.jpg";
+import useNotifications from "../../hooks/useNotifications";
 
 const CompanyDashBoard = () => {
   const context = useContext(AuthContext);
@@ -15,6 +16,8 @@ const CompanyDashBoard = () => {
   const [currentUser, setCurrentUser] = useState<string>("");
   const [openNotification, setOpenNotification] = useState<boolean>(false);
   const location = useLocation();
+  const data = useNotifications();
+  console.log(data);
 
   useEffect(() => {
     // Nếu có token, lấy username từ token
@@ -106,20 +109,15 @@ const CompanyDashBoard = () => {
                 openNotification ? "block" : "hidden"
               }`}
             >
-              <div className="flex gap-4 hover:bg-gray-800 p-4 rounded-lg">
-                <img src={Avatar} className="rounded-full w-12 h-12" />
-                <div className="flex flex-col items-start">
-                  <p>Đã chấp nhận đơn của bạn</p>
-                  <p className="text-pse-gray">Ngày tháng năm </p>
+              {data.map((notification) => (
+                <div className="flex gap-4 hover:bg-gray-800 p-4 rounded-lg">
+                  <img src={Avatar} className="rounded-full w-12 h-12" />
+                  <div className="flex flex-col items-start">
+                    <p>{notification.message}</p>
+                    <p className="text-pse-gray">{notification.createdDate}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-4 hover:bg-gray-800 p-4 rounded-lg">
-                <img src={Avatar} className="rounded-full w-12 h-12" />
-                <div className="flex flex-col items-start">
-                  <p>Đã chấp nhận đơn của bạn</p>
-                  <p className="text-pse-gray">Ngày tháng năm </p>
-                </div>
-              </div>
+              ))}
             </div>
           </button>
           <CompanyAccount />
