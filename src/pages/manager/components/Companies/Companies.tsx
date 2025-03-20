@@ -36,8 +36,8 @@ export default function CompanyApprovalsPage() {
     setIsReviewModalOpen(true)
   }
 
-  const handleApproveCompany =  (status:string, companyVerificationId: number) => {
-    const response = managerApi.approveCompany(status, companyVerificationId);
+  const handleApproveCompany =  async (status:string, companyVerificationId: number) => {
+    const response = await managerApi.approveCompany(status, companyVerificationId);
     console.log("res ver:",response);
     console.log("status:", status)
     console.log("CompanyId:", companyVerificationId)

@@ -7,15 +7,72 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui
 import { Progress } from "../../../components/ui/progress"
 import { ManagerHeader } from "./ManagerHeader"
 
-const data = [
-  { name: "Jan", value: 400 },
-  { name: "Feb", value: 300 },
-  { name: "Mar", value: 200 },
-  { name: "Apr", value: 278 },
-  { name: "May", value: 189 },
-  { name: "Jun", value: 239 },
-  { name: "Jul", value: 349 },
-]
+// const data = [
+//   { name: "Jan", value: 400 },
+//   { name: "Feb", value: 300 },
+//   { name: "Mar", value: 200 },
+//   { name: "Apr", value: 278 },
+//   { name: "May", value: 189 },
+//   { name: "Jun", value: 239 },
+//   { name: "Jul", value: 349 },
+// ]
+
+const revenueData = {
+  "7D": {
+    data: [
+      { name: "Mon", value: 12400 },
+      { name: "Tue", value: 15600 },
+      { name: "Wed", value: 14200 },
+      { name: "Thu", value: 16800 },
+      { name: "Fri", value: 19500 },
+      { name: "Sat", value: 21300 },
+      { name: "Sun", value: 22400 },
+    ],
+    total: "$45,231.89",
+    change: "+20.1%",
+  },
+  "1M": {
+    data: [
+      { name: "Week 1", value: 42000 },
+      { name: "Week 2", value: 48500 },
+      { name: "Week 3", value: 54200 },
+      { name: "Week 4", value: 61800 },
+    ],
+    total: "$206,500.00",
+    change: "+15.3%",
+  },
+  "3M": {
+    data: [
+      { name: "Jan", value: 400000 },
+      { name: "Feb", value: 300000 },
+      { name: "Mar", value: 200000 },
+      { name: "Apr", value: 278000 },
+      { name: "May", value: 189000 },
+      { name: "Jun", value: 239000 },
+      { name: "Jul", value: 349000 },
+    ],
+    total: "$1,955,000.00",
+    change: "+8.7%",
+  },
+  "1Y": {
+    data: [
+      { name: "Jan", value: 400000 },
+      { name: "Feb", value: 300000 },
+      { name: "Mar", value: 200000 },
+      { name: "Apr", value: 278000 },
+      { name: "May", value: 189000 },
+      { name: "Jun", value: 239000 },
+      { name: "Jul", value: 349000 },
+      { name: "Aug", value: 410000 },
+      { name: "Sep", value: 380000 },
+      { name: "Oct", value: 430000 },
+      { name: "Nov", value: 510000 },
+      { name: "Dec", value: 580000 },
+    ],
+    total: "$4,265,000.00",
+    change: "+12.5%",
+  },
+}
 
 const recentActivity = [
   { id: 1, action: "New contract signed", company: "Tech Solutions Inc.", time: "2 hours ago" },
@@ -26,6 +83,9 @@ const recentActivity = [
 
 export default function ManagerOverview() {
   const [selectedTimeRange, setSelectedTimeRange] = useState("7D")
+
+  
+  const currentRevenueData = revenueData[selectedTimeRange as keyof typeof revenueData]
 
   return (
     <>
@@ -107,7 +167,7 @@ export default function ManagerOverview() {
               </div>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data}>
+                  <LineChart data={currentRevenueData.data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
