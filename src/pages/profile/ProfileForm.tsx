@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { Camera, ChevronLeft, Edit2, LogOut, Mail, Phone, Sliders, User } from "lucide-react";
+import { Camera, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
-import { Link } from "react-router";
+import Header from "../../components/Header/Header";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -76,8 +76,9 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-gray-200 flex flex-col">
-      <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
+    <>
+    <div className="min-h-screen bg-[#121212] text-gray-200 flex flex-col ">
+      {/* <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
         <div className="container mx-auto px-4 py-1 flex items-center justify-between">
           <Link to="/" className="flex items-center text-[#FF8A00]">
             <ChevronLeft className="h-5 w-5 mr-1" />
@@ -88,9 +89,11 @@ export default function ProfileForm() {
             Đăng xuất
           </Button>
         </div>
-      </header>
+      </header> */}
+    <Header/>
+      
 
-      <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
+      <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-28">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="bg-[#1A1A1A] rounded-2xl shadow-xl overflow-hidden border border-[#2A2A2A]">
@@ -344,6 +347,7 @@ export default function ProfileForm() {
         </div>
       )}
     </div>
+    </>
   )
 }
 
