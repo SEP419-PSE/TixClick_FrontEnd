@@ -5,6 +5,7 @@ import TicketManagement from "./components/TicketManagement"
 
 export default function TicketPage() {
     return (
+      // <PinAuth>
       <>
       <Header/>
       <div className="min-h-screen bg-[#1E1E1E] pt-16">
@@ -16,6 +17,7 @@ export default function TicketPage() {
         </div>
       </div>
       </>
+      //</PinAuth>
     )
   }
   
