@@ -8,7 +8,7 @@ interface NumericKeypadProps {
   disabled?: boolean
 }
 
-export function NumericKeypad({ onKeyPress, onBackspace, onSubmit, disabled }: NumericKeypadProps) {
+export function NumericKeypad({ onKeyPress, onBackspace, disabled }: NumericKeypadProps) {
   const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "backspace"]
 
   return (
