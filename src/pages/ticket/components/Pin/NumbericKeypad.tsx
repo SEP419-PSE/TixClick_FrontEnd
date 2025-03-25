@@ -1,5 +1,4 @@
-import { SkipBackIcon as Backspace } from "lucide-react"
-import { Button } from "../../../../components/ui/button"
+import { Delete } from "lucide-react"
 
 interface NumericKeypadProps {
   onKeyPress: (key: string) => void
@@ -20,30 +19,28 @@ export function NumericKeypad({ onKeyPress, onBackspace, disabled }: NumericKeyp
 
         if (key === "backspace") {
           return (
-            <Button
+            <button
               key={index}
               type="button"
-              variant="outline"
-              className="aspect-square h-14 border-gray-700 text-black hover:bg-gray-700"
+              className="flex aspect-square h-14 ml-3 items-center justify-center rounded-lg border border-gray-700 bg-gray-800/80 text-white transition-all hover:bg-gray-700 active:scale-95 disabled:opacity-50 disabled:hover:bg-gray-800/80"
               onClick={onBackspace}
               disabled={disabled}
             >
-              <Backspace className="h-5 w-5" />
-            </Button>
+              <Delete className="h-5 w-5" />
+            </button>
           )
         }
 
         return (
-          <Button
+          <button
             key={index}
             type="button"
-            variant="outline"
-            className="aspect-square h-14 border-gray-700 text-xl font-medium text-black hover:bg-gray-700"
+            className="flex aspect-square h-14 ml-3 items-center justify-center rounded-lg border border-gray-700 bg-gray-800/80 text-xl font-medium text-white transition-all hover:bg-gray-700 active:scale-95 disabled:opacity-50 disabled:hover:bg-gray-800/80"
             onClick={() => onKeyPress(key)}
             disabled={disabled}
           >
             {key}
-          </Button>
+          </button>
         )
       })}
     </div>

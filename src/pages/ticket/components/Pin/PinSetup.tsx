@@ -1,4 +1,4 @@
-import { Check, X } from "lucide-react"
+import { ArrowLeft, Check, KeyRound, X } from "lucide-react"
 import { useState } from "react"
 import { Button } from "../../../../components/ui/button"
 import { NumericKeypad } from "./NumbericKeypad"
@@ -48,85 +48,95 @@ export function PinSetup({ onComplete }: PinSetupProps) {
       return
     }
 
-    // Store PIN in localStorage (hashed in a real app)
     localStorage.setItem("userPin", pin)
     onComplete()
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#1E1E1E] p-4">
-      <div className="w-full max-w-md rounded-lg border border-gray-800 bg-[#252525] p-6 shadow-lg">
-        <h2 className="mb-6 text-center text-2xl font-bold text-white">
+    <div className="w-full max-w-sm overflow-hidden rounded-xl border-2 border-blue-500/30 bg-gradient-to-b from-[#1a1a2e] to-[#16213e] p-8 shadow-[0_0_25px_rgba(0,0,0,0.3)]">
+      <div className="mb-6 flex flex-col items-center justify-center">
+        <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/20 p-3">
+          <KeyRound className="h-8 w-8 text-blue-400" />
+        </div>
+        <h2 className="text-center text-2xl font-bold text-white">
           {step === "create" ? "Tạo mã PIN" : "Xác nhận mã PIN"}
         </h2>
-
-        <div className="mb-6 flex justify-center">  
-          <div className="flex gap-2">
-            {Array.from({ length: maxLength }).map((_, index) => (
-              <div
-                key={index}
-                className={`flex h-12 w-8 items-center justify-center rounded-md border ${
-                  step === "create"
-                    ? index < pin.length
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 bg-[#333333]"
-                    : index < confirmPin.length
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 bg-[#333333]"
-                }`}
-              >
-                {(step === "create" && index < pin.length) || (step === "confirm" && index < confirmPin.length) ? (
-                  <div className="h-3 w-3 rounded-full bg-white"></div>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-md bg-red-900/30 p-3 text-sm text-red-400">
-            <X className="h-4 w-4" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <div className="mb-4 ml-12">
-          <NumericKeypad
-            onKeyPress={handleKeyPress}
-            onBackspace={handleBackspace}
-            onSubmit={step === "create" ? handleNextStep : handleSetPin}
-          />
-        </div>
-
-        {step === "create" ? (
-          <Button onClick={handleNextStep} className="w-full bg-blue-600 hover:bg-blue-700" disabled={pin.length < 4}>
-            Tiếp tục
-          </Button>
-        ) : (
-          <div className="space-y-3">
-            <Button
-              onClick={handleSetPin}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              disabled={confirmPin.length < 4}
-            >
-              <Check className="mr-2 h-4 w-4" />
-              Xác nhận
-            </Button>
-
-            <Button
-              onClick={() => {
-                setStep("create")
-                setConfirmPin("")
-                setError("")
-              }}
-              variant="outline"
-              className="w-full border-gray-700 text-gray-300 hover:bg-gray-800"
-            >
-              Quay lại
-            </Button>
-          </div>
-        )}
+        <p className="mt-1 text-center text-sm text-blue-300/80">
+          {step === "create" ? "Tạo mã PIN để bảo vệ tài khoản của bạn" : "Nhập lại mã PIN để xác nhận"}
+        </p>
       </div>
+
+      <div className="mb-6 flex justify-center">
+        <div className="flex gap-3">
+          {Array.from({ length: maxLength }).map((_, index) => (
+            <div
+              key={index}
+              className={`flex h-12 w-9 items-center justify-center rounded-lg border-2 transition-all duration-200 ${
+                step === "create"
+                  ? index < pin.length
+                    ? "border-blue-500 bg-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                    : "border-gray-700 bg-gray-800/50"
+                  : index < confirmPin.length
+                    ? "border-blue-500 bg-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                    : "border-gray-700 bg-gray-800/50"
+              }`}
+            >
+              {(step === "create" && index < pin.length) || (step === "confirm" && index < confirmPin.length) ? (
+                <div className="h-4 w-4 rounded-full bg-blue-400 shadow-[0_0_5px_rgba(59,130,246,0.5)]"></div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-5 flex items-center gap-2 rounded-lg bg-red-900/30 p-3 text-sm text-red-300">
+          <X className="h-4 w-4" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <div className="mb-5">
+        <NumericKeypad
+          onKeyPress={handleKeyPress}
+          onBackspace={handleBackspace}
+          onSubmit={step === "create" ? handleNextStep : handleSetPin}
+        />
+      </div>
+
+      {step === "create" ? (
+        <Button
+          onClick={handleNextStep}
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg hover:from-blue-700 hover:to-blue-600"
+          disabled={pin.length < 4}
+        >
+          Tiếp tục
+        </Button>
+      ) : (
+        <div className="space-y-3">
+          <Button
+            onClick={handleSetPin}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg hover:from-blue-700 hover:to-blue-600"
+            disabled={confirmPin.length < 4}
+          >
+            <Check className="mr-2 h-4 w-4" />
+            Xác nhận
+          </Button>
+
+          <Button
+            onClick={() => {
+              setStep("create")
+              setConfirmPin("")
+              setError("")
+            }}
+            variant="outline"
+            className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Quay lại
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

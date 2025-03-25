@@ -323,6 +323,7 @@ export default function AccountsPage() {
                   <Input
                     id="edit-username"
                     name="name"
+                    type="name"
                     defaultValue={editingAccount.lastName}
                     className="col-span-3 bg-[#3A3A3A] border-[#4A4A4A] text-white"
                   />
@@ -349,7 +350,7 @@ export default function AccountsPage() {
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Manager">Manager</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
