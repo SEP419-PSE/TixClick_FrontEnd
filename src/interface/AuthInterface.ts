@@ -10,3 +10,7 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
 }
+
+export interface RefreshToken {
+  token: string;
+}

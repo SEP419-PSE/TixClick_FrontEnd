@@ -1,320 +1,384 @@
-// File: StepTwo.tsx
 import { useState } from "react";
-import { DateRange, Range } from "react-date-range";
-import { addDays } from "date-fns";
-import "react-date-range/dist/styles.css";
-import "react-date-range/dist/theme/default.css";
-import { Calendar } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  CalendarCheck,
+  Ticket,
+  XCircle,
+  Save,
+  X,
+} from "lucide-react";
+import { useSearchParams } from "react-router";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "../../ui/dialog";
+import { Button } from "../../ui/button";
+import eventApi from "../../../services/event/eventApi";
+import {
+  convertHHMMtoHHMMSS,
+  formatDate,
+  formatDateTime,
+} from "../../../lib/utils";
 import { toast } from "sonner";
 
 type StepTwoProps = {
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
+  isStepValid: boolean;
   setIsStepValid: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-type TicketType = {
-  ticketName: string;
-  quantity: number;
-  createdDate: string;
+interface TicketType {
+  ticketCode: string;
+  name: string;
   price: number;
-  minQuantity: number;
-  maxQuantity: number;
+  quantity: number;
+  minPurchase: number;
+  maxPurchase: number;
   eventId: number;
-  status: boolean;
-  textColor: string;
-  seatBackgroundColor: string;
+}
+
+export interface Activity {
+  activityName: string;
+  dateEvent: Date;
+  startTimeEvent: string;
+  endTimeEvent: string;
+  startTicketSale: string; // yy-mm-dd hh:mm:ss
+  endTicketSale: string; // yy-mm-dd hh:mm:ss
+  tickets?: TicketType[];
+  eventId: number; // Optional vì chỉ dùng khi in
+}
+const defaultTicket: TicketType = {
+  ticketCode: "",
+  name: "",
+  price: 0,
+  quantity: 0,
+  minPurchase: 1,
+  maxPurchase: 10,
+  eventId: 0,
 };
 
-type DateRangeWithTickets = {
-  range: Range;
-  tickets: TicketType[];
-};
+const StepTwo: React.FC<StepTwoProps> = () => {
+  const [hasSeatMap, setHasSeatMap] = useState<boolean | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [currentActivityIndex, setCurrentActivityIndex] = useState<
+    number | null
+  >(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingHasSeatMap, setPendingHasSeatMap] = useState<boolean | null>(
+    null
+  );
+  const [newTicket, setNewTicket] = useState<TicketType>({ ...defaultTicket });
 
-export default function StepTwo({ setStep, setIsStepValid }: StepTwoProps) {
-  const [currentRange, setCurrentRange] = useState<Range>({
-    startDate: new Date(),
-    endDate: addDays(new Date(), 1),
-    key: "selection",
-  });
+  const [searchParams] = useSearchParams();
+  const eventId = Number(searchParams.get("id"));
 
-  const [dateRanges, setDateRanges] = useState<DateRangeWithTickets[]>([]);
-  const [ticketName, setTicketName] = useState("");
-  const [ticketPrice, setTicketPrice] = useState<number | "">("");
-  const [ticketQuantity, setTicketQuantity] = useState<number | "">("");
-  const [minQuantity, setMinQuantity] = useState<number | "">("");
-  const [maxQuantity, setMaxQuantity] = useState<number | "">("");
-  const [textColor, setTextColor] = useState("#FFFFFF");
-  const [seatBackgroundColor, setSeatBackgroundColor] = useState("#4ade80");
-
-  const [currentTickets, setCurrentTickets] = useState<TicketType[]>([]);
-
-  const isDateRangeOverlapping = (
-    newRange: Range,
-    existingRanges: DateRangeWithTickets[]
-  ) => {
-    return existingRanges.some(({ range }) => {
-      if (
-        !range.startDate ||
-        !range.endDate ||
-        !newRange.startDate ||
-        !newRange.endDate
-      )
-        return false;
-
-      const newStart = newRange.startDate.getTime();
-      const newEnd = newRange.endDate.getTime();
-      const existingStart = range.startDate.getTime();
-      const existingEnd = range.endDate.getTime();
-
-      // Kiểm tra xem có giao nhau không
-      return newStart <= existingEnd && newEnd >= existingStart;
-    });
-  };
-
-  const handleAddDateRange = () => {
-    // Nếu khoảng ngày mới, copy vé từ khoảng ngày trước đó
-    if (dateRanges.length > 0 && currentTickets.length === 0) {
-      const lastTickets = dateRanges[dateRanges.length - 1].tickets;
-      setCurrentTickets([...lastTickets]);
-    }
-    if (isDateRangeOverlapping(currentRange, dateRanges)) {
-      toast.error("Khoảng ngày này bị trùng hoặc giao với khoảng đã thêm!", {
-        position: "top-center",
-      });
-      return;
-    }
-
-    // Thêm khoảng ngày mới với các vé hiện tại (đã copy từ trước nếu có)
-    setDateRanges((prev) => [
+  const handleAddActivity = () => {
+    setActivities((prev) => [
       ...prev,
       {
-        range: currentRange,
-        tickets: [...currentTickets],
+        activityName: "",
+        dateEvent: new Date(),
+        startTimeEvent: "",
+        endTimeEvent: "",
+        startTicketSale: "",
+        endTicketSale: "",
+        tickets: hasSeatMap ? undefined : [],
+        eventId, // ← gán tự động từ URL
       },
     ]);
-
-    setIsStepValid(true);
   };
 
-  const handleDeleteDateRange = (index: number) => {
-    setDateRanges((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveActivity = (index: number) => {
+    const updated = [...activities];
+    updated.splice(index, 1);
+    setActivities(updated);
   };
 
-  const handleAddTicket = () => {
-    if (
-      !ticketName ||
-      ticketPrice === "" ||
-      ticketPrice <= 0 ||
-      ticketQuantity === "" ||
-      ticketQuantity <= 0 ||
-      minQuantity === "" ||
-      maxQuantity === "" ||
-      minQuantity < 0 ||
-      maxQuantity < 0 ||
-      minQuantity > maxQuantity
-    )
-      return;
+  const openTicketModal = (activityIndex: number) => {
+    setCurrentActivityIndex(activityIndex);
+    setNewTicket({
+      ticketCode: "",
+      name: "",
+      price: 0,
+      quantity: 0,
+      minPurchase: 1,
+      maxPurchase: 10,
+      eventId, // ← gán tự động từ URL
+    });
+    setIsTicketModalOpen(true);
+  };
 
-    const ticket: TicketType = {
-      ticketName,
-      quantity: Number(ticketQuantity),
-      createdDate: new Date().toISOString(),
-      price: Number(ticketPrice),
-      minQuantity: Number(minQuantity),
-      maxQuantity: Number(maxQuantity),
-      eventId: 0, // sẽ cập nhật khi gửi về server
-      status: true,
-      textColor,
-      seatBackgroundColor,
-    };
+  const saveTicket = () => {
+    if (currentActivityIndex === null) return;
+    const updated = [...activities];
+    updated[currentActivityIndex].tickets?.push(newTicket);
+    setActivities(updated);
+    setIsTicketModalOpen(false);
+  };
 
-    // Thêm vào vé hiện tại
-    setCurrentTickets((prev) => [...prev, ticket]);
+  const handleRemoveTicket = (activityIndex: number, ticketIndex: number) => {
+    const updated = [...activities];
+    updated[activityIndex].tickets?.splice(ticketIndex, 1);
+    setActivities(updated);
+  };
 
-    // Cập nhật tất cả các khoảng ngày trước đó để thêm vé này vào
-    setDateRanges((prev) =>
-      prev.map((rangeItem) => ({
-        ...rangeItem,
-        tickets: [...rangeItem.tickets, ticket],
-      }))
-    );
+  const handleSeatMapChange = (newValue: boolean) => {
+    if (activities.length > 0 && newValue !== hasSeatMap) {
+      setPendingHasSeatMap(newValue);
+      setShowConfirmDialog(true);
+    } else {
+      setHasSeatMap(newValue);
+      setActivities([]); // reset khi đổi loại sơ đồ
+    }
+  };
 
-    // Reset form vé
-    setTicketName("");
-    setTicketPrice("");
-    setTicketQuantity("");
-    setMinQuantity("");
-    setMaxQuantity("");
-    setTextColor("#FFFFFF");
-    setSeatBackgroundColor("#4ade80");
+  const confirmSeatMapChange = () => {
+    setHasSeatMap(pendingHasSeatMap);
+    setActivities([]);
+    setShowConfirmDialog(false);
+    setPendingHasSeatMap(null);
+  };
+
+  const cancelSeatMapChange = () => {
+    setShowConfirmDialog(false);
+    setPendingHasSeatMap(null);
+  };
+
+  const submitActivity = async () => {
+    const formatActivities = activities.map((activity) => ({
+      ...activity,
+      dateEvent: formatDate(activity.dateEvent),
+      startTicketSale: formatDateTime(activity.startTicketSale),
+      endTicketSale: formatDateTime(activity.endTicketSale),
+      startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
+      endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
+    })) as any; // Any tạm thời
+
+    // console.log(JSON.stringify(formatActivities, null, 2));
+    const response = await eventApi.createEventActivity(formatActivities);
+    // console.log(response);
+    toast.success(response.data.message);
   };
 
   return (
-    <div className="text-white space-y-6">
-      <p className="text-xl font-semibold">
-        Chọn các khoảng ngày diễn ra sự kiện
-      </p>
+    <div className="p-6 space-y-6 text-black">
+      <h2 className="text-2xl font-semibold text-white">
+        Sự kiện này có sơ đồ ghế không?
+      </h2>
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => handleSeatMapChange(true)}
+          className={`px-4 py-2 rounded ${
+            hasSeatMap === true ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          Có
+        </button>
+        <button
+          onClick={() => handleSeatMapChange(false)}
+          className={`px-4 py-2 rounded ${
+            hasSeatMap === false ? "bg-blue-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          Không
+        </button>
+      </div>
 
-      <div className="flex flex-col md:flex-row md:gap-8">
-        <DateRange
-          editableDateInputs={true}
-          onChange={(item) => setCurrentRange(item.selection)}
-          moveRangeOnFirstSelection={false}
-          ranges={[currentRange]}
-        />
-
-        <div className="flex-1 mt-4 md:mt-0">
-          <p className="font-semibold mb-2">Thêm loại vé cho khoảng ngày này</p>
-          <div className="space-y-2">
-            <div>
-              <label className="block text-sm">Tên vé</label>
-              <input
-                type="text"
-                placeholder="VD: Vé VIP"
-                value={ticketName}
-                onChange={(e) => setTicketName(e.target.value)}
-                className="w-full px-3 py-2 rounded bg-gray-800 text-white"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm">Giá vé (VNĐ)</label>
-              <input
-                type="number"
-                value={ticketPrice}
-                onChange={(e) => setTicketPrice(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded bg-gray-800 text-white"
-                min={0}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm">Số lượng vé</label>
-              <input
-                type="number"
-                value={ticketQuantity}
-                onChange={(e) => setTicketQuantity(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded bg-gray-800 text-white"
-                min={0}
-              />
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="block text-sm">Số lượng tối thiểu</label>
-                <input
-                  type="number"
-                  value={minQuantity}
-                  onChange={(e) => setMinQuantity(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded bg-gray-800 text-white"
-                  min={0}
-                />
-              </div>
-
-              <div className="flex-1">
-                <label className="block text-sm">Số lượng tối đa</label>
-                <input
-                  type="number"
-                  value={maxQuantity}
-                  onChange={(e) => setMaxQuantity(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded bg-gray-800 text-white"
-                  min={0}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="block text-sm">Màu chữ trên vé</label>
-                <input
-                  type="color"
-                  value={textColor}
-                  onChange={(e) => setTextColor(e.target.value)}
-                  className="w-full h-10 rounded"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm">Màu nền ghế</label>
-                <input
-                  type="color"
-                  value={seatBackgroundColor}
-                  onChange={(e) => setSeatBackgroundColor(e.target.value)}
-                  className="w-full h-10 rounded"
-                />
-              </div>
-              {/* Preview ghế kiểu rạp phim */}
-              <div className="mt-5">
-                <div
-                  className="w-10 h-10 rounded flex items-center justify-center border border-white/30 text-sm font-semibold"
-                  style={{
-                    backgroundColor: seatBackgroundColor,
-                    color: textColor,
-                  }}
-                >
-                  A1
-                </div>
-              </div>
-              ``
-            </div>
-
-            <button
-              onClick={handleAddTicket}
-              className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third rounded mt-2"
-            >
-              Thêm loại vé
-            </button>
-
-            <div className="mt-3 space-y-1">
-              {currentTickets.map((ticket, idx) => (
-                <div key={idx} className="text-sm">
-                  • {ticket.ticketName} - {ticket.price} VNĐ - {ticket.quantity}{" "}
-                  vé
-                </div>
-              ))}
-            </div>
-          </div>
-
+      {hasSeatMap !== null && (
+        <div className="space-y-6">
           <button
-            onClick={handleAddDateRange}
-            disabled={currentTickets.length === 0}
-            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded disabled:opacity-50"
+            onClick={handleAddActivity}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
-            Xác nhận khoảng ngày và vé
+            <CalendarCheck size={18} /> Thêm Activity
           </button>
-        </div>
-      </div>
 
-      <div>
-        <p className="font-semibold mt-6">Danh sách các khoảng ngày đã thêm:</p>
-        {dateRanges.map((item, idx) => (
-          <div
-            key={idx}
-            className="p-4 bg-pse-black-light rounded mt-2 border border-white/10 relative"
-          >
-            <button
-              onClick={() => handleDeleteDateRange(idx)}
-              className="absolute top-2 right-2 text-red-400 hover:text-red-600"
-              title="Xóa khoảng ngày này"
+          {activities.map((activity, index) => (
+            <div
+              key={index}
+              className="border rounded-lg shadow-sm p-5 bg-white space-y-4"
             >
-              🗑️
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">
+                  Hoạt động #{index + 1}
+                </h3>
+                <button
+                  onClick={() => handleRemoveActivity(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    label: "Tên hoạt động",
+                    key: "activityName",
+                    type: "text",
+                  },
+                  { label: "Ngày diễn ra", key: "dateEvent", type: "date" },
+                  { label: "Giờ bắt đầu", key: "startTimeEvent", type: "time" },
+                  { label: "Giờ kết thúc", key: "endTimeEvent", type: "time" },
+                  {
+                    label: "Bắt đầu bán vé",
+                    key: "startTicketSale",
+                    type: "datetime-local",
+                  },
+                  {
+                    label: "Kết thúc bán vé",
+                    key: "endTicketSale",
+                    type: "datetime-local",
+                  },
+                ].map(({ label, key, type }) => (
+                  <div key={key}>
+                    <label className="block mb-1 text-sm font-medium">
+                      {label}
+                    </label>
+                    <input
+                      type={type}
+                      value={
+                        key === "dateEvent"
+                          ? activity.dateEvent.toISOString().split("T")[0]
+                          : (activity as any)[key]
+                      }
+                      className="w-full border px-3 py-2 rounded text-black"
+                      onChange={(e) => {
+                        const updated = [...activities];
+                        if (key === "dateEvent") {
+                          updated[index].dateEvent = new Date(e.target.value);
+                        } else {
+                          (updated[index] as any)[key] = e.target.value;
+                        }
+                        setActivities(updated);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {!hasSeatMap && (
+                <div className="pt-4 border-t space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <Ticket size={18} /> Vé
+                    </h4>
+                    <button
+                      onClick={() => openTicketModal(index)}
+                      className="text-green-600 hover:text-green-800 flex items-center gap-1"
+                    >
+                      <Plus size={16} /> Thêm vé
+                    </button>
+                  </div>
+
+                  {activity.tickets?.map((ticket, tIndex) => (
+                    <div
+                      key={tIndex}
+                      className="bg-gray-50 border rounded p-4 flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="font-medium">{ticket.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {ticket.price.toLocaleString()} VND
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveTicket(index, tIndex)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Ticket Modal */}
+      {isTicketModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 space-y-4 relative">
+            <button
+              onClick={() => setIsTicketModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            >
+              <X size={20} />
             </button>
-            <p className="flex items-center gap-2">
-              <Calendar size={20} />{" "}
-              {item.range.startDate?.toLocaleDateString()} -{" "}
-              {item.range.endDate?.toLocaleDateString()}
-            </p>
-            <ul className="ml-4 list-disc mt-2">
-              {item.tickets.map((t, i) => (
-                <li key={i}>
-                  {t.ticketName} - {t.price} VNĐ - {t.quantity} vé (min:{" "}
-                  {t.minQuantity}, max: {t.maxQuantity})
-                </li>
-              ))}
-            </ul>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Ticket size={18} /> Thêm vé
+            </h3>
+            {[
+              { label: "Mã vé", key: "ticketCode" },
+              { label: "Tên vé", key: "name" },
+              { label: "Giá", key: "price", type: "number" },
+              { label: "Số lượng", key: "quantity", type: "number" },
+              { label: "Mua tối thiểu", key: "minPurchase", type: "number" },
+              { label: "Mua tối đa", key: "maxPurchase", type: "number" },
+            ].map(({ label, key, type }) => (
+              <div key={key}>
+                <label className="block mb-1 text-sm font-medium">
+                  {label}
+                </label>
+                <input
+                  type={type || "text"}
+                  className="w-full border px-3 py-2 rounded text-black"
+                  value={(newTicket as any)[key]}
+                  onChange={(e) =>
+                    setNewTicket((prev) => ({
+                      ...prev,
+                      [key]:
+                        type === "number" ? +e.target.value : e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            ))}
+            <button
+              onClick={saveTicket}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+            >
+              <Save size={18} /> Lưu vé
+            </button>
           </div>
-        ))}
+        </div>
+      )}
+      <div className="flex justify-center">
+        <button
+          onClick={() => submitActivity()}
+          className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-4"
+        >
+          Xuất dữ liệu
+        </button>
       </div>
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <h3 className="text-lg font-semibold">Xác nhận thay đổi</h3>
+            <p className="text-sm text-gray-500">
+              Việc chuyển chế độ sơ đồ ghế sẽ xóa toàn bộ dữ liệu hoạt động đã
+              nhập. Bạn có chắc chắn không?
+            </p>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={cancelSeatMapChange}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={confirmSeatMapChange}>
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+};
+
+export default StepTwo;

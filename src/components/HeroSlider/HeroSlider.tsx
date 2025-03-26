@@ -9,6 +9,8 @@ import { FaYoutube } from "react-icons/fa";
 import { AuthContext } from "../../contexts/AuthProvider";
 import { NavLink, useNavigate } from "react-router";
 import companyApi from "../../services/companyApi";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
@@ -44,10 +46,23 @@ const HeroSlider = () => {
   };
 
   const hanldeClickCreateEvent = async () => {
-    const response = await companyApi.isAccountHaveCompany();
-    navigate(
-      `${response.data.code == 200 ? "/create-event" : "create-company"}`
-    );
+    try {
+      const response = await companyApi.isAccountHaveCompany();
+      console.log(response.data.code);
+      if (response.data.code == 200) {
+        navigate("/create-event");
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response) {
+        navigate("/create-company", {
+          state: toast.error("Bạn cần phải tạo công ty trước"),
+        });
+      } else {
+        console.log("Lỗi không xác định:", axiosError.message);
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
+      }
+    }
   };
   return (
     <div className="lg:mb-8">

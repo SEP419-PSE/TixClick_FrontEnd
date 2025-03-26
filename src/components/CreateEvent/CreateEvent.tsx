@@ -34,14 +34,7 @@ export default function CreateEvent() {
           />
         );
       case 1:
-        return (
-          <StepTwo
-            step={step}
-            setStep={setStep}
-            isStepValid={isStepValid}
-            setIsStepValid={setIsStepValid}
-          />
-        );
+        return <StepTwo />;
       default:
         return <p>Hoàn tất hoặc bước không hợp lệ</p>;
     }

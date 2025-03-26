@@ -7,10 +7,12 @@ import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SearchBar from "../SearchBar/SearchBar";
 import companyApi from "../../services/companyApi";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 const Header = () => {
   const location = useLocation();
-  const naviagate = useNavigate();
+  const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -32,10 +34,23 @@ const Header = () => {
   }, []);
 
   const hanldeClickCreateEvent = async () => {
-    const response = await companyApi.isAccountHaveCompany();
-    naviagate(
-      `${response.data.code == 200 ? "/create-event" : "create-company"}`
-    );
+    try {
+      const response = await companyApi.isAccountHaveCompany();
+      console.log(response.data.code);
+      if (response.data.code == 200) {
+        navigate("/create-event");
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response) {
+        navigate("/create-company", {
+          state: toast.error("Bạn cần phải tạo công ty trước"),
+        });
+      } else {
+        console.log("Lỗi không xác định:", axiosError.message);
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
+      }
+    }
   };
 
   return (

@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import LoadingFullScreen from "../../Loading/LoadingFullScreen";
 import useAllCompany from "../../../hooks/useAllCompany";
 import { Company } from "../../../interface/company/Company";
+import { Axios, AxiosError } from "axios";
+import { useNavigate } from "react-router";
 
 const eventTypes: EventType[] = [
   { id: 1, name: "Nhạc sống" },
@@ -25,7 +27,12 @@ type StepOneProps = {
   setIsStepValid: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
+export default function StepOne({
+  step,
+  setStep,
+  setIsStepValid,
+}: StepOneProps) {
+  const navigate = useNavigate();
   const [logoImage, setLogoImage] = useState<File | null>(null);
   const [background, setBackGround] = useState<File | null>(null);
   const [eventName, setEventName] = useState("");
@@ -34,6 +41,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
   const [typeEvent, setTypeEvent] = useState("");
   const [editorContent, setEditorContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isApprove, setIsApprove] = useState<boolean>(false);
 
   const companies: Company | undefined = useAllCompany();
 
@@ -50,7 +58,8 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
       address.trim() !== "" &&
       typeEvent.trim() !== "" &&
       logoImage !== null &&
-      background !== null;
+      background !== null &&
+      isApprove !== false;
 
     setIsStepValid(isValid);
   }, [
@@ -62,10 +71,19 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
     logoImage,
     background,
     setIsStepValid,
+    isApprove,
   ]);
 
   const submitInfo = async () => {
-    if (!logoImage || !background) {
+    if (
+      editorContent.trim() == "<p><br></p>" ||
+      eventName.trim() == "" ||
+      locationEvent.trim() == "" ||
+      address.trim() == "" ||
+      typeEvent.trim() == "" ||
+      logoImage == null ||
+      background == null
+    ) {
       toast.warning("Vui lòng nhập đầy đủ thông tin", {
         position: "top-center",
       });
@@ -88,12 +106,20 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
 
       const response = await eventApi.create(formData);
       console.log(response);
+
       toast.success("Tạo sự kiện thành công", { position: "top-center" });
+      setIsApprove(true);
       setStep(1); // sang step 2 (index 1)
       setIsStepValid(false);
+      const queryParams = new URLSearchParams({
+        id: response.data.result.eventId,
+        step: step.toString(),
+      }).toString();
+      await navigate(`?${queryParams}`);
     } catch (error) {
       console.error("Error creating event:", error);
-      toast.error("Đã có lỗi xảy ra khi tạo sự kiện");
+      const errorAxios = error as AxiosError<{ message: string }>;
+      if (errorAxios.response) toast.error(errorAxios.response.data.message);
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +187,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
       <section className=" bg-pse-black-light md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-neon-green">
         <div className="md:w-[70%]">
           <p className="text-white font-semibold">{companies?.companyName}</p>
-          <p className="text-white">{companies?.description}</p>
+          <p className="text-white font-light">{companies?.description}</p>
         </div>
         <div>
           <img

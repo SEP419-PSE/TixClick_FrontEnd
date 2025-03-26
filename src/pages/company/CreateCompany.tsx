@@ -6,6 +6,21 @@ import { toast } from "sonner";
 import companyApi from "../../services/companyApi";
 
 import { XCircle } from "lucide-react";
+import BankDropdown from "./components/BankDropDown";
+import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
+
+const banks = [
+  { id: "970436", bankName: "Vietcombank" },
+  { id: "970418", bankName: "BIDV" },
+  { id: "970422", bankName: "MB Bank" },
+  { id: "970415", bankName: "VietinBank" },
+  { id: "970416", bankName: "ACB" },
+  { id: "970432", bankName: "VPBank" },
+  { id: "970403", bankName: "Sacombank" },
+  { id: "970423", bankName: "Techcombank" },
+  { id: "970441", bankName: "VIB" },
+  { id: "970454", bankName: "TPBank" },
+];
 
 const CreateCompany = () => {
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
@@ -40,8 +55,6 @@ const CreateCompany = () => {
   };
 
   const handleRegisterCompany = async () => {
-    setLoading(true);
-
     // Kiểm tra dữ liệu đầu vào
     if (
       !logoCompany ||
@@ -60,6 +73,7 @@ const CreateCompany = () => {
     }
 
     try {
+      setLoading(true);
       // Tạo FormData để gửi API tạo công ty
       const companyData = new FormData();
       companyData.append("logoURL", logoCompany);
@@ -81,41 +95,7 @@ const CreateCompany = () => {
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
       const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
-      // const companyId = await response.data.result.companyId;
-      // const companyVerificationId = await response.data.result
-      //   .companyVerificationId;
-
-      // Hiển thị thông báo nếu thành công
       toast.success("Tạo công ty thành công", { position: "top-center" });
-
-      // // Tạo FormData để upload tài liệu
-
-      // const documentData = new FormData();
-      // files.forEach((file) => {
-      //   documentData.append("files", file);
-      // });
-      // documentData.append("companyId", companyId as string);
-      // documentData.append(
-      //   "companyVerificationId",
-      //   companyVerificationId as string
-      // );
-      // documentData.append(
-      //   "uploadDate",
-      //   new Date().toISOString().replace("T", " ").split(".")[0]
-      // );
-
-      // documentData.forEach((value, key) => {
-      //   console.log(key, value, typeof value);
-      // });
-
-      // // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
-      // const responseDocument = await companyApi.createDocumentCompany(
-      //   documentData
-      // );
-      // console.log(responseDocument);
-      // toast.success("Tài liệu đã được tải lên thành công!", {
-      //   position: "top-center",
-      // });
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
@@ -128,6 +108,7 @@ const CreateCompany = () => {
 
   return (
     <div className="min-h-screen mt-16 flex items-center justify-center">
+      {loading && <LoadingFullScreen />}
       <div className="bg-pse-black-light flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
         <p className="font-semibold text-[18px] mb-4">Đăng ký công ty</p>
         <ImageUpload
@@ -163,11 +144,10 @@ const CreateCompany = () => {
           text={codeTax}
           setText={setCodeTax}
         />
-        <TextInput
-          label="Tên ngân hàng"
-          maxLength={50}
-          text={bankingName}
-          setText={setBankingName}
+        <BankDropdown
+          banks={banks}
+          selectedBankName={bankingName}
+          onChange={setBankingName}
         />
         <TextInput
           label="Số tài khoản"
