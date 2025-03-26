@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import { Textarea } from "../../../../components/ui/textarea"
 import { AccountGroup, Payments } from "../../../../interface/manager/Payment"
+import { ManagerHeader } from "../ManagerHeader"
 
 export default function PaymentsPage() {
   const [paymentGroups, setPaymentGroups] = useState<AccountGroup[]>([])
@@ -201,10 +202,8 @@ export default function PaymentsPage() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
-      <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-4 px-6">
-        <h1 className="text-2xl font-bold">Payment Management</h1>
-        <p className="text-gray-400">View and manage all payment transactions</p>
-      </header>
+      <ManagerHeader heading="Payments" text="View all payments" />
+      
 
       <main className="p-6">
         <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
