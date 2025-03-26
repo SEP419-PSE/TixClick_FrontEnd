@@ -36,20 +36,24 @@ export default function CompanyApprovalsPage() {
     setIsReviewModalOpen(true)
   }
 
-  const handleApproveCompany =  async (status:string, companyVerificationId: number) => {
-    const response = await managerApi.approveCompany(status, companyVerificationId);
-    console.log("res ver:",response);
-    console.log("status:", status)
-    console.log("CompanyId:", companyVerificationId)
+  const handleApproveCompany = async (status: string, companyVerificationId: number) => {
+    try {
+        const response = await managerApi.approveCompany(status, companyVerificationId);
+        console.log("✅ Approved successfully:", response);
 
-    fetchCompaniesList();
-    if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
-      setIsReviewModalOpen(false)
-      setIsDocumentModalOpen(true)
-    } else {
-      completeApproval()
+        fetchCompaniesList();
+
+        if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
+            setIsReviewModalOpen(false);
+            setIsDocumentModalOpen(true);
+        } else {
+            completeApproval();
+        }
+    } catch (error) {
+        console.error("❌ Approval failed:", error);
     }
-  }
+};
+
 
   const completeApproval = () => {
     setCompanies(
@@ -386,6 +390,10 @@ export default function CompanyApprovalsPage() {
                             <TableCell className="text-white">{doc.file_type}</TableCell>
                             <TableCell className="text-white">
                              
+                            </TableCell>
+                            
+                            <TableCell className="text-white">
+                             Huy
                             </TableCell>
                             <TableCell className="text-white">{doc.uploaded_date}</TableCell>
                             <TableCell className="text-right text-black flex items-center">

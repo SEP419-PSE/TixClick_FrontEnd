@@ -30,3 +30,6 @@ export interface Document {
   file_url?: string
   company_id: number
 }
+
+
+
