@@ -36,21 +36,20 @@ const managerApi = {
     approveCompany(status: string, companyVerificationId: number) {
         const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
         console.log("url:", url);
+        console.log(status)
+        console.log(companyVerificationId)
+    
+    
         const token = localStorage.getItem('accessToken');
-        return axiosClient.post(url, {}, {
+        return axiosClient.patch(url, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-        })
-        .then(response => {
-            console.log("✅ Approved successfully:", response.data);
-            return response.data;
-        })
-        .catch(error => {
-            console.error("❌ Approval failed:", error.response?.data || error.message);
-            throw error;
         });
+    
+        
     },
+    
 
     uploadContractDocument(request: ContractDocumentResponse){
         const url = "/contract-document/upload";
