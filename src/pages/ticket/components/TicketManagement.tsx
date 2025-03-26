@@ -1,4 +1,5 @@
 import { ArrowUpDown, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
+import { QRCodeSVG } from "qrcode.react"
 import { useState } from "react"
 import NoEvent from "../../../assets/NoEvent.png"
 import { Button } from "../../../components/ui/button"
@@ -66,6 +67,7 @@ export default function TicketManagement() {
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
   const [searchQuery, setSearchQuery] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState({
     id: "",
     eventName: "",
@@ -333,11 +335,46 @@ export default function TicketManagement() {
 
               <div className="flex flex-col items-center justify-center p-4 bg-gray-800 rounded-lg">
                 <p className="text-sm text-gray-400 mb-4">Mã QR vé của bạn</p>
-                <img
+                {/* <img
                   src={selectedTicket.qrCode || "/placeholder.svg"}
                   alt="Ticket QR Code"
                   className="w-48 h-48 object-contain bg-white p-2 rounded-lg"
-                />
+                /> */}
+                  <div>
+                    <div
+                      className="w-48 h-48 object-contain bg-white p-2 rounded-lg flex items-center justify-center cursor-pointer"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      {selectedTicket.qrCode ? (
+                        <QRCodeSVG
+                          value={selectedTicket.qrCode}
+                          size={176}
+                          bgColor={"#FFFFFF"}
+                          fgColor={"#000000"}
+                          level={"L"}
+                        />
+                      ) : (
+                        <img src="/placeholder.svg" alt="Ticket QR Code" className="w-full h-full object-contain" />
+                      )}
+                    </div>
+
+                    {isModalOpen && (
+                      <div
+                        className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+                        onClick={() => setIsModalOpen(false)} // Đóng modal khi bấm ra ngoài
+                      >
+                        <div className="bg-white p-4 rounded-lg relative" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="absolute top-2 right-2 text-gray-700 hover:text-red-500"
+                            onClick={() => setIsModalOpen(false)}
+                          >
+                            
+                          </button>
+                          <QRCodeSVG value={selectedTicket.qrCode} size={300} bgColor={"#FFFFFF"} fgColor={"#000000"} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 <p className="text-xs text-gray-400 mt-4">Mã vé: {selectedTicket.id}</p>
               </div>
             </div>
@@ -351,6 +388,8 @@ export default function TicketManagement() {
           </DialogContent>
         )}
       </Dialog>
+
+      
     </div>
   )
 }

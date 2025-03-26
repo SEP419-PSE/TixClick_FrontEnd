@@ -1,10 +1,11 @@
-import { Label } from "@headlessui/react"
 import {
   AlertCircle,
   Bell,
   CheckCircle,
   Clock,
   Download,
+  Eye,
+  FileText,
   MoreHorizontal,
   Search,
   Upload,
@@ -16,6 +17,7 @@ import { Button } from "../../../../components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
+import { Label } from "../../../../components/ui/label"
 import { Progress } from "../../../../components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
@@ -23,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components
 import { Contracts } from "../../../../interface/manager/Contracts"
 import managerApi from "../../../../services/manager/ManagerApi"
 import { ManagerHeader } from "../ManagerHeader"
+
 
 
 export default function ContractsPage() {
@@ -89,15 +92,15 @@ export default function ContractsPage() {
     },
   ])
 
-  const [newContract, setNewContract] = useState({
-    name: "",
-    company: "",
-    type: "",
-    startDate: "",
-    endDate: "",
-    value: "",
-    status: "Draft",
-  })
+  // const [newContract, setNewContract] = useState({
+  //   name: "",
+  //   company: "",
+  //   type: "",
+  //   startDate: "",
+  //   endDate: "",
+  //   value: "",
+  //   status: "Draft",
+  // })
 
   const [selectedContract, setSelectedContract] = useState<Contracts>({
     id: 1,
@@ -109,51 +112,72 @@ export default function ContractsPage() {
     value: 0,
     status: "",
     progress: 0,
-    documents: [
-    ],
-
+    documents: [],
   })
+
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
 
-  // const handleAddContract = () => {
-  //   setContracts([
-  //     ...contracts,
-  //     {
-  //       ...newContract,
-  //       id: contracts.length + 1,
-  //       value: Number.parseFloat(newContract.value),
-  //       progress: 0,
-  //       documents: [],
-  //     },
-  //   ])
-  //   setNewContract({ name: "", company: "", type: "", startDate: "", endDate: "", value: "", status: "Draft" })
-  //   toast.success("Contract Added", {
-  //     description: "The new contract has been successfully added.",
-  //   });
-  // }
-  console.log(setContracts);
-  console.log(newContract);
-  console.log(setNewContract);
-  
+  // New state for attachment detail view
+  const [selectedDocument, setSelectedDocument] = useState("")
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
+  const [documentDetails, setDocumentDetails] = useState({
+    name: "",
+    type: "",
+    size: "",
+    uploadedBy: "",
+    uploadedDate: "",
+    lastModified: "",
+    version: "",
+    description: "",
+  })
 
-  const handleUploadDocument = (id :any) => {
+  // Function to view document details
+  const handleViewDocumentDetails = (doc: string) => {
+    // In a real app, you would fetch document details from an API
+    // For now, we'll simulate this with mock data
+    setSelectedDocument(doc)
+
+    // Generate mock document details
+    const fileExtension = doc.split(".").pop() || ""
+    const fileType =
+      fileExtension === "pdf"
+        ? "PDF Document"
+        : fileExtension === "docx"
+          ? "Word Document"
+          : fileExtension === "xlsx"
+            ? "Excel Spreadsheet"
+            : "Document"
+
+    setDocumentDetails({
+      name: doc,
+      type: fileType,
+      size: `${Math.floor(Math.random() * 10) + 1} MB`,
+      uploadedBy: "John Doe",
+      uploadedDate: "2023-12-15",
+      lastModified: "2024-01-10",
+      version: "1.2",
+      description: `This is the ${doc} file for contract ${selectedContract.name}.`,
+    })
+
+    setIsAttachmentModalOpen(true)
+  }
+
+  const handleUploadDocument = (id: any) => {
     toast.success("Document Uploaded", {
       description: "The document has been successfully uploaded.",
-      
-    });
+    })
     console.log(id)
   }
 
-  const handleDownloadDocument = (id:number, doc:string) => {
-    toast.success(
-      "Document Downloaded",{
-      description: `${document} has been downloaded.`,
+  const handleDownloadDocument = (id: number, doc: string) => {
+    toast.success("Document Downloaded", {
+      description: `${doc} has been downloaded.`,
     })
-    console.log(id);
-    console.log(doc);
+    console.log(id)
+    console.log(doc)
   }
 
-  const getStatusBadge = (status : any ) => {
+  const getStatusBadge = (status: any) => {
     switch (status) {
       case "Active":
         return <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">Active</span>
@@ -166,10 +190,9 @@ export default function ContractsPage() {
       default:
         return null
     }
-    
   }
 
-  const getStatusIcon = (status:any) => {
+  const getStatusIcon = (status: any) => {
     switch (status) {
       case "Active":
         return <CheckCircle className="h-5 w-5 text-green-500" />
@@ -181,6 +204,23 @@ export default function ContractsPage() {
         return <XCircle className="h-5 w-5 text-red-500" />
       default:
         return null
+    }
+  }
+
+  const getDocumentIcon = (doc: string) => {
+    const fileExtension = doc.split(".").pop()?.toLowerCase() || ""
+
+    switch (fileExtension) {
+      case "pdf":
+        return <FileText className="h-5 w-5 text-red-400" />
+      case "docx":
+      case "doc":
+        return <FileText className="h-5 w-5 text-blue-400" />
+      case "xlsx":
+      case "xls":
+        return <FileText className="h-5 w-5 text-green-400" />
+      default:
+        return <FileText className="h-5 w-5 text-gray-400" />
     }
   }
 
@@ -197,8 +237,6 @@ export default function ContractsPage() {
     }
   }
 
-
-
   useEffect(() => {
     const initUseEffect = async () => {
       await fetchContractList()
@@ -206,6 +244,11 @@ export default function ContractsPage() {
     initUseEffect()
   }, [])
 
+  // Function to handle opening the contract modal
+  const openContractModal = (contract: Contracts) => {
+    setSelectedContract(contract)
+    setIsContractModalOpen(true)
+  }
 
   return (
     <>
@@ -242,101 +285,6 @@ export default function ContractsPage() {
                 <SelectItem value="consulting">Consulting Agreement</SelectItem>
               </SelectContent>
             </Select>
-            {/* <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-[#00B14F] text-white">
-                  <Plus className="mr-2 h-4 w-4" /> Add Contract
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-[#2A2A2A] text-white">
-                <DialogHeader>
-                  <DialogTitle>Add New Contract</DialogTitle>
-                  <DialogDescription>Enter the details of the new contract here.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Contract Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={newContract.name}
-                      onChange={(e) => setNewContract({ ...newContract, name: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="company" className="text-right">
-                      Company
-                    </Label>
-                    <Input
-                      id="company"
-                      value={newContract.company}
-                      onChange={(e) => setNewContract({ ...newContract, company: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">
-                      Contract Type
-                    </Label>
-                    <Select onValueChange={(value) => setNewContract({ ...newContract, type: value })}>
-                      <SelectTrigger className="col-span-3 bg-[#1E1E1E]">
-                        <SelectValue placeholder="Select contract type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Service Agreement">Service Agreement</SelectItem>
-                        <SelectItem value="Licensing Agreement">Licensing Agreement</SelectItem>
-                        <SelectItem value="Partnership Agreement">Partnership Agreement</SelectItem>
-                        <SelectItem value="Maintenance Agreement">Maintenance Agreement</SelectItem>
-                        <SelectItem value="Consulting Agreement">Consulting Agreement</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="startDate" className="text-right">
-                      Start Date
-                    </Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={newContract.startDate}
-                      onChange={(e) => setNewContract({ ...newContract, startDate: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="endDate" className="text-right">
-                      End Date
-                    </Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={newContract.endDate}
-                      onChange={(e) => setNewContract({ ...newContract, endDate: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="value" className="text-right">
-                      Contract Value
-                    </Label>
-                    <Input
-                      id="value"
-                      type="number"
-                      value={newContract.value}
-                      onChange={(e) => setNewContract({ ...newContract, value: e.target.value })}
-                      className="col-span-3 bg-[#1E1E1E]"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" onClick={handleAddContract} className="bg-[#00B14F] text-white">
-                    Add Contract
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog> */}
           </div>
         </div>
         <Table>
@@ -376,15 +324,8 @@ export default function ContractsPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onSelect={() => {
-                          setSelectedContract(contract)
-                          setIsContractModalOpen(true)
-                        }}
-                      >
-                        View details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => handleUploadDocument(contract.id)}>
+                      <DropdownMenuItem onClick={() => openContractModal(contract)}>View details</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleUploadDocument(contract.id)}>
                         <Upload className="mr-2 h-4 w-4" />
                         Upload document
                       </DropdownMenuItem>
@@ -403,6 +344,7 @@ export default function ContractsPage() {
         </Table>
       </main>
 
+      {/* Contract Details Modal */}
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
           <DialogHeader>
@@ -458,19 +400,28 @@ export default function ContractsPage() {
               <TabsContent value="documents">
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-2">Contract Documents</h3>
-                  {selectedContract.documents.length > 0 ? (
+                  {selectedContract.documents && selectedContract.documents.length > 0 ? (
                     <ul className="space-y-2">
                       {selectedContract.documents.map((doc, index) => (
-                        <li key={index} className="flex items-center justify-between">
-                          <span>{doc}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownloadDocument(selectedContract.id, doc)}
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </Button>
+                        <li key={index} className="flex items-center justify-between p-2 rounded hover:bg-[#333333]">
+                          <div className="flex items-center">
+                            {getDocumentIcon(doc)}
+                            <span className="ml-2">{doc}</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => handleViewDocumentDetails(doc)}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownloadDocument(selectedContract.id, doc)}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </Button>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -504,13 +455,97 @@ export default function ContractsPage() {
                     </div>
                   </div>
                   <Progress value={selectedContract.progress} className="w-full mt-4 bg-blue-500" />
-
                 </div>
               </TabsContent>
             </Tabs>
           )}
           <DialogFooter>
             <Button onClick={() => setIsContractModalOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Document Detail Attachment Modal */}
+      <Dialog open={isAttachmentModalOpen} onOpenChange={setIsAttachmentModalOpen}>
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Document Details</DialogTitle>
+            <DialogDescription>View details for {selectedDocument}</DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
+              {getDocumentIcon(selectedDocument)}
+              <span className="ml-2 text-xl font-medium">{selectedDocument}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">File Type</h4>
+                <p>{documentDetails.type}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">File Size</h4>
+                <p>{documentDetails.size}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Uploaded By</h4>
+                <p>{documentDetails.uploadedBy}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Upload Date</h4>
+                <p>{documentDetails.uploadedDate}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Last Modified</h4>
+                <p>{documentDetails.lastModified}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-400">Version</h4>
+                <p>{documentDetails.version}</p>
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <h4 className="text-sm font-medium text-gray-400">Description</h4>
+              <p className="mt-1">{documentDetails.description}</p>
+            </div>
+
+            <div className="mt-4 p-3 bg-[#1E1E1E] rounded-lg">
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Document History</h4>
+              <ul className="space-y-2 text-sm">
+                <li className="flex justify-between">
+                  <span>Created document</span>
+                  <span className="text-gray-400">2023-12-10</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Updated content</span>
+                  <span className="text-gray-400">2023-12-15</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Reviewed by legal</span>
+                  <span className="text-gray-400">2024-01-05</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Final version approved</span>
+                  <span className="text-gray-400">2024-01-10</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="flex justify-between">
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => handleDownloadDocument(selectedContract.id, selectedDocument)}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+              <Button variant="outline">
+                <Upload className="mr-2 h-4 w-4" />
+                Upload New Version
+              </Button>
+            </div>
+            <Button onClick={() => setIsAttachmentModalOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
