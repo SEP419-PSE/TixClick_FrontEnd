@@ -7,10 +7,12 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { AiFillTikTok } from "react-icons/ai";
 import { FaYoutube } from "react-icons/fa";
 import { AuthContext } from "../../contexts/AuthProvider";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import companyApi from "../../services/companyApi";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
   const [openMobileMenu, setOpenMobileMenu] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isBackDrop, setIsBackDrop] = useState<boolean>(false);
@@ -39,6 +41,13 @@ const HeroSlider = () => {
   const handleOpenMobileMenu = () => {
     setOpenMobileMenu(!openMobileMenu);
     document.body.style.overflow = openMobileMenu ? "auto" : "hidden";
+  };
+
+  const hanldeClickCreateEvent = async () => {
+    const response = await companyApi.isAccountHaveCompany();
+    navigate(
+      `${response.data.code == 200 ? "/create-event" : "create-company"}`
+    );
   };
   return (
     <div className="lg:mb-8">
@@ -72,9 +81,11 @@ const HeroSlider = () => {
                 <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
                 <li className="px-4 py-2 hover:opacity-60">Sự kiện của tôi</li>
                 <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
-                <li className="px-4 py-2 border rounded-md hover:opacity-60">
-                  Tạo sự kiện
-                </li>
+                <button onClick={hanldeClickCreateEvent}>
+                  <li className="px-4 py-2 border rounded-md hover:opacity-60">
+                    Tạo sự kiện
+                  </li>
+                </button>
                 <li
                   onClick={() => authContext?.logout()}
                   className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-60"

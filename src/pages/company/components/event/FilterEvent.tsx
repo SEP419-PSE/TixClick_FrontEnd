@@ -20,7 +20,7 @@ const typeEvents = [
 const FilterEvent = () => {
   return (
     <div className="my-4 min-w-[330px]">
-      <ul className="flex justify-between bg-white text-pse-gray p-2 rounded-md">
+      <ul className="flex justify-between bg-white text-pse-gray px-4 py-2 rounded-md">
         {typeEvents.map((type) => (
           <li key={type.id}>{type.type}</li>
         ))}

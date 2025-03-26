@@ -1,30 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import ImageUpload from "./ImageUpload";
-import TextInput from "./InputText";
-import SelectTypeEvent from "./SelectTypeEvent";
-import TextEditor from "./TextEditor";
-import eventApi from "../../services/eventApi";
-import { EventType } from "../../interface/EventInterface";
+import ImageUpload from "../ImageUpload";
+import TextInput from "../InputText";
+import SelectTypeEvent from "../SelectTypeEvent";
+import TextEditor from "../TextEditor";
+import eventApi from "../../../services/eventApi";
+import { EventType } from "../../../interface/EventInterface";
 import { toast } from "sonner";
+import LoadingFullScreen from "../../Loading/LoadingFullScreen";
+import useAllCompany from "../../../hooks/useAllCompany";
+import { Company } from "../../../interface/company/Company";
 
 const eventTypes: EventType[] = [
-  {
-    id: 1,
-    name: "Nhạc sống",
-  },
-  {
-    id: 2,
-    name: "Thể thao",
-  },
-  {
-    id: 3,
-    name: "Sân khấu & Nghệ thuật",
-  },
-  {
-    id: 4,
-    name: "Khác",
-  },
+  { id: 1, name: "Nhạc sống" },
+  { id: 2, name: "Thể thao" },
+  { id: 3, name: "Sân khấu & Nghệ thuật" },
+  { id: 4, name: "Khác" },
 ];
 
 type StepOneProps = {
@@ -37,99 +28,81 @@ type StepOneProps = {
 export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
   const [logoImage, setLogoImage] = useState<File | null>(null);
   const [background, setBackGround] = useState<File | null>(null);
-  const [logoOrganizer, setLogoOrganizer] = useState<File | null>(null);
   const [eventName, setEventName] = useState("");
   const [locationEvent, setLocationEvent] = useState("");
   const [address, setAddress] = useState("");
   const [typeEvent, setTypeEvent] = useState("");
-  const [organizerName, setOrganizerName] = useState("");
-  const [organizerInfor, setOrganizerInfor] = useState("");
   const [editorContent, setEditorContent] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Kiểm tra điều kiện hợp lệ
-  // useEffect(() => {
-  //   const isValid =
-  //     editorContent.trim() !== "<p><br></p>" &&
-  //     logoImage !== null &&
-  //     background !== null &&
-  //     logoOrganizer !== null &&
-  //     eventName.trim() !== "" &&
-  //     locationEvent.trim() !== "" &&
-  //     address.trim() !== "" &&
-  //     typeEvent.trim() !== "" &&
-  //     organizerName.trim() !== "";
+  const companies: Company | undefined = useAllCompany();
 
-  //   onValidationChange(isValid);
-  // }, [
-  //   editorContent,
-  //   eventName,
-  //   locationEvent,
-  //   address,
-  //   typeEvent,
-  //   organizerName,
-  //   onValidationChange,
-  //   logoImage,
-  //   background,
-  //   logoOrganizer,
-  // ]);
+  // const handleSelectCompany = (companyId: number) => {
+  //   setSelectedCompanyId(companyId);
+  // };
 
-  // const imageFile = [logoImage, background, logoOrganizer];
-
-  const checkValid = () => {
-    if (
+  // Auto validate khi người dùng nhập dữ liệu
+  useEffect(() => {
+    const isValid =
       editorContent.trim() !== "<p><br></p>" &&
       eventName.trim() !== "" &&
       locationEvent.trim() !== "" &&
       address.trim() !== "" &&
       typeEvent.trim() !== "" &&
-      organizerName.trim() !== "" &&
       logoImage !== null &&
-      background !== null &&
-      logoOrganizer !== null
-    ) {
-      setIsStepValid(true);
-    } else {
+      background !== null;
+
+    setIsStepValid(isValid);
+  }, [
+    editorContent,
+    eventName,
+    locationEvent,
+    address,
+    typeEvent,
+    logoImage,
+    background,
+    setIsStepValid,
+  ]);
+
+  const submitInfo = async () => {
+    if (!logoImage || !background) {
       toast.warning("Vui lòng nhập đầy đủ thông tin", {
         position: "top-center",
       });
       return;
     }
-  };
-  const fetchData = async () => {
+
     try {
+      setIsLoading(true);
       const formData = new FormData();
       formData.append("eventName", eventName);
       formData.append("location", locationEvent);
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
       formData.append("typeEvent", "Offline");
+      if (companies)
+        formData.append("companyId", companies?.companyId.toString());
 
-      // Append từng file nếu có
-      if (logoImage) formData.append("logoURL", logoImage);
-      if (background) formData.append("bannerURL", background);
-      if (logoOrganizer) formData.append("logoOrganizeURL", logoOrganizer);
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(key, value);
-      // }
+      formData.append("logoURL", logoImage);
+      formData.append("bannerURL", background);
 
       const response = await eventApi.create(formData);
       console.log(response);
       toast.success("Tạo sự kiện thành công", { position: "top-center" });
-      setStep(2);
+      setStep(1); // sang step 2 (index 1)
+      setIsStepValid(false);
     } catch (error) {
       console.error("Error creating event:", error);
+      toast.error("Đã có lỗi xảy ra khi tạo sự kiện");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const createEvent = () => {
-    checkValid();
-    fetchData();
-  };
-
-  // console.log(editorContent);
   return (
     <div className="text-black text-[16px]">
-      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      {isLoading && <LoadingFullScreen />}
+      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -155,7 +128,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
         <p className="text-white">Địa chỉ sự kiện</p>
         <TextInput
           maxLength={80}
@@ -171,7 +144,7 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
         />
       </section>
 
-      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
         <SelectTypeEvent
           choice={typeEvent}
           setChoice={setTypeEvent}
@@ -179,41 +152,33 @@ export default function StepOne({ setStep, setIsStepValid }: StepOneProps) {
           listType={eventTypes}
         />
       </section>
-      <section className="bg-gradient-to-br from-pse-green-third p-4 rounded-lg mb-8 shadow-box">
+
+      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
       </section>
-      <section className=" bg-gradient-to-br from-pse-green-third md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-box">
+
+      <section className=" bg-pse-black-light md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-neon-green">
         <div className="md:w-[70%]">
-          <TextInput
-            label="Tên ban tổ chức"
-            maxLength={80}
-            text={organizerName}
-            setText={setOrganizerName}
-          />
-          <TextInput
-            label="Giới thiệu chung"
-            maxLength={100}
-            text={organizerInfor}
-            setText={setOrganizerInfor}
-          />
+          <p className="text-white font-semibold">{companies?.companyName}</p>
+          <p className="text-white">{companies?.description}</p>
         </div>
         <div>
-          <ImageUpload
-            image={logoOrganizer}
-            setImage={setLogoOrganizer}
-            width={275}
-            height={275}
-            label="Thêm logo ban tổ chức"
+          <img
+            src={companies?.logoURL}
+            alt="Company Logo"
+            className="w-[275px] h-[275px]"
           />
         </div>
       </section>
-      <div className="flex flex-col items-end">
+
+      <div className="flex flex-col items-center">
         <button
           className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded-md shadow-box"
-          onClick={createEvent}
+          onClick={submitInfo}
+          disabled={isLoading}
         >
-          Next
+          Xác nhận thông tin
         </button>
       </div>
     </div>

@@ -45,6 +45,7 @@ import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import ChatApp from "./pages/chat/ChatApp";
+import CreateEvent from "./components/CreateEvent/CreateEvent";
 
 export default function App() {
   return (
@@ -55,7 +56,7 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail" element={<EventDetail />} />
-            <Route path="create-event" element={<Stepper />} />
+            <Route path="create-event" element={<CreateEvent />} />
             {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
               <Route index path="signin" element={<SignInForm />} />

@@ -3,7 +3,7 @@ import { useState } from "react";
 interface TextInputProps {
   maxLength: number;
   label: string;
-  text: string;
+  text: string | undefined;
   setText: React.Dispatch<React.SetStateAction<string>>;
   className?: string;
 }
@@ -53,7 +53,7 @@ export default function TextInput({
           <p></p>
         )}
         <p className={`${isMaxLength ? "text-pse-error" : "text-white/80"}`}>
-          {text.length}/{maxLength}
+          {text?.length}/{maxLength}
         </p>
       </div>
     </div>

@@ -52,9 +52,9 @@ const SignInForm = () => {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data === ERROR_RESPONSE.invalidAccount())
+        if (error.response.data.message == "Tài khoản chưa được kích hoạt")
           navigate("/auth/verify");
-        toast.error(error.response.data);
+        toast.error(error.response.data.message);
       })
       .finally(() => {
         setIsLoading(false);
