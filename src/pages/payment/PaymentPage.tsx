@@ -1,13 +1,14 @@
 import { motion } from "framer-motion"
 import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, MapPin, Tag, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
 import payOs from "../../assets/payOs.svg"
 import { Button } from "../../components/ui/button"
 import { Checkbox } from "../../components/ui/checkbox"
 
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { toast, Toaster } from "sonner"
 import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
@@ -18,26 +19,45 @@ export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [minutes, setMinutes] = useState(10)
   const [seconds, setSeconds] = useState(0)
-  console.log(setMinutes)
-  console.log(setSeconds)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const countdownInterval = setInterval(() => {
+      if (seconds > 0) {
+        setSeconds(seconds - 1);
+      } else if (minutes > 0) {
+        setMinutes(minutes - 1);
+        setSeconds(59);
+      } else {
+        toast.success("Hết thời gian thanh toán");
+    
+        clearInterval(countdownInterval);
+    
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      }
+    }, 1000);
+    
+    return () => clearInterval(countdownInterval);
+  }, [minutes, seconds, navigate])
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
+      <Toaster/>
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center sticky top-0 z-10">
         <Link to="/">
-        <div className="flex items-center ml-4">
-       
-          <img src={Logo} alt="Event Ticket" className="h-12 w-auto mr-4" />
-          <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
-        </div>
+          <div className="flex items-center ml-4">
+            <img src={Logo || "/placeholder.svg"} alt="Event Ticket" className="h-12 w-auto mr-4" />
+            <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
+          </div>
         </Link>
         <Link to="/">
-        <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
-          <X className="h-4 w-4 mr-2" />
-          Hủy giao dịch
-        </Button>
+          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
+            <X className="h-4 w-4 mr-2" />
+            Hủy giao dịch
+          </Button>
         </Link>
-        
       </header>
 
       <div className="relative h-60 md:h-80 bg-[#1A1A1A] overflow-hidden">
@@ -59,7 +79,6 @@ export default function PaymentPage() {
           >
             <MapPin className="h-5 w-5 text-[#FF8A00]" />
             <span>Nhà hát Lớn Hà Nội</span>
-            
           </motion.div>
 
           <motion.div
@@ -113,8 +132,8 @@ export default function PaymentPage() {
                   <div className="h-2 w-2 rounded-full bg-white"></div>
                 </div>
                 <Label className="flex items-center cursor-pointer text-white">
-                <img src={payOs} alt="Payos" width={60} height={30} className="mr-2" />
-                   ( payOS - Thanh toán an toàn với thẻ nội địa, Visa, Master, JCB )
+                  <img src={payOs || "/placeholder.svg"} alt="Payos" width={60} height={30} className="mr-2" />( payOS -
+                  Thanh toán an toàn với thẻ nội địa, Visa, Master, JCB )
                 </Label>
               </div>
 
@@ -146,15 +165,15 @@ export default function PaymentPage() {
 
             <div className="p-5">
               <div className="flex gap-4">
-                  <div className="w-fit h-full bg-gradient-to-br from-[#FF8A00]/30 to-[#FF8A00]/10 flex items-center justify-center">
+                <div className="w-fit h-full bg-gradient-to-br from-[#FF8A00]/30 to-[#FF8A00]/10 flex items-center justify-center">
                   <img
-                    src={banner}
+                    src={banner || "/placeholder.svg"}
                     alt="Event Poster"
                     width={120}
                     height={180}
                     className="rounded-md object-cover"
                   />
-                  </div>
+                </div>
                 <div>
                   <h3 className="font-medium text-lg text-white">Hòa nhạc Mùa Xuân 2024</h3>
                   <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
@@ -268,7 +287,7 @@ export default function PaymentPage() {
             <div className="flex items-start space-x-2 mt-2">
               <Checkbox
                 id="terms"
-                className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00]"
+                className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-slate-50"
               />
               <label htmlFor="terms" className="text-sm leading-none text-gray-300">
                 Tôi xác nhận các thông tin đặt vé đã chính xác
@@ -287,5 +306,6 @@ export default function PaymentPage() {
     </div>
   )
 }
+
 
 

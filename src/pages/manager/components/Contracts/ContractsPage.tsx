@@ -9,24 +9,55 @@ import {
   MoreHorizontal,
   Search,
   Upload,
-  XCircle
-} from "lucide-react"
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { Button } from "../../../../components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
-import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
-import { Progress } from "../../../../components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
-import { Contracts } from "../../../../interface/manager/Contracts"
-import managerApi from "../../../../services/manager/ManagerApi"
-import { ManagerHeader } from "../ManagerHeader"
-
-
+  XCircle,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../../../../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../../components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../../../components/ui/dropdown-menu";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import { Progress } from "../../../../components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../../../components/ui/tabs";
+import { Contracts } from "../../../../interface/manager/Contracts";
+import managerApi from "../../../../services/manager/ManagerApi";
+import { ManagerHeader } from "../ManagerHeader";
 
 export default function ContractsPage() {
   const [contracts, setContracts] = useState([
@@ -90,7 +121,7 @@ export default function ContractsPage() {
       progress: 0,
       documents: [],
     },
-  ])
+  ]);
 
   // const [newContract, setNewContract] = useState({
   //   name: "",
@@ -113,13 +144,12 @@ export default function ContractsPage() {
     status: "",
     progress: 0,
     documents: [],
-  })
+  });
 
-  const [isContractModalOpen, setIsContractModalOpen] = useState(false)
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 
-  // New state for attachment detail view
-  const [selectedDocument, setSelectedDocument] = useState("")
-  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState("");
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
   const [documentDetails, setDocumentDetails] = useState({
     name: "",
     type: "",
@@ -129,24 +159,55 @@ export default function ContractsPage() {
     lastModified: "",
     version: "",
     description: "",
-  })
+  });
 
-  // Function to view document details
+  const [paymentCode, setPaymentCode] = useState("");
+  const [vietQRParams, setVietQRParams] = useState({
+    bankID: "",
+    accountID: "",
+    amount: "",
+    description: "",
+  });
+
+  const generateVietQRUrl = () => {
+    if (!vietQRParams.bankID || !vietQRParams.accountID) {
+      return null;
+    }
+
+    const encodedDescription = encodeURIComponent(
+      vietQRParams.description || ""
+    );
+    const amount = vietQRParams.amount
+      ? Number.parseInt(vietQRParams.amount)
+      : selectedContract.value;
+
+    return `https://img.vietqr.io/image/${vietQRParams.bankID}-${vietQRParams.accountID}-compact.png?amount=${amount}&addInfo=${encodedDescription}&accountName=Contract%20Payment`;
+  };
+
+  const handlePaymentConfirmation = () => {
+    if (paymentCode.trim() === "") {
+      toast.error("Please enter a payment confirmation code");
+      return;
+    }
+
+    toast.success("Payment confirmed", {
+      description: `Payment for contract ${selectedContract.name} has been confirmed.`,
+    });
+    setPaymentCode("");
+  };
+
   const handleViewDocumentDetails = (doc: string) => {
-    // In a real app, you would fetch document details from an API
-    // For now, we'll simulate this with mock data
-    setSelectedDocument(doc)
+    setSelectedDocument(doc);
 
-    // Generate mock document details
-    const fileExtension = doc.split(".").pop() || ""
+    const fileExtension = doc.split(".").pop() || "";
     const fileType =
       fileExtension === "pdf"
         ? "PDF Document"
         : fileExtension === "docx"
-          ? "Word Document"
-          : fileExtension === "xlsx"
-            ? "Excel Spreadsheet"
-            : "Document"
+        ? "Word Document"
+        : fileExtension === "xlsx"
+        ? "Excel Spreadsheet"
+        : "Document";
 
     setDocumentDetails({
       name: doc,
@@ -157,107 +218,139 @@ export default function ContractsPage() {
       lastModified: "2024-01-10",
       version: "1.2",
       description: `This is the ${doc} file for contract ${selectedContract.name}.`,
-    })
+    });
 
-    setIsAttachmentModalOpen(true)
-  }
+    setIsAttachmentModalOpen(true);
+  };
 
   const handleUploadDocument = (id: any) => {
     toast.success("Document Uploaded", {
       description: "The document has been successfully uploaded.",
-    })
-    console.log(id)
-  }
+    });
+    console.log(id);
+  };
 
   const handleDownloadDocument = (id: number, doc: string) => {
     toast.success("Document Downloaded", {
       description: `${doc} has been downloaded.`,
-    })
-    console.log(id)
-    console.log(doc)
-  }
+    });
+    console.log(id);
+    console.log(doc);
+  };
 
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "Active":
-        return <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">Active</span>
+        return (
+          <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">
+            Active
+          </span>
+        );
       case "Pending":
-        return <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">Pending</span>
+        return (
+          <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">
+            Pending
+          </span>
+        );
       case "Draft":
-        return <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">Draft</span>
+        return (
+          <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">
+            Draft
+          </span>
+        );
       case "Expired":
-        return <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">Expired</span>
+        return (
+          <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">
+            Expired
+          </span>
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const getStatusIcon = (status: any) => {
     switch (status) {
       case "Active":
-        return <CheckCircle className="h-5 w-5 text-green-500" />
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case "Pending":
-        return <Clock className="h-5 w-5 text-yellow-500" />
+        return <Clock className="h-5 w-5 text-yellow-500" />;
       case "Draft":
-        return <AlertCircle className="h-5 w-5 text-blue-500" />
+        return <AlertCircle className="h-5 w-5 text-blue-500" />;
       case "Expired":
-        return <XCircle className="h-5 w-5 text-red-500" />
+        return <XCircle className="h-5 w-5 text-red-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const getDocumentIcon = (doc: string) => {
-    const fileExtension = doc.split(".").pop()?.toLowerCase() || ""
+    const fileExtension = doc.split(".").pop()?.toLowerCase() || "";
 
     switch (fileExtension) {
       case "pdf":
-        return <FileText className="h-5 w-5 text-red-400" />
+        return <FileText className="h-5 w-5 text-red-400" />;
       case "docx":
       case "doc":
-        return <FileText className="h-5 w-5 text-blue-400" />
+        return <FileText className="h-5 w-5 text-blue-400" />;
       case "xlsx":
       case "xls":
-        return <FileText className="h-5 w-5 text-green-400" />
+        return <FileText className="h-5 w-5 text-green-400" />;
       default:
-        return <FileText className="h-5 w-5 text-gray-400" />
+        return <FileText className="h-5 w-5 text-gray-400" />;
     }
-  }
+  };
 
   const fetchContractList = async () => {
     try {
-      const res: any = await managerApi.getAllContract()
-      console.log("Contract List:", res.data.result)
+      const res: any = await managerApi.getAllContract();
+      console.log("Contract List:", res.data.result);
       if (res.data.result && res.data.result.length > 0) {
-        setContracts(res.data.result)
+        setContracts(res.data.result);
       }
     } catch (error) {
-      console.error("Error fetching contract:", error)
-      toast.error("Failed to fetch contract")
+      console.error("Error fetching contract:", error);
+      toast.error("Failed to fetch contract");
     }
-  }
+  };
 
   useEffect(() => {
     const initUseEffect = async () => {
-      await fetchContractList()
-    }
-    initUseEffect()
-  }, [])
+      await fetchContractList();
+    };
+    initUseEffect();
+  }, []);
 
-  // Function to handle opening the contract modal
   const openContractModal = (contract: Contracts) => {
-    setSelectedContract(contract)
-    setIsContractModalOpen(true)
-  }
+    setSelectedContract(contract);
+    setIsContractModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (selectedContract && selectedContract.id) {
+      setVietQRParams({
+        bankID: "BIDV",
+        accountID: "31410001689304",
+        amount: selectedContract.value.toString(),
+        description: `Payment for contract #${selectedContract.id}`,
+      });
+    }
+  }, [selectedContract]);
 
   return (
     <>
-      <ManagerHeader heading="Contracts" text="Manage and track all contracts" />
+      <ManagerHeader
+        heading="Contracts"
+        text="Manage and track all contracts"
+      />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
             <Search className="text-gray-400" />
-            <Input className="w-[300px] bg-[#2A2A2A] text-white" placeholder="Search contracts..." />
+            <Input
+              className="w-[300px] bg-[#2A2A2A] text-white"
+              placeholder="Search contracts..."
+            />
           </div>
           <div className="flex items-center space-x-2">
             <Select>
@@ -280,8 +373,12 @@ export default function ContractsPage() {
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="service">Service Agreement</SelectItem>
                 <SelectItem value="licensing">Licensing Agreement</SelectItem>
-                <SelectItem value="partnership">Partnership Agreement</SelectItem>
-                <SelectItem value="maintenance">Maintenance Agreement</SelectItem>
+                <SelectItem value="partnership">
+                  Partnership Agreement
+                </SelectItem>
+                <SelectItem value="maintenance">
+                  Maintenance Agreement
+                </SelectItem>
                 <SelectItem value="consulting">Consulting Agreement</SelectItem>
               </SelectContent>
             </Select>
@@ -303,14 +400,25 @@ export default function ContractsPage() {
           </TableHeader>
           <TableBody>
             {contracts.map((contract) => (
-              <TableRow key={contract.id} className="border-[#333333] hover:bg-[#2A2A2A]">
-                <TableCell className="font-medium text-white">{contract.name}</TableCell>
+              <TableRow
+                key={contract.id}
+                className="border-[#333333] hover:bg-[#2A2A2A]"
+              >
+                <TableCell className="font-medium text-white">
+                  {contract.name}
+                </TableCell>
                 <TableCell className="text-white">{contract.company}</TableCell>
                 <TableCell className="text-white">{contract.type}</TableCell>
-                <TableCell className="text-white">{contract.startDate}</TableCell>
+                <TableCell className="text-white">
+                  {contract.startDate}
+                </TableCell>
                 <TableCell className="text-white">{contract.endDate}</TableCell>
-                <TableCell className="text-white">${contract.value.toLocaleString()}</TableCell>
-                <TableCell className="text-white">{getStatusBadge(contract.status)}</TableCell>
+                <TableCell className="text-white">
+                  ${contract.value.toLocaleString()}
+                </TableCell>
+                <TableCell className="text-white">
+                  {getStatusBadge(contract.status)}
+                </TableCell>
                 <TableCell className="text-white">
                   <Progress value={contract.progress} className="w-[60px]" />
                 </TableCell>
@@ -322,10 +430,19 @@ export default function ContractsPage() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-[#2A2A2A] text-white"
+                    >
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => openContractModal(contract)}>View details</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleUploadDocument(contract.id)}>
+                      <DropdownMenuItem
+                        onClick={() => openContractModal(contract)}
+                      >
+                        View details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleUploadDocument(contract.id)}
+                      >
                         <Upload className="mr-2 h-4 w-4" />
                         Upload document
                       </DropdownMenuItem>
@@ -334,7 +451,9 @@ export default function ContractsPage() {
                         <Bell className="mr-2 h-4 w-4" />
                         Set reminder
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-500">Terminate contract</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-500">
+                        Terminate contract
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -344,19 +463,21 @@ export default function ContractsPage() {
         </Table>
       </main>
 
-      {/* Contract Details Modal */}
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
           <DialogHeader>
             <DialogTitle>Contract Details</DialogTitle>
-            <DialogDescription>View and manage the details of the selected contract.</DialogDescription>
+            <DialogDescription>
+              View and manage the details of the selected contract.
+            </DialogDescription>
           </DialogHeader>
           {selectedContract && (
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="documents">Documents</TabsTrigger>
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                <TabsTrigger value="payment">Payment</TabsTrigger>
               </TabsList>
               <TabsContent value="details">
                 <div className="grid gap-4 py-4">
@@ -393,30 +514,45 @@ export default function ContractsPage() {
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Progress</Label>
-                    <Progress value={selectedContract.progress} className="w-[200px]" />
+                    <Progress
+                      value={selectedContract.progress}
+                      className="w-[200px]"
+                    />
                   </div>
                 </div>
               </TabsContent>
               <TabsContent value="documents">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-2">Contract Documents</h3>
-                  {selectedContract.documents && selectedContract.documents.length > 0 ? (
+                  <h3 className="text-lg font-semibold mb-2">
+                    Contract Documents
+                  </h3>
+                  {selectedContract.documents &&
+                  selectedContract.documents.length > 0 ? (
                     <ul className="space-y-2">
                       {selectedContract.documents.map((doc, index) => (
-                        <li key={index} className="flex items-center justify-between p-2 rounded hover:bg-[#333333]">
+                        <li
+                          key={index}
+                          className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
+                        >
                           <div className="flex items-center">
                             {getDocumentIcon(doc)}
                             <span className="ml-2">{doc}</span>
                           </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleViewDocumentDetails(doc)}>
+                          <div className="flex gap-2 text-black">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewDocumentDetails(doc)}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDownloadDocument(selectedContract.id, doc)}
+                              onClick={() =>
+                                handleDownloadDocument(selectedContract.id, doc)
+                              }
                             >
                               <Download className="mr-2 h-4 w-4" />
                               Download
@@ -428,7 +564,10 @@ export default function ContractsPage() {
                   ) : (
                     <p>No documents uploaded yet.</p>
                   )}
-                  <Button className="mt-4" onClick={() => handleUploadDocument(selectedContract.id)}>
+                  <Button
+                    className="mt-4"
+                    onClick={() => handleUploadDocument(selectedContract.id)}
+                  >
                     <Upload className="mr-2 h-4 w-4" />
                     Upload New Document
                   </Button>
@@ -436,25 +575,147 @@ export default function ContractsPage() {
               </TabsContent>
               <TabsContent value="timeline">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-2">Contract Timeline</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Contract Timeline
+                  </h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Start</div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
+                        Start
+                      </div>
                       <div className="w-4 h-4 rounded-full bg-green-500"></div>
                       <div className="ml-2">{selectedContract.startDate}</div>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Current</div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
+                        Current
+                      </div>
                       <div className="w-4 h-4 rounded-full bg-blue-500"></div>
                       <div className="ml-2">Today</div>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">End</div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
+                        End
+                      </div>
                       <div className="w-4 h-4 rounded-full bg-red-500"></div>
                       <div className="ml-2">{selectedContract.endDate}</div>
                     </div>
                   </div>
-                  <Progress value={selectedContract.progress} className="w-full mt-4 bg-blue-500" />
+                  <Progress
+                    value={selectedContract.progress}
+                    className="w-full mt-4 bg-blue-500"
+                  />
+                </div>
+              </TabsContent>
+              <TabsContent value="payment">
+                <div className="py-4">
+                  <h3 className="text-lg font-semibold mb-4">
+                    Contract Payment
+                  </h3>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
+                        <h4 className="text-md font-medium mb-2">
+                          Payment Details
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="text-gray-400">Contract Value:</div>
+                          <div>${selectedContract.value.toLocaleString()}</div>
+                          <div className="text-gray-400">Payment Status:</div>
+                          <div>
+                            {selectedContract.progress >= 100
+                              ? "Paid"
+                              : "Pending"}
+                          </div>
+                          <div className="text-gray-400">Due Date:</div>
+                          <div>{selectedContract.endDate}</div>
+                          <div className="text-gray-400">Bank:</div>
+                          <div>{vietQRParams.bankID}</div>
+                          <div className="text-gray-400">Account Number:</div>
+                          <div>{vietQRParams.accountID}</div>
+                          <div className="text-gray-400">Description:</div>
+                          <div className="truncate">
+                            {vietQRParams.description}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
+                        <h4 className="text-md font-medium mb-2">
+                          Confirm Payment
+                        </h4>
+                        <div className="space-y-3">
+                          <p className="text-sm text-gray-400">
+                            After completing payment, enter the confirmation
+                            code below:
+                          </p>
+                          <div className="flex space-x-2">
+                            <Input
+                              placeholder="Enter payment code"
+                              value={paymentCode}
+                              onChange={(e) => setPaymentCode(e.target.value)}
+                              className="bg-[#2A2A2A]"
+                            />
+                            <Button onClick={handlePaymentConfirmation}>
+                              Confirm
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
+                      <div className="mb-4 text-center">
+                        <h4 className="text-md font-medium mb-1">
+                          Scan to Pay
+                        </h4>
+                        <p className="text-sm text-gray-400">
+                          Scan this VietQR code to make payment for this
+                          contract
+                        </p>
+                      </div>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="bg-white p-4 rounded-lg mb-4 flex items-center justify-center cursor-pointer hover:scale-105 transition">
+                            {generateVietQRUrl() ? (
+                              <img
+                                src={generateVietQRUrl() || ""}
+                                alt="VietQR Payment Code"
+                                width={200}
+                                height={200}
+                                className="w-48 h-48"
+                              />
+                            ) : (
+                              <div className="w-48 h-48 flex flex-col items-center justify-center text-black">
+                                <p className="text-center text-sm">
+                                  Loading payment QR code...
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </DialogTrigger>
+
+                        <DialogContent className="flex flex-col items-center p-6">
+                          {generateVietQRUrl() && (
+                            <img
+                              src={generateVietQRUrl() || ""}
+                              alt="VietQR Payment Code"
+                              className="w-80 h-80"
+                            />
+                          )}
+                        </DialogContent>
+                      </Dialog>
+
+                      <p className="text-xs text-gray-400 text-center">
+                        Payment reference: {selectedContract.id}-
+                        {selectedContract.company
+                          .replace(/\s+/g, "")
+                          .toLowerCase()}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -465,18 +726,24 @@ export default function ContractsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Document Detail Attachment Modal */}
-      <Dialog open={isAttachmentModalOpen} onOpenChange={setIsAttachmentModalOpen}>
+      <Dialog
+        open={isAttachmentModalOpen}
+        onOpenChange={setIsAttachmentModalOpen}
+      >
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle>Document Details</DialogTitle>
-            <DialogDescription>View details for {selectedDocument}</DialogDescription>
+            <DialogDescription>
+              View details for {selectedDocument}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="flex items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
               {getDocumentIcon(selectedDocument)}
-              <span className="ml-2 text-xl font-medium">{selectedDocument}</span>
+              <span className="ml-2 text-xl font-medium">
+                {selectedDocument}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-4">
@@ -489,15 +756,21 @@ export default function ContractsPage() {
                 <p>{documentDetails.size}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">Uploaded By</h4>
+                <h4 className="text-sm font-medium text-gray-400">
+                  Uploaded By
+                </h4>
                 <p>{documentDetails.uploadedBy}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">Upload Date</h4>
+                <h4 className="text-sm font-medium text-gray-400">
+                  Upload Date
+                </h4>
                 <p>{documentDetails.uploadedDate}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">Last Modified</h4>
+                <h4 className="text-sm font-medium text-gray-400">
+                  Last Modified
+                </h4>
                 <p>{documentDetails.lastModified}</p>
               </div>
               <div>
@@ -512,7 +785,9 @@ export default function ContractsPage() {
             </div>
 
             <div className="mt-4 p-3 bg-[#1E1E1E] rounded-lg">
-              <h4 className="text-sm font-medium text-gray-400 mb-2">Document History</h4>
+              <h4 className="text-sm font-medium text-gray-400 mb-2">
+                Document History
+              </h4>
               <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span>Created document</span>
@@ -535,8 +810,13 @@ export default function ContractsPage() {
           </div>
 
           <DialogFooter className="flex justify-between">
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => handleDownloadDocument(selectedContract.id, selectedDocument)}>
+            <div className="flex gap-2 text-black">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  handleDownloadDocument(selectedContract.id, selectedDocument)
+                }
+              >
                 <Download className="mr-2 h-4 w-4" />
                 Download
               </Button>
@@ -545,11 +825,12 @@ export default function ContractsPage() {
                 Upload New Version
               </Button>
             </div>
-            <Button onClick={() => setIsAttachmentModalOpen(false)}>Close</Button>
+            <Button onClick={() => setIsAttachmentModalOpen(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
-
