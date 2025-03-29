@@ -2,8 +2,8 @@ import type React from "react"
 
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import { PinSetup } from "./PinSetup"
-import { PinVerification } from "./PinVerification"
 import { PinUpdate } from "./PinUpdate"
+import { PinVerification } from "./PinVerification"
 
 
 interface PinAuthProps {

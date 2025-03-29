@@ -36,15 +36,15 @@ export default function Policy() {
   const policyPdfs = {
     "1": {
       icon: <FileText className="h-4 w-4" />,
-      pdfUrl: "/placeholder.svg?height=800&width=600&text=PDF1",
+      pdfUrl: "http://res.cloudinary.com/dxypmsqdo/image/upload/v1743221521/mv6nhedkijdwgy2qwdsy.pdf",
     },
     "2": {
       icon: <Shield className="h-4 w-4" />,
-      pdfUrl: "/placeholder.svg?height=800&width=600&text=PDF2",
+      pdfUrl: "https://res.cloudinary.com/dxypmsqdo/image/upload/v1743223292/namphan/lrlrg7dhxzwph2bq62x7.pdf",
     },
     "3": {
       icon: <HelpCircle className="h-4 w-4" />,
-      pdfUrl: "/placeholder.svg?height=800&width=600&text=PDF3",
+      pdfUrl: "https://res.cloudinary.com/dxypmsqdo/image/upload/v1743223292/namphan/lrlrg7dhxzwph2bq62x7.pdf",
     },
   }
 

@@ -16,4 +16,11 @@ export interface AdminAccount {
     username: string;
     role: string;
   }
+
+  export interface OverviewMetrics {
+    totalTransaction: number;
+    totalTickets: number;
+    totalRevenue: number;
+  }
+
   
