@@ -5,12 +5,14 @@ import { Edit, Trash } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useSearchParams } from "react-router";
 import ticketApi from "../../services/ticketApi";
+import seatmapApi from "../../services/seatmapApi";
+import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 
 // Type definitions
 type SeatStatus = "available" | "disabled";
 type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType";
 type ViewMode = "edit" | "preview";
-type SectionType = "seated" | "standing";
+export type SectionType = "SEATED" | "STANDING";
 
 // Utility functions
 const formatCurrency = (amount: number): string => {
@@ -31,7 +33,7 @@ export type SeatTypeEdit = {
   eventId?: number;
 };
 
-interface ISeat {
+export interface ISeat {
   id: string;
   row: number;
   column: number;
@@ -42,7 +44,7 @@ interface ISeat {
   y?: number;
 }
 
-interface ISection {
+export interface ISection {
   id: string;
   name: string;
   rows: number;
@@ -56,6 +58,7 @@ interface ISection {
   priceId?: string;
   price?: number; // Price for standing sections
   capacity?: number; // Capacity for standing sections
+  isSave: boolean;
 }
 
 interface DraggableSectionProps {
@@ -132,13 +135,13 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
       >
         <div className="text-center text-gray-800 font-semibold mb-3">
           {section.name}
-          {section.type == "standing" && (
+          {section.type == "STANDING" && (
             <div className="text-sm text-gray-600 mt-1">
               Khu vực đứng - {formatCurrency(section.price || 0)}
             </div>
           )}
         </div>
-        {section.type == "standing" ? (
+        {section.type == "STANDING" ? (
           <div
             className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg flex flex-col items-center justify-center text-gray-700 font-medium relative overflow-hidden"
             style={{
@@ -363,26 +366,44 @@ const SeatChartDesigner: React.FC = () => {
   const [maxQuantity, setMaxQuantity] = useState(2);
   const [editingSeat, setEditingSeat] = useState<SeatTypeEdit | null>(null);
 
-  const [newSectionType, setNewSectionType] = useState<SectionType>("seated");
+  const [newSectionType, setNewSectionType] = useState<SectionType>("SEATED");
   const [standingPrice, setStandingPrice] = useState<number>(0);
   const [standingCapacity, setStandingCapacity] = useState<number>(0);
-
-  const getTickets = async () => {
-    try {
-      const response = await ticketApi.getTicketsByEventId(Number(eventId));
-      if (response.data.result.length > 0) {
-        setSeatTypes(response.data.result);
-      }
-    } catch (error) {
-      console.log("error fetch", error);
-      setSeatTypes([]);
-    }
-  };
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    //Get ticketList
+    const getTickets = async () => {
+      try {
+        const response = await ticketApi.getTicketsByEventId(Number(eventId));
+        if (response.data.result.length > 0) {
+          setSeatTypes(response.data.result);
+        } else if (response.data.result.length == 0) {
+          setSeatTypes([]);
+        }
+      } catch (error) {
+        console.log("error fetch", error);
+      }
+    };
     getTickets();
-  }, [seatTypes]);
+  }, []);
+
+  useEffect(() => {
+    const getSections = async () => {
+      try {
+        const response = await seatmapApi.getSections(Number(eventId));
+        // console.log(response.data.result);
+        if (response.data.result.length > 0) {
+          setSections(response.data.result);
+        }
+        if (response.data.result.length == 0) {
+          setSections(response.data.result);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSections();
+  }, []);
 
   const handleSave = async () => {
     // Validate empty fields
@@ -434,15 +455,24 @@ const SeatChartDesigner: React.FC = () => {
     }
 
     if (editingSeat) {
-      setSeatTypes(
-        seatTypes.map((seat) =>
-          seat.id == editingSeat.id
-            ? { ...seat, name: name.trim(), color, textColor, price }
-            : seat
-        )
-      );
-      setEditingSeat(null);
-      toast.success("Cập nhật loại ghế thành công");
+      const editSeat = {
+        ...editingSeat,
+        name: name.trim(),
+        color: color,
+        textColor: textColor,
+        price: price,
+        minQuantity: 1,
+        maxQuantity: maxQuantity,
+      };
+      ticketApi
+        .updateTicket(editSeat)
+        .then((response) => {
+          console.log(response);
+          setSeatTypes(response.data.result);
+          toast.success("Cập nhật loại ghế thành công");
+        })
+        .catch((error) => console.log(error))
+        .finally(() => setEditingSeat(null));
     } else {
       ticketApi
         .createTicketInSeatMap({
@@ -455,7 +485,10 @@ const SeatChartDesigner: React.FC = () => {
           maxQuantity,
           eventId: Number(eventId),
         })
-        .then((response) => console.log(response))
+        .then((response) => {
+          console.log(response);
+          setSeatTypes(response.data.result);
+        })
         .catch((error) => console.log(error));
 
       toast.success("Thêm loại ghế thành công");
@@ -494,6 +527,7 @@ const SeatChartDesigner: React.FC = () => {
 
     const response = await ticketApi.deleteTicket(id);
     console.log(response);
+    setSeatTypes(response.data.result);
     toast.success("Đã xóa loại ghế");
   };
 
@@ -520,19 +554,19 @@ const SeatChartDesigner: React.FC = () => {
 
   // Add a new section with calculated position
   const addSection = () => {
-    if (newSectionType == "standing" && !addCurrentSeatTypeId) {
+    if (newSectionType == "STANDING" && !addCurrentSeatTypeId) {
       toast.error("Vui lòng chọn giá vé cho khu vực đứng");
       return;
     }
     if (
-      newSectionType == "standing" &&
+      newSectionType == "STANDING" &&
       (!standingCapacity || standingCapacity <= 0)
     ) {
       toast.error("Vui lòng nhập số lượng vé cho khu vực đứng");
       return;
     }
 
-    if (newSectionType == "seated") {
+    if (newSectionType == "SEATED") {
       if (newSectionRows <= 0 || newSectionColumns <= 0) {
         toast.error("Số hàng và số cột phải lớn hơn 0");
         return;
@@ -547,8 +581,8 @@ const SeatChartDesigner: React.FC = () => {
 
     // Calculate section dimensions based on rows and columns
     const { width: sectionWidth, height: sectionHeight } = calculateSectionSize(
-      newSectionType == "seated" ? newSectionRows : 1,
-      newSectionType == "seated" ? newSectionColumns : 1
+      newSectionType == "SEATED" ? newSectionRows : 1,
+      newSectionType == "SEATED" ? newSectionColumns : 1
     );
 
     // Calculate default position - center of the container
@@ -559,23 +593,24 @@ const SeatChartDesigner: React.FC = () => {
     const seatObj = seatTypes.find((s) => s.id == addCurrentSeatTypeId);
 
     const newSection: ISection = {
-      id: `section-${sections.length + 1}`,
+      id: Date.now().toString(),
       name: `Section ${sections.length + 1}`,
-      rows: newSectionType == "seated" ? newSectionRows : 1,
-      columns: newSectionType == "seated" ? newSectionColumns : 1,
+      rows: newSectionType == "SEATED" ? newSectionRows : 1,
+      columns: newSectionType == "SEATED" ? newSectionColumns : 1,
       seats: [],
       x: Math.max(0, centerX),
       y: Math.max(40, centerY),
       width: sectionWidth,
       height: sectionHeight,
       type: newSectionType,
-      priceId: newSectionType == "standing" ? seatObj?.id : undefined,
-      price: newSectionType == "standing" ? seatObj?.price : undefined,
-      capacity: newSectionType == "standing" ? standingCapacity : undefined,
+      priceId: newSectionType == "STANDING" ? seatObj?.id : undefined,
+      price: newSectionType == "STANDING" ? seatObj?.price : undefined,
+      capacity: newSectionType == "STANDING" ? standingCapacity : undefined,
+      isSave: false,
     };
 
     // Generate seats only for seated sections
-    if (newSectionType == "seated") {
+    if (newSectionType == "SEATED") {
       newSection.seats = generateSeats(newSection);
     }
     // newSection.seats = generateSeats(newSection);
@@ -697,27 +732,37 @@ const SeatChartDesigner: React.FC = () => {
     }
   };
 
+  const exportData = () => {
+    // console.log(JSON.stringify(sections, null, 2));
+    setLoading(true);
+    seatmapApi
+      .createSeatmap(sections, Number(eventId))
+      .then((response) => {
+        console.log(JSON.stringify(response.data.result, null, 2));
+        setSections(response.data.result);
+        toast.success(response.data.message);
+      })
+      .catch((error) => console.log(error));
+    setLoading(false);
+  };
+
   // Delete a section
-  const deleteSection = (sectionId: string) => {
-    setSections(sections.filter((section) => section.id !== sectionId));
-    if (activeSection == sectionId) {
-      setActiveSection(sections.length > 1 ? sections[0].id : null);
+  const deleteSection = async (sectionId: string) => {
+    console.log(sectionId, eventId, sections);
+    const response = await seatmapApi.deleteSections(
+      sectionId,
+      Number(eventId),
+      sections
+    );
+    if (response.data.result.length != 0) {
+      setSections(response.data.result);
+    } else {
+      setSections(response.data.result);
     }
-    toast.success("Đã xóa khu vực");
+    toast.success(response.data.message);
   };
 
   // Export JSON data
-  const exportData = () => {
-    const result = sections.map((section) => ({
-      ...section,
-      seats: section.seats.map((seat) => ({
-        ...seat,
-        seatType: seatTypes.find((type) => type.id == seat.seatTypeId),
-      })),
-    }));
-
-    console.log(JSON.stringify(result, null, 2));
-  };
 
   // Get color based on seat type
   const getSeatColor = (seat: ISeat): string => {
@@ -748,9 +793,11 @@ const SeatChartDesigner: React.FC = () => {
       addSection();
     }
   }, []);
+  console.log(JSON.stringify(sections, null, 2));
 
   return (
     <div className="container mx-auto p-6 bg-gray-200 min-h-screen">
+      {loading && <LoadingFullScreen />}
       <h1 className="text-3xl font-bold mb-8 text-gray-900 text-center">
         Thiết kế sơ đồ ghế
       </h1>
@@ -779,7 +826,7 @@ const SeatChartDesigner: React.FC = () => {
           className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-md font-medium"
           onClick={exportData}
         >
-          Xuất dữ liệu
+          Lưu sơ đồ
         </button>
       </div>
 
@@ -802,12 +849,12 @@ const SeatChartDesigner: React.FC = () => {
                     setNewSectionType(e.target.value as SectionType)
                   }
                 >
-                  <option value="seated">Khu vực có ghế</option>
-                  <option value="standing">Khu vực đứng</option>
+                  <option value="SEATED">Khu vực có ghế</option>
+                  <option value="STANDING">Khu vực đứng</option>
                 </select>
               </div>
 
-              {newSectionType == "standing" ? (
+              {newSectionType == "STANDING" ? (
                 <>
                   {/* <div>
                     <label className="block font-medium mb-2 text-gray-900">
@@ -964,7 +1011,7 @@ const SeatChartDesigner: React.FC = () => {
                 />
               </div>
               {sections.find((s) => s.id == activeSection)?.type ==
-              "standing" ? (
+              "STANDING" ? (
                 <>
                   <div>
                     <label className="block mb-2 font-medium text-gray-900">
@@ -1080,7 +1127,7 @@ const SeatChartDesigner: React.FC = () => {
               <h3 className="font-semibold mb-4 text-gray-900">Công cụ:</h3>
               <div className="flex flex-wrap gap-3">
                 {sections.find((s) => s.id == activeSection)?.type ==
-                "seated" ? (
+                "SEATED" ? (
                   <>
                     <button
                       className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
@@ -1129,7 +1176,7 @@ const SeatChartDesigner: React.FC = () => {
             </div>
 
             {(activeTool == "add" || activeTool == "edit") &&
-              sections.find((s) => s.id == activeSection)?.type == "seated" && (
+              sections.find((s) => s.id == activeSection)?.type == "SEATED" && (
                 <div className="mt-6">
                   <div>
                     <label className="block mb-2 font-medium text-gray-900">
@@ -1216,12 +1263,12 @@ const SeatChartDesigner: React.FC = () => {
       >
         <div>
           {/* Danh sách loại ghế */}
-          <ul className="space-y-3 overflow-y-auto h-[150px] space-x-3 mb-6">
-            {/* {seatTypes.length == 0 && (
+          <ul className="space-y-3 overflow-y-auto h-auto max-h-[150px] space-x-3 mb-6">
+            {seatTypes.length == 0 && (
               <div className="text-black flex items-center justify-center">
                 Không có vé nào
               </div>
-            )} */}
+            )}
             {seatTypes.map((seat) => (
               <li
                 key={seat.id}
@@ -1340,8 +1387,8 @@ const SeatChartDesigner: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-gray-900 font-medium mb-2">
-                  Vé tối đa
+                <label className="block truncate text-gray-900 font-medium mb-2">
+                  Số vé tối đa 1 người được mua
                 </label>
                 <input
                   type="number"

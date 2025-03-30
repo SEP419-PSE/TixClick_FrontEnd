@@ -109,7 +109,7 @@ export default function StepOne({
 
       toast.success("Tạo sự kiện thành công", { position: "top-center" });
       setIsApprove(true);
-      setStep(1); // sang step 2 (index 1)
+      setStep((prev) => prev + 1); // sang step 2 (index 1)
       setIsStepValid(false);
       const queryParams = new URLSearchParams({
         id: response.data.result.eventId,
