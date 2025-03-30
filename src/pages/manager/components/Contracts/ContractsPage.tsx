@@ -621,7 +621,7 @@ export default function ContractsPage() {
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="text-gray-400">Contract Value:</div>
-                          <div>${selectedContract.value.toLocaleString()}</div>
+                          <div>${selectedContract.value}</div>
                           <div className="text-gray-400">Payment Status:</div>
                           <div>
                             {selectedContract.progress >= 100

@@ -270,7 +270,7 @@ export default function TicketManagement() {
             <div className="w-64 h-64 mb-6">
               <img src={NoEvent || "/placeholder.svg"} alt="No tickets" className="w-full h-full object-contain" />
             </div>
-            <p className="text-gray-400 mb-6">Bạn chưa có vé nào</p>
+            <p className="text-gray-400 mb-6">Không có vé nào</p>
             <Button className="bg-pse-green hover:bg-[#00B14F]/90">Mua vé ngay</Button>
           </div>
         )}
@@ -361,7 +361,7 @@ export default function TicketManagement() {
                     {isModalOpen && (
                       <div
                         className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
-                        onClick={() => setIsModalOpen(false)} // Đóng modal khi bấm ra ngoài
+                        onClick={() => setIsModalOpen(false)} 
                       >
                         <div className="bg-white p-4 rounded-lg relative" onClick={(e) => e.stopPropagation()}>
                           <button

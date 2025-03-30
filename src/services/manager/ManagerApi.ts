@@ -40,7 +40,7 @@ const managerApi = {
         console.log(companyVerificationId)
     
     
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem("accessToken");
         return axiosClient.patch(url, {
             headers: {
                 Authorization: `Bearer ${token}`

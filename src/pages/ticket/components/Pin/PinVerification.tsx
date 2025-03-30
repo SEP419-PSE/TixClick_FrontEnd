@@ -118,7 +118,7 @@ export function PinVerification({ onSuccess, onReset }: PinVerificationProps) {
             variant="outline"
             className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
           >
-            Thiết lập lại mã PIN
+            Quên mã PIN?
           </Button>
         )}
       </div>

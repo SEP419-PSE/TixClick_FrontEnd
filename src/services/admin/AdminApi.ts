@@ -20,6 +20,11 @@ const adminApi ={
     getAllAccount(){
         const url = "/account/role-manager-admin"
         return axiosClient.get(url)
+    },
+     
+    getOverview(){
+        const url = "/ticket-purchase/overview"
+        return axiosClient.get(url)
     }
 }
 

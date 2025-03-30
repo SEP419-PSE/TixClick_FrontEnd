@@ -1,13 +1,12 @@
 import { Menu, Search, X } from "lucide-react";
 import { useContext, useState } from "react";
+import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
+import { FaFacebookSquare, FaYoutube } from "react-icons/fa";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-import { FaFacebookSquare } from "react-icons/fa";
-import { AiFillTikTok } from "react-icons/ai";
-import { FaYoutube } from "react-icons/fa";
-import { AuthContext } from "../../contexts/AuthProvider";
 import { NavLink } from "react-router";
+import { AuthContext } from "../../contexts/AuthProvider";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
@@ -41,13 +40,18 @@ const HeroSlider = () => {
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
-                <li className="px-4 py-2 hover:text-pse-green">Vé của tôi</li>
-                <li className="px-4 py-2 hover:text-pse-green">
-                  Sự kiện của tôi
-                </li>
-                <li className="px-4 py-2 hover:text-pse-green">
-                  Trang cá nhân
-                </li>
+                
+                  <li className="px-4 py-2 hover:text-pse-green">
+                    <a href="/ticketManagement">Vé của tôi</a>
+                  </li>
+                  <li className="px-4 py-2 hover:text-pse-green">
+                    <a href="/consumerCenter">Sự kiện của tôi</a>
+                  </li>
+                  <li className="px-4 py-2 hover:text-pse-green">
+                    <a href="/profileForm">Trang cá nhân</a>
+                  </li>
+                
+
                 <li
                   onClick={() => authContext?.logout()}
                   className="px-4 py-2 hover:text-pse-green"
