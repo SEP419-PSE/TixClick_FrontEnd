@@ -33,6 +33,7 @@ import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
+import NotificationPage from "./pages/manager/components/Notifications/NotificationPage";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
@@ -82,11 +83,12 @@ export default function App() {
               <Route path="events" element={<EventsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="company-approvals" element={<CompanyApprovalsPage />} />
+              <Route path="notifications" element={<NotificationPage />} />
 
 
             </Route>
-            <Route path="profileForm" element={<ProfileForm />} />
 
+            <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
 
 
