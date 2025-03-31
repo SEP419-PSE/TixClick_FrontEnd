@@ -10,8 +10,8 @@ import { toast } from "sonner";
 import LoadingFullScreen from "../../Loading/LoadingFullScreen";
 import useAllCompany from "../../../hooks/useAllCompany";
 import { Company } from "../../../interface/company/Company";
-import { Axios, AxiosError } from "axios";
-import { useNavigate } from "react-router";
+import { AxiosError } from "axios";
+import { useNavigate, useSearchParams } from "react-router";
 
 const eventTypes: EventType[] = [
   { id: 1, name: "Nhạc sống" },
@@ -20,19 +20,25 @@ const eventTypes: EventType[] = [
   { id: 4, name: "Khác" },
 ];
 
-type StepOneProps = {
+export type StepProps = {
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   isStepValid: boolean;
   setIsStepValid: React.Dispatch<React.SetStateAction<boolean>>;
+  updateStep: (newStep: number) => void;
+  eventId: number;
 };
 
 export default function StepOne({
   step,
   setStep,
+  isStepValid,
   setIsStepValid,
-}: StepOneProps) {
+  updateStep,
+  eventId,
+}: StepProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [logoImage, setLogoImage] = useState<File | null>(null);
   const [background, setBackGround] = useState<File | null>(null);
   const [eventName, setEventName] = useState("");
@@ -41,7 +47,6 @@ export default function StepOne({
   const [typeEvent, setTypeEvent] = useState("");
   const [editorContent, setEditorContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isApprove, setIsApprove] = useState<boolean>(false);
 
   const companies: Company | undefined = useAllCompany();
 
@@ -50,6 +55,14 @@ export default function StepOne({
   // };
 
   // Auto validate khi người dùng nhập dữ liệu
+
+  useEffect(() => {
+    if (eventId) {
+      console.log("Có event");
+    } else {
+      console.log("Chưa có event");
+    }
+  }, []);
   useEffect(() => {
     const isValid =
       editorContent.trim() !== "<p><br></p>" &&
@@ -58,8 +71,7 @@ export default function StepOne({
       address.trim() !== "" &&
       typeEvent.trim() !== "" &&
       logoImage !== null &&
-      background !== null &&
-      isApprove !== false;
+      background !== null;
 
     setIsStepValid(isValid);
   }, [
@@ -71,7 +83,6 @@ export default function StepOne({
     logoImage,
     background,
     setIsStepValid,
-    isApprove,
   ]);
 
   const submitInfo = async () => {
@@ -95,6 +106,7 @@ export default function StepOne({
       const formData = new FormData();
       formData.append("eventName", eventName);
       formData.append("location", locationEvent);
+      formData.append("locationName", address);
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
       formData.append("typeEvent", "Offline");
@@ -108,12 +120,9 @@ export default function StepOne({
       console.log(response);
 
       toast.success("Tạo sự kiện thành công", { position: "top-center" });
-      setIsApprove(true);
-      setStep((prev) => prev + 1); // sang step 2 (index 1)
-      setIsStepValid(false);
       const queryParams = new URLSearchParams({
         id: response.data.result.eventId,
-        step: step.toString(),
+        step: "2",
       }).toString();
       await navigate(`?${queryParams}`);
     } catch (error) {
@@ -123,6 +132,19 @@ export default function StepOne({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const nextStep = async () => {
+    if (!isStepValid) {
+      toast.warning("Bạn cần nhập đủ thông tin!");
+      return;
+    }
+    await submitInfo();
+    setIsStepValid(false); // reset cho bước sau
+  };
+
+  const prevStep = () => {
+    setStep((prev) => Math.max(prev - 1, 0));
   };
 
   return (
@@ -198,13 +220,21 @@ export default function StepOne({
         </div>
       </section>
 
-      <div className="flex flex-col items-center">
+      <div className="flex justify-between mt-6">
         <button
-          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded-md shadow-box"
-          onClick={submitInfo}
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+          onClick={() => updateStep(step - 1)}
+          disabled={step === 1}
+        >
+          Quay lại
+        </button>
+
+        <button
+          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded disabled:opacity-50"
+          onClick={nextStep}
           disabled={isLoading}
         >
-          Xác nhận thông tin
+          Tiếp tục
         </button>
       </div>
     </div>

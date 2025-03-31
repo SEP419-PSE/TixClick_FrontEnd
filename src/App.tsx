@@ -55,7 +55,7 @@ export default function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="event-detail" element={<EventDetail />} />
+            <Route path="event-detail/:id" element={<EventDetail />} />
             <Route path="create-event" element={<CreateEvent />} />
             {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
@@ -123,7 +123,7 @@ export default function App() {
             <Route path="profile" element={<ProfileCompany />} />
           </Route>
 
-          <Route path="seatmap" element={<SeatMap />} />
+          {/* <Route path="seatmap" element={<Sea />} /> */}
           <Route path="drag" element={<DraggableArea />} />
 
           <Route path="404" element={<ErrorPage />} />

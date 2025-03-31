@@ -1,16 +1,26 @@
+import React from "react";
 import Img1 from "../../assets/c9d60e7974b86bb46ff88e96ae91b3cc.jpg";
 import { CiCalendar } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { EventDetailResponse } from "../../interface/EventInterface";
 
-const InformationEvent = () => {
+export type EventDetailProps = {
+  eventDetail: EventDetailResponse | undefined;
+};
+
+const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
   return (
     <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-pse-black ">
       <div>
-        <img src={Img1} className="w-full" />
+        <img
+          src={eventDetail?.bannerURL}
+          loading="lazy"
+          className="w-full lg:w-[614px] lg:h-[350px]"
+        />
       </div>
-      <div className="relative bg-pse-black-light p-4 leading-10 shadow-box">
+      <div className="relative bg-pse-black-light p-4 leading-10 shadow-box min-w-[600px]">
         <p className="font-extrabold text-[18px] leading-6">
-          Liveshow "Hơn 1000 Năm Sau Chưa Quên Người Yêu Cũ"
+          {eventDetail?.eventName}
         </p>
         <p className="flex items-center text-pse-green-second font-bold">
           <span>
@@ -22,14 +32,19 @@ const InformationEvent = () => {
           <span>
             <FaMapMarkerAlt size={18} className="mr-1" color="white" />
           </span>
-          <div>Nhà hát hồ gươm</div>
+          <div className="text-pse-green-second font-semibold">
+            {eventDetail?.location}
+          </div>
           <div className="absolute top-5 left-5">
-            40 Trần Hung Đạo, Thành phố Hà Nội
+            {eventDetail?.locationName}
           </div>
         </p>
         <div className="max-[1150px]:hidden absolute bottom-28 w-[95%] h-[1px] bg-white rounded-full">
           <div className="text-[20px] font-extrabold my-2">
-            Giá từ <span className="text-pse-green-second">800.000 VND</span>
+            Giá từ{" "}
+            <span className="text-pse-green-second">
+              {eventDetail?.price} VND
+            </span>
           </div>
           <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
             Mua vé ngay

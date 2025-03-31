@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { MdExpandMore } from "react-icons/md";
+import { EventDetailProps } from "./InformationEvent";
 
 const tickets = [
   {
@@ -42,7 +43,7 @@ const tickets = [
   },
 ];
 
-const InformationTicket = () => {
+const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
 
   const onChangeActiveTicket = (id: number) => {

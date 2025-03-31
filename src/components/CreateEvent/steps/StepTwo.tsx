@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Trash2,
@@ -8,7 +8,7 @@ import {
   Save,
   X,
 } from "lucide-react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -23,13 +23,7 @@ import {
   formatDateTime,
 } from "../../../lib/utils";
 import { toast } from "sonner";
-
-type StepTwoProps = {
-  step: number;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-  isStepValid: boolean;
-  setIsStepValid: React.Dispatch<React.SetStateAction<boolean>>;
-};
+import { StepProps } from "./Step1_Infor";
 
 interface TicketType {
   ticketCode: string;
@@ -61,7 +55,13 @@ const defaultTicket: TicketType = {
   eventId: 0,
 };
 
-const StepTwo: React.FC<StepTwoProps> = () => {
+const StepTwo: React.FC<StepProps> = ({
+  step,
+  setStep,
+  isStepValid,
+  setIsStepValid,
+  updateStep,
+}) => {
   const [hasSeatMap, setHasSeatMap] = useState<boolean | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -73,9 +73,31 @@ const StepTwo: React.FC<StepTwoProps> = () => {
     null
   );
   const [newTicket, setNewTicket] = useState<TicketType>({ ...defaultTicket });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const eventId = Number(searchParams.get("id"));
+  const navigate = useNavigate();
+  // console.log(activities);
+
+  useEffect(() => {
+    const hasValidActivity = activities.some(
+      (activity) =>
+        activity.activityName.trim() &&
+        activity.dateEvent &&
+        activity.startTimeEvent.trim() &&
+        activity.endTimeEvent.trim() &&
+        activity.startTicketSale.trim() &&
+        activity.endTicketSale.trim() &&
+        activity.eventId !== undefined
+    );
+
+    if (hasValidActivity) {
+      setIsStepValid(true);
+    } else {
+      setIsStepValid(false);
+    }
+  }, [activities]);
 
   const handleAddActivity = () => {
     setActivities((prev) => [
@@ -150,6 +172,7 @@ const StepTwo: React.FC<StepTwoProps> = () => {
   };
 
   const submitActivity = async () => {
+    setIsLoading(true);
     const formatActivities = activities.map((activity) => ({
       ...activity,
       dateEvent: formatDate(activity.dateEvent),
@@ -159,10 +182,29 @@ const StepTwo: React.FC<StepTwoProps> = () => {
       endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
     })) as any; // Any tạm thời
 
-    // console.log(JSON.stringify(formatActivities, null, 2));
+    console.log(JSON.stringify(formatActivities, null, 2));
     const response = await eventApi.createEventActivity(formatActivities);
-    // console.log(response);
+    console.log(response);
+    setIsLoading(false);
     toast.success(response.data.message);
+    const queryParams = new URLSearchParams({
+      id: eventId.toString(),
+      step: "3",
+    }).toString();
+    await navigate(`?${queryParams}`);
+  };
+
+  const nextStep = async () => {
+    if (!isStepValid) {
+      toast.warning("Bạn cần phải thêm activity");
+      return;
+    }
+    await submitActivity();
+    setIsStepValid(false); // reset cho bước sau
+  };
+
+  const prevStep = () => {
+    setStep((prev) => Math.max(prev - 1, 0));
   };
 
   return (
@@ -350,12 +392,21 @@ const StepTwo: React.FC<StepTwoProps> = () => {
           </div>
         </div>
       )}
-      <div className="flex justify-center">
+      <div className="flex justify-between mt-6">
         <button
-          onClick={() => submitActivity()}
-          className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-4"
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+          onClick={() => updateStep(step - 1)}
+          disabled={step === 1}
         >
-          Xuất dữ liệu
+          Quay lại
+        </button>
+
+        <button
+          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded disabled:opacity-50"
+          onClick={nextStep}
+          disabled={isLoading}
+        >
+          Tiếp tục
         </button>
       </div>
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

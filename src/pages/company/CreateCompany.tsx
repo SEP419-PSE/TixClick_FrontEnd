@@ -8,6 +8,7 @@ import companyApi from "../../services/companyApi";
 import { XCircle } from "lucide-react";
 import BankDropdown from "./components/BankDropDown";
 import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
+import { useNavigate } from "react-router";
 
 const banks = [
   { id: "970436", bankName: "Vietcombank" },
@@ -23,6 +24,7 @@ const banks = [
 ];
 
 const CreateCompany = () => {
+  const navigate = useNavigate();
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
@@ -95,7 +97,10 @@ const CreateCompany = () => {
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
       const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
-      toast.success("Tạo công ty thành công", { position: "top-center" });
+      if (response.data.code == 200) {
+        navigate("/create-event");
+        toast.success("Tạo công ty thành công", { position: "top-center" });
+      }
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {

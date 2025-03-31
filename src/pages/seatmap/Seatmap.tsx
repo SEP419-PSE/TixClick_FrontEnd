@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router";
 import ticketApi from "../../services/ticketApi";
 import seatmapApi from "../../services/seatmapApi";
 import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
+import { StepProps } from "../../components/CreateEvent/steps/Step1_Infor";
 
 // Type definitions
 type SeatStatus = "available" | "disabled";
@@ -338,7 +339,7 @@ const SeatMapContainer: React.FC<SeatMapContainerProps> = ({
 };
 
 // Main Application Component
-const SeatChartDesigner: React.FC = () => {
+const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
   // Get event id;
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("id");
@@ -1410,6 +1411,22 @@ const SeatChartDesigner: React.FC = () => {
         </div>
       </Popup>
       <Toaster />
+
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={() => updateStep(step - 1)}
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+        >
+          Quay lại
+        </button>
+
+        <button
+          onClick={() => updateStep(step + 1)}
+          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded disabled:opacity-50"
+        >
+          Tiếp tục
+        </button>
+      </div>
     </div>
   );
 };
