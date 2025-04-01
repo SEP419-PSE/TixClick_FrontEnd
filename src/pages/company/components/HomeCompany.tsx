@@ -1,4 +1,4 @@
-import CompanyAccount from "./CompanyAccount";
+// import CompanyAccount from "./CompanyAccount";
 import Statistic from "./Statistic";
 import { BarChartComponent } from "./chart/BarChart";
 

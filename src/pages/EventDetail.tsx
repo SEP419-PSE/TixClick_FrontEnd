@@ -1,4 +1,4 @@
-import { useLocation, useParams } from "react-router";
+import { useParams } from "react-router";
 import HostEvent from "../components/EventDetail/HostEvent";
 import InformationEvent from "../components/EventDetail/InformationEvent";
 import InformationTicket from "../components/EventDetail/InformationTicket";

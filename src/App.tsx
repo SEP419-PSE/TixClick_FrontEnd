@@ -12,13 +12,6 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageContract from "./pages/company/components/ManageContract";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import ManageMember from "./pages/company/components/ManageMember";
-import ProfileCompany from "./pages/company/components/ProfileCompany";
-import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
@@ -43,7 +36,14 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import TicketBooking from "./pages/TicketBooking";
+import CreateCompany from "./pages/company/CreateCompany";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageContract from "./pages/company/components/ManageContract";
+
+import ProfileCompany from "./pages/company/components/ProfileCompany";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 
@@ -56,10 +56,10 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail/:id" element={<EventDetail />} />
-            <Route
+            {/* <Route
               path="event-detail/:id/booking-ticket"
               element={<TicketBooking />}
-            />
+            /> */}
             <Route path="create-event" element={<CreateEvent />} />
             {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>

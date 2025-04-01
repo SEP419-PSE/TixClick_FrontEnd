@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router";
 import NavbarCompany from "./components/NavbarCompany";
 import CompanyAccount from "./components/CompanyAccount";
-import { Badge, Bell } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthProvider";
 import { Client } from "@stomp/stompjs";
@@ -14,6 +14,7 @@ const CompanyDashBoard = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [connectionStatus, setConnectionStatus] = useState("Disconnected");
   const [currentUser, setCurrentUser] = useState<string>("");
+  console.log(currentUser,messages,connectionStatus)
   const [openNotification, setOpenNotification] = useState<boolean>(false);
   const location = useLocation();
   const data = useNotifications();
