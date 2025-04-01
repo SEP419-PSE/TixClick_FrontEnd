@@ -1,3 +1,15 @@
+import React from 'react'
+
+type Props = {}
+
+const TicketBooking = (props: Props) => {
+  return (
+    <div>TicketBooking</div>
+  )
+}
+
+export default TicketBooking
+
 // import React from "react";
 
 // // Type definitions
