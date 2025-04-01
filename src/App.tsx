@@ -42,7 +42,7 @@ import ManageEvents from "./pages/company/components/ManageEvents";
 import HomeCompany from "./pages/company/components/HomeCompany";
 import ManageMember from "./pages/company/components/ManageMember";
 import ManageContract from "./pages/company/components/ManageContract";
-import DraggableArea from "./pages/seatmap/DragandDrop";
+
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
@@ -127,8 +127,6 @@ export default function App() {
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />
           </Route>
-
-          <Route path="drag" element={<DraggableArea />} />
 
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />
