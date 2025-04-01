@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, MapPin, Tag, X } from "lucide-react"
+import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
@@ -19,6 +19,8 @@ export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [minutes, setMinutes] = useState(10)
   const [seconds, setSeconds] = useState(0)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -41,6 +43,17 @@ export default function PaymentPage() {
     
     return () => clearInterval(countdownInterval);
   }, [minutes, seconds, navigate])
+
+  const handleConfirmPayment = () => {
+    if (!acceptTerms) return
+
+    setIsProcessing(true)
+
+    setTimeout(() => {
+      setShowConfirmation(false)
+      navigate("/payment/queue")
+    }, 2000)
+  }
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
@@ -285,22 +298,54 @@ export default function PaymentPage() {
             </div>
 
             <div className="flex items-start space-x-2 mt-2">
-              <Checkbox
-                id="terms"
-                className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-slate-50"
-              />
-              <label htmlFor="terms" className="text-sm leading-none text-gray-300">
-                Tôi xác nhận các thông tin đặt vé đã chính xác
-              </label>
-            </div>
+                <Checkbox
+                  id="terms"
+                  className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-white"
+                  checked={acceptTerms}
+                  onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                />
+                <label
+                  htmlFor="terms"
+                  className="text-sm leading-none text-gray-300"
+                  onClick={() => setAcceptTerms(!acceptTerms)}
+                >
+                  Tôi xác nhận các thông tin đặt vé đã chính xác
+                </label>
+              </div>
           </div>
 
           <Button
-            className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-            onClick={() => setShowConfirmation(false)}
+              className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300 relative"
+              onClick={handleConfirmPayment}
+              disabled={isProcessing || !acceptTerms}
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                "Xác nhận và Thanh Toán"
+              )}
+            </Button>
+
+
+          {isProcessing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"
           >
-            Xác nhận và Thanh Toán
-          </Button>
+            <div className="relative h-20 w-20 mb-4">
+              <div className="absolute inset-0 rounded-full border-4 border-[#FF8A00] border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-[#FF8A00]/20"></div>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Đang xử lý thanh toán</h3>
+            <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
+          </motion.div>
+        )}
         </DialogContent>
       </Dialog>
     </div>

@@ -75,6 +75,8 @@ export default function App() {
             <Route path="manager" element={<ManagerDashboardPage />} />
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
+            {/* <Route path="payment/queue" element={<PaymentQueuePage />} /> */}
+
 
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
@@ -112,7 +114,6 @@ export default function App() {
 {/*             
             <Route path="managerManagement" element={<AccountsPage />} />
             <Route path="event" element={<EventsPage />} />
-
             <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
 
