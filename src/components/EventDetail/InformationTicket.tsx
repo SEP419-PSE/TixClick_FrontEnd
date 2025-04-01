@@ -1,48 +1,50 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { MdExpandMore } from "react-icons/md";
+import { EventDetailProps } from "./InformationEvent";
+import { formatDateVietnamese, formatTimeFe } from "../../lib/utils";
 
-const tickets = [
-  {
-    id: 1,
-    time: "19:00 - 21:00",
-    date: "16 Tháng 02, 2025",
-    ticketType: [
-      {
-        type: "VIP1",
-        price: "6.500.000",
-      },
-      {
-        type: "VIP2",
-        price: "6.000.000",
-      },
-      {
-        type: "VIP3",
-        price: "5.500.000",
-      },
-    ],
-  },
-  {
-    id: 2,
-    time: "19:00 - 21:00",
-    date: "15 Tháng 02, 2025",
-    ticketType: [
-      {
-        type: "VIP1",
-        price: "6.500.000",
-      },
-      {
-        type: "VIP2",
-        price: "6.000.000",
-      },
-      {
-        type: "VIP3",
-        price: "5.500.000",
-      },
-    ],
-  },
-];
+// const tickets = [
+//   {
+//     id: 1,
+//     time: "19:00 - 21:00",
+//     date: "16 Tháng 02, 2025",
+//     ticketType: [
+//       {
+//         type: "VIP1",
+//         price: "6.500.000",
+//       },
+//       {
+//         type: "VIP2",
+//         price: "6.000.000",
+//       },
+//       {
+//         type: "VIP3",
+//         price: "5.500.000",
+//       },
+//     ],
+//   },
+//   {
+//     id: 2,
+//     time: "19:00 - 21:00",
+//     date: "15 Tháng 02, 2025",
+//     ticketType: [
+//       {
+//         type: "VIP1",
+//         price: "6.500.000",
+//       },
+//       {
+//         type: "VIP2",
+//         price: "6.000.000",
+//       },
+//       {
+//         type: "VIP3",
+//         price: "5.500.000",
+//       },
+//     ],
+//   },
+// ];
 
-const InformationTicket = () => {
+const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
 
   const onChangeActiveTicket = (id: number) => {
@@ -55,28 +57,33 @@ const InformationTicket = () => {
         <div className="p-3 border-b text-[18px] text-pse-green-second border-white font-extrabold">
           Thông tin vé
         </div>
-        {tickets.map((ticket) => (
-          <div key={ticket.id} className="border-b border-white">
+        {eventDetail?.eventActivityDTOList.map((activity, index) => (
+          <div key={index} className="border-b border-white">
             <div
-              onClick={() => onChangeActiveTicket(ticket.id)}
+              // onClick={() => onChangeActiveTicket(ticket.id)}
               className="px-3 pb-3 font-semibold flex items-center cursor-pointer"
             >
               <span>
                 <MdExpandMore
                   size={22}
-                  className={`mr-2 transition-all duration-500 ${
-                    activeShowTicket === ticket.id && "rotate-180"
-                  }`}
+                  // className={`mr-2 transition-all duration-500 ${
+                  //   activeShowTicket === ticket.id && "rotate-180"
+                  // }`}
                 />
               </span>
               <p className="flex flex-col">
-                {ticket.time}, <span>{ticket.date}</span>
+                {formatTimeFe(activity.startTimeEvent)} -{" "}
+                {formatTimeFe(activity.endTimeEvent)},{" "}
+                <span>
+                  {" "}
+                  {formatDateVietnamese(activity.dateEvent.toString())}
+                </span>
               </p>
               <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
                 Mua vé ngay
               </button>
             </div>
-            {activeShowTicket === ticket.id && (
+            {/* {activeShowTicket === ticket.id && (
               <div className="bg-black border-t border-white transition-all duration-500">
                 <ul className="">
                   {ticket.ticketType.map((type) => (
@@ -92,7 +99,7 @@ const InformationTicket = () => {
                   ))}
                 </ul>
               </div>
-            )}
+            )} */}
           </div>
         ))}
       </div>

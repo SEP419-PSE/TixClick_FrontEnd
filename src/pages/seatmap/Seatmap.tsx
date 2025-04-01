@@ -3,12 +3,17 @@ import Draggable from "react-draggable";
 import Popup from "../../components/Popup/Popup";
 import { Edit, Trash } from "lucide-react";
 import { toast, Toaster } from "sonner";
+import { useSearchParams } from "react-router";
+import ticketApi from "../../services/ticketApi";
+import seatmapApi from "../../services/seatmapApi";
+import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
+import { StepProps } from "../../components/CreateEvent/steps/Step1_Infor";
 
 // Type definitions
 type SeatStatus = "available" | "disabled";
 type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType";
 type ViewMode = "edit" | "preview";
-type SectionType = "seated" | "standing";
+export type SectionType = "SEATED" | "STANDING";
 
 // Utility functions
 const formatCurrency = (amount: number): string => {
@@ -18,26 +23,29 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-type SeatTypeEdit = {
-  id: number;
+export type SeatTypeEdit = {
+  id: string;
   name: string;
   color: string;
   textColor: string;
   price: number;
+  minQuantity?: number;
+  maxQuantity?: number;
+  eventId?: number;
 };
 
-interface ISeat {
+export interface ISeat {
   id: string;
   row: number;
   column: number;
-  status: SeatStatus;
+  // status: SeatStatus;
   price: number;
-  seatTypeId: number;
+  seatTypeId: string;
   x?: number;
   y?: number;
 }
 
-interface ISection {
+export interface ISection {
   id: string;
   name: string;
   rows: number;
@@ -48,8 +56,10 @@ interface ISection {
   width: number;
   height: number;
   type: SectionType;
+  priceId?: string;
   price?: number; // Price for standing sections
   capacity?: number; // Capacity for standing sections
+  isSave: boolean;
 }
 
 interface DraggableSectionProps {
@@ -126,19 +136,19 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
       >
         <div className="text-center text-gray-800 font-semibold mb-3">
           {section.name}
-          {section.type === "standing" && (
+          {section.type == "STANDING" && (
             <div className="text-sm text-gray-600 mt-1">
               Khu vực đứng - {formatCurrency(section.price || 0)}
             </div>
           )}
         </div>
-        {section.type === "standing" ? (
+        {section.type == "STANDING" ? (
           <div
             className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg flex flex-col items-center justify-center text-gray-700 font-medium relative overflow-hidden"
             style={{
               width: section.width - 32,
               height: section.height - 32,
-              minWidth: "120px",
+              minWidth: "180px",
               minHeight: "80px",
             }}
           >
@@ -164,10 +174,6 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-lg font-semibold mb-1">Khu vực đứng</span>
-              <span className="text-sm text-gray-500 mb-1">
-                {formatCurrency(section.price || 0)}
-              </span>
               <span className="text-sm text-gray-500">
                 Số lượng: {section.capacity || 0} vé
               </span>
@@ -187,12 +193,13 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                     justifyContent: "center",
                     fontWeight: "600",
                   }}
+                  className="bg-gray-700 bg-opacity-20 rounded-md"
                 >
                   {String.fromCharCode(65 + rowIndex)}
                 </div>
                 {Array.from({ length: section.columns }).map((_, colIndex) => {
                   const seat = section.seats.find(
-                    (s) => s.row === rowIndex && s.column === colIndex
+                    (s) => s.row == rowIndex && s.column == colIndex
                   );
 
                   if (!seat)
@@ -218,14 +225,17 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                         height: `30px`,
                         fontSize: `14px`,
                         backgroundColor:
-                          seat.status === "disabled" ? "#f3f4f6" : seatColor,
+                          // seat.status == "disabled" ? "#f3f4f6" : seatColor,
+                          seatColor,
                         color:
-                          seat.status === "disabled"
-                            ? "#9ca3af"
-                            : seatTypes.find(
-                                (type) => type.id === seat.seatTypeId
-                              )?.textColor || "#000000",
-                        opacity: seat.status === "disabled" ? 0.3 : 1,
+                          // seat.status == "disabled"
+                          //   ? "#9ca3af"
+                          //   : seatTypes.find(
+                          //       (type) => type.id == seat.seatTypeId
+                          //     )?.textColor || "#000000",
+                          seatTypes.find((type) => type.id == seat.seatTypeId)
+                            ?.textColor || "#000000",
+                        // opacity: seat.status == "disabled" ? 0.3 : 1,
                         marginRight: "5px",
                         display: "flex",
                         alignItems: "center",
@@ -243,16 +253,16 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                       {String.fromCharCode(65 + rowIndex)}
                       {colIndex + 1}
 
-                      {hoveredSeat && hoveredSeat.id === seat.id && (
+                      {hoveredSeat && hoveredSeat.id == seat.id && (
                         <div
                           className="absolute z-20 bg-gray-800 text-white p-3 rounded-lg text-xs whitespace-nowrap shadow-lg"
                           style={{
-                            bottom: rowIndex === 0 ? "auto" : "100%",
-                            top: rowIndex === 0 ? "100%" : "auto",
+                            bottom: rowIndex == 0 ? "auto" : "100%",
+                            top: rowIndex == 0 ? "100%" : "auto",
                             left: "50%",
                             transform: "translateX(-50%)",
-                            marginBottom: rowIndex === 0 ? "0" : "2px",
-                            marginTop: rowIndex === 0 ? "2px" : "0",
+                            marginBottom: rowIndex == 0 ? "0" : "2px",
+                            marginTop: rowIndex == 0 ? "2px" : "0",
                           }}
                         >
                           <div className="mb-1">
@@ -262,18 +272,18 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                           <div className="mb-1">
                             Loại ghế:{" "}
                             {seatTypes.find(
-                              (type) => type.id === seat.seatTypeId
+                              (type) => type.id == seat.seatTypeId
                             )?.name || "Chưa xác định"}
                           </div>
                           <div className="mb-1">
                             Giá: {formatCurrency(seat.price)}
                           </div>
-                          <div>
+                          {/* <div>
                             Trạng thái:{" "}
-                            {seat.status === "available"
+                            {seat.status == "available"
                               ? "Có sẵn"
                               : "Đã vô hiệu"}
-                          </div>
+                          </div> */}
                         </div>
                       )}
                     </div>
@@ -315,7 +325,7 @@ const SeatMapContainer: React.FC<SeatMapContainerProps> = ({
           <DraggableSection
             key={section.id}
             section={section}
-            isActive={activeSection === section.id}
+            isActive={activeSection == section.id}
             onSectionClick={() => setActiveSection(section.id)}
             onPositionChange={(x, y) => updateSection(section.id, { x, y })}
             onSeatClick={handleSeatClick}
@@ -329,13 +339,20 @@ const SeatMapContainer: React.FC<SeatMapContainerProps> = ({
 };
 
 // Main Application Component
-const SeatChartDesigner: React.FC = () => {
+const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
+  // Get event id;
+  const [searchParams] = useSearchParams();
+  const eventId = searchParams.get("id");
+
   const [sections, setSections] = useState<ISection[]>([]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ToolType>("select");
-  const [currentSeatTypeId, setCurrentSeatTypeId] = useState<number | null>(
+  const [currentSeatTypeId, setCurrentSeatTypeId] = useState<string | null>(
     null
   );
+  const [addCurrentSeatTypeId, setAddCurrenSeatTypeId] = useState<
+    string | null
+  >(null);
   const [viewMode, setViewMode] = useState<ViewMode>("edit");
   const [newSectionRows, setNewSectionRows] = useState<number>(6);
   const [newSectionColumns, setNewSectionColumns] = useState<number>(8);
@@ -347,19 +364,55 @@ const SeatChartDesigner: React.FC = () => {
   const [color, setColor] = useState("#000000");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [price, setPrice] = useState(0);
+  const [maxQuantity, setMaxQuantity] = useState(2);
   const [editingSeat, setEditingSeat] = useState<SeatTypeEdit | null>(null);
 
-  const [newSectionType, setNewSectionType] = useState<SectionType>("seated");
+  const [newSectionType, setNewSectionType] = useState<SectionType>("SEATED");
   const [standingPrice, setStandingPrice] = useState<number>(0);
   const [standingCapacity, setStandingCapacity] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSave = () => {
+  useEffect(() => {
+    const getTickets = async () => {
+      try {
+        const response = await ticketApi.getTicketsByEventId(Number(eventId));
+        if (response.data.result.length > 0) {
+          setSeatTypes(response.data.result);
+        } else if (response.data.result.length == 0) {
+          setSeatTypes([]);
+        }
+      } catch (error) {
+        console.log("error fetch", error);
+      }
+    };
+    getTickets();
+  }, []);
+
+  useEffect(() => {
+    const getSections = async () => {
+      try {
+        const response = await seatmapApi.getSections(Number(eventId));
+        // console.log(response.data.result);
+        if (response.data.result.length > 0) {
+          setSections(response.data.result);
+        }
+        if (response.data.result.length == 0) {
+          setSections(response.data.result);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSections();
+  }, []);
+
+  const handleSave = async () => {
     // Validate empty fields
     if (!name.trim()) {
       toast.error("Vui lòng nhập tên loại ghế");
       return;
     }
-    if (!color || color === "#000000") {
+    if (!color) {
       toast.error("Vui lòng chọn màu cho loại ghế");
       return;
     }
@@ -375,11 +428,15 @@ const SeatChartDesigner: React.FC = () => {
       toast.error("Giá ghế phải lớn hơn 0");
       return;
     }
+    if (maxQuantity < 2) {
+      toast.error("Số lượng vé tối đa phải lớn hơn hoặc bằng 2");
+      return;
+    }
 
     // Check for duplicate name
     const duplicateName = seatTypes.some(
       (type) =>
-        type.name.toLowerCase() === name.trim().toLowerCase() &&
+        type.name.toLowerCase() == name.trim().toLowerCase() &&
         (!editingSeat || type.id !== editingSeat.id)
     );
     if (duplicateName) {
@@ -390,7 +447,7 @@ const SeatChartDesigner: React.FC = () => {
     // Check for duplicate color
     const duplicateColor = seatTypes.some(
       (type) =>
-        type.color.toLowerCase() === color.toLowerCase() &&
+        type.color.toLowerCase() == color.toLowerCase() &&
         (!editingSeat || type.id !== editingSeat.id)
     );
     if (duplicateColor) {
@@ -399,35 +456,55 @@ const SeatChartDesigner: React.FC = () => {
     }
 
     if (editingSeat) {
-      setSeatTypes(
-        seatTypes.map((seat) =>
-          seat.id === editingSeat.id
-            ? { ...seat, name: name.trim(), color, textColor, price }
-            : seat
-        )
-      );
-      setEditingSeat(null);
-      toast.success("Cập nhật loại ghế thành công");
+      const editSeat = {
+        ...editingSeat,
+        name: name.trim(),
+        color: color,
+        textColor: textColor,
+        price: price,
+        minQuantity: 1,
+        maxQuantity: maxQuantity,
+      };
+      ticketApi
+        .updateTicket(editSeat)
+        .then((response) => {
+          console.log(response);
+          setSeatTypes(response.data.result);
+          toast.success("Cập nhật loại ghế thành công");
+        })
+        .catch((error) => console.log(error))
+        .finally(() => setEditingSeat(null));
     } else {
-      setSeatTypes([
-        ...seatTypes,
-        {
-          id: Date.now(),
+      ticketApi
+        .createTicketInSeatMap({
+          id: Date.now().toString(),
           name: name.trim(),
           color,
           textColor,
           price,
-        },
-      ]);
+          minQuantity: 1,
+          maxQuantity,
+          eventId: Number(eventId),
+        })
+        .then((response) => {
+          console.log(response);
+          setSeatTypes(response.data.result);
+        })
+        .catch((error) => console.log(error));
+
       toast.success("Thêm loại ghế thành công");
     }
 
     // Reset form
+    resetForm();
+  };
+
+  const resetForm = () => {
     setName("");
     setColor("#000000");
     setTextColor("#FFFFFF");
     setPrice(0);
-    setIsPopupOpen(false);
+    setMaxQuantity(2);
   };
 
   const handleEdit = (seat: SeatTypeEdit) => {
@@ -438,10 +515,10 @@ const SeatChartDesigner: React.FC = () => {
     setPrice(seat.price);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string) => {
     // Check if any seats are using this seat type
     const seatTypeInUse = sections.some((section) =>
-      section.seats.some((seat) => seat.seatTypeId === id)
+      section.seats.some((seat) => seat.seatTypeId == id)
     );
 
     if (seatTypeInUse) {
@@ -449,7 +526,9 @@ const SeatChartDesigner: React.FC = () => {
       return;
     }
 
-    setSeatTypes(seatTypes.filter((seat) => seat.id !== id));
+    const response = await ticketApi.deleteTicket(id);
+    console.log(response);
+    setSeatTypes(response.data.result);
     toast.success("Đã xóa loại ghế");
   };
 
@@ -476,28 +555,24 @@ const SeatChartDesigner: React.FC = () => {
 
   // Add a new section with calculated position
   const addSection = () => {
-    if (
-      newSectionType === "standing" &&
-      (!standingPrice || standingPrice <= 0)
-    ) {
-      toast.error("Vui lòng nhập giá cho khu vực đứng");
+    if (newSectionType == "STANDING" && !addCurrentSeatTypeId) {
+      toast.error("Vui lòng chọn giá vé cho khu vực đứng");
       return;
     }
-
     if (
-      newSectionType === "standing" &&
+      newSectionType == "STANDING" &&
       (!standingCapacity || standingCapacity <= 0)
     ) {
       toast.error("Vui lòng nhập số lượng vé cho khu vực đứng");
       return;
     }
 
-    if (newSectionType === "seated") {
+    if (newSectionType == "SEATED") {
       if (newSectionRows <= 0 || newSectionColumns <= 0) {
         toast.error("Số hàng và số cột phải lớn hơn 0");
         return;
       }
-      if (seatTypes.length === 0) {
+      if (seatTypes.length == 0) {
         toast.error(
           "Vui lòng thêm ít nhất một loại ghế trước khi tạo khu vực có ghế"
         );
@@ -507,33 +582,39 @@ const SeatChartDesigner: React.FC = () => {
 
     // Calculate section dimensions based on rows and columns
     const { width: sectionWidth, height: sectionHeight } = calculateSectionSize(
-      newSectionType === "seated" ? newSectionRows : 1,
-      newSectionType === "seated" ? newSectionColumns : 1
+      newSectionType == "SEATED" ? newSectionRows : 1,
+      newSectionType == "SEATED" ? newSectionColumns : 1
     );
 
     // Calculate default position - center of the container
     const centerX = (1200 - sectionWidth) / 2;
     const centerY = (800 - sectionHeight) / 2;
 
+    // Fint Seat object depend on currentSeatTypeId
+    const seatObj = seatTypes.find((s) => s.id == addCurrentSeatTypeId);
+
     const newSection: ISection = {
-      id: `section-${sections.length + 1}`,
+      id: Date.now().toString(),
       name: `Section ${sections.length + 1}`,
-      rows: newSectionType === "seated" ? newSectionRows : 1,
-      columns: newSectionType === "seated" ? newSectionColumns : 1,
+      rows: newSectionType == "SEATED" ? newSectionRows : 1,
+      columns: newSectionType == "SEATED" ? newSectionColumns : 1,
       seats: [],
       x: Math.max(0, centerX),
       y: Math.max(40, centerY),
       width: sectionWidth,
       height: sectionHeight,
       type: newSectionType,
-      price: newSectionType === "standing" ? standingPrice : undefined,
-      capacity: newSectionType === "standing" ? standingCapacity : undefined,
+      priceId: newSectionType == "STANDING" ? seatObj?.id : undefined,
+      price: newSectionType == "STANDING" ? seatObj?.price : undefined,
+      capacity: newSectionType == "STANDING" ? standingCapacity : undefined,
+      isSave: false,
     };
 
     // Generate seats only for seated sections
-    if (newSectionType === "seated") {
+    if (newSectionType == "SEATED") {
       newSection.seats = generateSeats(newSection);
     }
+    // newSection.seats = generateSeats(newSection);
 
     setSections([...sections, newSection]);
     setActiveSection(newSection.id);
@@ -551,9 +632,9 @@ const SeatChartDesigner: React.FC = () => {
           id: `${section.id}-r${row}-c${col}`,
           row,
           column: col,
-          status: "available",
+          // status: "available",
           price: defaultSeatType?.price || price,
-          seatTypeId: defaultSeatType?.id || 0,
+          seatTypeId: defaultSeatType.id?.toString() || "",
         });
       }
     }
@@ -562,17 +643,18 @@ const SeatChartDesigner: React.FC = () => {
 
   // Update a section
   const updateSection = (sectionId: string, data: Partial<ISection>) => {
+    // console.log("update section");
     // Validate section name
     if (data.name !== undefined && !data.name.trim()) {
       toast.error("Tên khu vực không được để trống");
       return;
     }
 
-    // Validate standing price
-    if (data.price !== undefined && data.price <= 0) {
-      toast.error("Giá khu vực đứng phải lớn hơn 0");
-      return;
-    }
+    // // Validate standing price
+    // if (data.price !== undefined && data.price <= 0) {
+    //   toast.error("Giá khu vực đứng phải lớn hơn 0");
+    //   return;
+    // }
 
     // Validate rows and columns
     if (
@@ -585,7 +667,7 @@ const SeatChartDesigner: React.FC = () => {
 
     setSections(
       sections.map((section) => {
-        if (section.id === sectionId) {
+        if (section.id == sectionId) {
           const updatedSection = { ...section, ...data };
 
           if (data.rows !== undefined || data.columns !== undefined) {
@@ -609,24 +691,24 @@ const SeatChartDesigner: React.FC = () => {
   // Handle seat click
   const handleSeatClick = (seat: ISeat) => {
     const sectionId = seat.id.split("-r")[0];
-    const activeS = sections.find((s) => s.id === sectionId);
+    const activeS = sections.find((s) => s.id == sectionId);
     if (!activeS) return;
 
-    if (activeTool === "remove") {
+    if (activeTool == "remove") {
       updateSection(sectionId, {
         seats: activeS.seats.map((s) =>
-          s.id === seat.id ? { ...s, status: "disabled" } : s
+          s.id == seat.id ? { ...s, status: "disabled" } : s
         ),
       });
       toast.success("Đã vô hiệu hóa ghế");
-    } else if (activeTool === "add" || activeTool === "edit") {
+    } else if (activeTool == "add" || activeTool == "edit") {
       if (!currentSeatTypeId) {
         toast.error("Vui lòng chọn loại ghế");
         return;
       }
 
       const selectedSeatType = seatTypes.find(
-        (type) => type.id === currentSeatTypeId
+        (type) => type.id == currentSeatTypeId
       );
       if (!selectedSeatType) {
         toast.error("Loại ghế không hợp lệ");
@@ -635,7 +717,7 @@ const SeatChartDesigner: React.FC = () => {
 
       updateSection(sectionId, {
         seats: activeS.seats.map((s) =>
-          s.id === seat.id
+          s.id == seat.id
             ? {
                 ...s,
                 status: "available",
@@ -646,44 +728,54 @@ const SeatChartDesigner: React.FC = () => {
         ),
       });
       toast.success(
-        `Đã ${activeTool === "add" ? "thêm" : "cập nhật"} ghế thành công`
+        `Đã ${activeTool == "add" ? "thêm" : "cập nhật"} ghế thành công`
       );
     }
   };
 
+  const exportData = () => {
+    // console.log(JSON.stringify(sections, null, 2));
+    setLoading(true);
+    seatmapApi
+      .createSeatmap(sections, Number(eventId))
+      .then((response) => {
+        console.log(JSON.stringify(response.data.result, null, 2));
+        setSections(response.data.result);
+        toast.success(response.data.message);
+      })
+      .catch((error) => console.log(error));
+    setLoading(false);
+  };
+
   // Delete a section
-  const deleteSection = (sectionId: string) => {
-    setSections(sections.filter((section) => section.id !== sectionId));
-    if (activeSection === sectionId) {
-      setActiveSection(sections.length > 1 ? sections[0].id : null);
+  const deleteSection = async (sectionId: string) => {
+    console.log(sectionId, eventId, sections);
+    const response = await seatmapApi.deleteSections(
+      sectionId,
+      Number(eventId),
+      sections
+    );
+    if (response.data.result.length != 0) {
+      setSections(response.data.result);
+    } else {
+      setSections(response.data.result);
     }
-    toast.success("Đã xóa khu vực");
+    toast.success(response.data.message);
   };
 
   // Export JSON data
-  const exportData = () => {
-    const dataStr =
-      "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(sections));
-    const downloadAnchorNode = document.createElement("a");
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "seat_chart.json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-  };
 
   // Get color based on seat type
   const getSeatColor = (seat: ISeat): string => {
-    if (seat.status === "disabled") return "#e5e7eb"; // gray-200 color
+    // if (seat.status == "disabled") return "#e5e7eb"; // gray-200 color
 
-    const seatType = seatTypes.find((type) => type.id === seat.seatTypeId);
+    const seatType = seatTypes.find((type) => type.id == seat.seatTypeId);
     return seatType ? seatType.color : "#6b7280"; // Use actual color from seat type or gray-500 as default
   };
 
   // Toggle view mode
   const toggleViewMode = () => {
-    setViewMode(viewMode === "edit" ? "preview" : "edit");
+    setViewMode(viewMode == "edit" ? "preview" : "edit");
   };
 
   // Add form reset when closing popup
@@ -698,24 +790,20 @@ const SeatChartDesigner: React.FC = () => {
 
   useEffect(() => {
     // Add a default section on startup
-    if (sections.length === 0) {
+    if (sections.length == 0) {
       addSection();
     }
   }, []);
+  console.log(JSON.stringify(sections, null, 2));
 
   return (
     <div className="container mx-auto p-6 bg-gray-200 min-h-screen">
+      {loading && <LoadingFullScreen />}
       <h1 className="text-3xl font-bold mb-8 text-gray-900 text-center">
         Thiết kế sơ đồ ghế
       </h1>
       {/* Toolbar */}
       <div className="flex flex-wrap gap-4 mb-8 justify-center">
-        <button
-          className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-md font-medium"
-          onClick={exportData}
-        >
-          Xuất dữ liệu
-        </button>
         <button
           className="px-6 py-2.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors shadow-md font-medium"
           onClick={() => {
@@ -727,18 +815,24 @@ const SeatChartDesigner: React.FC = () => {
         </button>
         <button
           className={`px-6 py-2.5 rounded-lg transition-colors shadow-md font-medium ${
-            viewMode === "preview"
+            viewMode == "preview"
               ? "bg-amber-500 text-white hover:bg-amber-600"
               : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
           }`}
           onClick={toggleViewMode}
         >
-          {viewMode === "edit" ? "Xem trước" : "Quay lại chỉnh sửa"}
+          {viewMode == "edit" ? "Xem trước" : "Quay lại chỉnh sửa"}
+        </button>
+        <button
+          className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-md font-medium"
+          onClick={exportData}
+        >
+          Lưu sơ đồ
         </button>
       </div>
 
       {/* New Section Size Controls */}
-      {viewMode === "edit" && (
+      {viewMode == "edit" && (
         <div className="mb-8 max-w-4xl mx-auto">
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
             <h2 className="text-xl font-semibold mb-6 text-gray-900 pb-4 border-b border-gray-200">
@@ -756,14 +850,14 @@ const SeatChartDesigner: React.FC = () => {
                     setNewSectionType(e.target.value as SectionType)
                   }
                 >
-                  <option value="seated">Khu vực có ghế</option>
-                  <option value="standing">Khu vực đứng</option>
+                  <option value="SEATED">Khu vực có ghế</option>
+                  <option value="STANDING">Khu vực đứng</option>
                 </select>
               </div>
 
-              {newSectionType === "standing" ? (
+              {newSectionType == "STANDING" ? (
                 <>
-                  <div>
+                  {/* <div>
                     <label className="block font-medium mb-2 text-gray-900">
                       Giá khu vực đứng (VND):
                     </label>
@@ -774,7 +868,7 @@ const SeatChartDesigner: React.FC = () => {
                       onChange={(e) => setStandingPrice(Number(e.target.value))}
                       min="0"
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="block font-medium mb-2 text-gray-900">
                       Số lượng vé:
@@ -788,6 +882,33 @@ const SeatChartDesigner: React.FC = () => {
                       }
                       min="0"
                     />
+                  </div>
+                  <div>
+                    <label className="block mb-2 font-medium text-gray-900">
+                      Giá khu vực đứng
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      value={addCurrentSeatTypeId || ""}
+                      onChange={(e) => {
+                        setAddCurrenSeatTypeId(e.target.value);
+                        // const seatId = seatTypes.find(
+                        //   (s) => s.id == Number(e.target.value)
+                        // );
+                        // console.log(seatId);
+                      }}
+                    >
+                      <option value="">Chọn loại ghế</option>
+                      {seatTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name} -{" "}
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(type.price)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </>
               ) : (
@@ -838,7 +959,7 @@ const SeatChartDesigner: React.FC = () => {
       )}
 
       {/* Section settings if selected */}
-      {activeSection && viewMode === "edit" && (
+      {activeSection && viewMode == "edit" && (
         <div className="max-w-4xl mx-auto mb-8">
           <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
             <h2 className="text-xl font-semibold mb-6 text-gray-900 pb-4 border-b border-gray-200">
@@ -855,7 +976,7 @@ const SeatChartDesigner: React.FC = () => {
                   <div key={section.id} className="flex items-center">
                     <button
                       className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                        activeSection === section.id
+                        activeSection == section.id
                           ? "bg-indigo-600 text-white shadow-md"
                           : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                       }`}
@@ -883,17 +1004,48 @@ const SeatChartDesigner: React.FC = () => {
                   type="text"
                   className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   value={
-                    sections.find((s) => s.id === activeSection)?.name || ""
+                    sections.find((s) => s.id == activeSection)?.name || ""
                   }
                   onChange={(e) =>
                     updateSection(activeSection, { name: e.target.value })
                   }
                 />
               </div>
-              {sections.find((s) => s.id === activeSection)?.type ===
-              "standing" ? (
+              {sections.find((s) => s.id == activeSection)?.type ==
+              "STANDING" ? (
                 <>
                   <div>
+                    <label className="block mb-2 font-medium text-gray-900">
+                      Giá khu vực đứng
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      value={currentSeatTypeId || ""}
+                      onChange={(e) => {
+                        setCurrentSeatTypeId(e.target.value);
+                        const seatId = seatTypes.find(
+                          (s) => s.id == e.target.value
+                        );
+                        // console.log(seatId);
+                        updateSection(activeSection, {
+                          priceId: seatId?.id,
+                          price: seatId?.price,
+                        });
+                      }}
+                    >
+                      <option value="">Chọn loại ghế</option>
+                      {seatTypes.map((type) => (
+                        <option key={type.id} value={type.id}>
+                          {type.name} -{" "}
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(type.price)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* <div>
                     <label className="block mb-2 font-medium text-gray-900">
                       Giá khu vực đứng (VND)
                     </label>
@@ -901,7 +1053,7 @@ const SeatChartDesigner: React.FC = () => {
                       type="number"
                       className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={
-                        sections.find((s) => s.id === activeSection)?.price || 0
+                        sections.find((s) => s.id == activeSection)?.price || 0
                       }
                       onChange={(e) =>
                         updateSection(activeSection, {
@@ -910,7 +1062,7 @@ const SeatChartDesigner: React.FC = () => {
                       }
                       min="0"
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="block mb-2 font-medium text-gray-900">
                       Số lượng vé
@@ -919,8 +1071,8 @@ const SeatChartDesigner: React.FC = () => {
                       type="number"
                       className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={
-                        sections.find((s) => s.id === activeSection)
-                          ?.capacity || 0
+                        sections.find((s) => s.id == activeSection)?.capacity ||
+                        0
                       }
                       onChange={(e) =>
                         updateSection(activeSection, {
@@ -941,7 +1093,7 @@ const SeatChartDesigner: React.FC = () => {
                       type="number"
                       className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={
-                        sections.find((s) => s.id === activeSection)?.rows || 0
+                        sections.find((s) => s.id == activeSection)?.rows || 0
                       }
                       onChange={(e) =>
                         updateSection(activeSection, {
@@ -958,7 +1110,7 @@ const SeatChartDesigner: React.FC = () => {
                       type="number"
                       className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={
-                        sections.find((s) => s.id === activeSection)?.columns ||
+                        sections.find((s) => s.id == activeSection)?.columns ||
                         0
                       }
                       onChange={(e) =>
@@ -975,12 +1127,12 @@ const SeatChartDesigner: React.FC = () => {
             <div className="mt-8">
               <h3 className="font-semibold mb-4 text-gray-900">Công cụ:</h3>
               <div className="flex flex-wrap gap-3">
-                {sections.find((s) => s.id === activeSection)?.type ===
-                "seated" ? (
+                {sections.find((s) => s.id == activeSection)?.type ==
+                "SEATED" ? (
                   <>
                     <button
                       className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                        activeTool === "add"
+                        activeTool == "add"
                           ? "bg-indigo-600 text-white shadow-md"
                           : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                       }`}
@@ -990,17 +1142,7 @@ const SeatChartDesigner: React.FC = () => {
                     </button>
                     <button
                       className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                        activeTool === "remove"
-                          ? "bg-indigo-600 text-white shadow-md"
-                          : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
-                      }`}
-                      onClick={() => setActiveTool("remove")}
-                    >
-                      Xóa ghế
-                    </button>
-                    <button
-                      className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                        activeTool === "edit"
+                        activeTool == "edit"
                           ? "bg-indigo-600 text-white shadow-md"
                           : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                       }`}
@@ -1008,11 +1150,22 @@ const SeatChartDesigner: React.FC = () => {
                     >
                       Sửa ghế
                     </button>
+                    <button
+                      className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
+                        activeTool == "remove"
+                          ? "bg-indigo-600 text-white shadow-md"
+                          : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
+                      }`}
+                      onClick={() => setActiveTool("remove")}
+                    >
+                      Xóa ghế
+                    </button>
                   </>
                 ) : null}
+
                 <button
                   className={`px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                    activeTool === "move"
+                    activeTool == "move"
                       ? "bg-indigo-600 text-white shadow-md"
                       : "bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200"
                   }`}
@@ -1023,9 +1176,8 @@ const SeatChartDesigner: React.FC = () => {
               </div>
             </div>
 
-            {(activeTool === "add" || activeTool === "edit") &&
-              sections.find((s) => s.id === activeSection)?.type ===
-                "seated" && (
+            {(activeTool == "add" || activeTool == "edit") &&
+              sections.find((s) => s.id == activeSection)?.type == "SEATED" && (
                 <div className="mt-6">
                   <div>
                     <label className="block mb-2 font-medium text-gray-900">
@@ -1034,9 +1186,7 @@ const SeatChartDesigner: React.FC = () => {
                     <select
                       className="w-full px-4 py-2.5 border rounded-lg text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={currentSeatTypeId || ""}
-                      onChange={(e) =>
-                        setCurrentSeatTypeId(Number(e.target.value))
-                      }
+                      onChange={(e) => setCurrentSeatTypeId(e.target.value)}
                     >
                       <option value="">Chọn loại ghế</option>
                       {seatTypes.map((type) => (
@@ -1114,7 +1264,12 @@ const SeatChartDesigner: React.FC = () => {
       >
         <div>
           {/* Danh sách loại ghế */}
-          <ul className="space-y-3 mb-6">
+          <ul className="space-y-3 overflow-y-auto h-auto max-h-[150px] space-x-3 mb-6">
+            {seatTypes.length == 0 && (
+              <div className="text-black flex items-center justify-center">
+                Không có vé nào
+              </div>
+            )}
             {seatTypes.map((seat) => (
               <li
                 key={seat.id}
@@ -1218,18 +1373,34 @@ const SeatChartDesigner: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-gray-900 font-medium mb-2">
-                Giá (VND)
-              </label>
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full px-4 py-2.5 border rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-gray-50"
-                min="0"
-              />
+            <div className="flex gap-4">
+              <div>
+                <label className="block text-gray-900 font-medium mb-2">
+                  Giá (VND)
+                </label>
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(Number(e.target.value))}
+                  className="w-full px-4 py-2.5 border rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-gray-50"
+                  min="0"
+                />
+              </div>
+
+              <div>
+                <label className="block truncate text-gray-900 font-medium mb-2">
+                  Số vé tối đa 1 người được mua
+                </label>
+                <input
+                  type="number"
+                  value={maxQuantity}
+                  onChange={(e) => setMaxQuantity(Number(e.target.value))}
+                  className="w-full px-4 py-2.5 border rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-gray-50"
+                  min="2"
+                />
+              </div>
             </div>
+
             <button
               onClick={handleSave}
               className="w-full px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium mt-6 shadow-md"
@@ -1240,6 +1411,22 @@ const SeatChartDesigner: React.FC = () => {
         </div>
       </Popup>
       <Toaster />
+
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={() => updateStep(step - 1)}
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+        >
+          Quay lại
+        </button>
+
+        <button
+          onClick={() => updateStep(step + 1)}
+          className="px-4 py-2 bg-pse-green-second hover:bg-pse-green-third text-white rounded disabled:opacity-50"
+        >
+          Tiếp tục
+        </button>
+      </div>
     </div>
   );
 };

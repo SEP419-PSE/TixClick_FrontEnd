@@ -18,6 +18,22 @@ const companyApi = {
       },
     });
   },
+  createCompanyandDocument: (data: FormData) => {
+    const url = `${baseUrl}/create-company-and-document`;
+    return axiosClient.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+  getCompaniesByAccountId: () => {
+    const url = `${baseUrl}/get-company-by-account-id`;
+    return axiosClient.get(url);
+  },
+  isAccountHaveCompany: () => {
+    const url = `${baseUrl}/is-account-have-company`;
+    return axiosClient.get(url);
+  },
 };
 
 export default companyApi;

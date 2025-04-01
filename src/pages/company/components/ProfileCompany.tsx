@@ -6,10 +6,10 @@ import {
   CreditCard,
   FileText,
 } from "lucide-react";
-import { NavLink } from "react-router";
+
 import CompanyAvt from "../../../assets/AvatarHuy.jpg";
 import { Button } from "../../../components/ui/button";
-
+import { NavLink } from "react-router";
 interface AccountCompanyInterface {
   id: number;
   label: string;
@@ -62,7 +62,7 @@ const accountInfor: AccountCompanyInterface[] = [
     canEdit: false,
   },
 ];
-console.log(accountInfor)
+console.log(accountInfor);
 
 const ProfileCompany = () => {
   return (

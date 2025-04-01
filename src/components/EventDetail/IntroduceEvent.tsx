@@ -2,9 +2,10 @@ import CustomDivider from "../Divider/CustomDivider";
 import Img from "../../assets/1c7973947f9b163b2376dc6bdc0c6540.jpg";
 import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
-import { useState } from "react";
+import React, { useState } from "react";
+import { EventDetailProps } from "./InformationEvent";
 
-const IntroduceEvent = () => {
+const IntroduceEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const onClickExpanded = () => {
@@ -21,19 +22,11 @@ const IntroduceEvent = () => {
         <div className="mx-3">
           <CustomDivider />
         </div>
-
-        <p className="mb-3 mx-3">
-          2NE1 WELCOME BACK 2024-25 ASIA TOUR IN HO CHI MINH 2NE1, nhóm nhạc nữ
-          huyền thoại của K-pop gồm CL, BOM, DARA và MINZY, ra mắt năm 2009 dưới
-          sự quản lý của YG Entertainment, nhanh chóng gây tiếng vang lớn với
-          loạt hit đình đám như "Fire," "I’m the Best" và "Come Back Home." Với
-          phong cách trình diễn táo bạo và tầm ảnh hưởng vượt bậc, họ trở thành
-          nhóm nữ K-pop đầu tiên thực hiện world tour và ghi dấu trên bảng xếp
-          hạng Billboard 200 với album CRUSH. Tái hợp sau hơn một thập kỷ, 2NE1
-          sẽ mang tour diễn WELCOME BACK Asian Tour 2024-25 đến TP. Hồ Chí Minh
-          vào ngày 15-16/2/2025, hứa hẹn mang đến cho người hâm mộ Việt Nam
-          những màn trình diễn bùng nổ và khó quên.
-        </p>
+        <div
+          className="p-6"
+          dangerouslySetInnerHTML={{ __html: eventDetail?.description as any }}
+        />
+        {/* <p className="mb-3 mx-3">{eventDetail?.description}</p>
         <div className="flex justify-center mb-3 mx-3">
           <img src={Img} />
         </div>
@@ -66,7 +59,7 @@ const IntroduceEvent = () => {
               dẫn để tránh bất kỳ sự bất tiện nào tại sự kiện.
             </li>
           </ul>
-        </div>
+        </div> */}
         <div
           className={`absolute bottom-0 h-[70px] w-full bg-white blur-[20px] transition-all duration-300 ease-in-out ${
             isExpanded ? "opacity-0" : "opacity-95"

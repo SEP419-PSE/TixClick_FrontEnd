@@ -1,19 +1,67 @@
-import { Menu, Search, X } from "lucide-react";
-import { useContext, useState } from "react";
-import { AiFillTikTok } from "react-icons/ai";
+import { CircleUserRound, Menu, Search, X } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { FaFacebookSquare, FaYoutube } from "react-icons/fa";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
 import { NavLink } from "react-router";
 import { AuthContext } from "../../contexts/AuthProvider";
+import { NavLink, useNavigate } from "react-router";
+import companyApi from "../../services/companyApi";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
   const [openMobileMenu, setOpenMobileMenu] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [isBackDrop, setIsBackDrop] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsBackDrop(true);
+      } else {
+        setIsBackDrop(false);
+      }
+
+      if (window.scrollY > window.innerHeight - 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const handleOpenMobileMenu = () => {
     setOpenMobileMenu(!openMobileMenu);
     document.body.style.overflow = openMobileMenu ? "auto" : "hidden";
+  };
+
+  const hanldeClickCreateEvent = async () => {
+    try {
+      const response = await companyApi.isAccountHaveCompany();
+      console.log(response.data.code);
+      if (response.data.code == 200) {
+        navigate("/create-event");
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response) {
+        navigate("/create-company", {
+          state: toast.error("Bạn cần phải tạo công ty trước"),
+        });
+      } else {
+        console.log("Lỗi không xác định:", axiosError.message);
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
+      }
+    }
   };
   return (
     <div className="lg:mb-8">
@@ -26,35 +74,35 @@ const HeroSlider = () => {
           loop
           muted
           playsInline
-          className="w-[100%] h-screen object-cover brightness-50"
+          className="w-[100%] h-screen object-cover brightness-90 contrast-125"
         >
           <source
-            src="https://videos.pexels.com/video-files/4043988/4043988-hd_1920_1080_24fps.mp4"
+            src="https://videos.pexels.com/video-files/2022395/2022395-hd_1920_1080_30fps.mp4"
             type="video/mp4"
           />
         </video>
 
         {/* Header  */}
-        <header className="fixed flex items-center top-0 left-0 w-full p-4 lg:px-14 lg:py-6 text-white">
+        <header
+          className={`fixed flex items-center top-0 left-0 w-full p-4 lg:px-14 text-white transition-all duration-500 z-10 ${
+            isVisible ? "translate-y-0 " : "-translate-y-full"
+          } ${isBackDrop && "backdrop-blur-[20px] bg-black bg-opacity-30"}`}
+        >
           <p className="font-semibold text-2xl">TixClick</p>
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
-                
-                  <li className="px-4 py-2 hover:text-pse-green">
-                    <a href="/ticketManagement">Vé của tôi</a>
+                <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
+                <li className="px-4 py-2 hover:opacity-60">Sự kiện của tôi</li>
+                <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                <button onClick={hanldeClickCreateEvent}>
+                  <li className="px-4 py-2 border rounded-md hover:opacity-60">
+                    Tạo sự kiện
                   </li>
-                  <li className="px-4 py-2 hover:text-pse-green">
-                    <a href="/consumerCenter">Sự kiện của tôi</a>
-                  </li>
-                  <li className="px-4 py-2 hover:text-pse-green">
-                    <a href="/profileForm">Trang cá nhân</a>
-                  </li>
-                
-
+                </button>
                 <li
                   onClick={() => authContext?.logout()}
-                  className="px-4 py-2 hover:text-pse-green"
+                  className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-60"
                 >
                   Đăng xuất
                 </li>

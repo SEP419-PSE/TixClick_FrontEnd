@@ -15,7 +15,7 @@ const NavbarCompany = () => {
 
   return (
     <div
-      className={`relative w-full h-screen px-6 py-8 border-r border-[#dbdbdb] z-10`}
+      className={`fixed text-white bg-pse-black hidden lg:flex flex-col w-[300px] h-screen px-6 py-8 border-r z-10 transition-all duration-500`}
     >
       <div className="flex items-center gap-2 text-[18px] font-bold ">
         <span>
@@ -29,12 +29,12 @@ const NavbarCompany = () => {
       {/* Divider */}
       <div className="w-full h-[1px] my-8 bg-[#dbdbdb]"></div>
       <div>
-        <ul className="flex flex-col gap-10 text-[#787486]">
+        <ul className="flex flex-col gap-10 text-white">
           <NavLink to="/company">
             <li
               className={`flex items-center gap-2 ${
                 location.pathname == "/company" &&
-                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
+                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-80 text-white"
               }`}
             >
               <span>
@@ -47,7 +47,7 @@ const NavbarCompany = () => {
             <li
               className={`flex items-center gap-2 ${
                 location.pathname == "/company/events" &&
-                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
+                "transition-all duration-500 px-4 py-2 rounded-[6px]  bg-pse-green bg-opacity-80 text-white"
               }`}
             >
               <span>
@@ -56,24 +56,12 @@ const NavbarCompany = () => {
               Event
             </li>
           </NavLink>
-          <NavLink to="/company/tickets">
-            <li
-              className={`flex items-center gap-2 ${
-                location.pathname == "/company/tickets" &&
-                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
-              }`}
-            >
-              <span>
-                <TicketCheck strokeWidth={1} />
-              </span>
-              Ticket
-            </li>
-          </NavLink>
+
           <NavLink to="/company/members">
             <li
               className={`flex items-center gap-2 ${
                 location.pathname == "/company/members" &&
-                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
+                "transition-all duration-500 px-4 py-2 rounded-[6px]  bg-pse-green bg-opacity-80 text-white"
               }`}
             >
               <span>
@@ -86,7 +74,7 @@ const NavbarCompany = () => {
             <li
               className={`flex items-center gap-2 ${
                 location.pathname == "/company/contracts" &&
-                "transition-all duration-500 px-4 py-2 rounded-[6px] bg-pse-green bg-opacity-15 text-black"
+                "transition-all duration-500 px-4 py-2 rounded-[6px]  bg-pse-green bg-opacity-80 text-white"
               }`}
             >
               <span>
@@ -97,7 +85,7 @@ const NavbarCompany = () => {
           </NavLink>
         </ul>
       </div>
-      <div className="mt-[100%] flex justify-center">
+      <div className="mt-auto flex justify-center">
         <ButtonNeon>Đăng xuất</ButtonNeon>
       </div>
     </div>
