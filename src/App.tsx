@@ -12,6 +12,12 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageContract from "./pages/company/components/ManageContract";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import ManageMember from "./pages/company/components/ManageMember";
+import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
@@ -36,16 +42,10 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import CreateCompany from "./pages/company/CreateCompany";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageMember from "./pages/company/components/ManageMember";
-import ManageContract from "./pages/company/components/ManageContract";
 
-import ProfileCompany from "./pages/company/components/ProfileCompany";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
 
 export default function App() {
   return (

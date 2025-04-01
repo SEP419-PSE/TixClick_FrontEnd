@@ -1,15 +1,11 @@
 import {
-  AlertCircle,
   Bell,
-  CheckCircle,
-  Clock,
   Download,
   Eye,
   FileText,
   MoreHorizontal,
   Search,
-  Upload,
-  XCircle,
+  Upload
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +29,6 @@ import {
 } from "../../../../components/ui/dropdown-menu";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
-import { Progress } from "../../../../components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -55,73 +50,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../components/ui/tabs";
-import { Contracts } from "../../../../interface/manager/Contracts";
+import { ContractDocumentDTO, ContractDTO, VietQR } from "../../../../interface/manager/Contracts";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { ManagerHeader } from "../ManagerHeader";
 
 export default function ContractsPage() {
-  const [contracts, setContracts] = useState([
-    {
-      id: 1,
-      name: "Service Agreement - Acme Inc",
-      company: "Acme Inc",
-      type: "Service Agreement",
-      startDate: "2023-01-01",
-      endDate: "2023-12-31",
-      value: 100000,
-      status: "Active",
-      progress: 50,
-      documents: ["contract.pdf", "terms.pdf"],
-    },
-    {
-      id: 2,
-      name: "Licensing Deal - Globex",
-      company: "Globex Corporation",
-      type: "Licensing Agreement",
-      startDate: "2023-03-15",
-      endDate: "2024-03-14",
-      value: 250000,
-      status: "Active",
-      progress: 25,
-      documents: ["license.pdf"],
-    },
-    {
-      id: 3,
-      name: "Partnership Agreement - Initech",
-      company: "Initech",
-      type: "Partnership Agreement",
-      startDate: "2023-06-01",
-      endDate: "2024-05-31",
-      value: 500000,
-      status: "Pending",
-      progress: 0,
-      documents: ["partnership.pdf", "terms.pdf"],
-    },
-    {
-      id: 4,
-      name: "Maintenance Contract - Umbrella",
-      company: "Umbrella Corporation",
-      type: "Maintenance Agreement",
-      startDate: "2023-09-01",
-      endDate: "2024-08-31",
-      value: 75000,
-      status: "Active",
-      progress: 10,
-      documents: ["maintenance.pdf"],
-    },
-    {
-      id: 5,
-      name: "Consulting Services - Soylent",
-      company: "Soylent Corp",
-      type: "Consulting Agreement",
-      startDate: "2023-11-01",
-      endDate: "2024-10-31",
-      value: 150000,
-      status: "Draft",
-      progress: 0,
-      documents: [],
-    },
-  ]);
+  const [contracts, setContracts] = useState<ContractDTO[]>([]);
+  const [contractDocument, setContractDocument] = useState<ContractDocumentDTO[]>([])
 
   // const [newContract, setNewContract] = useState({
   //   name: "",
@@ -133,19 +68,9 @@ export default function ContractsPage() {
   //   status: "Draft",
   // })
 
-  const [selectedContract, setSelectedContract] = useState<Contracts>({
-    id: 1,
-    name: "",
-    company: "",
-    type: "",
-    startDate: "",
-    endDate: "",
-    value: 0,
-    status: "",
-    progress: 0,
-    documents: [],
-  });
-
+  const [selectedContract, setSelectedContract] = useState<ContractDTO>();
+  const [selectedContractDocument, setSelectedContractDocument] = useState<ContractDocumentDTO>();
+console.log(setContractDocument, setSelectedContractDocument)
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 
   const [selectedDocument, setSelectedDocument] = useState("");
@@ -162,7 +87,7 @@ export default function ContractsPage() {
   });
 
   const [paymentCode, setPaymentCode] = useState("");
-  const [vietQRParams, setVietQRParams] = useState({
+  const [vietQRParams, setVietQRParams] = useState<VietQR>({
     bankID: "",
     accountID: "",
     amount: "",
@@ -179,7 +104,7 @@ export default function ContractsPage() {
     );
     const amount = vietQRParams.amount
       ? Number.parseInt(vietQRParams.amount)
-      : selectedContract.value;
+      : selectedContract?.totalAmount
 
     return `https://img.vietqr.io/image/${vietQRParams.bankID}-${vietQRParams.accountID}-compact.png?amount=${amount}&addInfo=${encodedDescription}&accountName=Contract%20Payment`;
   };
@@ -191,7 +116,7 @@ export default function ContractsPage() {
     }
 
     toast.success("Payment confirmed", {
-      description: `Payment for contract ${selectedContract.name} has been confirmed.`,
+      description: `Payment for contract ${selectedContract?.accountId} has been confirmed.`,
     });
     setPaymentCode("");
   };
@@ -217,7 +142,9 @@ export default function ContractsPage() {
       uploadedDate: "2023-12-15",
       lastModified: "2024-01-10",
       version: "1.2",
-      description: `This is the ${doc} file for contract ${selectedContract.name}.`,
+      description: `This is the ${doc} file for contract.`,
+      // description: `This is the ${doc} file for contract ${selectedContract.name}.`,
+
     });
 
     setIsAttachmentModalOpen(true);
@@ -230,59 +157,59 @@ export default function ContractsPage() {
     console.log(id);
   };
 
-  const handleDownloadDocument = (id: number, doc: string) => {
-    toast.success("Document Downloaded", {
-      description: `${doc} has been downloaded.`,
-    });
-    console.log(id);
-    console.log(doc);
-  };
+  // const handleDownloadDocument = (id: number, doc: string) => {
+  //   toast.success("Document Downloaded", {
+  //     description: `${doc} has been downloaded.`,
+  //   });
+  //   console.log(id);
+  //   console.log(doc);
+  // };
 
-  const getStatusBadge = (status: any) => {
-    switch (status) {
-      case "Active":
-        return (
-          <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">
-            Active
-          </span>
-        );
-      case "Pending":
-        return (
-          <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">
-            Pending
-          </span>
-        );
-      case "Draft":
-        return (
-          <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">
-            Draft
-          </span>
-        );
-      case "Expired":
-        return (
-          <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">
-            Expired
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
+  // const getStatusBadge = (status: any) => {
+  //   switch (status) {
+  //     case "Active":
+  //       return (
+  //         <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">
+  //           Active
+  //         </span>
+  //       );
+  //     case "Pending":
+  //       return (
+  //         <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">
+  //           Pending
+  //         </span>
+  //       );
+  //     case "Draft":
+  //       return (
+  //         <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">
+  //           Draft
+  //         </span>
+  //       );
+  //     case "Expired":
+  //       return (
+  //         <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">
+  //           Expired
+  //         </span>
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
-  const getStatusIcon = (status: any) => {
-    switch (status) {
-      case "Active":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "Pending":
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "Draft":
-        return <AlertCircle className="h-5 w-5 text-blue-500" />;
-      case "Expired":
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return null;
-    }
-  };
+  // const getStatusIcon = (status: any) => {
+  //   switch (status) {
+  //     case "Active":
+  //       return <CheckCircle className="h-5 w-5 text-green-500" />;
+  //     case "Pending":
+  //       return <Clock className="h-5 w-5 text-yellow-500" />;
+  //     case "Draft":
+  //       return <AlertCircle className="h-5 w-5 text-blue-500" />;
+  //     case "Expired":
+  //       return <XCircle className="h-5 w-5 text-red-500" />;
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const getDocumentIcon = (doc: string) => {
     const fileExtension = doc.split(".").pop()?.toLowerCase() || "";
@@ -321,18 +248,18 @@ export default function ContractsPage() {
     initUseEffect();
   }, []);
 
-  const openContractModal = (contract: Contracts) => {
+  const openContractModal = (contract: ContractDTO) => {
     setSelectedContract(contract);
     setIsContractModalOpen(true);
   };
 
   useEffect(() => {
-    if (selectedContract && selectedContract.id) {
+    if (selectedContract && selectedContract.contractId) {
       setVietQRParams({
         bankID: "BIDV",
         accountID: "31410001689304",
-        amount: selectedContract.value.toString(),
-        description: `Payment for contract #${selectedContract.id}`,
+        amount: selectedContract.totalAmount.toString(),
+        description: `Payment for contract #${selectedContract.contractId}`,
       });
     }
   }, [selectedContract]);
@@ -394,34 +321,33 @@ export default function ContractsPage() {
               <TableHead className="text-white">End Date</TableHead>
               <TableHead className="text-white">Value</TableHead>
               <TableHead className="text-white">Status</TableHead>
-              <TableHead className="text-white">Progress</TableHead>
               <TableHead className="text-white text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {contracts.map((contract) => (
               <TableRow
-                key={contract.id}
+                key={contract.contractId}
                 className="border-[#333333] hover:bg-[#2A2A2A]"
               >
                 <TableCell className="font-medium text-white">
-                  {contract.name}
+                  {contract.commission}
                 </TableCell>
-                <TableCell className="text-white">{contract.company}</TableCell>
-                <TableCell className="text-white">{contract.type}</TableCell>
-                <TableCell className="text-white">
+                <TableCell className="text-white">{contract.companyId}</TableCell>
+                <TableCell className="text-white">{contract.contractType}</TableCell>
+                {/* <TableCell className="text-white">
                   {contract.startDate}
                 </TableCell>
-                <TableCell className="text-white">{contract.endDate}</TableCell>
+                <TableCell className="text-white">{contract.endDate}</TableCell> */}
                 <TableCell className="text-white">
-                  ${contract.value.toLocaleString()}
+                  {/* ${contract.value.toLocaleString()} */}
                 </TableCell>
-                <TableCell className="text-white">
+                {/* <TableCell className="text-white">
                   {getStatusBadge(contract.status)}
-                </TableCell>
-                <TableCell className="text-white">
+                </TableCell> */}
+                {/* <TableCell className="text-white">
                   <Progress value={contract.progress} className="w-[60px]" />
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -441,7 +367,7 @@ export default function ContractsPage() {
                         View details
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleUploadDocument(contract.id)}
+                        onClick={() => handleUploadDocument(contract.contractId)}
                       >
                         <Upload className="mr-2 h-4 w-4" />
                         Upload document
@@ -483,42 +409,42 @@ export default function ContractsPage() {
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Contract Name</Label>
-                    <div>{selectedContract.name}</div>
+                    <div>{selectedContract.commission}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Company</Label>
-                    <div>{selectedContract.company}</div>
+                    <div>{selectedContract.companyId}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Type</Label>
-                    <div>{selectedContract.type}</div>
+                    <div>{selectedContract.contractType}</div>
                   </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
+                  {/* <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Start Date</Label>
                     <div>{selectedContract.startDate}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">End Date</Label>
                     <div>{selectedContract.endDate}</div>
-                  </div>
+                  </div> */}
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Value</Label>
-                    <div>${selectedContract.value.toLocaleString()}</div>
+                    <div>${selectedContract.totalAmount.toLocaleString()}</div>
                   </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
+                  {/* <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Status</Label>
                     <div className="flex items-center">
                       {getStatusIcon(selectedContract.status)}
                       <span className="ml-2">{selectedContract.status}</span>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
+                  </div> */}
+                  {/* <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Progress</Label>
                     <Progress
                       value={selectedContract.progress}
                       className="w-[200px]"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </TabsContent>
               <TabsContent value="documents">
@@ -526,10 +452,10 @@ export default function ContractsPage() {
                   <h3 className="text-lg font-semibold mb-2">
                     Contract Documents
                   </h3>
-                  {selectedContract.documents &&
-                  selectedContract.documents.length > 0 ? (
+                  {selectedContract.contractId == selectedContractDocument?.contractId 
+                  ? (
                     <ul className="space-y-2">
-                      {selectedContract.documents.map((doc, index) => (
+                      {contractDocument.map((doc:any, index:any) => (
                         <li
                           key={index}
                           className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
@@ -550,9 +476,9 @@ export default function ContractsPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() =>
-                                handleDownloadDocument(selectedContract.id, doc)
-                              }
+                              // onClick={() =>
+                              //   handleDownloadDocument(selectedContract.contractId, doc)
+                              // }
                             >
                               <Download className="mr-2 h-4 w-4" />
                               Download
@@ -566,7 +492,7 @@ export default function ContractsPage() {
                   )}
                   <Button
                     className="mt-4"
-                    onClick={() => handleUploadDocument(selectedContract.id)}
+                    onClick={() => handleUploadDocument(selectedContract.contractId)}
                   >
                     <Upload className="mr-2 h-4 w-4" />
                     Upload New Document
@@ -584,7 +510,7 @@ export default function ContractsPage() {
                         Start
                       </div>
                       <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                      <div className="ml-2">{selectedContract.startDate}</div>
+                      {/* <div className="ml-2">{selectedContract.startDate}</div> */}
                     </div>
                     <div className="flex items-center">
                       <div className="w-12 text-right mr-4 text-sm text-gray-500">
@@ -598,13 +524,13 @@ export default function ContractsPage() {
                         End
                       </div>
                       <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                      <div className="ml-2">{selectedContract.endDate}</div>
+                      {/* <div className="ml-2">{selectedContract.endDate}</div> */}
                     </div>
                   </div>
-                  <Progress
+                  {/* <Progress
                     value={selectedContract.progress}
                     className="w-full mt-4 bg-blue-500"
-                  />
+                  /> */}
                 </div>
               </TabsContent>
               <TabsContent value="payment">
@@ -621,15 +547,15 @@ export default function ContractsPage() {
                         </h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="text-gray-400">Contract Value:</div>
-                          <div>${selectedContract.value}</div>
+                          <div>${selectedContract.totalAmount}</div>
                           <div className="text-gray-400">Payment Status:</div>
-                          <div>
+                          {/* <div>
                             {selectedContract.progress >= 100
                               ? "Paid"
                               : "Pending"}
-                          </div>
+                          </div> */}
                           <div className="text-gray-400">Due Date:</div>
-                          <div>{selectedContract.endDate}</div>
+                          {/* <div>{selectedContract.endDate}</div> */}
                           <div className="text-gray-400">Bank:</div>
                           <div>{vietQRParams.bankID}</div>
                           <div className="text-gray-400">Account Number:</div>
@@ -709,10 +635,11 @@ export default function ContractsPage() {
                       </Dialog>
 
                       <p className="text-xs text-gray-400 text-center">
-                        Payment reference: {selectedContract.id}-
-                        {selectedContract.company
-                          .replace(/\s+/g, "")
-                          .toLowerCase()}
+                        Payment reference: {selectedContract.contractId}-
+                        {selectedContract.companyId
+                          // .replace(/\s+/g, "")
+                          // .toLowerCase()
+                          }
                       </p>
                     </div>
                   </div>
@@ -813,9 +740,9 @@ export default function ContractsPage() {
             <div className="flex gap-2 text-black">
               <Button
                 variant="outline"
-                onClick={() =>
-                  handleDownloadDocument(selectedContract.id, selectedDocument)
-                }
+                // onClick={() =>
+                //   handleDownloadDocument(selectedContractDocument?.contractDocumentId, selectedDocument)
+                // }
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download

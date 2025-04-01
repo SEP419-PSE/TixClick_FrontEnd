@@ -1,12 +1,12 @@
 
 
-const TicketBooking = () => {
-  return (
-    <div>TicketBooking</div>
-  )
-}
+// const TicketBooking = () => {
+//   return (
+//     <div>TicketBooking</div>
+//   )
+// }
 
-export default TicketBooking
+// export default TicketBooking
 
 // import React from "react";
 
