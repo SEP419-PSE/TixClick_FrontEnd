@@ -10,7 +10,7 @@ import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 import { StepProps } from "../../components/CreateEvent/steps/Step1_Infor";
 
 // Type definitions
-type SeatStatus = "available" | "disabled";
+// type SeatStatus = "available" | "disabled";
 type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType";
 type ViewMode = "edit" | "preview";
 export type SectionType = "SEATED" | "STANDING";
@@ -368,7 +368,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
   const [editingSeat, setEditingSeat] = useState<SeatTypeEdit | null>(null);
 
   const [newSectionType, setNewSectionType] = useState<SectionType>("SEATED");
-  const [standingPrice, setStandingPrice] = useState<number>(0);
+  // const [standingPrice, setStandingPrice] = useState<number>(0);
   const [standingCapacity, setStandingCapacity] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 

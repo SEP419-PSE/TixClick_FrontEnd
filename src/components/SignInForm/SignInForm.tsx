@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 
 import GoogleImg from "../../assets/google.png";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { ERROR_RESPONSE } from "../../constants/constants";
+// import { ERROR_RESPONSE } from "../../constants/constants";
 
 const SignInForm = () => {
   const authContext = useContext(AuthContext);

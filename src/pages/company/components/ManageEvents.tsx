@@ -1,4 +1,4 @@
-import EmptyList from "../../../components/EmptyList/EmptyList";
+// import EmptyList from "../../../components/EmptyList/EmptyList";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router";
 import EventDesignList from "./event/EventDesignList";

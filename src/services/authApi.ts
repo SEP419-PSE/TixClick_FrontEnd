@@ -1,6 +1,5 @@
 import {
   LoginRequest,
-  RefreshToken,
   RegisterRequest,
 } from "../interface/AuthInterface";
 import axiosClient from "./axiosClient";
