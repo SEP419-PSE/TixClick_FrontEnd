@@ -1,101 +1,54 @@
-import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
-import { useState } from "react";
-import StepOne from "./StepOne";
-import StepTwo from "./StepTwo";
+import React from "react";
 
-const steps = [
-  "Thông tin sự kiện",
-  "Thời gian & Loại vé",
-  "Cài đặt",
-  "Thông tin thanh toán",
-];
+interface StepperProps {
+  currentStep: number;
+  steps: string[];
+}
 
-// const stepComponents = [StepOne, StepTwo, StepThree, StepFour];
-
-export default function Stepper() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isStepValid, setIsStepValid] = useState(false);
-
-  // useEffect(() => {
-  //   setIsStepValid(false);
-  // }, [currentStep]);
-
-  // const handleNext = () => {
-  //   if (!isStepValid) {
-  //     toast.warning(TOAST_WARNING, {
-  //       position: "top-center",
-  //     });
-  //     return;
-  //   }
-  //   setCurrentStep((prev) => prev + 1); // Chuyển step nếu hợp lệ
-  // };
-
-  // const handleValidationChange = (isValid: boolean) => {
-  //   setIsStepValid(isValid);
-  // };
-
-  // console.log(isStepValid);
-
+const Stepper: React.FC<StepperProps> = ({ currentStep, steps }) => {
   return (
-    <>
-      <div className="fixed left-1/2 top-2 z-20 flex justify-between items-center text-[14px] w-[90%] max-w-[500px] mx-auto px-2 transform -translate-x-1/2 overflow-hidden">
-        {steps.map((step, index) => (
+    <div className="flex items-center justify-between w-full max-w-3xl mx-auto mb-8">
+      {steps.map((step, index) => {
+        const isActive = index === currentStep;
+        const isCompleted = index < currentStep;
+
+        return (
           <div
             key={index}
-            className="flex flex-col items-center relative z-10 gap-1 md:gap-2"
+            className="flex-1 flex flex-col items-center relative"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold relative ${
-                index < currentStep ? "bg-pse-green" : "bg-pse-gray"
+            <div
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-2
+                ${isCompleted ? "bg-green-500 border-green-500 text-white" : ""}
+                ${isActive ? "border-blue-500 text-blue-500" : ""}
+                ${
+                  !isCompleted && !isActive
+                    ? "border-gray-300 text-gray-400"
+                    : ""
+                }
+              `}
+            >
+              {isCompleted ? "✓" : index + 1}
+            </div>
+            <span
+              className={`text-sm mt-2 text-center ${
+                isActive ? "text-blue-600 font-medium" : "text-gray-500"
               }`}
             >
-              {index + 1 < currentStep ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <CheckCircle className="w-6 h-6 text-green" />
-                </motion.div>
-              ) : (
-                index + 1
-              )}
-            </motion.div>
-            <span className="text-[10px] md:text-sm mt-1 text-white">
               {step}
             </span>
+            {index !== steps.length - 1 && (
+              <div
+                className={`absolute top-4 left-full h-0.5 w-full ${
+                  isCompleted ? "bg-green-500" : "bg-gray-300"
+                }`}
+              />
+            )}
           </div>
-        ))}
-        {/* Thanh nền */}
-        <motion.div className="absolute top-5 left-2 right-2 h-1 bg-white z-0"></motion.div>
-        {/* Thanh tiến trình */}
-        <motion.div
-          className="absolute top-5 left-2 h-1 bg-pse-green z-10"
-          initial={{ width: 0 }}
-          animate={{ width: `${(currentStep / steps.length - 1) * 100}%` }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        ></motion.div>
-      </div>
-
-      <div className="min-h-screen max-w-[1000px] pt-24 pb-10 mx-auto p-6 bg-gradient-to-r from-pse-green-second/70 via-pse-green-second/50 rounded-lg">
-        <div className="text-center text-lg font-semibold mb-4">
-          {currentStep === 1 && (
-            <StepOne
-              step={currentStep}
-              setStep={setCurrentStep}
-              isStepValid={isStepValid}
-              setIsStepValid={setIsStepValid}
-            />
-          )}
-          {currentStep === 2 && <StepTwo />}
-          {currentStep === 3 && <div>Step 3</div>}
-          {currentStep === 4 && <div>Step 4</div>}
-        </div>
-      </div>
-    </>
+        );
+      })}
+    </div>
   );
-}
+};
+
+export default Stepper;

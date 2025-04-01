@@ -1,28 +1,16 @@
-import { useState } from "react";
-import SearchBar from "./SearchBar";
 import CompanyAccount from "./CompanyAccount";
 import Statistic from "./Statistic";
-import MemberList from "./member/MemberList";
+import { BarChartComponent } from "./chart/BarChart";
 
 const HomeCompany = () => {
-  const [query, setQuery] = useState("");
+  // const [query, setQuery] = useState("");
 
-  const handleSearch = () => {
-    console.log("Searching for:", query);
-  };
+  // const handleSearch = () => {
+  //   console.log("Searching for:", query);
+  // };
   return (
-    <div className="px-6 py-6">
-      <div className="flex justify-between items-center font-semibold">
-        <SearchBar
-          placeholder="Search something..."
-          query={query}
-          onChange={setQuery}
-          onSearch={handleSearch}
-        />
-        <CompanyAccount />
-      </div>
-      <div className="w-full h-[1px] mt-3 mb-8 bg-[#dbdbdb]"></div>
-      <div className="flex items-center justify-between">
+    <div className="px-6 py-6 bg-transparent text-white overflow-y-hidden">
+      <div className="flex-col lg:flex-row flex items-center gap-5">
         <Statistic
           label="Tổng sự kiện"
           quantity={10}
@@ -49,9 +37,7 @@ const HomeCompany = () => {
         />
       </div>
       <div className="my-8">
-        <div className="w-[800px]">
-          <MemberList />
-        </div>
+        <BarChartComponent />
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ const RootLayout = () => {
       </main>
       <footer>
         {!PATHNAME_EXCEPT.includes(location.pathname) && <Footer />}
-        <Toaster />
+        <Toaster position="top-center" />
       </footer>
     </>
   );

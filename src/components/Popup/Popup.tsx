@@ -18,12 +18,12 @@ export default function Popup({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="bg-white rounded-2xl shadow-xl p-6 max-w-lg  w-full mx-4 relative"
+            className="bg-white rounded-2xl shadow-xl p-6 max-w-lg overflow-y-auto w-full mx-4 relative"
           >
             <button
               onClick={onClose}

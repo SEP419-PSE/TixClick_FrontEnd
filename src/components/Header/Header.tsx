@@ -2,13 +2,17 @@ import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-import { Link, NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import SearchBar from "../SearchBar/SearchBar";
+import companyApi from "../../services/companyApi";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const authContext = useContext(AuthContext);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -29,6 +33,26 @@ const Header = () => {
     };
   }, []);
 
+  const hanldeClickCreateEvent = async () => {
+    try {
+      const response = await companyApi.isAccountHaveCompany();
+      console.log(response.data.code);
+      if (response.data.code == 200) {
+        navigate("/create-event");
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response) {
+        navigate("/create-company", {
+          state: toast.error("Bạn cần phải tạo công ty trước"),
+        });
+      } else {
+        console.log("Lỗi không xác định:", axiosError.message);
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
+      }
+    }
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 w-full p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
@@ -41,11 +65,13 @@ const Header = () => {
         <span className="lg:hidden p-[6px] border rounded-full">
           <LuSearch size={24} />
         </span>
-        <NavLink to="/create-event">
-          <button className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500">
-            Tạo sự kiện
-          </button>
-        </NavLink>
+
+        <button
+          onClick={hanldeClickCreateEvent}
+          className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500"
+        >
+          Tạo sự kiện
+        </button>
         <div className="font-semibold flex items-center cursor-pointer">
           {authContext?.isLogin ? (
             <div
@@ -62,22 +88,22 @@ const Header = () => {
               >
                 <ul className="rounded-lg">
                   <Link to="/ticketManagement">
-                  <li className="flex items-center gap-2 p-3 hover:bg-pse-gray rounded-tl-lg rounded-tr-lg">
-                    <LuTicketCheck size={24} />
-                    Vé đã mua
-                  </li>
+                    <li className="flex items-center gap-2 p-3 hover:bg-pse-gray rounded-tl-lg rounded-tr-lg">
+                      <LuTicketCheck size={24} />
+                      Vé đã mua
+                    </li>
                   </Link>
                   <Link to="/consumerCenter">
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
-                    <RiCalendarEventLine size={24} />
-                    Sự kiện của tôi
-                  </li>
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
+                      <RiCalendarEventLine size={24} />
+                      Sự kiện của tôi
+                    </li>
                   </Link>
                   <Link to="/profileForm">
-                  <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
-                    <CgProfile size={24} />
-                    Trang cá nhân
-                  </li>
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
+                      <CgProfile size={24} />
+                      Trang cá nhân
+                    </li>
                   </Link>
                   <li
                     onClick={() => authContext.logout()}

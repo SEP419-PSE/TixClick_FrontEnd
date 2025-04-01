@@ -6,8 +6,25 @@ import TextInput from "../../components/CreateEvent/InputText";
 import companyApi from "../../services/companyApi";
 
 import { XCircle } from "lucide-react";
+import BankDropdown from "./components/BankDropDown";
+import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
+import { useNavigate } from "react-router";
+
+const banks = [
+  { id: "970436", bankName: "Vietcombank" },
+  { id: "970418", bankName: "BIDV" },
+  { id: "970422", bankName: "MB Bank" },
+  { id: "970415", bankName: "VietinBank" },
+  { id: "970416", bankName: "ACB" },
+  { id: "970432", bankName: "VPBank" },
+  { id: "970403", bankName: "Sacombank" },
+  { id: "970423", bankName: "Techcombank" },
+  { id: "970441", bankName: "VIB" },
+  { id: "970454", bankName: "TPBank" },
+];
 
 const CreateCompany = () => {
+  const navigate = useNavigate();
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
@@ -40,8 +57,6 @@ const CreateCompany = () => {
   };
 
   const handleRegisterCompany = async () => {
-    setLoading(true);
-
     // Kiểm tra dữ liệu đầu vào
     if (
       !logoCompany ||
@@ -60,9 +75,10 @@ const CreateCompany = () => {
     }
 
     try {
+      setLoading(true);
       // Tạo FormData để gửi API tạo công ty
       const companyData = new FormData();
-      companyData.append("file", logoCompany);
+      companyData.append("logoURL", logoCompany);
       companyData.append("companyName", companyName);
       companyData.append("address", address);
       companyData.append("description", description);
@@ -70,29 +86,21 @@ const CreateCompany = () => {
       companyData.append("bankingName", bankingName);
       companyData.append("bankingCode", bankingCode);
       companyData.append("nationalId", cccd);
+      Array.from(files).forEach((file) => {
+        companyData.append("companyDocument", file); // Append từng file
+      });
+
+      // companyData.forEach((key, value) => {
+      //   console.log(key, value);
+      // });
 
       // Gửi API đầu tiên (tạo công ty) và chờ kết quả
-      const response = await companyApi.create(companyData);
+      const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
-      // const companyId = response.data.result.companyId;
-
-      // Hiển thị thông báo nếu thành công
-      toast.success("Tạo công ty thành công", { position: "top-center" });
-
-      // Tạo FormData để upload tài liệu
-      // const documentData = new FormData();
-      // files.forEach((file) => {
-      //   documentData.append("files", file);
-      // });
-      // documentData.append("companyId", companyId);
-      // documentData.append("uploadDate", new Date().toISOString());
-
-      // // Gửi API thứ hai (upload tài liệu) sau khi API đầu tiên hoàn tất
-      // await companyApi.createDocumentCompany(documentData);
-
-      // toast.success("Tài liệu đã được tải lên thành công!", {
-      //   position: "top-center",
-      // });
+      if (response.data.code == 200) {
+        navigate("/create-event");
+        toast.success("Tạo công ty thành công", { position: "top-center" });
+      }
     } catch (error) {
       console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
@@ -104,7 +112,8 @@ const CreateCompany = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen mt-16 flex items-center justify-center">
+      {loading && <LoadingFullScreen />}
       <div className="bg-pse-black-light flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
         <p className="font-semibold text-[18px] mb-4">Đăng ký công ty</p>
         <ImageUpload
@@ -140,11 +149,10 @@ const CreateCompany = () => {
           text={codeTax}
           setText={setCodeTax}
         />
-        <TextInput
-          label="Tên ngân hàng"
-          maxLength={50}
-          text={bankingName}
-          setText={setBankingName}
+        <BankDropdown
+          banks={banks}
+          selectedBankName={bankingName}
+          onChange={setBankingName}
         />
         <TextInput
           label="Số tài khoản"
@@ -160,14 +168,14 @@ const CreateCompany = () => {
         />
         <div className="w-full mx-auto my-4 p-5 bg-white rounded-lg shadow-lg border">
           <h2 className="text-lg font-bold mb-4 text-gray-800">
-            📂 Tài liệu xác thực (PDF, DOC)
+            📂 Tài liệu xác thực (PDF)
           </h2>
 
           {/* File Input */}
           <input
             type="file"
             multiple
-            accept=".pdf, .doc, .docx"
+            accept=".pdf"
             onChange={handleFileChange}
             className="mb-4 w-full text-sm text-gray-700 file:bg-blue-500 file:text-white file:px-3 file:py-2 file:rounded-lg file:border-none file:cursor-pointer hover:file:bg-blue-600"
           />

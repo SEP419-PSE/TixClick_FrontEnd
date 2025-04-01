@@ -1,4 +1,5 @@
 import axios from "axios";
+import authApi from "./authApi";
 
 const axiosClient = axios.create({
   baseURL: "http://160.191.175.172:8080",
@@ -23,14 +24,38 @@ axiosClient.interceptors.request.use(
 
 // Add a response interceptor
 axiosClient.interceptors.response.use(
-  function (response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return response;
-  },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu lỗi 401 và chưa retry lần nào
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      localStorage.getItem("refreshToken")
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const data = await authApi.refreshAccessToken();
+        console.log("Get new accessToken", data);
+        const newAccessToken = data.result.accessToken;
+
+        // Lưu accessToken mới
+        localStorage.setItem("accessToken", newAccessToken);
+        axiosClient.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+        return axiosClient(originalRequest); // retry lại request gốc
+      } catch (err) {
+        localStorage.clear();
+        window.location.href = "/login"; // redirect về login nếu refresh fail
+        return Promise.reject(err);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

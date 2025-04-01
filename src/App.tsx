@@ -37,13 +37,24 @@ import NotificationPage from "./pages/manager/components/Notifications/Notificat
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
-import { default as OrganizerCenter, default as OrganizerPage } from "./pages/organizer";
+import {
+  default as OrganizerCenter,
+  default as OrganizerPage,
+} from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
-import DraggableArea from "./pages/seatmap/DragandDrop";
-import SeatMap from "./pages/seatmap/Seatmap";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
+import CreateCompany from "./pages/company/CreateCompany";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageTickets from "./pages/company/components/ManageTickets";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageContract from "./pages/company/components/ManageContract";
+import SeatMap from "./pages/seatmap/Seatmap";
+import DraggableArea from "./pages/seatmap/DragandDrop";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
 
 export default function App() {
   return (
@@ -53,8 +64,12 @@ export default function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="event-detail" element={<EventDetail />} />
-            <Route path="create-event" element={<Stepper />} />
+            <Route path="event-detail/:id" element={<EventDetail />} />
+            <Route
+              path="event-detail/:id/booking-ticket"
+              element={<TicketBooking />}
+            />
+            <Route path="create-event" element={<CreateEvent />} />
             {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
               <Route index path="signin" element={<SignInForm />} />
@@ -66,7 +81,6 @@ export default function App() {
             <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
 
-
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
@@ -77,22 +91,20 @@ export default function App() {
             <Route path="payment" element={<PaymentPage />} />
             {/* <Route path="payment/queue" element={<PaymentQueuePage />} /> */}
 
-
-
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
-              <Route path="company-approvals" element={<CompanyApprovalsPage />} />
+              <Route
+                path="company-approvals"
+                element={<CompanyApprovalsPage />}
+              />
               <Route path="notifications" element={<NotificationPage />} />
-
-
             </Route>
 
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
-
 
             <Route path="consumerCenter" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
@@ -102,8 +114,7 @@ export default function App() {
 
             <Route path="ticketManagement" element={<TicketPage />} />
 
-
-            <Route path="proAdmin" element={<AdminLayout />} >  
+            <Route path="proAdmin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="events" element={<AdminEvent />} />
               <Route path="companies" element={<AdminCompany />} />
@@ -111,7 +122,7 @@ export default function App() {
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
 
-{/*             
+            {/*             
             <Route path="managerManagement" element={<AccountsPage />} />
             <Route path="event" element={<EventsPage />} />
             <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
@@ -121,19 +132,18 @@ export default function App() {
           <Route path="company" element={<CompanyDashBoard />}>
             <Route index element={<HomeCompany />} />
             <Route path="events" element={<ManageEvents />} />
-            <Route path="tickets" element={<ManageTickets />} />
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />
           </Route>
 
-          <Route path="seatmap" element={<SeatMap />} />
           <Route path="drag" element={<DraggableArea />} />
 
-          
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />
 
+          {/* Chat app */}
+          <Route path="chat" element={<ChatApp />} />
         </Routes>
       </BrowserRouter>
     </div>
