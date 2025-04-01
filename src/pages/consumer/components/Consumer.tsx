@@ -1,9 +1,6 @@
-'use client'
-
 import { Calendar, Clock, DollarSign, MapPin, Search, Ticket, Users, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import NoEvent from '../../../assets/NoEvent.png'
-import { Button } from '../../../components/ui/button'
 import { Event } from '../../../interface/organizer/Organizer'
 import { EventFilter } from '../../organizer/components/EventFilter'
 import { useLanguage } from '../../organizer/components/LanguageContext'
@@ -363,12 +360,12 @@ export default function Consumer() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={closeEventDetails}>
+              {/* <div className="flex justify-end gap-4">
+                <Button variant="outline" className="text-black hover:bg-gray-400" onClick={closeEventDetails}>
                   Đóng
                 </Button>
                 <Button className="bg-[#00B14F] hover:bg-[#00B14F]/90">Chỉnh sửa sự kiện</Button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

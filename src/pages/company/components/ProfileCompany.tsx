@@ -1,10 +1,10 @@
 import {
-  Building2,
-  FileText,
-  CreditCard,
-  Banknote,
-  ClipboardList,
   BadgePercent,
+  Banknote,
+  Building2,
+  ClipboardList,
+  CreditCard,
+  FileText,
 } from "lucide-react";
 
 import CompanyAvt from "../../../assets/AvatarHuy.jpg";
@@ -62,6 +62,7 @@ const accountInfor: AccountCompanyInterface[] = [
     canEdit: false,
   },
 ];
+console.log(accountInfor);
 
 const ProfileCompany = () => {
   return (

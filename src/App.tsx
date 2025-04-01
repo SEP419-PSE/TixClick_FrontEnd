@@ -13,6 +13,14 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
+import CompanyDashBoard from "./pages/company/CompanyDashBoard";
+import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageContract from "./pages/company/components/ManageContract";
+import ManageEvents from "./pages/company/components/ManageEvents";
+import ManageMember from "./pages/company/components/ManageMember";
+import ManageTickets from "./pages/company/components/ManageTickets";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
+import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
@@ -25,7 +33,9 @@ import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
+import NotificationPage from "./pages/manager/components/Notifications/NotificationPage";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
+import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
 import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import {
   default as OrganizerCenter,
@@ -39,15 +49,12 @@ import CreateCompany from "./pages/company/CreateCompany";
 import CompanyDashBoard from "./pages/company/CompanyDashBoard";
 import ManageEvents from "./pages/company/components/ManageEvents";
 import HomeCompany from "./pages/company/components/HomeCompany";
+import ManageTickets from "./pages/company/components/ManageTickets";
 import ManageMember from "./pages/company/components/ManageMember";
 import ManageContract from "./pages/company/components/ManageContract";
 import SeatMap from "./pages/seatmap/Seatmap";
 import DraggableArea from "./pages/seatmap/DragandDrop";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
-import ChatApp from "./pages/chat/ChatApp";
-import CreateEvent from "./components/CreateEvent/CreateEvent";
-import SeatChartDesigner from "./pages/seatmap/Seatmap";
-import TicketBooking from "./pages/TicketBooking";
 
 export default function App() {
   return (
@@ -74,17 +81,15 @@ export default function App() {
             <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
 
-            <Route path="ticketManagement" element={<TicketPage />} />
-
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
-            <Route path="profileForm" element={<ProfileForm />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
+            {/* <Route path="payment/queue" element={<PaymentQueuePage />} /> */}
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
@@ -95,8 +100,10 @@ export default function App() {
                 path="company-approvals"
                 element={<CompanyApprovalsPage />}
               />
+              <Route path="notifications" element={<NotificationPage />} />
             </Route>
 
+            <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
 
             <Route path="consumerCenter" element={<RootLayouts />}>
@@ -104,6 +111,8 @@ export default function App() {
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
             </Route>
+
+            <Route path="ticketManagement" element={<TicketPage />} />
 
             <Route path="proAdmin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
@@ -116,7 +125,6 @@ export default function App() {
             {/*             
             <Route path="managerManagement" element={<AccountsPage />} />
             <Route path="event" element={<EventsPage />} />
-
             <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
 
@@ -132,6 +140,8 @@ export default function App() {
           <Route path="drag" element={<DraggableArea />} />
 
           <Route path="404" element={<ErrorPage />} />
+          <Route path="vietqr" element={<VietQRGenerator />} />
+
           {/* Chat app */}
           <Route path="chat" element={<ChatApp />} />
         </Routes>

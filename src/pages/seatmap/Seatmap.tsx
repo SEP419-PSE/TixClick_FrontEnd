@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Draggable from "react-draggable";
 import Popup from "../../components/Popup/Popup";
 import { Edit, Trash } from "lucide-react";
@@ -108,10 +108,10 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   };
 
   // Calculate seat size based on section dimensions
-  const seatSize = Math.min(
-    (section.width - 80) / section.columns,
-    (section.height - 80) / section.rows
-  );
+  // const seatSize = Math.min(
+  //   (section.width - 80) / section.columns,
+  //   (section.height - 80) / section.rows
+  // );
 
   return (
     <Draggable

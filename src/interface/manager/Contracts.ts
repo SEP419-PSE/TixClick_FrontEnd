@@ -10,3 +10,29 @@ export interface Contracts{
     progress: number; 
     documents: string[]; 
 }
+
+// export interface Contracts {
+//     contractId: number;
+//     totalAmount: number;
+//     commission: string;
+//     contractType: string;
+//     accountId: number;
+//     eventId: number;
+//     companyId: number;
+//   }
+
+export interface ContractUpload {
+    contractId: number;
+    file: string
+}
+
+export interface ContractDocumentResponse {
+    contractDocumentId: number;
+    contractId: number;
+    fileName: string;
+    fileURL: string;
+    fileType: string;
+    uploadedBy: number;
+    uploadDate: string; 
+  }
+  

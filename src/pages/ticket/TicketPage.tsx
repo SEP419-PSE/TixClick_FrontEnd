@@ -1,10 +1,15 @@
+import Header from "../../components/Header/Header"
+import { PinAuth } from "./components/Pin/PinAuth"
 import { SidebarProfile } from "./components/SidebarProfile"
 import TicketManagement from "./components/TicketManagement"
 
 
 export default function TicketPage() {
     return (
-      <div className="min-h-screen bg-[#1E1E1E]">
+      <PinAuth>
+      <>
+      <Header/>
+      <div className="min-h-screen bg-[#1E1E1E] pt-16">
         <div className="flex">
           <SidebarProfile />
           <main className="flex-1">
@@ -12,6 +17,8 @@ export default function TicketPage() {
           </main>
         </div>
       </div>
+      </>
+      </PinAuth>
     )
   }
   

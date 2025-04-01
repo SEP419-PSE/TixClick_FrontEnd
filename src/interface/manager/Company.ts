@@ -14,6 +14,7 @@ export interface Company {
   nationalId: string;
   logoURL: string;
   description: string;
+  address: string;
   status: "PENDING" | "ACTIVE" | "INACTIVE";
   companyVerificationId: number;
   customAccount: customAccount;
@@ -29,3 +30,6 @@ export interface Document {
   file_url?: string
   company_id: number
 }
+
+
+

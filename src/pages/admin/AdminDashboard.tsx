@@ -82,8 +82,8 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="flex h-screen bg-[#1E1E1E] text-white">
-      
+    // <div className="flex h-screen bg-[#1E1E1E] text-white">
+      <>
 
       <main className="flex-1 overflow-x-hidden overflow-y-auto">
         <header className="flex items-center justify-between p-4 bg-[#2A2A2A]">
@@ -236,7 +236,8 @@ export default function AdminDashboard() {
           </Card>
         </div>
       </main>
-    </div>
+    {/* </div> */}
+    </>
   )
 }
 

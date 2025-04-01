@@ -22,24 +22,7 @@ export default function CompanyApprovalsPage() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false)
 
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      contract_id: 1,
-      file_name: "Contract A",
-      file_type: "PDF",
-      uploaded_date: "2021-10-01",
-      file_url: "https://example.com/contractA.pdf",
-      company_id: 1,
-    },
-    {
-      contract_id: 2,
-      file_name: "Contract B",
-      file_type: "PDF",
-      uploaded_date: "2021-10-05",
-      file_url: "https://example.com/contractB.pdf",
-      company_id: 1,
-    }
-  ])
+  const [documents, setDocuments] = useState<Document[]>([])
   const [newDocument, setNewDocument] = useState({
     name: "",
     description: "",
@@ -53,17 +36,24 @@ export default function CompanyApprovalsPage() {
     setIsReviewModalOpen(true)
   }
 
-  const handleApproveCompany =  (status:string, companyVerificationId: number) => {
-    const response = managerApi.approveCompany(status, companyVerificationId);
-    console.log("res ver:",response);
-    fetchCompaniesList();
-    if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
-      setIsReviewModalOpen(false)
-      setIsDocumentModalOpen(true)
-    } else {
-      completeApproval()
+  const handleApproveCompany = async (status: string, companyVerificationId: number) => {
+    try {
+        const response = await managerApi.approveCompany(status, companyVerificationId);
+        console.log("✅ Approved successfully:", response);
+
+        fetchCompaniesList();
+
+        if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
+            setIsReviewModalOpen(false);
+            setIsDocumentModalOpen(true);
+        } else {
+            completeApproval();
+        }
+    } catch (error) {
+        console.error("❌ Approval failed:", error);
     }
-  }
+};
+
 
   const completeApproval = () => {
     setCompanies(
@@ -307,7 +297,7 @@ export default function CompanyApprovalsPage() {
                   <Label className="text-sm font-medium text-gray-400">Location</Label>
                   <div className="text-lg flex items-center">
                     <MapPin className="mr-2 h-5 w-5 text-[#00B14F]" />
-                    {selectedCompany.companyName}
+                    {selectedCompany.address}
                   </div>
                 </div>
               </div>
@@ -353,7 +343,7 @@ export default function CompanyApprovalsPage() {
               <X className="mr-2 h-4 w-4" /> Reject Company
             </Button>
             <Button 
-              onClick={() => handleApproveCompany("approved", selectedCompany?.companyVerificationId ?? 0)}
+              onClick={() => handleApproveCompany("APPROVED", selectedCompany?.companyVerificationId ?? 0)}
               className="bg-[#00B14F] text-white">
               <Check className="mr-2 h-4 w-4" /> Approve Company
             </Button> 
@@ -400,6 +390,10 @@ export default function CompanyApprovalsPage() {
                             <TableCell className="text-white">{doc.file_type}</TableCell>
                             <TableCell className="text-white">
                              
+                            </TableCell>
+                            
+                            <TableCell className="text-white">
+                             Huy
                             </TableCell>
                             <TableCell className="text-white">{doc.uploaded_date}</TableCell>
                             <TableCell className="text-right text-black flex items-center">

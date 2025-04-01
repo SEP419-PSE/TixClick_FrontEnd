@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
-import axiosClient from "../services/axiosClient";
 import { toast } from "sonner";
+import axiosClient from "../services/axiosClient";
 
 type Props = {
   children: React.ReactNode;
@@ -51,3 +51,4 @@ const AuthProvider = ({ children }: Props) => {
 };
 
 export { AuthContext, AuthProvider };
+

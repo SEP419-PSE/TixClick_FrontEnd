@@ -18,3 +18,20 @@ export interface Installment {
     dueDate: string;
     status: string;
 }
+
+export interface Payments {
+  paymentId: number;
+  paymentMethod: string;
+  amount: number;
+  paymentDate: string;
+  status: string;
+  orderCode: string;
+  orderId: number;
+  accountId: number;
+}
+
+export interface AccountGroup {
+  accountId: number
+  payments: Payments[]
+  isExpanded: boolean
+}

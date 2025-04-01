@@ -1,11 +1,10 @@
 import { CircleUserRound, Menu, Search, X } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
+import { FaFacebookSquare, FaYoutube } from "react-icons/fa";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-import { FaFacebookSquare } from "react-icons/fa";
-import { AiFillTikTok } from "react-icons/ai";
-import { FaYoutube } from "react-icons/fa";
+import { NavLink } from "react-router";
 import { AuthContext } from "../../contexts/AuthProvider";
 import { NavLink, useNavigate } from "react-router";
 import companyApi from "../../services/companyApi";
