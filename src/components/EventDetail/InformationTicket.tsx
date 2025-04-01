@@ -3,46 +3,46 @@ import { MdExpandMore } from "react-icons/md";
 import { EventDetailProps } from "./InformationEvent";
 import { formatDateVietnamese, formatTimeFe } from "../../lib/utils";
 
-const tickets = [
-  {
-    id: 1,
-    time: "19:00 - 21:00",
-    date: "16 Tháng 02, 2025",
-    ticketType: [
-      {
-        type: "VIP1",
-        price: "6.500.000",
-      },
-      {
-        type: "VIP2",
-        price: "6.000.000",
-      },
-      {
-        type: "VIP3",
-        price: "5.500.000",
-      },
-    ],
-  },
-  {
-    id: 2,
-    time: "19:00 - 21:00",
-    date: "15 Tháng 02, 2025",
-    ticketType: [
-      {
-        type: "VIP1",
-        price: "6.500.000",
-      },
-      {
-        type: "VIP2",
-        price: "6.000.000",
-      },
-      {
-        type: "VIP3",
-        price: "5.500.000",
-      },
-    ],
-  },
-];
+// const tickets = [
+//   {
+//     id: 1,
+//     time: "19:00 - 21:00",
+//     date: "16 Tháng 02, 2025",
+//     ticketType: [
+//       {
+//         type: "VIP1",
+//         price: "6.500.000",
+//       },
+//       {
+//         type: "VIP2",
+//         price: "6.000.000",
+//       },
+//       {
+//         type: "VIP3",
+//         price: "5.500.000",
+//       },
+//     ],
+//   },
+//   {
+//     id: 2,
+//     time: "19:00 - 21:00",
+//     date: "15 Tháng 02, 2025",
+//     ticketType: [
+//       {
+//         type: "VIP1",
+//         price: "6.500.000",
+//       },
+//       {
+//         type: "VIP2",
+//         price: "6.000.000",
+//       },
+//       {
+//         type: "VIP3",
+//         price: "5.500.000",
+//       },
+//     ],
+//   },
+// ];
 
 const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
