@@ -52,5 +52,23 @@ export interface SelectedEvent {
 
 }
 
+
+export interface EventResponse {
+  eventId: number;
+  eventName: string;
+  location: string;
+  locationName: string;
+  description: string;
+  bannerUrl: string;
+  logoUrl: string;
+  status: string |"PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "SCHEDULED"; 
+  typeEvent: "Offline" | "Online"; 
+  organizerId: number;
+  organizerName: string;
+  companyId: number;
+  companyName: string;
+}
+
+
   
   

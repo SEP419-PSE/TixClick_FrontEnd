@@ -1,4 +1,4 @@
-import { ContractDocumentResponse } from "../../interface/manager/Contracts";
+import { ContractUpload } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
 
@@ -25,7 +25,7 @@ const managerApi = {
     },
 
     getAllEvent(){
-        const url = "/event/all";
+        const url = "/event/all_scheduled_pending_approved";
         return axiosClient.get(url)
     },
     // approveCompany(status:string, companyVerificationId:number){
@@ -50,9 +50,28 @@ const managerApi = {
         
     },
     
+    approveEvent(status: string, id: number) {
+        const url = `/event/${id}/approve/${status}`;
+        console.log("url:", url);
+        console.log(status);
+        console.log(id);
+    
+        const token = localStorage.getItem("accessToken");
+    
+        return axiosClient.put(
+            url,
+            {},  
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+    },
+    
 
-    uploadContractDocument(request: ContractDocumentResponse){
-        const url = "/contract-document/upload";
+    uploadContractDocument(request: ContractUpload){
+        const url = `/contract-document/upload?contractId=${request.contractId}`;
         return axiosClient.post(url, request);
     }
 }

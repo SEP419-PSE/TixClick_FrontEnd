@@ -6,7 +6,6 @@ import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
 import { createWorker } from "tesseract.js"
 import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
@@ -15,7 +14,8 @@ import { Progress } from "../../../../components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
-import { SelectedEvent } from "../../../../interface/manager/EventType"
+import { EventResponse } from "../../../../interface/manager/EventType"
+import managerApi from "../../../../services/manager/ManagerApi"
 import { ManagerHeader } from "../ManagerHeader"
 
 
@@ -96,95 +96,11 @@ const templateRegions: TemplateRegion[] = [
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      name: "Tech Conference 2023",
-      date: "2023-09-15",
-      location: "San Francisco, CA",
-      organizer: "Acme Inc",
-      attendees: 500,
-      status: "Upcoming",
-      type: "Conference",
-      description: "Annual tech conference showcasing the latest innovations in AI and machine learning.",
-      budget: 100000,
-      sponsors: ["TechCorp", "InnovateCo", "FutureTech"],
-      speakers: ["John Doe", "Jane Smith", "Alice Johnson"],
-    },
-    {
-      id: 2,
-      name: "Marketing Summit",
-      date: "2023-10-01",
-      location: "New York, NY",
-      organizer: "Globex Corporation",
-      attendees: 300,
-      status: "Upcoming",
-      type: "Seminar",
-      description: "A summit for marketing professionals to discuss the latest trends and strategies.",
-      budget: 75000,
-      sponsors: ["AdTech", "MarketPro", "BrandBoost"],
-      speakers: ["Bob Williams", "Emma Davis", "Michael Brown"],
-    },
-    {
-      id: 3,
-      name: "Product Launch",
-      date: "2023-11-10",
-      location: "London, UK",
-      organizer: "Initech",
-      attendees: 1000,
-      status: "Pending",
-      type: "Product Launch",
-      description: "Launching our revolutionary new product to the European market.",
-      budget: 200000,
-      sponsors: ["InvestGroup", "MediaMax", "TechVentures"],
-      speakers: ["Sarah Connor", "David Martinez", "Emily Chang"],
-    },
-    {
-      id: 4,
-      name: "Annual Gala",
-      date: "2023-12-05",
-      location: "Paris, France",
-      organizer: "Umbrella Corporation",
-      attendees: 750,
-      status: "Pending",
-      type: "Networking",
-      description: "End-of-year gala to celebrate achievements and network with industry leaders.",
-      budget: 150000,
-      sponsors: ["LuxeBrands", "GourmetFoods", "EventPro"],
-      speakers: ["George Clooney", "Amal Clooney"],
-    },
-    {
-      id: 5,
-      name: "Startup Pitch Night",
-      date: "2024-01-20",
-      location: "Berlin, Germany",
-      organizer: "Soylent Corp",
-      attendees: 200,
-      status: "Pending",
-      type: "Networking",
-      description: "An evening for startups to pitch their ideas to potential investors.",
-      budget: 50000,
-      sponsors: ["VentureCapital", "StartupIncubator", "TechFund"],
-      speakers: ["Elon Musk", "Mark Zuckerberg"],
-    },
-  ])
+  const [events, setEvents] = useState<EventResponse[]>([])
 
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredEvents, setFilteredEvents] = useState(events)
-  const [selectedEvent, setSelectedEvent] = useState<SelectedEvent>({
-    id: 0,
-    name: "",
-    date: "",
-    location: "",
-    organizer: "",
-    attendees: 0,
-    status: "",
-    type: "",
-    description: "",
-    budget: 0,
-    sponsors: [],
-    speakers: [],
-  })
+  const [selectedEvent, setSelectedEvent] = useState<EventResponse>()
   const [isEventModalOpen, setIsEventModalOpen] = useState(false)
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState("all")
@@ -209,6 +125,26 @@ export default function EventsPage() {
   const imageRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const fetchEventList = async () => {
+    try {
+      const res: any = await managerApi.getAllEvent();
+      console.log("Event List:", res.data.result);
+      if (res.data.result && res.data.result.length > 0) {
+        setEvents(res.data.result);
+      }
+    } catch (error) {
+      console.error("Error fetching contract:", error);
+      toast.error("Failed to fetch contract");
+    }
+  };
+
+  useEffect(() => {
+    const initUseEffect = async () => {
+      await fetchEventList();
+    };
+    initUseEffect();
+  }, []);
 
   // Handle file drop for contract scanner
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -449,8 +385,8 @@ export default function EventsPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          eventId: selectedEvent.id,
-          eventName: selectedEvent.name,
+          eventId: selectedEvent?.eventId,
+          eventName: selectedEvent?.eventName,
           originalFilename: file?.name,
           fileType: fileType,
           extractedData,
@@ -497,7 +433,7 @@ export default function EventsPage() {
     }
 
     if (filterType !== "all") {
-      result = result.filter((event) => event.type === filterType)
+      result = result.filter((event) => event.typeEvent === filterType)
     }
 
     result.sort((a: any, b: any) => {
@@ -518,39 +454,62 @@ export default function EventsPage() {
 
   const getStatusBadge = (status: any) => {
     switch (status) {
-      case "Upcoming":
-        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Upcoming</span>;
-      case "Pending":
+      case "DRAFT":
+        return <span className="px-2 py-1 bg-slate-300 text-black rounded-md">Draft</span>;
+      case "SCHEDULED":
+        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Scheduled</span>;
+      case "PENDING_APPROVAL":
         return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>;
-      case "Completed":
-        return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-md">Completed</span>;
+      case "COMPLETED":
+        return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-md">Pending</span>;
       default:
         return null;
     }
     
   }
 
-  const handleApprove = () => {
-    const updatedEvents = events.map((event) =>
-      event.id === selectedEvent.id ? { ...event, status: "Approved" } : event,
-    )
-    setEvents(updatedEvents)
-    setSelectedEvent({ ...selectedEvent, status: "Approved" })
-    toast.success("Event Approved", {
-      description: "The event has been successfully approved.",
-    })
-  }
+  const handleApprove = async (status: string, id: number) => {
+    if (!selectedEvent) return;
 
+    try {
+        const response = await managerApi.approveEvent(status, id);
+        console.log("✅ Approved successfully:", response);
+
+        const updatedEvents = events.map((event) =>
+            event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event
+        );
+
+        setEvents(updatedEvents);
+        setSelectedEvent({ ...selectedEvent, status: "APPROVED" });
+
+        toast.success("Event Approved", {
+            description: "The event has been successfully approved.",
+        });
+    } catch (error: any) {
+        console.error("❌ Error approving event:", error);
+
+        toast.error("Approval Failed", {
+            description: error?.response?.data?.message || "Something went wrong.",
+        });
+    }
+};
+
+  
   const handleReject = () => {
+    if (!selectedEvent) return;
+  
     const updatedEvents = events.map((event) =>
-      event.id === selectedEvent.id ? { ...event, status: "Rejected" } : event,
-    )
-    setEvents(updatedEvents)
-    setSelectedEvent({ ...selectedEvent, status: "Rejected" })
+      event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event
+    );
+  
+    setEvents(updatedEvents);
+    setSelectedEvent({ ...selectedEvent, status: "REJECTED" });
+  
     toast.success("Event Rejected", {
       description: "The event has been rejected.",
-    })
-  }
+    });
+  };
+  
 
   const handleCreateContract = () => {
     setIsContractModalOpen(true)
@@ -583,8 +542,8 @@ export default function EventsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Upcoming">Upcoming</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
             </Select>
@@ -611,7 +570,7 @@ export default function EventsPage() {
               <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
                 <DropdownMenuItem onClick={() => setSortBy("date")}>Date</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy("name")}>Name</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("attendees")}>Attendees</DropdownMenuItem>
+                {/* <DropdownMenuItem onClick={() => setSortBy("attendees")}>Attendees</DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
                   {sortOrder === "asc" ? "Ascending" : "Descending"}
@@ -634,12 +593,12 @@ export default function EventsPage() {
           </TableHeader>
           <TableBody>
             {filteredEvents.map((event) => (
-              <TableRow key={event.id} className="border-[#333333] hover:bg-[#2A2A2A]">
-                <TableCell className="font-medium text-white">{event.name}</TableCell>
-                <TableCell className="text-white">{event.date}</TableCell>
+              <TableRow key={event.eventId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                <TableCell className="font-medium text-white">{event.eventName}</TableCell>
+                <TableCell className="text-white">{event.eventName}</TableCell>
                 <TableCell className="text-white">{event.location}</TableCell>
-                <TableCell className="text-white">{event.organizer}</TableCell>
-                <TableCell className="text-white">{event.type}</TableCell>
+                <TableCell className="text-white">{event.companyName}</TableCell>
+                <TableCell className="text-white">{event.typeEvent}</TableCell>
                 <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -660,7 +619,7 @@ export default function EventsPage() {
                         View details
                       </DropdownMenuItem>
                       <DropdownMenuItem>Edit event information</DropdownMenuItem>
-                      <DropdownMenuItem>Manage attendees</DropdownMenuItem>
+                      {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
                       <DropdownMenuItem>View associated contracts</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
@@ -681,20 +640,16 @@ export default function EventsPage() {
           </DialogHeader>
           {selectedEvent && (
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="attendees">Attendees</TabsTrigger>
+                {/* <TabsTrigger value="attendees">Attendees</TabsTrigger> */}
                 <TabsTrigger value="budget">Budget</TabsTrigger>
               </TabsList>
               <TabsContent value="details">
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Event Name</Label>
-                    <div>{selectedEvent.name}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Date</Label>
-                    <div>{selectedEvent.date}</div>
+                    <div>{selectedEvent.eventName}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Location</Label>
@@ -702,11 +657,11 @@ export default function EventsPage() {
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Organizer</Label>
-                    <div>{selectedEvent.organizer}</div>
+                    <div>{selectedEvent.organizerName}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Type</Label>
-                    <div>{selectedEvent.type}</div>
+                    <div>{selectedEvent.typeEvent}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Status</Label>
@@ -714,11 +669,11 @@ export default function EventsPage() {
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Description</Label>
-                    <div>{selectedEvent.description}</div>
+                    {/* <div>{selectedEvent.description}</div> */}
                   </div>
                 </div>
               </TabsContent>
-              <TabsContent value="attendees">
+              {/* <TabsContent value="attendees">
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-2">Attendee Information</h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -744,8 +699,8 @@ export default function EventsPage() {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
-              <TabsContent value="budget">
+              </TabsContent> */}
+              {/* <TabsContent value="budget">
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-2">Budget Information</h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -771,14 +726,16 @@ export default function EventsPage() {
                     </Card>
                   </div>
                 </div>
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           )}
           <DialogFooter>
             <div className="flex gap-2">
-              {selectedEvent.status === "Pending" && (
+              {selectedEvent?.status === "PENDING_APPROVAL" && (
                 <>
-                  <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700 text-white">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white"
+                     onClick={() => handleApprove("SCHEDULED", selectedEvent?.eventId ?? 0)}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
                   </Button>
                   <Button onClick={handleReject} className="bg-red-600 hover:bg-red-700 text-white">
@@ -786,7 +743,7 @@ export default function EventsPage() {
                   </Button>
                 </>
               )}
-              {selectedEvent.status === "Upcoming" && (
+              {selectedEvent?.status === "SCHEDULED" && (
                 <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
                   <FileText className="mr-2 h-4 w-4" /> Create Contract
                 </Button>
@@ -801,7 +758,7 @@ export default function EventsPage() {
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
           <DialogHeader>
             <DialogTitle>Contract Scanner</DialogTitle>
-            <DialogDescription>Scan and extract contract information for: {selectedEvent.name}</DialogDescription>
+            <DialogDescription>Scan and extract contract information for: {selectedEvent?.eventName}</DialogDescription>
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
