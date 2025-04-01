@@ -1,5 +1,4 @@
 import React from "react";
-import Img1 from "../../assets/c9d60e7974b86bb46ff88e96ae91b3cc.jpg";
 import { CiCalendar } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { EventDetailResponse } from "../../interface/EventInterface";
