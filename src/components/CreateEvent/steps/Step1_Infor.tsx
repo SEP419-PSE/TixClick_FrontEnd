@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 
+import { AxiosError } from "axios";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
+import useAllCompany from "../../../hooks/useAllCompany";
+import { Company } from "../../../interface/company/Company";
+import { EventType } from "../../../interface/EventInterface";
+import eventApi from "../../../services/eventApi";
+import LoadingFullScreen from "../../Loading/LoadingFullScreen";
 import ImageUpload from "../ImageUpload";
 import TextInput from "../InputText";
 import SelectTypeEvent from "../SelectTypeEvent";
 import TextEditor from "../TextEditor";
-import eventApi from "../../../services/eventApi";
-import { EventType } from "../../../interface/EventInterface";
-import { toast } from "sonner";
-import LoadingFullScreen from "../../Loading/LoadingFullScreen";
-import useAllCompany from "../../../hooks/useAllCompany";
-import { Company } from "../../../interface/company/Company";
-import { AxiosError } from "axios";
-import { useNavigate, useSearchParams } from "react-router";
 
 const eventTypes: EventType[] = [
   { id: 1, name: "Nhạc sống" },
@@ -31,14 +31,13 @@ export type StepProps = {
 
 export default function StepOne({
   step,
-  setStep,
   isStepValid,
   setIsStepValid,
   updateStep,
   eventId,
 }: StepProps) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
   const [logoImage, setLogoImage] = useState<File | null>(null);
   const [background, setBackGround] = useState<File | null>(null);
   const [eventName, setEventName] = useState("");
@@ -143,9 +142,9 @@ export default function StepOne({
     setIsStepValid(false); // reset cho bước sau
   };
 
-  const prevStep = () => {
-    setStep((prev) => Math.max(prev - 1, 0));
-  };
+  // const prevStep = () => {
+  //   setStep((prev) => Math.max(prev - 1, 0));
+  // };
 
   return (
     <div className="text-black text-[16px]">

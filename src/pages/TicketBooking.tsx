@@ -1,8 +1,6 @@
-import React from 'react'
 
-type Props = {}
 
-const TicketBooking = (props: Props) => {
+const TicketBooking = () => {
   return (
     <div>TicketBooking</div>
   )

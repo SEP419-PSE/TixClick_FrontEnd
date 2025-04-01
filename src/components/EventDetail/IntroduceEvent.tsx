@@ -1,5 +1,4 @@
 import CustomDivider from "../Divider/CustomDivider";
-import Img from "../../assets/1c7973947f9b163b2376dc6bdc0c6540.jpg";
 import { MdExpandMore } from "react-icons/md";
 import { MdExpandLess } from "react-icons/md";
 import React, { useState } from "react";
