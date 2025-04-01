@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Camera, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
+import { Camera, Check, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import Header from "../../components/Header/Header";
@@ -250,17 +250,13 @@ export default function ProfileForm() {
                           className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                           // disabled={loading}
                         >
-                          {/* {loading ? (
-                          <div className="flex items-center">
-                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            Đang lưu
-                          </div>
-                        ) : (
+                          
+                        
                           <div className="flex items-center">
                             <Check className="mr-2 h-4 w-4" />
                             Lưu thông tin
                           </div>
-                        )} */}
+                        
                         </Button>
                       )}
                     </form>
