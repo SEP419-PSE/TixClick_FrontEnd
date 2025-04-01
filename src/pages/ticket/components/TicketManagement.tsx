@@ -1,109 +1,50 @@
 import { ArrowUpDown, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
-import { useState } from "react"
-import NoEvent from "../../../assets/NoEvent.png"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 import { Button } from "../../../components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog"
 import { Input } from "../../../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import { TicketResponse } from "../../../interface/ticket/Ticket"
 import { cn } from "../../../lib/utils"
-
-
-const mockTickets = [
-  {
-    id: "1",
-    eventName: "Lễ hội âm nhạc mùa hè",
-    date: "2025-06-15",
-    time: "19:00",
-    location: "Công viên Thống Nhất, Hà Nội",
-    price: "350,000 VND",
-    status: "success",
-    type: "VIP",
-    qrCode: "/placeholder.svg?height=200&width=200",
-    isUpcoming: true,
-  },
-  {
-    id: "2",
-    eventName: "Triển lãm nghệ thuật đương đại",
-    date: "2025-05-20",
-    time: "10:00",
-    location: "Bảo tàng Mỹ thuật, TP.HCM",
-    price: "150,000 VND",
-    status: "processing",
-    type: "Standard",
-    qrCode: "/placeholder.svg?height=200&width=200",
-    isUpcoming: true,
-  },
-  {
-    id: "3",
-    eventName: "Workshop Thiết kế UX/UI",
-    date: "2025-04-10",
-    time: "14:00",
-    location: "Toong Coworking Space, Hà Nội",
-    price: "500,000 VND",
-    status: "cancelled",
-    type: "Standard",
-    qrCode: "/placeholder.svg?height=200&width=200",
-    isUpcoming: false,
-  },
-  {
-    id: "4",
-    eventName: "Hội thảo Khởi nghiệp 2025",
-    date: "2025-07-05",
-    time: "09:00",
-    location: "Trung tâm Hội nghị Quốc gia, Hà Nội",
-    price: "250,000 VND",
-    status: "success",
-    type: "VIP",
-    qrCode: "/placeholder.svg?height=200&width=200",
-    isUpcoming: true,
-  },
-]
+import ticketApi from "../../../services/ticket/TicketApi"
 
 
 export default function TicketManagement() {
-  const [status, setStatus] = useState("all")
+  // const [status, setStatus] = useState("all")
+  const [ticket, setTicket] = useState<TicketResponse[]>([])
   const [timeFilter, setTimeFilter] = useState("upcoming")
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
   const [searchQuery, setSearchQuery] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState({
-    id: "",
-    eventName: "",
-    date: "",
-    time: "",
-    location: "",
-    price: "",
-    status: "",
-    type: "",
-    qrCode: "",
-    isUpcoming: false,
-  })
+  const [selectedTicket, setSelectedTicket] = useState<TicketResponse | null>()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const statusTabs = [
-    { value: "all", label: "Tất cả" },
-    { value: "success", label: "Thành công" },
-    { value: "processing", label: "Đang xử lý" },
-    { value: "cancelled", label: "Đã hủy" },
-  ]
+  const qrValue: string | string[] = selectedTicket?.qrCode as string;
 
-  const filteredTickets = mockTickets.filter((ticket) => {
-    if (status !== "all" && ticket.status !== status) {
-      return false
-    }
+  // const statusTabs = [
+  //   { value: "all", label: "Tất cả" },
+  //   { value: "success", label: "Thành công" },
+  //   { value: "cancelled", label: "Đã hủy" },
+  // ]
 
-    if (timeFilter === "upcoming" && !ticket.isUpcoming) {
-      return false
-    }
+  // const filteredTickets = ticket.filter((ticket) => {
+  //   if (status !== "all" && ticket.status !== status) {
+  //     return false
+  //   }
 
-    if (timeFilter === "ended" && ticket.isUpcoming) {
-      return false
-    }
+  //   if (timeFilter === "upcoming" && !ticket.isUpcoming) {
+  //     return false
+  //   }
 
-    return true
-  })
+  //   if (timeFilter === "ended" && ticket.isUpcoming) {
+  //     return false
+  //   }
+
+  //   return true
+  // })
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc")
@@ -114,35 +55,53 @@ export default function TicketManagement() {
     setIsDialogOpen(true)
   }
 
-  const StatusIndicator = ({ status }: { status: string }) => {
-    let bgColor = ""
-    let textColor = ""
-    let statusText = ""
+  // const StatusIndicator = ({ status }: { status: string }) => {
+  //   let bgColor = ""
+  //   let textColor = ""
+  //   let statusText = ""
 
-    switch (status) {
-      case "success":
-        bgColor = "bg-blue-300"
-        textColor = "text-black"
-        // statusText = "Thành công"
-        break
-      case "processing":
-        bgColor = "bg-yellow-500"
-        textColor = "text-black"
-        // statusText = "Đang xử lý"
-        break
-      case "cancelled":
-        bgColor = "bg-red-500"
-        textColor = "text-white"
-        // statusText = "Đã hủy"
-        break
-      default:
-        bgColor = "bg-gray-500"
-        textColor = "text-white"
-        // statusText = "Không xác định"
+  //   switch (status) {
+  //     case "success":
+  //       bgColor = "bg-blue-300"
+  //       textColor = "text-black"
+  //       break
+  //     case "processing":
+  //       bgColor = "bg-yellow-500"
+  //       textColor = "text-black"
+  //       break
+  //     case "cancelled":
+  //       bgColor = "bg-red-500"
+  //       textColor = "text-white"
+  //       break
+  //     default:
+  //       bgColor = "bg-gray-500"
+  //       textColor = "text-white"
+  //   }
+
+  //   return <div className={`px-3 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>{statusText}</div>
+  // }
+
+
+  const fetchTicketsList = async () => {
+      try {
+        const res: any = await ticketApi.getAllTickets()
+        console.log("Ticket List:", res.data.result)
+        if (res.data.result && res.data.result.length > 0) {
+          setTicket(res.data.result)
+        }
+      } catch (error) {
+        console.error("Error fetching companies:", error)
+        toast.error("Failed to fetch companies")
+      }
     }
-
-    return <div className={`px-3 py-1 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>{statusText}</div>
-  }
+  
+    useEffect(() => {
+      const initUseEffect = async () => {
+        await fetchTicketsList()
+      }
+      initUseEffect()
+    }, [])
+      
 
   return (
     <div className="min-h-screen bg-[#1E1E1E]">
@@ -184,7 +143,7 @@ export default function TicketManagement() {
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-px bg-gray-800 rounded-lg p-1 mb-6">
+        {/* <div className="grid grid-cols-3 gap-px bg-gray-800 rounded-lg p-1 mb-6">
           {statusTabs.map((tab) => (
             <button
               key={tab.value}
@@ -197,7 +156,7 @@ export default function TicketManagement() {
               {tab.label}
             </button>
           ))}
-        </div>
+        </div> */}
 
         <div className="flex justify-center gap-8 mb-8">
           <Button
@@ -224,27 +183,27 @@ export default function TicketManagement() {
           </Button>
         </div>
 
-        {filteredTickets.length > 0 ? (
+        {/* {filteredTickets.length > 0 ? ( */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTickets.map((ticket) => (
+            {ticket.map((ticket) => (
               <div
-                key={ticket.id}
+                key={ticket.eventId}
                 className="bg-gray-900 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => handleTicketClick(ticket)}
               >
                 <div className="p-4 border-b border-gray-800">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-white font-medium text-lg">{ticket.eventName}</h3>
-                    <StatusIndicator status={ticket.status} />
+                    {/* <StatusIndicator status={ticket.status} /> */}
                   </div>
                   <div className="space-y-2 text-sm text-gray-400">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>{new Date(ticket.date).toLocaleDateString("vi-VN")}</span>
+                      <span>{new Date(ticket.eventDate).toLocaleDateString("vi-VN")}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      <span>{ticket.time}</span>
+                      <span>{ticket.eventStartTime}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
@@ -259,21 +218,21 @@ export default function TicketManagement() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Ticket className="w-4 h-4 text-gray-400" />
-                    <span className="text-white">{ticket.type}</span>
+                    <span className="text-white">{ticket.location}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-16">
+        {/* ) : ( */}
+          {/* <div className="flex flex-col items-center justify-center py-16">
             <div className="w-64 h-64 mb-6">
               <img src={NoEvent || "/placeholder.svg"} alt="No tickets" className="w-full h-full object-contain" />
             </div>
             <p className="text-gray-400 mb-6">Không có vé nào</p>
             <Button className="bg-pse-green hover:bg-[#00B14F]/90">Mua vé ngay</Button>
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -287,7 +246,7 @@ export default function TicketManagement() {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-medium text-white mb-1">{selectedTicket.eventName}</h3>
-                  <StatusIndicator status={selectedTicket.status} />
+                  {/* <StatusIndicator status={selectedTicket.status} /> */}
                 </div>
 
                 <div className="space-y-3 text-gray-300">
@@ -295,7 +254,7 @@ export default function TicketManagement() {
                     <Calendar className="w-5 h-5 text-[#ff8a00]" />
                     <div>
                       <p className="text-gray-400 text-sm">Ngày</p>
-                      <p>{new Date(selectedTicket.date).toLocaleDateString("vi-VN")}</p>
+                      <p>{new Date(selectedTicket.eventDate).toLocaleDateString("vi-VN")}</p>
                     </div>
                   </div>
 
@@ -303,7 +262,7 @@ export default function TicketManagement() {
                     <Clock className="w-5 h-5 text-[#ff8a00]" />
                     <div>
                       <p className="text-gray-400 text-sm">Giờ</p>
-                      <p>{selectedTicket.time}</p>
+                      <p>{selectedTicket.eventStartTime}</p>
                     </div>
                   </div>
 
@@ -327,7 +286,7 @@ export default function TicketManagement() {
                     <Ticket className="w-5 h-5 text-[#ff8a00]" />
                     <div>
                       <p className="text-gray-400 text-sm">Loại vé</p>
-                      <p>{selectedTicket.type}</p>
+                      <p>{selectedTicket.ticketType}</p>
                     </div>
                   </div>
                 </div>
@@ -370,12 +329,12 @@ export default function TicketManagement() {
                           >
                             
                           </button>
-                          <QRCodeSVG value={selectedTicket.qrCode} size={300} bgColor={"#FFFFFF"} fgColor={"#000000"} />
+                          <QRCodeSVG value={qrValue} size={300} bgColor={"#FFFFFF"} fgColor={"#000000"} />
                         </div>
                       </div>
                     )}
                   </div>
-                <p className="text-xs text-gray-400 mt-4">Mã vé: {selectedTicket.id}</p>
+                <p className="text-xs text-gray-400 mt-4">Mã vé: {selectedTicket.eventId}</p>
               </div>
             </div>
 
