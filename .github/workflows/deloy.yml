@@ -12,6 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Remove Old Docker Image if Exists
+        run: |
+          echo "Removing old Docker image if exists..."
+          docker rmi -f fe_tixclick:latest || true
+
       - name: Build Docker Image
         run: |
           echo "Building Docker image for frontend..."
