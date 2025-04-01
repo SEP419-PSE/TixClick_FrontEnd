@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import Stepper from "./components/CreateEvent/Stepper";
 import EnterCode from "./components/OTP/EnterCode";
 import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -18,7 +17,6 @@ import HomeCompany from "./pages/company/components/HomeCompany";
 import ManageContract from "./pages/company/components/ManageContract";
 import ManageEvents from "./pages/company/components/ManageEvents";
 import ManageMember from "./pages/company/components/ManageMember";
-import ManageTickets from "./pages/company/components/ManageTickets";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
@@ -45,16 +43,9 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import CreateCompany from "./pages/company/CreateCompany";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageTickets from "./pages/company/components/ManageTickets";
-import ManageMember from "./pages/company/components/ManageMember";
-import ManageContract from "./pages/company/components/ManageContract";
-import SeatMap from "./pages/seatmap/Seatmap";
-import DraggableArea from "./pages/seatmap/DragandDrop";
-import ProfileCompany from "./pages/company/components/ProfileCompany";
+import TicketBooking from "./pages/TicketBooking";
+import CreateEvent from "./components/CreateEvent/CreateEvent";
+import ChatApp from "./pages/chat/ChatApp";
 
 export default function App() {
   return (
@@ -136,8 +127,6 @@ export default function App() {
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />
           </Route>
-
-          <Route path="drag" element={<DraggableArea />} />
 
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />
