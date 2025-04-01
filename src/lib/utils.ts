@@ -32,3 +32,18 @@ export const convertHHMMtoHHMMSS = (time: string): string => {
   }
   return time; // nếu không đúng định dạng thì giữ nguyên
 };
+
+export const formatDateVietnamese = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+export const formatTimeFe = (timeStr: string): string => timeStr.slice(0, 5);
+
+export const formatMoney = (amount: number | undefined): string => {
+  return amount?.toLocaleString("vi-VN") + " ₫";
+};

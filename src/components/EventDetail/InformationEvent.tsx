@@ -3,6 +3,7 @@ import Img1 from "../../assets/c9d60e7974b86bb46ff88e96ae91b3cc.jpg";
 import { CiCalendar } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { EventDetailResponse } from "../../interface/EventInterface";
+import { formatMoney } from "../../lib/utils";
 
 export type EventDetailProps = {
   eventDetail: EventDetailResponse | undefined;
@@ -43,7 +44,7 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
           <div className="text-[20px] font-extrabold my-2">
             Giá từ{" "}
             <span className="text-pse-green-second">
-              {eventDetail?.price} VND
+              {formatMoney(eventDetail?.price)}
             </span>
           </div>
           <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
