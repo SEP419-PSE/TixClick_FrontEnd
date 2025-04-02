@@ -1,13 +1,13 @@
-import Header from "../components/Header/Header";
 import { Calendar, MapPin, Ticket } from "lucide-react";
-import CustomDivider from "../components/Divider/CustomDivider";
-import { Button } from "../components/ui/button";
-import Draggable from "react-draggable";
 import { useEffect, useState } from "react";
-import seatmapApi from "../services/seatmapApi";
-import { useSearchParams } from "react-router";
-import ticketApi from "../services/ticketApi";
+import Draggable from "react-draggable";
+import { useSearchParams, useNavigate } from "react-router";
+import CustomDivider from "../components/Divider/CustomDivider";
+import Header from "../components/Header/Header";
+import { Button } from "../components/ui/button";
 import { formatMoney } from "../lib/utils";
+import seatmapApi from "../services/seatmapApi";
+import ticketApi from "../services/ticketApi";
 
 type SeatStatus = "available" | "disabled";
 type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType";
@@ -66,12 +66,14 @@ interface DraggableSectionProps {
   section: ISection;
   seatTypes: SeatTypeEdit[];
   getSeatColor: (seat: ISeat) => string;
+  onSeatClick: (seat: ISeat, sectionName: string) => void;
 }
 
 const DraggableSection: React.FC<DraggableSectionProps> = ({
   section,
   seatTypes,
   getSeatColor,
+  onSeatClick,
 }) => {
   // Track dragging state
   // const [isDragging, setIsDragging] = useState(false);
@@ -93,6 +95,11 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   //   (section.height - 80) / section.rows
   // );
 
+  // Removed local selected seats state as it's now handled in the parent component
+  const handleSeatClick = (seat: ISeat) => {
+    onSeatClick(seat, section.name);
+  };
+  
   return (
     <Draggable
       position={{ x: section.x, y: section.y }}
@@ -150,7 +157,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="text-sm text-gray-500">
+              <span className="text-xs text-gray-500">
                 Số lượng: {section.capacity || 0} vé
               </span>
             </div>
@@ -217,10 +224,11 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                         cursor: "pointer",
                         fontWeight: "500",
                       }}
-                      // onClick={(e) => {
-                      //   e.stopPropagation();
-                      //   if (!isDragging) onSeatClick(seat);
-                      // }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSeatClick(seat);
+                      }}
+                      
                       onMouseEnter={() => setHoveredSeat(seat)}
                       onMouseLeave={() => setHoveredSeat(null)}
                     >
@@ -277,12 +285,21 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   );
 };
 
+export interface SelectedSeatInfo extends ISeat {
+  sectionName: string;
+  typeName: string;
+  formattedPrice: string;
+  seatLabel: string;
+}
+
 const TicketBooking = () => {
   const [searchParms] = useSearchParams();
   const eventId = searchParms.get("eventId");
   const eventActivityId = searchParms.get("eventActivityId");
   const [sections, setSections] = useState<ISection[]>();
   const [seatTypes, setSeatTypes] = useState<SeatTypeEdit[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<SelectedSeatInfo[]>([]);
+  const navigate = useNavigate();
 
   console.log(sections);
 
@@ -311,13 +328,89 @@ const TicketBooking = () => {
     fetchSeatmap();
   }, [eventId, eventActivityId]);
 
+  // Handle seat click
+  const handleSeatClick = (seat: ISeat, sectionName: string) => {
+    // Find seat type info
+    const seatType = seatTypes.find(type => type.id === seat.seatTypeId);
+    
+    // Create rich seat info object
+    const seatInfo: SelectedSeatInfo = {
+      ...seat,
+      sectionName,
+      typeName: seatType?.name || "Unknown Type",
+      formattedPrice: formatCurrency(seatType?.price || 0),
+      seatLabel: `${String.fromCharCode(65 + seat.row)}${seat.column + 1}`
+    };
+    
+    // Check if seat is already selected
+    const isSelected = selectedSeats.some(s => s.id === seat.id);
+    
+    if (isSelected) {
+      // Remove the seat if already selected
+      setSelectedSeats(prev => prev.filter(s => s.id !== seat.id));
+      console.log("Unselected seat:", seatInfo);
+    } else {
+      // Add the seat if not already selected
+      setSelectedSeats(prev => [...prev, seatInfo]);
+      console.log("Selected seat:", seatInfo);
+    }
+    
+    // Log the full seat info for debugging
+    console.log("Seat details:", {
+      id: seat.id,
+      row: seat.row,
+      column: seat.column,
+      rowLabel: String.fromCharCode(65 + seat.row),
+      seatLabel: String.fromCharCode(65 + seat.row) + (seat.column + 1),
+      section: sectionName,
+      seatType: seatType?.name,
+      price: seatType?.price,
+      formattedPrice: formatCurrency(seatType?.price || 0)
+    });
+  };
+
   // console.log(sections);
   // console.log(seatTypes);
   const getSeatColor = (seat: ISeat): string => {
     // if (seat.status == "disabled") return "#e5e7eb"; // gray-200 color
+    
+    // Check if seat is selected to highlight it
+    const isSelected = selectedSeats.some(s => s.id === seat.id);
+    if (isSelected) {
+      return "#059669"; // Highlight selected seat with a green color
+    }
 
     const seatType = seatTypes.find((type) => type.id == seat.seatTypeId);
     return seatType ? seatType.color : "#6b7280"; // Use actual color from seat type or gray-500 as default
+  };
+
+  // Tính tổng tiền từ các ghế đã chọn
+  const calculateTotal = () => {
+    return selectedSeats.reduce((total, seat) => {
+      const seatType = seatTypes.find(type => type.id === seat.seatTypeId);
+      return total + (seatType?.price || 0);
+    }, 0);
+  };
+
+  // Hàm xử lý việc chuyển đến trang thanh toán
+  const handleProceedToPayment = () => {
+    if (selectedSeats.length === 0) return;
+    
+    // Lưu thông tin ghế đã chọn vào localStorage
+    localStorage.setItem('selectedSeats', JSON.stringify({
+      seats: selectedSeats,
+      totalAmount: calculateTotal(),
+      eventInfo: {
+        id: eventId,
+        activityId: eventActivityId,
+        name: "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+        location: "Nhà Hát Kịch IDECAF",
+        date: "19:30, 12 tháng 4, 2025"
+      }
+    }));
+    
+    // Chuyển đến trang thanh toán
+    navigate('/payment');
   };
 
   return (
@@ -339,6 +432,7 @@ const TicketBooking = () => {
                 section={section}
                 seatTypes={seatTypes}
                 getSeatColor={getSeatColor}
+                onSeatClick={(seat, sectionName) => handleSeatClick(seat, sectionName)}
               />
             ))}
           </div>
@@ -377,7 +471,7 @@ const TicketBooking = () => {
             </h3>
             {/* Map mảng ticketType ở đây */}
             {seatTypes.map((seatType) => (
-              <div className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
+              <div key={seatType.id} className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
                 <div
                   className="w-8 h-8 rounded-lg shadow-md mr-3"
                   style={{ backgroundColor: seatType.color }}
@@ -387,23 +481,58 @@ const TicketBooking = () => {
                     {seatType.name}
                   </div>
                   <div className="text-sm text-gray-600">
-                    {new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(seatType.price)}
+                    {formatCurrency(seatType.price)}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-3">Ghế đã chọn:</h3>
+            {selectedSeats.length > 0 ? (
+              <div className="space-y-2">
+                {selectedSeats.map((seat) => (
+                  <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">
+                        {seat.sectionName} - {seat.seatLabel}
+                      </div>
+                      <div className="text-sm font-semibold text-gray-700">
+                        {seat.formattedPrice}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {seat.typeName}
+                    </div>
+                  </div>
+                ))}
+                <div className="flex justify-between font-medium mt-2 pt-2 border-t border-gray-200">
+                  <div>Tổng tiền:</div>
+                  <div>
+                    {formatCurrency(calculateTotal())}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">Chưa chọn ghế nào.</p>
+            )}
+          </div>
+        
           <div className="mt-auto bg-pse-black-light text-white -mx-[26px] -my-[26px] p-4 pb-4">
             <div className="mb-2 flex items-center text-xs gap-1">
               <Ticket fill="white" className="text-pse-black-light" />
-              A-1, A-2
+              {selectedSeats.length > 0 
+                ? selectedSeats.map(seat => seat.seatLabel).join(', ')
+                : 'Chưa chọn ghế'}
             </div>
 
-            <Button className="w-full bg-white text-black" disabled={true}>
-              Vui lòng chọn vé
+            <Button 
+              className="w-full bg-white text-black" 
+              disabled={selectedSeats.length === 0}
+              onClick={handleProceedToPayment}
+            >
+              {selectedSeats.length > 0 ? 'Tiếp tục' : 'Vui lòng chọn vé'}
             </Button>
           </div>
         </div>

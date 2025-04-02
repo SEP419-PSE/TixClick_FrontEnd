@@ -22,27 +22,42 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
+  const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
       if (seconds > 0) {
-        setSeconds(seconds - 1);
+        setSeconds(seconds - 1)
       } else if (minutes > 0) {
-        setMinutes(minutes - 1);
-        setSeconds(59);
+        setMinutes(minutes - 1)
+        setSeconds(59)
       } else {
-        toast.success("Hết thời gian thanh toán");
-    
-        clearInterval(countdownInterval);
-    
+        toast.success("Hết thời gian thanh toán")
+
+        clearInterval(countdownInterval)
+
         setTimeout(() => {
-          navigate("/");
-        }, 2000);
+          navigate("/")
+        }, 2000)
       }
-    }, 1000);
-    
-    return () => clearInterval(countdownInterval);
+    }, 1000)
+
+    return () => clearInterval(countdownInterval)
   }, [minutes, seconds, navigate])
+
+  useEffect(() => {
+    const storedSeatsData = localStorage.getItem("selectedSeats")
+    if (storedSeatsData) {
+      const parsedData = JSON.parse(storedSeatsData)
+      setSelectedSeatsData(parsedData)
+    } else {
+      // If no data is found, redirect back to the booking page
+      toast.error("Không tìm thấy thông tin đặt vé")
+      setTimeout(() => {
+        navigate("/")
+      }, 1500)
+    }
+  }, [navigate])
 
   const handleConfirmPayment = () => {
     if (!acceptTerms) return
@@ -57,7 +72,7 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
-      <Toaster/>
+      <Toaster />
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center sticky top-0 z-10">
         <Link to="/">
           <div className="flex items-center ml-4">
@@ -82,7 +97,7 @@ export default function PaymentPage() {
             transition={{ duration: 0.5 }}
             className="text-4xl md:text-5xl font-bold mb-4 text-center"
           >
-            Hòa nhạc Mùa Xuân 2024
+            {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
           </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -91,7 +106,7 @@ export default function PaymentPage() {
             className="flex items-center gap-2 text-xl md:text-2xl mb-6"
           >
             <MapPin className="h-5 w-5 text-[#FF8A00]" />
-            <span>Nhà hát Lớn Hà Nội</span>
+            <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
           </motion.div>
 
           <motion.div
@@ -101,7 +116,7 @@ export default function PaymentPage() {
             className="flex items-center gap-3 bg-[#2A2A2A] px-6 rounded-full"
           >
             <Calendar className="h-5 w-5 text-[#FF8A00]" />
-            <span className="font-medium">Thứ Bảy, 30/03/2024 - 20:00</span>
+            <span className="font-medium">{selectedSeatsData?.eventInfo?.date || "Thứ Bảy, 30/03/2024 - 20:00"}</span>
             {/* <Countdown targetDate="2024-03-30T20:00:00" /> */}
           </motion.div>
         </div>
@@ -188,14 +203,16 @@ export default function PaymentPage() {
                   />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg text-white">Hòa nhạc Mùa Xuân 2024</h3>
+                  <h3 className="font-medium text-lg text-white">
+                    {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
+                  </h3>
                   <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
                     <Calendar className="h-4 w-4 text-[#FF8A00]" />
-                    <span>30/03/2024 - 20:00</span>
+                    <span>{selectedSeatsData?.eventInfo?.date || "30/03/2024 - 20:00"}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
                     <MapPin className="h-4 w-4 text-[#FF8A00]" />
-                    <span>Nhà hát Lớn Hà Nội</span>
+                    <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
                   </div>
                 </div>
               </div>
@@ -203,31 +220,56 @@ export default function PaymentPage() {
               <Separator className="my-4 border-[#2A2A2A]" />
 
               <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
-                      2x
+                {selectedSeatsData?.seats ? (
+                  selectedSeatsData.seats.map((seat: any, index: number) => (
+                    <div key={seat.id || index} className="flex justify-between text-sm">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
+                          1x
+                        </div>
+                        <div>
+                          {seat.sectionName} - {seat.seatLabel} ({seat.typeName})
+                        </div>
+                      </div>
+                      <div className="font-medium">{seat.formattedPrice}</div>
                     </div>
-                    <div>Vé Thường</div>
-                  </div>
-                  <div className="font-medium">600.000 đ</div>
-                </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
+                          2x
+                        </div>
+                        <div>Vé Thường</div>
+                      </div>
+                      <div className="font-medium">600.000 đ</div>
+                    </div>
 
-                <div className="flex justify-between text-sm">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
-                      1x
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
+                          1x
+                        </div>
+                        <div>Vé VIP</div>
+                      </div>
+                      <div className="font-medium">500.000 đ</div>
                     </div>
-                    <div>Vé VIP</div>
-                  </div>
-                  <div className="font-medium">500.000 đ</div>
-                </div>
+                  </>
+                )}
 
                 <Separator className="my-3 border-[#2A2A2A]" />
 
                 <div className="flex justify-between font-medium">
                   <div>Tổng cộng</div>
-                  <div className="text-[#FF8A00] text-lg">1.100.000 đ</div>
+                  <div className="text-[#FF8A00] text-lg">
+                    {selectedSeatsData
+                      ? new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(selectedSeatsData.totalAmount)
+                      : "1.100.000 đ"}
+                  </div>
                 </div>
               </div>
 
@@ -235,6 +277,7 @@ export default function PaymentPage() {
                 <Button
                   variant="outline"
                   className="flex-1 border-[#2A2A2A] text-black hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
+                  onClick={() => navigate(-1)}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Quay lại
@@ -262,95 +305,123 @@ export default function PaymentPage() {
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Sự kiện</span>
               <div>
-                <div className="font-medium text-white">Hòa nhạc Mùa Xuân 2024</div>
-                <div className="text-sm mt-1 text-gray-400">Nhà hát Lớn Hà Nội</div>
+                <div className="font-medium text-white">
+                  {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
+                </div>
+                <div className="text-sm mt-1 text-gray-400">
+                  {selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Thời gian</span>
               <div>
-                <div className="text-[#FF8A00] font-medium">20:00 - Thứ Bảy, 30/03/2024</div>
+                <div className="text-[#FF8A00] font-medium">
+                  {selectedSeatsData?.eventInfo?.date || "20:00 - Thứ Bảy, 30/03/2024"}
+                </div>
               </div>
             </div>
 
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Vé</span>
               <div className="bg-[#2A2A2A] p-3 rounded-md">
-                <div className="flex items-center mb-1">
-                  <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
-                    2x
-                  </div>
-                  <div>Vé Thường</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
-                    1x
-                  </div>
-                  <div>Vé VIP</div>
-                </div>
+                {selectedSeatsData?.seats ? (
+                  selectedSeatsData.seats.map((seat: any, index: number) => (
+                    <div key={seat.id || index} className="flex items-center mb-1">
+                      <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
+                        1x
+                      </div>
+                      <div>
+                        {seat.sectionName} - {seat.seatLabel} ({seat.typeName})
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex items-center mb-1">
+                      <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
+                        2x
+                      </div>
+                      <div>Vé Thường</div>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
+                        1x
+                      </div>
+                      <div>Vé VIP</div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Tổng</span>
-              <div className="bg-[#FF8A00] text-white font-medium p-2 text-center rounded-md">1.100.000 VND</div>
+              <div className="bg-[#FF8A00] text-white font-medium p-2 text-center rounded-md">
+                {selectedSeatsData
+                  ? new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(selectedSeatsData.totalAmount)
+                  : "1.100.000 VND"}
+              </div>
             </div>
 
             <div className="flex items-start space-x-2 mt-2">
-                <Checkbox
-                  id="terms"
-                  className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-white"
-                  checked={acceptTerms}
-                  onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm leading-none text-gray-300"
-                  onClick={() => setAcceptTerms(!acceptTerms)}
-                >
-                  Tôi xác nhận các thông tin đặt vé đã chính xác
-                </label>
-              </div>
+              <Checkbox
+                id="terms"
+                className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-white"
+                checked={acceptTerms}
+                onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm leading-none text-gray-300"
+                onClick={() => setAcceptTerms(!acceptTerms)}
+              >
+                Tôi xác nhận các thông tin đặt vé đã chính xác
+              </label>
+            </div>
           </div>
 
           <Button
-              className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300 relative"
-              onClick={handleConfirmPayment}
-              disabled={isProcessing || !acceptTerms}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Đang xử lý...
-                </>
-              ) : (
-                "Xác nhận và Thanh Toán"
-              )}
-            </Button>
-
+            className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300 relative"
+            onClick={handleConfirmPayment}
+            disabled={isProcessing || !acceptTerms}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Đang xử lý...
+              </>
+            ) : (
+              "Xác nhận và Thanh Toán"
+            )}
+          </Button>
 
           {isProcessing && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"
-          >
-            <div className="relative h-20 w-20 mb-4">
-              <div className="absolute inset-0 rounded-full border-4 border-[#FF8A00] border-t-transparent animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="h-10 w-10 rounded-full bg-[#FF8A00]/20"></div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-50"
+            >
+              <div className="relative h-20 w-20 mb-4">
+                <div className="absolute inset-0 rounded-full border-4 border-[#FF8A00] border-t-transparent animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-[#FF8A00]/20"></div>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Đang xử lý thanh toán</h3>
-            <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
-          </motion.div>
-        )}
+              <h3 className="text-xl font-bold text-white mb-2">Đang xử lý thanh toán</h3>
+              <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
+            </motion.div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
   )
 }
+
 
 
 
