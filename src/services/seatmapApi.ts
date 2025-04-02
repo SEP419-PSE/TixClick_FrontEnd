@@ -16,6 +16,10 @@ const seatmapApi = {
     const url = `${seatmapUrl}/zones/${zoneId}/events/${eventId}`;
     return axiosClient.delete(url, { data: data });
   },
+  getSeatmapConsumer: (eventId: number, eventActivityId: number) => {
+    const url = `${seatmapUrl}/events/${eventId}/activities/${eventActivityId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default seatmapApi;

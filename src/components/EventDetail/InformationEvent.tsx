@@ -6,7 +6,7 @@ import { EventDetailResponse } from "../../interface/EventInterface";
 import { formatMoney } from "../../lib/utils";
 
 export type EventDetailProps = {
-  eventDetail: EventDetailResponse | undefined;
+  eventDetail: Partial<EventDetailResponse> | undefined;
 };
 
 const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
@@ -34,11 +34,9 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
             <FaMapMarkerAlt size={18} className="mr-1" color="white" />
           </span>
           <div className="text-pse-green-second font-semibold">
-            {eventDetail?.location}
-          </div>
-          <div className="absolute top-5 left-5">
             {eventDetail?.locationName}
           </div>
+          <div className="absolute top-5 left-5">{eventDetail?.location}</div>
         </p>
         <div className="max-[1150px]:hidden absolute bottom-28 w-[95%] h-[1px] bg-white rounded-full">
           <div className="text-[20px] font-extrabold my-2">
