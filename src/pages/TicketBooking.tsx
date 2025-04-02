@@ -1,7 +1,7 @@
 import { Calendar, MapPin, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
-import { useSearchParams, useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import CustomDivider from "../components/Divider/CustomDivider";
 import Header from "../components/Header/Header";
 import { Button } from "../components/ui/button";
@@ -31,9 +31,11 @@ export type SeatTypeEdit = {
   minQuantity?: number
   maxQuantity?: number
   eventId?: number
+  ticketId: number
 }
 
 export interface ISeat {
+  seatId: number
   zoneActivityId?: number
   id: string
   row: number
@@ -60,6 +62,7 @@ export interface ISection {
   price?: number // Price for standing sections
   capacity?: number // Capacity for standing sections
   isSave: boolean
+  zoneActivityId?: number // Added to ensure we can access this property
 }
 
 interface DraggableSectionProps {
@@ -70,39 +73,14 @@ interface DraggableSectionProps {
 }
 
 const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes, getSeatColor, onSeatClick }) => {
-  // Track dragging state
-  // const [isDragging, setIsDragging] = useState(false);
   const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null)
 
-  // Handle drag start
-  // const handleDragStart = () => {
-  //   setIsDragging(true);
-  // };
-
-  // Handle drag end
-  // const handleDragStop = (_e: any, data: { x: number; y: number }) => {
-  //   setIsDragging(false);
-  // };
-
-  // Calculate seat size based on section dimensions
-  // const seatSize = Math.min(
-  //   (section.width - 80) / section.columns,
-  //   (section.height - 80) / section.rows
-  // );
-
-  // Removed local selected seats state as it's now handled in the parent component
   const handleSeatClick = (seat: ISeat) => {
     onSeatClick(seat, section.name)
   }
 
   return (
-    <Draggable
-      position={{ x: section.x, y: section.y }}
-      // onStart={handleDragStart}
-      // onStop={handleDragStop}
-      disabled={true}
-      bounds="parent"
-    >
+    <Draggable position={{ x: section.x, y: section.y }} disabled={true} bounds="parent">
       <div
         className={`absolute w-auto h-auto p-4 overflow-visible `}
         style={{
@@ -110,7 +88,6 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
           borderRadius: "8px",
           boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
         }}
-        // onClick={() => !isDragging}
       >
         <div className="text-center text-gray-800 font-semibold mb-3">
           {section.name}
@@ -190,17 +167,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
                         width: `30px`,
                         height: `30px`,
                         fontSize: `14px`,
-                        backgroundColor:
-                          // seat.status == "disabled" ? "#f3f4f6" : seatColor,
-                          seatColor,
-                        color:
-                          // seat.status == "disabled"
-                          //   ? "#9ca3af"
-                          //   : seatTypes.find(
-                          //       (type) => type.id == seat.seatTypeId
-                          //     )?.textColor || "#000000",
-                          seatTypes.find((type) => type.id == seat.seatTypeId)?.textColor || "#000000",
-                        // opacity: seat.status == "disabled" ? 0.3 : 1,
+                        backgroundColor: seatColor,
+                        color: seatTypes.find((type) => type.id == seat.seatTypeId)?.textColor || "#000000",
                         marginRight: "5px",
                         display: "flex",
                         alignItems: "center",
@@ -238,12 +206,6 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
                           <div className="mb-1">
                             Giá: {formatMoney(seatTypes.find((type) => type.id == seat.seatTypeId)?.price)}
                           </div>
-                          {/* <div>
-                            Trạng thái:{" "}
-                            {seat.status == "available"
-                              ? "Có sẵn"
-                              : "Đã vô hiệu"}
-                          </div> */}
                         </div>
                       )}
                     </div>
@@ -263,29 +225,30 @@ export interface SelectedSeatInfo extends ISeat {
   typeName: string
   formattedPrice: string
   seatLabel: string
+  ticketId?: number // Added to store the ticket ID
+  zoneId?: number // Added to store the zone ID
 }
 
 const TicketBooking = () => {
   const [searchParms] = useSearchParams()
   const eventId = searchParms.get("eventId")
   const eventActivityId = searchParms.get("eventActivityId")
-  const [sections, setSections] = useState<ISection[]>()
+  const [sections, setSections] = useState<ISection[]>([])
   const [seatTypes, setSeatTypes] = useState<SeatTypeEdit[]>([])
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeatInfo[]>([])
   const navigate = useNavigate()
 
-  console.log(sections)
+  console.log("Sections:", sections)
 
   useEffect(() => {
     const fetchSeatmap = async () => {
       try {
         const response = await seatmapApi.getSeatmapConsumer(Number(eventId), Number(eventActivityId))
-        // console.log(response);
         if (response.data.result.length != 0) {
           setSections(response.data.result)
         }
         const ticketResponse = await ticketApi.getTicketsByEventId(Number(eventId))
-        console.log(ticketResponse)
+        console.log("ticket:", ticketResponse.data.result)
         if (ticketResponse.data.result.length != 0) {
           setSeatTypes(ticketResponse.data.result)
         }
@@ -296,10 +259,38 @@ const TicketBooking = () => {
     fetchSeatmap()
   }, [eventId, eventActivityId])
 
+  // Function to get the seat color based on selection status
+  const getSeatColor = (seat: ISeat): string => {
+    // Check if seat is selected to highlight it
+    const isSelected = selectedSeats.some((s) => s.id === seat.id)
+    if (isSelected) {
+      return "#059669" // Highlight selected seat with a green color
+    }
+
+    const seatType = seatTypes.find((type) => type.id == seat.seatTypeId)
+    return seatType ? seatType.color : "#6b7280" // Use actual color from seat type or gray-500 as default
+  }
+
   // Handle seat click
   const handleSeatClick = (seat: ISeat, sectionName: string) => {
     // Find seat type info
     const seatType = seatTypes.find((type) => type.id === seat.seatTypeId)
+
+    // Find the corresponding ticket by matching seatTypeId with ticket id in the seatTypes array
+    // In this case, the seatTypeId is the same as the ticket id
+    const ticket = seatTypes.find((type) => type.id === seat.seatTypeId);
+    const ticketId = ticket ? ticket.ticketId : undefined;
+    console.log("ticketId:", ticketId)
+    localStorage.setItem("ticketId", JSON.stringify(ticket?.ticketId));
+
+
+    // Get zoneId from the section or from the seat if available
+    const section = sections.find((s) => s.name === sectionName)
+    const zoneId = seat.zoneActivityId || section?.zoneActivityId || Number.parseInt(section?.id || "0")
+
+    console.log("Found section:", section)
+    console.log("Zone ID:", zoneId)
+    console.log("Ticket ID:", ticketId)
 
     // Create rich seat info object
     const seatInfo: SelectedSeatInfo = {
@@ -308,10 +299,17 @@ const TicketBooking = () => {
       typeName: seatType?.name || "Unknown Type",
       formattedPrice: formatCurrency(seatType?.price || 0),
       seatLabel: `${String.fromCharCode(65 + seat.row)}${seat.column + 1}`,
+      ticketId: ticketId, // Add the ticketId to the seat info
+      zoneId: zoneId, // Add the zoneId to the seat info
     }
+    
 
     // Check if seat is already selected
-    const isSelected = selectedSeats.some((s) => s.id === seat.id)
+    const isSelected = selectedSeats.some((s) => s.seatId === seat.seatId)
+    const seatId = seat.seatId
+    localStorage.setItem("seatId", JSON.stringify(seat.seatId));
+
+    console.log("seat ID:",seatId)
 
     if (isSelected) {
       // Remove the seat if already selected
@@ -334,22 +332,9 @@ const TicketBooking = () => {
       seatType: seatType?.name,
       price: seatType?.price,
       formattedPrice: formatCurrency(seatType?.price || 0),
+      ticketId: ticketId, // Log the ticketId
+      zoneId: zoneId, // Log the zoneId
     })
-  }
-
-  // console.log(sections);
-  // console.log(seatTypes);
-  const getSeatColor = (seat: ISeat): string => {
-    // if (seat.status == "disabled") return "#e5e7eb"; // gray-200 color
-
-    // Check if seat is selected to highlight it
-    const isSelected = selectedSeats.some((s) => s.id === seat.id)
-    if (isSelected) {
-      return "#059669" // Highlight selected seat with a green color
-    }
-
-    const seatType = seatTypes.find((type) => type.id == seat.seatTypeId)
-    return seatType ? seatType.color : "#6b7280" // Use actual color from seat type or gray-500 as default
   }
 
   // Tính tổng tiền từ các ghế đã chọn
@@ -364,7 +349,19 @@ const TicketBooking = () => {
   const handleProceedToPayment = () => {
     if (selectedSeats.length === 0) return
 
-    // Lưu thông tin ghế đã chọn vào localStorage
+    // Prepare ticket purchase requests
+    const ticketPurchaseRequests = selectedSeats.map((seat) => ({
+      zoneId: seat.zoneId || 0,
+      seatId: seat.id || seat.id, // Use seatId property if available, otherwise use id
+      eventActivityId: Number(eventActivityId),
+      ticketId: seat.ticketId, // Use the ticketId we added to the seat info
+      eventId: Number(eventId),
+      quantity: 1,
+    }))
+
+    console.log("Ticket purchase requests:", ticketPurchaseRequests)
+
+    // Store data for payment page
     localStorage.setItem(
       "selectedSeats",
       JSON.stringify({
@@ -376,6 +373,13 @@ const TicketBooking = () => {
           name: "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
           location: "Nhà Hát Kịch IDECAF",
           date: "19:30, 12 tháng 4, 2025",
+        },
+        apiResponses: {
+          ticket: seatTypes, // Store the ticket types for reference
+          seats: selectedSeats, // Store the selected seats with all details
+          purchase: {
+            ticketPurchaseRequests, // Store the prepared purchase requests
+          },
         },
       }),
     )
@@ -487,4 +491,3 @@ const TicketBooking = () => {
 }
 
 export default TicketBooking
-
