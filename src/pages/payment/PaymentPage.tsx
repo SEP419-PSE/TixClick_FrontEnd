@@ -13,6 +13,29 @@ import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
+import ticketApi from "../../services/ticket/TicketApi"
+
+const ticketPurchaseApi = {
+  createTicketPurchase: async (data: any, accessToken: string) => {
+    try {
+      console.log("🚀 Sending request to /ticket-purchase/create");
+      console.log("📤 Request Data:", data);
+      console.log("🔑 Access Token:", accessToken);
+
+      const response = await ticketApi.createTicketPurchase(data);
+
+      console.log("📥 Response Status:", response.status);
+      console.log("📥 Response Headers:", response.headers);
+
+      console.log("✅ Response Data:", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error creating ticket purchase:", error);
+      throw error;
+    }
+  },
+};
 
 
 export default function PaymentPage() {
@@ -23,6 +46,7 @@ export default function PaymentPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -59,15 +83,62 @@ export default function PaymentPage() {
     }
   }, [navigate])
 
-  const handleConfirmPayment = () => {
+  const prepareTicketPurchaseData = () => {
+    if (!selectedSeatsData || !selectedSeatsData.seats || !selectedSeatsData.eventInfo) {
+      return null
+    }
+
+    // Prepare the ticket purchase requests based on the selected seats
+    const ticketPurchaseRequests = selectedSeatsData.seats.map((seat: any) => ({
+      zoneId: seat.zoneActivityId || 0,
+      seatId: seat.id,
+      eventActivityId: selectedSeatsData.eventInfo.activityId,
+      ticketId: seat.seatTypeId,
+      eventId: selectedSeatsData.eventInfo.id,
+      quantity: 1, // For seated tickets, quantity is always 1
+    }))
+
+    return {
+      ticketPurchaseRequests,
+    }
+  }
+
+  const handleConfirmPayment = async () => {
     if (!acceptTerms) return
 
     setIsProcessing(true)
+    setApiError(null)
 
-    setTimeout(() => {
+    try {
+      const purchaseData = prepareTicketPurchaseData()
+
+      if (!purchaseData) {
+        throw new Error("Không thể chuẩn bị dữ liệu đặt vé")
+      }
+
+      console.log("Sending ticket purchase data:", purchaseData)
+
+      // Call the API to create the ticket purchase
+      const response = await ticketPurchaseApi.createTicketPurchase(purchaseData, localStorage.getItem("accessToken") || "")
+
+      console.log("Ticket purchase response:", response)
+
+      // If successful, close the confirmation dialog and navigate to the queue page
       setShowConfirmation(false)
-      navigate("/payment/queue")
-    }, 2000)
+
+      // Show success message
+      toast.success("Đặt vé thành công!")
+
+      // Navigate to the queue page after a short delay
+      setTimeout(() => {
+        navigate("/payment/queue")
+      }, 2000)
+    } catch (error) {
+      console.error("Error during payment confirmation:", error)
+      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -368,6 +439,13 @@ export default function PaymentPage() {
               </div>
             </div>
 
+            {apiError && (
+              <div className="bg-red-900/50 border border-red-500 p-3 rounded-md text-sm text-red-200">
+                <div className="font-medium mb-1">Lỗi:</div>
+                <div>{apiError}</div>
+              </div>
+            )}
+
             <div className="flex items-start space-x-2 mt-2">
               <Checkbox
                 id="terms"
@@ -421,6 +499,8 @@ export default function PaymentPage() {
     </div>
   )
 }
+
+
 
 
 
