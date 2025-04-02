@@ -1,7 +1,12 @@
 import React from "react";
 import { MdExpandMore } from "react-icons/md";
 import { EventDetailProps } from "./InformationEvent";
-import { formatDateVietnamese, formatTimeFe } from "../../lib/utils";
+import {
+  formatDateVietnamese,
+  formatMoney,
+  formatTimeFe,
+} from "../../lib/utils";
+import { NavLink } from "react-router";
 
 // const tickets = [
 //   {
@@ -57,10 +62,10 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
         <div className="p-3 border-b text-[18px] text-pse-green-second border-white font-extrabold">
           Thông tin vé
         </div>
-        {eventDetail?.eventActivityDTOList.map((activity, index) => (
-          <div key={index} className="border-b border-white">
+        {eventDetail?.eventActivityDTOList?.map((activity) => (
+          <div key={activity.eventActivityId} className="border-b border-white">
             <div
-              // onClick={() => onChangeActiveTicket(ticket.id)}
+              onClick={() => onChangeActiveTicket(activity.eventActivityId)}
               className="px-3 pb-3 font-semibold flex items-center cursor-pointer"
             >
               <span>
@@ -79,27 +84,32 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                   {formatDateVietnamese(activity.dateEvent.toString())}
                 </span>
               </p>
-              <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
-                Mua vé ngay
-              </button>
+              <NavLink
+                className={"ml-auto"}
+                to={`booking-ticket?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`}
+              >
+                <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
+                  Mua vé ngay
+                </button>
+              </NavLink>
             </div>
-            {/* {activeShowTicket === ticket.id && (
+            {activeShowTicket === activity.eventActivityId && (
               <div className="bg-black border-t border-white transition-all duration-500">
                 <ul className="">
-                  {ticket.ticketType.map((type) => (
+                  {activity.tickets?.map((ticket) => (
                     <li
-                      key={type.type}
+                      key={ticket.ticketId}
                       className="odd:bg-pse-black-light/80 even:bg-pse-black-light/95 py-4 pl-11 pr-4 flex justify-between"
                     >
-                      <span className="font-semibold">{type.type}</span>
+                      <span className="font-semibold">{ticket.ticketName}</span>
                       <span className="text-pse-green-second font-semibold ">
-                        {type.price} VND
+                        {formatMoney(ticket.price)}
                       </span>
                     </li>
                   ))}
                 </ul>
               </div>
-            )} */}
+            )}
           </div>
         ))}
       </div>

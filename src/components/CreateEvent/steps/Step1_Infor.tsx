@@ -104,8 +104,8 @@ export default function StepOne({
       setIsLoading(true);
       const formData = new FormData();
       formData.append("eventName", eventName);
-      formData.append("location", locationEvent);
-      formData.append("locationName", address);
+      formData.append("location", address);
+      formData.append("locationName", locationEvent);
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
       formData.append("typeEvent", "Offline");

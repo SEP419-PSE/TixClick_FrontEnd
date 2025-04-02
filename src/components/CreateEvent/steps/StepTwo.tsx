@@ -26,11 +26,11 @@ import { StepProps } from "./Step1_Infor";
 
 interface TicketType {
   ticketCode: string;
-  name: string;
+  ticketName: string;
   price: number;
   quantity: number;
-  minPurchase: number;
-  maxPurchase: number;
+  minQuantity: number;
+  maxQuantity: number;
   eventId: number;
 }
 
@@ -46,11 +46,11 @@ export interface Activity {
 }
 const defaultTicket: TicketType = {
   ticketCode: "",
-  name: "",
+  ticketName: "",
   price: 0,
   quantity: 0,
-  minPurchase: 1,
-  maxPurchase: 10,
+  minQuantity: 1,
+  maxQuantity: 2,
   eventId: 0,
 };
 
@@ -122,12 +122,12 @@ const StepTwo: React.FC<StepProps> = ({
   const openTicketModal = (activityIndex: number) => {
     setCurrentActivityIndex(activityIndex);
     setNewTicket({
-      ticketCode: "",
-      name: "",
+      ticketCode: Date.now().toString(),
+      ticketName: "",
       price: 0,
       quantity: 0,
-      minPurchase: 1,
-      maxPurchase: 10,
+      minQuantity: 1,
+      maxQuantity: 2,
       eventId, // ← gán tự động từ URL
     });
     setIsTicketModalOpen(true);
@@ -322,7 +322,7 @@ const StepTwo: React.FC<StepProps> = ({
                       className="bg-gray-50 border rounded p-4 flex justify-between items-center"
                     >
                       <div>
-                        <p className="font-medium">{ticket.name}</p>
+                        <p className="font-medium">{ticket.ticketName}</p>
                         <p className="text-sm text-gray-500">
                           {ticket.price.toLocaleString()} VND
                         </p>
@@ -356,12 +356,10 @@ const StepTwo: React.FC<StepProps> = ({
               <Ticket size={18} /> Thêm vé
             </h3>
             {[
-              { label: "Mã vé", key: "ticketCode" },
-              { label: "Tên vé", key: "name" },
+              { label: "Tên vé", key: "ticketName" },
               { label: "Giá", key: "price", type: "number" },
               { label: "Số lượng", key: "quantity", type: "number" },
-              { label: "Mua tối thiểu", key: "minPurchase", type: "number" },
-              { label: "Mua tối đa", key: "maxPurchase", type: "number" },
+              { label: "Mua tối đa", key: "maxQuantity", type: "number" },
             ].map(({ label, key, type }) => (
               <div key={key}>
                 <label className="block mb-1 text-sm font-medium">

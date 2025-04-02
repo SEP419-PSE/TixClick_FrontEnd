@@ -51,4 +51,20 @@ export interface EventActivityDTOList {
   seatMapId: number;
   eventId: number;
   createdBy: number;
+  tickets: Ticket[];
+}
+
+export interface Ticket {
+  ticketId: number;
+  ticketName: string;
+  ticketCode: string;
+  createdDate: Date;
+  price: number;
+  minQuantity: number;
+  maxQuantity: number;
+  status: boolean;
+  textColor: string;
+  seatBackgroundColor: string;
+  accountId: number;
+  eventId: number;
 }
