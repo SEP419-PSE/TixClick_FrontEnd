@@ -95,7 +95,7 @@ export default function PaymentPage() {
       eventActivityId: selectedSeatsData.eventInfo.activityId,
       ticketId: seat.seatTypeId,
       eventId: selectedSeatsData.eventInfo.id,
-      quantity: 1, // For seated tickets, quantity is always 1
+      quantity: 1, 
     }))
 
     return {
