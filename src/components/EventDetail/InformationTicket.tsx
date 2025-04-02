@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdExpandMore } from "react-icons/md";
 import { EventDetailProps } from "./InformationEvent";
 import {
@@ -50,11 +50,11 @@ import { NavLink } from "react-router";
 // ];
 
 const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
-  // const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
+  const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
 
-  // const onChangeActiveTicket = (id: number) => {
-  //   setActiveShowTicket(activeShowTicket === id ? null : id);
-  // };
+  const onChangeActiveTicket = (id: number) => {
+    setActiveShowTicket(activeShowTicket === id ? null : id);
+  };
 
   return (
     <div className="p-3 bg-white/80 ">
