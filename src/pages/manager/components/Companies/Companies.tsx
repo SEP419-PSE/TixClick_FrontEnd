@@ -135,7 +135,7 @@ export default function CompanyApprovalsPage() {
   const fetchCompaniesList = async () => {
     try {
       const res: any = await managerApi.getAllCompany()
-      console.log("Company List:", res.data.result)
+      console.log("Company List Huy:", res.data.result)
       if (res.data.result && res.data.result.length > 0) {
         setCompanies(res.data.result)
       }

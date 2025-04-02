@@ -17,7 +17,6 @@ import HomeCompany from "./pages/company/components/HomeCompany";
 import ManageContract from "./pages/company/components/ManageContract";
 import ManageEvents from "./pages/company/components/ManageEvents";
 import ManageMember from "./pages/company/components/ManageMember";
-import ProfileCompany from "./pages/company/components/ProfileCompany";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -43,9 +42,10 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import TicketBooking from "./pages/TicketBooking";
+
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
+import ProfileCompany from "./pages/company/components/ProfileCompany";
 
 export default function App() {
   return (

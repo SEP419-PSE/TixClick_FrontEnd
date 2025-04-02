@@ -3,7 +3,6 @@ import {
   LayoutGrid,
   PartyPopper,
   ReceiptText,
-  TicketCheck,
   Users,
 } from "lucide-react";
 import Logo from "../../../assets/Logo.png";

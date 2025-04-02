@@ -4,7 +4,6 @@ import {
   Trash2,
   CalendarCheck,
   Ticket,
-  XCircle,
   Save,
   X,
 } from "lucide-react";
@@ -57,7 +56,6 @@ const defaultTicket: TicketType = {
 
 const StepTwo: React.FC<StepProps> = ({
   step,
-  setStep,
   isStepValid,
   setIsStepValid,
   updateStep,
@@ -203,9 +201,9 @@ const StepTwo: React.FC<StepProps> = ({
     setIsStepValid(false); // reset cho bước sau
   };
 
-  const prevStep = () => {
-    setStep((prev) => Math.max(prev - 1, 0));
-  };
+  // const prevStep = () => {
+  //   setStep((prev) => Math.max(prev - 1, 0));
+  // };
 
   return (
     <div className="p-6 space-y-6 text-black">

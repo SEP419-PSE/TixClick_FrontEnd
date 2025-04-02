@@ -1,15 +1,15 @@
-import { CircleUserRound, Menu, Search, X } from "lucide-react";
+import { AxiosError } from "axios";
+import { Menu, Search, X } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
+import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { FaFacebookSquare, FaYoutube } from "react-icons/fa";
 import { LuLogOut, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
-import { AuthContext } from "../../contexts/AuthProvider";
 import { NavLink, useNavigate } from "react-router";
-import companyApi from "../../services/companyApi";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
-import { AiFillTikTok } from "react-icons/ai";
+import { AuthContext } from "../../contexts/AuthProvider";
+import companyApi from "../../services/companyApi";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
@@ -153,24 +153,32 @@ const HeroSlider = () => {
           </div>
         </div>
         <div className="text-black my-8">
-          <ul className="space-y-4">
-            <li className="flex items-center gap-2 py-3 px-6 hover:bg-pse-black/20">
-              <LuTicketCheck size={24} />
-              Vé đã mua
-            </li>
-            <li className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
-              <RiCalendarEventLine size={24} />
-              Sự kiện của tôi
-            </li>
-            <li className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
-              <CgProfile size={24} />
-              Trang cá nhân
-            </li>
-            <li className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20 ">
-              <LuLogOut size={24} />
-              Đăng xuất
-            </li>
-          </ul>
+        <ul className="space-y-4">
+      <li>
+        <a href="/ticketManagement" className="flex items-center gap-2 py-3 px-6 hover:bg-pse-black/20">
+          <LuTicketCheck size={24} />
+          Vé đã mua
+        </a>
+      </li>
+      <li>
+        <a href="/consumerCenter" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
+          <RiCalendarEventLine size={24} />
+          Sự kiện của tôi
+        </a>
+      </li>
+      <li>
+        <a href="/profileForm" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
+          <CgProfile size={24} />
+          Trang cá nhân
+        </a>
+      </li>
+      <li>
+        <a href="/logout" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
+          <LuLogOut size={24} />
+          Đăng xuất
+        </a>
+      </li>
+    </ul>
         </div>
         <div className="text-white rounded-tl-[60px] flex justify-end items-center gap-4 mt-auto text-right p-6 bg-pse-black">
           <span className="border p-2 rounded-full">
