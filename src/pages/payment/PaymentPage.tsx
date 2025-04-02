@@ -13,30 +13,29 @@ import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
-import ticketApi from "../../services/ticket/TicketApi"
 
 const ticketPurchaseApi = {
-  createTicketPurchase: async (data: any, accessToken: string) => {
+  createTicketPurchase: async (data: any) => {
     try {
-      console.log("🚀 Sending request to /ticket-purchase/create");
-      console.log("📤 Request Data:", data);
-      console.log("🔑 Access Token:", accessToken);
+      const response = await fetch("/ticket-purchase/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
 
-      const response = await ticketApi.createTicketPurchase(data);
+      if (!response.ok) {
+        throw new Error("Failed to create ticket purchase")
+      }
 
-      console.log("📥 Response Status:", response.status);
-      console.log("📥 Response Headers:", response.headers);
-
-      console.log("✅ Response Data:", response.data);
-
-      return response.data;
+      return await response.json()
     } catch (error) {
-      console.error("❌ Error creating ticket purchase:", error);
-      throw error;
+      console.error("Error creating ticket purchase:", error)
+      throw error
     }
   },
-};
-
+}
 
 export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -47,6 +46,17 @@ export default function PaymentPage() {
   const navigate = useNavigate()
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
+
+  const storedTicketId = localStorage.getItem("ticketId")
+  ? JSON.parse(localStorage.getItem("ticketId")!)
+  : undefined;
+
+  const storedSeatId = localStorage.getItem("seatId")
+  ? JSON.parse(localStorage.getItem("seatId")!)
+  : undefined;
+
+  console.log("store seatID:", storedSeatId)
+  
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -74,6 +84,13 @@ export default function PaymentPage() {
     if (storedSeatsData) {
       const parsedData = JSON.parse(storedSeatsData)
       setSelectedSeatsData(parsedData)
+
+      // Log the API responses for debugging
+      if (parsedData.apiResponses) {
+        console.log("Ticket API response:", parsedData.apiResponses.ticket)
+        console.log("Seat API responses:", parsedData.apiResponses.seats)
+        console.log("Purchase API response:", parsedData.apiResponses.purchase)
+      }
     } else {
       // If no data is found, redirect back to the booking page
       toast.error("Không tìm thấy thông tin đặt vé")
@@ -88,15 +105,23 @@ export default function PaymentPage() {
       return null
     }
 
-    // Prepare the ticket purchase requests based on the selected seats
+    // If we already have a purchase response from the ticket booking page, use that
+    if (selectedSeatsData.apiResponses && selectedSeatsData.apiResponses.purchase) {
+      console.log("Using existing purchase data from ticket booking page")
+      return selectedSeatsData.apiResponses.purchase
+    }
+
+    // Otherwise, prepare the ticket purchase requests based on the selected seats
     const ticketPurchaseRequests = selectedSeatsData.seats.map((seat: any) => ({
-      zoneId: seat.zoneActivityId || 0,
-      seatId: seat.id,
-      eventActivityId: selectedSeatsData.eventInfo.activityId,
-      ticketId: seat.seatTypeId,
-      eventId: selectedSeatsData.eventInfo.id,
-      quantity: 1, 
+      zoneId: seat.zoneId || 0,
+      seatId: storedSeatId, // Use seatId property if available, otherwise use id
+      eventActivityId: Number(selectedSeatsData.eventInfo.activityId),
+      ticketId: storedTicketId, // Use the ticketId from the seat info
+      eventId: Number(selectedSeatsData.eventInfo.id),
+      quantity: 1, // For seated tickets, quantity is always 1
     }))
+
+    console.log("Generated ticket purchase requests:", ticketPurchaseRequests)
 
     return {
       ticketPurchaseRequests,
@@ -119,7 +144,7 @@ export default function PaymentPage() {
       console.log("Sending ticket purchase data:", purchaseData)
 
       // Call the API to create the ticket purchase
-      const response = await ticketPurchaseApi.createTicketPurchase(purchaseData, localStorage.getItem("accessToken") || "")
+      const response = await ticketPurchaseApi.createTicketPurchase(purchaseData)
 
       console.log("Ticket purchase response:", response)
 
@@ -188,7 +213,6 @@ export default function PaymentPage() {
           >
             <Calendar className="h-5 w-5 text-[#FF8A00]" />
             <span className="font-medium">{selectedSeatsData?.eventInfo?.date || "Thứ Bảy, 30/03/2024 - 20:00"}</span>
-            {/* <Countdown targetDate="2024-03-30T20:00:00" /> */}
           </motion.div>
         </div>
       </div>
@@ -293,7 +317,7 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.id || index} className="flex justify-between text-sm">
+                    <div key={seat.seatId || index} className="flex justify-between text-sm">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           1x
@@ -347,7 +371,7 @@ export default function PaymentPage() {
               <div className="mt-6 flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 border-[#2A2A2A] text-black hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
+                  className="flex-1 border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
                   onClick={() => navigate(-1)}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -399,7 +423,7 @@ export default function PaymentPage() {
               <div className="bg-[#2A2A2A] p-3 rounded-md">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.id || index} className="flex items-center mb-1">
+                    <div key={seat.seatId || index} className="flex items-center mb-1">
                       <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
                         1x
                       </div>
