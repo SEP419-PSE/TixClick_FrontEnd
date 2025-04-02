@@ -33,10 +33,8 @@ import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import NotificationPage from "./pages/manager/components/Notifications/NotificationPage";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
-import ManagerDashboardPage from "./pages/manager/ManagerDashboardPage";
 import {
   default as OrganizerCenter,
-  default as OrganizerPage,
 } from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
@@ -47,6 +45,7 @@ import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import TicketBooking from "./pages/TicketBooking";
+import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 
 export default function App() {
   return (
@@ -70,7 +69,6 @@ export default function App() {
               <Route path="code" element={<EnterCode />} />
             </Route>
             {/* Organizer route */}
-            <Route path="organizer" element={<OrganizerPage />} />
             <Route path="404" element={<ErrorPage />} />
 
             {/*Company route */}
@@ -79,10 +77,9 @@ export default function App() {
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
-            <Route path="manager" element={<ManagerDashboardPage />} />
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
-            {/* <Route path="payment/queue" element={<PaymentQueuePage />} /> */}
+            <Route path="payment/queue" element={<PaymentQueuePage />} />
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
