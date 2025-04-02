@@ -46,6 +46,7 @@ import TicketPage from "./pages/ticket/TicketPage";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
+import TicketBooking from "./pages/TicketBooking";
 
 export default function App() {
   return (
@@ -56,6 +57,10 @@ export default function App() {
           <Route element={<RootLayout />}>
             <Route index element={<HomePage />} />
             <Route path="event-detail/:id" element={<EventDetail />} />
+            <Route
+              path="event-detail/:id/booking-ticket"
+              element={<TicketBooking />}
+            />
             <Route path="create-event" element={<CreateEvent />} />
             {/* Authitencation route */}
             <Route path="auth" element={<SignInPage />}>
@@ -71,10 +76,7 @@ export default function App() {
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
-          <Route
-            path="event-detail/:id/booking-ticket"
-            element={<TicketBooking />}
-          />
+
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
             <Route path="manager" element={<ManagerDashboardPage />} />
