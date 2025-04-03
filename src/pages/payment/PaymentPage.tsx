@@ -15,15 +15,17 @@ import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
 
 const ticketPurchaseApi = {
-  createTicketPurchase: async (data: any) => {
+  createTicketPurchase: async (data: any, accessToken: string) => {
     try {
-      const response = await fetch("/ticket-purchase/create", {
+      const response = await fetch("https://160.191.175.172:8443/ticket-purchase/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(data),
       })
+      console.log("response", response)
 
       if (!response.ok) {
         throw new Error("Failed to create ticket purchase")
@@ -47,16 +49,7 @@ export default function PaymentPage() {
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
 
-  const storedTicketId = localStorage.getItem("ticketId")
-  ? JSON.parse(localStorage.getItem("ticketId")!)
-  : undefined;
-
-  // const storedSeatId = localStorage.getItem("seatId")
-  // ? JSON.parse(localStorage.getItem("seatId")!)
-  // : undefined;
-
-  // console.log("store seatID:", storedSeatId)
-  
+  const storedTicketId = localStorage.getItem("ticketId") ? JSON.parse(localStorage.getItem("ticketId")!) : undefined
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -144,9 +137,25 @@ export default function PaymentPage() {
       console.log("Sending ticket purchase data:", purchaseData)
 
       // Call the API to create the ticket purchase
-      const response = await ticketPurchaseApi.createTicketPurchase(purchaseData)
+      const response = await ticketPurchaseApi.createTicketPurchase(
+        purchaseData,
+        localStorage.getItem("accessToken") || "",
+      )
 
       console.log("Ticket purchase response:", response)
+
+      // Store all the necessary data for the queue page
+      const queueData = {
+        purchaseResponse: response,
+        eventInfo: selectedSeatsData.eventInfo,
+        seats: selectedSeatsData.seats,
+        totalAmount: selectedSeatsData.totalAmount,
+        transactionId: `TIX-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`,
+        timestamp: new Date().toISOString(),
+      }
+
+      // Save to localStorage for the queue page to access
+      localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
 
       // If successful, close the confirmation dialog and navigate to the queue page
       setShowConfirmation(false)
@@ -523,9 +532,4 @@ export default function PaymentPage() {
     </div>
   )
 }
-
-
-
-
-
 
