@@ -45,7 +45,7 @@ const TicketBookingNoneSeatmap = () => {
         const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(
           Number(activityEventId)
         );
-        console.log(ticketResponse);
+        // console.log(ticketResponse);
         if (ticketResponse.data.result.length !== 0) {
           const updatedTickets = ticketResponse.data.result.map(
             (ticket: Ticket) => ({
@@ -99,12 +99,12 @@ const TicketBookingNoneSeatmap = () => {
     setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1);
   };
 
-  console.log(tickets);
+  // console.log(tickets);
   return (
-    <div className="flex">
-      <div className="w-[80%]">
+    <div className="flex flex-col lg:flex-row">
+      <div className="lg:w-[80%]">
         <div className="text-center bg-pse-black-light py-4">Chọn vé</div>
-        <div className="flex flex-col w-[600px] mx-auto my-10">
+        <div className="flex flex-col lg:w-[600px] mx-auto my-10">
           <div className="flex justify-between w-full bg-pse-green p-4 rounded-t-lg">
             <div className="font-bold">Loại vé</div>
             <div className="font-bold">Số lượng</div>
@@ -166,7 +166,7 @@ const TicketBookingNoneSeatmap = () => {
         </div>
       </div>
 
-      <div className="flex flex-col ml-auto h-screen w-[20%] text-black bg-white p-6 shadow-md border border-gray-200">
+      <div className="flex flex-col lg:ml-auto lg:h-screen lg:w-[20%] text-black bg-white p-6 shadow-md border border-gray-200">
         <div className="mb-4 space-y-4">
           <div className="text-[18px] font-semibold">
             Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!
