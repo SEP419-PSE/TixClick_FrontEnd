@@ -36,3 +36,7 @@ jobs:
           CNAME=${{ env.CONTAINER_NAME }}
           echo ":: Running new frontend container - $CNAME"
           docker run -d -p 5173:5173 --name $CNAME fe_tixclick:latest
+      - name: Cleanup Unused Docker Images
+        run: |
+          echo "Cleaning up unused Docker images..."
+          docker system prune -af
