@@ -51,11 +51,11 @@ export default function PaymentPage() {
   ? JSON.parse(localStorage.getItem("ticketId")!)
   : undefined;
 
-  const storedSeatId = localStorage.getItem("seatId")
-  ? JSON.parse(localStorage.getItem("seatId")!)
-  : undefined;
+  // const storedSeatId = localStorage.getItem("seatId")
+  // ? JSON.parse(localStorage.getItem("seatId")!)
+  // : undefined;
 
-  console.log("store seatID:", storedSeatId)
+  // console.log("store seatID:", storedSeatId)
   
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function PaymentPage() {
     // Otherwise, prepare the ticket purchase requests based on the selected seats
     const ticketPurchaseRequests = selectedSeatsData.seats.map((seat: any) => ({
       zoneId: seat.zoneId || 0,
-      seatId: storedSeatId, // Use seatId property if available, otherwise use id
+      seatId: seat.id, // Use seatId property if available, otherwise use id
       eventActivityId: Number(selectedSeatsData.eventInfo.activityId),
       ticketId: storedTicketId, // Use the ticketId from the seat info
       eventId: Number(selectedSeatsData.eventInfo.id),
