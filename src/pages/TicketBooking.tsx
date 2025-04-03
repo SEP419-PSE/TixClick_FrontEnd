@@ -309,11 +309,12 @@ const TicketBooking = () => {
     const seatId = seat.seatId
     localStorage.setItem("seatId", JSON.stringify(seat.seatId));
 
+
     console.log("seat ID:",seatId)
 
     if (isSelected) {
       // Remove the seat if already selected
-      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id))
+      setSelectedSeats((prev) => prev.filter((s) => s.seatId !== seat.seatId))
       console.log("Unselected seat:", seatInfo)
     } else {
       // Add the seat if not already selected
@@ -345,6 +346,11 @@ const TicketBooking = () => {
     }, 0)
   }
 
+
+  const storedSeatId = localStorage.getItem("seatId")
+  ? JSON.parse(localStorage.getItem("seatId")!)
+  : undefined;
+  
   // Hàm xử lý việc chuyển đến trang thanh toán
   const handleProceedToPayment = () => {
     if (selectedSeats.length === 0) return
@@ -352,7 +358,7 @@ const TicketBooking = () => {
     // Prepare ticket purchase requests
     const ticketPurchaseRequests = selectedSeats.map((seat) => ({
       zoneId: seat.zoneId || 0,
-      seatId: seat.id || seat.id, // Use seatId property if available, otherwise use id
+      seatId: storedSeatId, // Use seatId property if available, otherwise use id
       eventActivityId: Number(eventActivityId),
       ticketId: seat.ticketId, // Use the ticketId we added to the seat info
       eventId: Number(eventId),
