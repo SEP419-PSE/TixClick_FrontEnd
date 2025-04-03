@@ -86,7 +86,17 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
               </p>
               <NavLink
                 className={"ml-auto"}
-                to={`booking-ticket?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`}
+                to={
+                  eventDetail.haveSeatMap
+                    ? {
+                        pathname: "booking-ticket",
+                        search: `?eventId=${activity.eventId}&activityEventId=${activity.eventActivityId}`,
+                      }
+                    : {
+                        pathname: "booking-ticket-no-seatmap",
+                        search: `?eventId=${activity.eventId}&activityEventId=${activity.eventActivityId}`,
+                      }
+                }
               >
                 <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
                   Mua vé ngay
@@ -99,7 +109,7 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                   {activity.tickets?.map((ticket) => (
                     <li
                       key={ticket.ticketId}
-                      className="odd:bg-pse-black-light/80 even:bg-pse-black-light/95 py-4 pl-11 pr-4 flex justify-between"
+                      className="odd:bg-pse-black-light/50 even:bg-pse-black-light/20 py-4 pl-11 pr-4 flex justify-between"
                     >
                       <span className="font-semibold">{ticket.ticketName}</span>
                       <span className="text-pse-green-second font-semibold ">

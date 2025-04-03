@@ -17,7 +17,7 @@ const EventDetail = () => {
     const fetchData = async () => {
       if (id) {
         const response = await eventApi.getEventDetail(Number(id));
-        console.log(response);
+        // console.log(response);
         if (response.data.result) {
           setEventDetail(response.data.result);
         } else {

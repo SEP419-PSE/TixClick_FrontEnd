@@ -47,6 +47,7 @@ import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import TicketBooking from "./pages/TicketBooking";
+import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 
 export default function App() {
   return (
@@ -76,6 +77,11 @@ export default function App() {
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
+
+          <Route
+            path="event-detail/:id/booking-ticket-no-seatmap"
+            element={<TicketBookingNoneSeatmap />}
+          />
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
