@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router";
@@ -45,6 +45,8 @@ export default function StepOne({
   const [address, setAddress] = useState("");
   const [typeEvent, setTypeEvent] = useState("");
   const [editorContent, setEditorContent] = useState<string>("");
+  const [eventMode, setEventMode] = useState<string>("Offline");
+  const [joinUrl, setJoinUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const companies: Company | undefined = useAllCompany();
@@ -108,7 +110,8 @@ export default function StepOne({
       formData.append("locationName", locationEvent);
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
-      formData.append("typeEvent", "Offline");
+      formData.append("typeEvent", eventMode);
+      formData.append("urlonline", joinUrl);
       if (companies)
         formData.append("companyId", companies?.companyId.toString());
 
@@ -177,18 +180,60 @@ export default function StepOne({
 
       <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
         <p className="text-white">Địa chỉ sự kiện</p>
-        <TextInput
-          maxLength={80}
-          label="Tên địa điểm"
-          text={locationEvent}
-          setText={setLocationEvent}
-        />
-        <TextInput
-          maxLength={80}
-          label="Địa chỉ"
-          text={address}
-          setText={setAddress}
-        />
+        <div className="flex flex-col space-y-2 text-white">
+          <div className="flex items-center space-x-6 my-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="eventMode"
+                value="Online"
+                checked={eventMode === "Online"}
+                onChange={() => setEventMode("Online")}
+                className="accent-pse-green w-4 h-4"
+              />
+              <span>Online</span>
+            </label>
+
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="eventMode"
+                value="Offline"
+                checked={eventMode === "Offline"}
+                onChange={() => setEventMode("Offline")}
+                className="accent-pse-green w-4 h-4"
+              />
+              <span>Offline</span>
+            </label>
+          </div>
+        </div>
+        {eventMode == "Offline" ? (
+          <>
+            <TextInput
+              maxLength={80}
+              label="Tên địa điểm"
+              text={locationEvent}
+              setText={setLocationEvent}
+            />
+            <TextInput
+              maxLength={80}
+              label="Địa chỉ"
+              text={address}
+              setText={setAddress}
+            />
+          </>
+        ) : (
+          <div className="mx-1">
+            <input
+              value={joinUrl}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setJoinUrl(e.target.value)
+              }
+              placeholder="Đường dẫn tham dự"
+              className="px-3 py-1 rounded-md w-full outline-none text-[15px]"
+            />
+          </div>
+        )}
       </section>
 
       <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">

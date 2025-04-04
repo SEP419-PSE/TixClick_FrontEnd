@@ -23,80 +23,39 @@ const eventTypes: EventTypeEngLishName[] = [
   { id: 4, name: "Khác", englishName: "Other" },
 ];
 
-const FilterEvent = () => {
-  const [eventMode, setEventMode] = useState<string>("Offline");
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const currentDate = new Date().toISOString().split("T")[0];
+type Props = {
+  handleOpenFilter: () => void;
+  openFilter: boolean;
+  handleCloseFilter: () => void;
+  startDate: string;
+  handleStartDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  currentDate: string;
+  endDate: string;
+  handleEndDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSwitchChange: (checked: boolean) => void;
+  eventMode: string;
+  selectedItems: string[];
+  handleToggleChange: (name: string) => void;
+  submitForm: () => void;
+  resetForm: () => void;
+};
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedStartDate = e.target.value;
-    const currentDate = new Date().toISOString().split("T")[0];
-
-    // Kiểm tra startDate không nhỏ hơn ngày hiện tại
-    if (selectedStartDate < currentDate) {
-      toast.warning("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
-    } else {
-      setStartDate(selectedStartDate);
-
-      // Kiểm tra endDate phải lớn hơn startDate nếu endDate đã được chọn
-      if (endDate && selectedStartDate >= endDate) {
-        toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-      }
-    }
-  };
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedEndDate = e.target.value;
-
-    // Kiểm tra endDate phải lớn hơn startDate
-    if (startDate && selectedEndDate <= startDate) {
-      toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-    } else {
-      setEndDate(selectedEndDate);
-    }
-  };
-
-  // Hàm cập nhật trạng thái khi toggle thay đổi
-  const handleToggleChange = (value: string) => {
-    setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(value)) {
-        // Nếu đã chọn, thì bỏ chọn
-        return prevSelectedItems.filter((item) => item !== value);
-      } else {
-        // Nếu chưa chọn, thì thêm vào mảng
-        return [...prevSelectedItems, value];
-      }
-    });
-  };
-
-  const handleSwitchChange = (checked: boolean) => {
-    setEventMode(checked ? "Online" : "Offline");
-  };
-
-  const hanldeOpenFilter = () => {
-    setOpenFilter(true);
-  };
-
-  const hanldeCloseFilter = () => {
-    setOpenFilter(false);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setEventMode("Offline");
-    setSelectedItems([]);
-    setStartDate("");
-    setEndDate("");
-  };
-
-  const submitForm = () => {
-    toast;
-  };
-
-  console.log(eventMode, selectedItems, openFilter);
+const FilterEvent = ({
+  currentDate,
+  endDate,
+  eventMode,
+  handleCloseFilter,
+  handleEndDateChange,
+  handleOpenFilter,
+  handleStartDateChange,
+  handleSwitchChange,
+  handleToggleChange,
+  openFilter,
+  resetForm,
+  selectedItems,
+  startDate,
+  submitForm,
+}: Props) => {
   return (
     <div className="flex gap-4">
       {/* <Button className="bg-pse-gray/50 focus:bg-pse-green">
@@ -109,7 +68,7 @@ const FilterEvent = () => {
         </span>
       </Button> */}
       <Button
-        onClick={hanldeOpenFilter}
+        onClick={handleOpenFilter}
         className="bg-pse-gray/50 focus:bg-pse-green"
       >
         <span>
@@ -124,7 +83,7 @@ const FilterEvent = () => {
         <div className="fixed flex flex-col bottom-0 left-0 w-full max-w-sm h-[85%] px-4 py-4 bg-white text-black rounded-t-lg">
           <div className="relative flex w-full mb-2 justify-center items-center font-bold">
             <p className="">Bộ lọc</p>
-            <button onClick={hanldeCloseFilter} className="absolute right-0">
+            <button onClick={handleCloseFilter} className="absolute right-0">
               <FaXmark />
             </button>
           </div>

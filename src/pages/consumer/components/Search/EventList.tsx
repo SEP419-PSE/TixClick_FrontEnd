@@ -1,7 +1,7 @@
 import React from "react";
 import Img from "../../../../assets/1c7973947f9b163b2376dc6bdc0c6540.jpg";
 import { EventDetailResponse } from "../../../../interface/EventInterface";
-import { formatMoney } from "../../../../lib/utils";
+import { formatDateVietnamese, formatMoney } from "../../../../lib/utils";
 import { CiCalendar } from "react-icons/ci";
 import EmptyList from "../../../../components/EmptyList/EmptyList";
 
@@ -30,7 +30,11 @@ const EventList: React.FC<Props> = ({ eventList }) => {
           </div>
           <div className="flex items-center gap-1">
             <CiCalendar size={20} />
-            <p>31 Tháng 03, 2024</p>
+            <p>
+              {formatDateVietnamese(
+                event.eventActivityDTOList[0].dateEvent.toString()
+              )}
+            </p>
           </div>
         </div>
       ))}

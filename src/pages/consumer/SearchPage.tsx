@@ -7,23 +7,30 @@ import EventList from "./components/Search/EventList";
 import { FormEvent, useEffect, useState } from "react";
 import eventApi from "../../services/eventApi";
 import FilterEvent from "./components/Search/FilterEvent";
+import { toast } from "sonner";
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const eventName = searchParams.get("event-name") || "";
   const [eventList, setEventList] = useState<EventDetailResponse[]>([]);
-  const [eventCategory, setEventCategory] = useState<string[]>([]);
+  const [eventMode, setEventMode] = useState<string>("");
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const currentDate = new Date().toISOString().split("T")[0];
 
   // Gọi API khi event-name thay đổi
   useEffect(() => {
+    console.log("call lại list");
     const fetchData = async () => {
       if (eventName.trim() !== "") {
         const response = await eventApi.search(
-          "",
-          "",
-          "",
+          startDate,
+          endDate,
+          eventMode,
           eventName,
-          eventCategory
+          selectedItems
         );
         console.log(response);
         setEventList(response.data.result || []);
@@ -33,10 +40,88 @@ const SearchPage = () => {
     };
 
     fetchData();
-  }, [eventName, eventCategory]);
+  }, [searchParams, eventName, eventMode, startDate, endDate, selectedItems]);
 
-  // Xử lý form submit
-  const onSubmitSearch = (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    console.log("Láy dữ liệu từ URL");
+    const start = searchParams.get("startDate");
+    const end = searchParams.get("endDate");
+    const mode = searchParams.get("eventMode");
+    const types = searchParams.get("types");
+
+    if (start) setStartDate(start);
+    if (end) setEndDate(end);
+    if (mode) setEventMode(mode);
+    if (types) setSelectedItems(types.split(","));
+  }, [searchParams]);
+
+  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedStartDate = e.target.value;
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    // Kiểm tra startDate không nhỏ hơn ngày hiện tại
+    if (selectedStartDate < currentDate) {
+      toast.warning("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
+    } else {
+      setStartDate(selectedStartDate);
+
+      // Kiểm tra endDate phải lớn hơn startDate nếu endDate đã được chọn
+      if (endDate && selectedStartDate >= endDate) {
+        toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
+      }
+    }
+  };
+
+  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedEndDate = e.target.value;
+
+    // Kiểm tra endDate phải lớn hơn startDate
+    if (startDate && selectedEndDate <= startDate) {
+      toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
+    } else {
+      setEndDate(selectedEndDate);
+    }
+  };
+
+  // Hàm cập nhật trạng thái khi toggle thay đổi
+  const handleToggleChange = (value: string) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(value)) {
+        // Nếu đã chọn, thì bỏ chọn
+        return prevSelectedItems.filter((item) => item !== value);
+      } else {
+        // Nếu chưa chọn, thì thêm vào mảng
+        return [...prevSelectedItems, value];
+      }
+    });
+  };
+
+  const handleSwitchChange = (checked: boolean) => {
+    setEventMode(checked ? "Online" : "Offline");
+  };
+
+  const hanldeOpenFilter = () => {
+    setOpenFilter(true);
+  };
+
+  const hanldeCloseFilter = () => {
+    setOpenFilter(false);
+  };
+
+  const resetForm = () => {
+    setStartDate("");
+    setEndDate("");
+    setEventMode("");
+    setSelectedItems([]);
+    const params = new URLSearchParams(searchParams);
+    params.delete("startDate");
+    params.delete("endDate");
+    params.delete("eventMode");
+    params.delete("types");
+    setSearchParams(params);
+  };
+
+  const onSubmitSearch = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -44,13 +129,51 @@ const SearchPage = () => {
 
     const currentParams = new URLSearchParams(searchParams);
 
+    currentParams.set("event-name", searchValue);
+    setSearchParams(currentParams);
+
+    // ✅ Gọi lại fetch thủ công nếu chuỗi rỗng
     if (searchValue === "") {
-      currentParams.delete("event-name");
+      const response = await eventApi.search(
+        startDate,
+        endDate,
+        eventMode,
+        "",
+        selectedItems
+      );
+      setEventList(response.data.result || []);
+    }
+  };
+
+  const submitForm = async () => {
+    const params = new URLSearchParams(searchParams);
+    if (startDate) params.set("startDate", startDate);
+    else params.delete("startDate");
+
+    if (endDate) params.set("endDate", endDate);
+    else params.delete("endDate");
+
+    if (eventMode) params.set("eventMode", eventMode);
+    else params.delete("eventMode");
+
+    if (selectedItems.length > 0) {
+      params.set("types", selectedItems.join(","));
     } else {
-      currentParams.set("event-name", searchValue);
+      params.delete("types");
     }
 
-    setSearchParams(currentParams);
+    setSearchParams(params);
+    setOpenFilter(false);
+
+    // ✅ Gọi lại API bất kể eventName rỗng hay không
+    const response = await eventApi.search(
+      startDate,
+      endDate,
+      eventMode,
+      eventName,
+      selectedItems
+    );
+    setEventList(response.data.result || []);
   };
 
   return (
@@ -83,7 +206,22 @@ const SearchPage = () => {
         {/* Date picker */}
       </form>
       <div className="mb-4">
-        <FilterEvent />
+        <FilterEvent
+          currentDate={currentDate}
+          endDate={endDate}
+          eventMode={eventMode}
+          handleCloseFilter={hanldeCloseFilter}
+          handleEndDateChange={handleEndDateChange}
+          handleStartDateChange={handleStartDateChange}
+          handleSwitchChange={handleSwitchChange}
+          handleToggleChange={handleToggleChange}
+          resetForm={resetForm}
+          selectedItems={selectedItems}
+          startDate={startDate}
+          submitForm={submitForm}
+          handleOpenFilter={hanldeOpenFilter}
+          openFilter={openFilter}
+        />
       </div>
 
       <div>
