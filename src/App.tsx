@@ -48,6 +48,7 @@ import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
+import SearchPage from "./pages/consumer/SearchPage";
 
 export default function App() {
   return (
@@ -82,6 +83,7 @@ export default function App() {
             path="event-detail/:id/booking-ticket-no-seatmap"
             element={<TicketBookingNoneSeatmap />}
           />
+          <Route path="/search" element={<SearchPage />} />
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />

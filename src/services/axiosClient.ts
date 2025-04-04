@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import authApi from "./authApi";
 
 const axiosClient = axios.create({
@@ -11,10 +11,6 @@ const axiosClient = axios.create({
 // Add a request interceptor
 axiosClient.interceptors.request.use(
   (config) => {
-    // const token = localStorage.getItem("accessToken");
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
     return config;
   },
   (error) => {
@@ -26,33 +22,42 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const axiosResponseError = error as AxiosError<{
+      code: number;
+      message: string;
+    }>;
+
     const originalRequest = error.config;
 
-    // Nếu lỗi 401 và chưa retry lần nào
+    // Nếu lỗi 401 và không phải đang gọi refresh token
     if (
-      error.response?.status === 401 &&
+      axiosResponseError.response?.status === 401 &&
       !originalRequest._retry &&
-      localStorage.getItem("refreshToken")
+      !originalRequest.url?.includes("/auth/refresh-token")
     ) {
       originalRequest._retry = true;
-
+      delete axiosClient.defaults.headers.common["Authorization"];
+      delete originalRequest.headers["Authorization"];
       try {
-        const data = await authApi.refreshAccessToken();
-        console.log("Get new accessToken", data);
-        const newAccessToken = data.result.accessToken;
+        const refreshTokenResponse = await authApi.refreshAccessToken();
+        console.log(refreshTokenResponse);
+        const newAccessToken = refreshTokenResponse.data.result.accessToken;
+        // const refreshToken = refreshTokenResponse.data.result.refreshToken;
+        console.log(newAccessToken);
 
-        // Lưu accessToken mới
+        // Cập nhật token mới vào localStorage và header
         localStorage.setItem("accessToken", newAccessToken);
         axiosClient.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${newAccessToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
-        return axiosClient(originalRequest); // retry lại request gốc
-      } catch (err) {
+        // Retry lại request ban đầu
+        return axiosClient(originalRequest);
+      } catch (error) {
+        console.error("Lỗi khi lấy refresh token", error);
         localStorage.clear();
-        window.location.href = "/login"; // redirect về login nếu refresh fail
-        return Promise.reject(err);
+        // window.location.href = "/auth/signin"; // Redirect về login nếu refresh token không hợp lệ
       }
     }
 

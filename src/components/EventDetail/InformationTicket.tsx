@@ -8,47 +8,6 @@ import {
 } from "../../lib/utils";
 import { NavLink } from "react-router";
 
-// const tickets = [
-//   {
-//     id: 1,
-//     time: "19:00 - 21:00",
-//     date: "16 Tháng 02, 2025",
-//     ticketType: [
-//       {
-//         type: "VIP1",
-//         price: "6.500.000",
-//       },
-//       {
-//         type: "VIP2",
-//         price: "6.000.000",
-//       },
-//       {
-//         type: "VIP3",
-//         price: "5.500.000",
-//       },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     time: "19:00 - 21:00",
-//     date: "15 Tháng 02, 2025",
-//     ticketType: [
-//       {
-//         type: "VIP1",
-//         price: "6.500.000",
-//       },
-//       {
-//         type: "VIP2",
-//         price: "6.000.000",
-//       },
-//       {
-//         type: "VIP3",
-//         price: "5.500.000",
-//       },
-//     ],
-//   },
-// ];
-
 const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
 
@@ -86,17 +45,12 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
               </p>
               <NavLink
                 className={"ml-auto"}
-                to={
-                  eventDetail.haveSeatMap
-                    ? {
-                        pathname: "booking-ticket",
-                        search: `?eventId=${activity.eventId}&activityEventId=${activity.eventActivityId}`,
-                      }
-                    : {
-                        pathname: "booking-ticket-no-seatmap",
-                        search: `?eventId=${activity.eventId}&activityEventId=${activity.eventActivityId}`,
-                      }
-                }
+                to={{
+                  pathname: eventDetail.haveSeatMap
+                    ? "booking-ticket"
+                    : "booking-ticket-no-seatmap",
+                  search: `?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`,
+                }}
               >
                 <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
                   Mua vé ngay

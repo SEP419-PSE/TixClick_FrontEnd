@@ -23,6 +23,8 @@ const EventDetail = () => {
         } else {
           setEventDetail(undefined);
         }
+        const countResponse = await eventApi.countView(Number(id));
+        console.log(countResponse.data.message);
       }
     };
     fetchData();

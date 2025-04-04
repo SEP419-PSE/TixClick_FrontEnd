@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 import { Card } from "../components/ui/card";
 import { useSearchParams } from "react-router";
 import ticketMappingApi from "../services/ticketMappingApi";
-import { toast } from "sonner";
+import eventApi from "../services/eventApi";
+import { EventDetailResponse } from "../interface/EventInterface";
 
 interface Ticket {
   id: number;
@@ -34,10 +35,17 @@ interface TicketClass {
 const TicketBookingNoneSeatmap = () => {
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("eventId");
-  const activityEventId = searchParams.get("activityEventId");
+  const activityEventId = searchParams.get("eventActivityId");
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [eventInfor, setEventInfor] =
+    useState<
+      Pick<
+        EventDetailResponse,
+        "eventName" | "eventActivityDTOList" | "locationName"
+      >
+    >();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -71,6 +79,16 @@ const TicketBookingNoneSeatmap = () => {
     setTotalPrice(newTotal);
   }, [tickets]);
 
+  useEffect(() => {
+    const fetchEventInfor = async () => {
+      const response = await eventApi.getEventDetail(Number(eventId));
+      if (response.data.result.length != 0) {
+        setEventInfor(response.data.result);
+      }
+    };
+    fetchEventInfor();
+  }, [eventId]);
+
   const handleIncreaseQuantity = (ticketId: number) => {
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
@@ -99,9 +117,8 @@ const TicketBookingNoneSeatmap = () => {
     setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1);
   };
 
-  // console.log(tickets);
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className="flex flex-col h-auto lg:min-h-screen lg:flex-row">
       <div className="lg:w-[80%]">
         <div className="text-center bg-pse-black-light py-4">Chọn vé</div>
         <div className="flex flex-col lg:w-[600px] mx-auto my-10">
@@ -169,7 +186,7 @@ const TicketBookingNoneSeatmap = () => {
       <div className="flex flex-col lg:ml-auto lg:h-screen lg:w-[20%] text-black bg-white p-6 shadow-md border border-gray-200">
         <div className="mb-4 space-y-4">
           <div className="text-[18px] font-semibold">
-            Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!
+            {eventInfor?.eventName}
           </div>
           <div className="flex items-center gap-1 font-medium">
             <span>
@@ -189,7 +206,7 @@ const TicketBookingNoneSeatmap = () => {
                 className="text-pse-green-second"
               />
             </span>
-            Nhà Hát Kịch IDECAF
+            {eventInfor?.locationName}
           </div>
         </div>
         <CustomDivider />
