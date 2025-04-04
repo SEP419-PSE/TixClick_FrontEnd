@@ -6,7 +6,7 @@ import axiosClient from "../axiosClient";
 const managerApi = {
     getAllCompany() {
         const url = "/company/manager";
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken2');
         return axiosClient.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -40,7 +40,7 @@ const managerApi = {
         console.log(companyVerificationId)
     
     
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("accessToken2");
         return axiosClient.patch(url, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -56,7 +56,7 @@ const managerApi = {
         console.log(status);
         console.log(id);
     
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("accessToken2");
     
         return axiosClient.put(
             url,
