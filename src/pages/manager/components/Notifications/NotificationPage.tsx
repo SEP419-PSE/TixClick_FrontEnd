@@ -169,10 +169,11 @@ export default function NotificationPage() {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${context?.accessToken}`,
+              Authorization: `Bearer ${context?.accessToken2}`,
             },
           }
         );
+
 
         if (!response.ok) {
           throw new Error("Lỗi khi tải thông báo");
