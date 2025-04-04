@@ -42,47 +42,50 @@ export default function SuperLogin() {
   }
 
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+
+    // Kiểm tra dữ liệu đầu vào
     if (!credentials.userName || !credentials.password) {
-      setFormTouched({
-        userName: true,
-        password: true,
-      })
-      setError("Please fill in all required fields")
-      return
+      setFormTouched({ userName: true, password: true });
+      setError("Please fill in all required fields");
+      return;
     }
-    setIsLoading(true)
-    setError("")
+
+    setIsLoading(true);
+    setError("");
 
     try {
-      console.log("Submitting credentials:", credentials)
-      const response = await superLoginApi.login(credentials)
-      console.log("API Response:", response)
+      console.log("Submitting credentials:", credentials);
+      const response = await superLoginApi.login(credentials);
+      console.log("API Response:", response);
 
-      if (response.data?.result?.accessToken) {
-        localStorage.setItem("accessToken", response.data.result.accessToken)
-        localStorage.setItem("refreshToken", response.data.result.refreshToken)
+      const result = response.data?.result;
+      if (result?.status === true && result?.accessToken) {
+        // Lưu token vào localStorage
+        localStorage.setItem("accessToken2", result.accessToken);
+        localStorage.setItem("refreshToken2", result.refreshToken);
 
-        authContext?.login()
+        // Gọi superLogin với token
+        authContext?.superLogin(result.accessToken);
 
-        if (response.data.result.status == true) {
-          toast.success("Login successful", { duration: 2000 })
-          setTimeout(() => {
-            navigate(response.data.result.roleName == "ADMIN" ? "/proAdmin" : "/manager-dashboard")
-          }, 1000)
-        } else {
-          setError("Access denied")
-        }
+        // Đặt token cho Axios
+        authContext?.setTokenForAxios("super", result.accessToken);
+
+        // Điều hướng sau khi đăng nhập thành công
+        toast.success("Login successful", { duration: 2000 });
+        setTimeout(() => {
+          navigate(result.roleName === "ADMIN" ? "/proAdmin" : "/manager-dashboard");
+        }, 1000);
       } else {
-        setError("Invalid credentials")
+        setError("Access denied");
       }
     } catch (error) {
-      console.error("Login error:", error)
-      setError("Invalid username or password")
+      console.error("Login error:", error);
+      setError("Invalid username or password");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#121212] to-[#1E1E1E] p-4">

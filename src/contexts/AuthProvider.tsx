@@ -8,9 +8,13 @@ type Props = {
 
 interface AuthInterface {
   isLogin: boolean;
-  login: () => void;
+  isSuperLogin: boolean;
+  login: (token: string) => void;
+  superLogin: (token: string) => void;
   logout: () => void;
   accessToken: string | null;
+  accessToken2: string | null;
+  setTokenForAxios: (tokenType: "user" | "super", token: string) => void;
 }
 
 const AuthContext = createContext<AuthInterface | undefined>(undefined);
@@ -20,35 +24,67 @@ const AuthProvider = ({ children }: Props) => {
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
+
+  const [isSuperLogin, setIsSuperLogin] = useState<boolean>(false);
+  const [accessToken2, setAccessToken2] = useState<string | null>(
+    localStorage.getItem("accessToken2")
+  );
+
+  // Kiểm tra token khi load trang
   useEffect(() => {
-    //Kiểm tra token ở localStorage
     const token = localStorage.getItem("accessToken");
     if (token) {
       setIsLogin(true);
       setAccessToken(token);
-      axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
-  }, [isLogin, accessToken]);
 
-  const login = () => {
+    const superToken = localStorage.getItem("accessToken2");
+    if (superToken) {
+      setIsSuperLogin(true);
+      setAccessToken2(superToken);
+    }
+  }, []);
+
+  // Đặt token theo loại login
+  const setTokenForAxios = (tokenType: "user" | "super", token: string) => {
+    axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  };
+
+  const login = (token: string) => {
+    localStorage.setItem("accessToken", token);
     setIsLogin(true);
+    setAccessToken(token);
+  };
+
+  const superLogin = (token: string) => {
+    localStorage.setItem("accessToken2", token);
+    setIsSuperLogin(true);
+    setAccessToken2(token);
   };
 
   const logout = async () => {
-    await localStorage.clear();
-    await delete axiosClient.defaults.headers.common["Authorization"];
-    await setAccessToken(null);
-    await toast.success("Đăng xuất thành công");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("accessToken2");
+    delete axiosClient.defaults.headers.common["Authorization"];
+    setAccessToken(null);
+    setAccessToken2(null);
     setIsLogin(false);
+    setIsSuperLogin(false);
+    toast.success("Đăng xuất thành công");
   };
+
   const value = {
     accessToken,
+    accessToken2,
     isLogin,
+    isSuperLogin,
     login,
+    superLogin,
     logout,
+    setTokenForAxios,
   };
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext, AuthProvider };
-
