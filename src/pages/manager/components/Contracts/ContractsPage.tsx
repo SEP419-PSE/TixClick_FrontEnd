@@ -53,6 +53,7 @@ import {
 import { ContractDocumentDTO, ContractDTO, VietQR } from "../../../../interface/manager/Contracts";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { ManagerHeader } from "../ManagerHeader";
+import { UploadDocumentDialog } from "./UploadDocument";
 
 export default function ContractsPage() {
   const [contracts, setContracts] = useState<any[]>([])
@@ -93,6 +94,9 @@ export default function ContractsPage() {
     amount: "",
     description: "",
   })
+
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+  const [selectedContractForUpload, setSelectedContractForUpload] = useState<number | null>(null)
 
   const generateVietQRUrl = () => {
     if (!vietQRParams.bankID || !vietQRParams.accountID) {
@@ -145,12 +149,90 @@ export default function ContractsPage() {
     setIsAttachmentModalOpen(true)
   }
 
-  const handleUploadDocument = (id: any) => {
-    toast.success("Document Uploaded", {
-      description: "The document has been successfully uploaded.",
-    })
-    console.log(id)
+  const handleUploadDocument = (id: number) => {
+    setSelectedContractForUpload(id)
+    setIsUploadDialogOpen(true)
   }
+
+  const handleUploadSuccess = async () => {
+    // Refresh the contract list to show the new document
+    await fetchContractList()
+
+    // If we have a selected contract, update its documents
+    if (selectedContract && selectedContractForUpload === selectedContract.contractId) {
+      const contractData = contracts.find((item: any) => item.contractDTO.contractId === selectedContract.contractId)
+
+      if (contractData && contractData.contractDocumentDTOS) {
+        setContractDocument(contractData.contractDocumentDTOS)
+      }
+    }
+  }
+
+  // const handleUploadDocument = async (id: number) => {
+  //   try {
+  //     // Create a file input element
+  //     const fileInput = document.createElement('input');
+  //     fileInput.type = 'file';
+  //     fileInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt';
+
+  //     // Handle file selection
+  //     fileInput.onchange = async (e) => {
+  //       const files = (e.target as HTMLInputElement).files;
+  //       if (!files || files.length === 0) return;
+
+  //       const file = files[0];
+
+  //       try {
+  //         // Show loading toast
+  //         toast.loading("Uploading document...");
+
+  //         // Call the API to upload the document
+  //         const response = await managerApi.uploadContractDocument(id, file);
+
+  //         // Handle successful upload
+  //         if (response.data && response.data.code === 0) {
+  //           toast.dismiss();
+  //           toast.success("Document Uploaded", {
+  //             description: "The document has been successfully uploaded."
+  //           });
+
+  //           // Refresh the contract list to show the new document
+  //           await fetchContractList();
+
+  //           // If we have a selected contract, update its documents
+  //           if (selectedContract && selectedContract.contractId === id) {
+  //             const contractData = contracts.find((item: any) =>
+  //               item.contractDTO.contractId === id
+  //             );
+
+  //             if (contractData && contractData.contractDocumentDTOS) {
+  //               setContractDocument(contractData.contractDocumentDTOS);
+  //             }
+  //           }
+  //         } else {
+  //           toast.dismiss();
+  //           toast.error("Upload Failed", {
+  //             description: response.data.message || "Failed to upload document."
+  //           });
+  //         }
+  //       } catch (error) {
+  //         toast.dismiss();
+  //         toast.error("Upload Failed", {
+  //           description: "An error occurred while uploading the document."
+  //         });
+  //         console.error("Error uploading document:", error);
+  //       }
+  //     };
+
+  //     // Trigger the file input click
+  //     fileInput.click();
+  //   } catch (error) {
+  //     toast.error("Upload Failed", {
+  //       description: "An error occurred while preparing the upload."
+  //     });
+  //     console.error("Error in upload process:", error);
+  //   }
+  // };
 
   // const handleDownloadDocument = (id: number, doc: string) => {
   //   toast.success("Document Downloaded", {
@@ -673,6 +755,12 @@ export default function ContractsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <UploadDocumentDialog
+        contractId={selectedContractForUpload || 0}
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </>
   )
 }
