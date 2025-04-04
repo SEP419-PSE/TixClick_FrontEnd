@@ -39,7 +39,7 @@ const managerApi = {
         console.log(status)
         console.log(companyVerificationId)
     
-    
+
         const token = localStorage.getItem("accessToken2");
         return axiosClient.patch(url, {
             headers: {
@@ -47,7 +47,7 @@ const managerApi = {
             }
         });
     
-        
+
     },
     
     approveEvent(status: string, id: number) {
