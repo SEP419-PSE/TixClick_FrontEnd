@@ -1,3 +1,4 @@
+import { Client } from "@stomp/stompjs";
 import { Bell, BellOff } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -7,9 +8,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../components/ui/tabs";
-import NotificationList, { Notification } from "./NotificationList";
-import { Client } from "@stomp/stompjs";
 import { AuthContext } from "../../../../contexts/AuthProvider";
+import NotificationList, { Notification } from "./NotificationList";
 
 export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -35,7 +35,7 @@ export default function NotificationPage() {
     console.log("Connecting to WebSocket for user:", currentUser);
 
     const client = new Client({
-      brokerURL: "ws://160.191.175.172:8080/ws",
+      brokerURL: "wss://160.191.175.172:8443/wss",
       connectHeaders: {
         Authorization: `Bearer ${context.accessToken}`,
       },
@@ -165,14 +165,15 @@ export default function NotificationPage() {
       try {
         setLoading(true);
         const response = await fetch(
-          "http://160.191.175.172:8080/notification/notifications",
+          "https://160.191.175.172:8443/notification/notifications",
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${context?.accessToken}`,
+              Authorization: `Bearer ${context?.accessToken2}`,
             },
           }
         );
+
 
         if (!response.ok) {
           throw new Error("Lỗi khi tải thông báo");

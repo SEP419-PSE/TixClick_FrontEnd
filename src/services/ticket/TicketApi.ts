@@ -1,3 +1,4 @@
+import { TicketPurchaseRequest } from "../../interface/ticket/Ticket";
 import axiosClient from "../axiosClient";
 
 const ticketApi = {
@@ -10,6 +11,17 @@ const ticketApi = {
             }
         });
     },
+
+    createTicketPurchase(request: TicketPurchaseRequest) {
+        const url = "/ticket-purchase/create";
+        const token = localStorage.getItem('accessToken');
+        return axiosClient.post(url, request, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json" 
+          }
+        });
+      }
 }
 
 export default ticketApi;

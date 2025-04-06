@@ -6,7 +6,7 @@ import axiosClient from "../axiosClient";
 const managerApi = {
     getAllCompany() {
         const url = "/company/manager";
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken2');
         return axiosClient.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -39,15 +39,15 @@ const managerApi = {
         console.log(status)
         console.log(companyVerificationId)
     
-    
-        const token = localStorage.getItem("accessToken");
+
+        const token = localStorage.getItem("accessToken2");
         return axiosClient.patch(url, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
     
-        
+
     },
     
     approveEvent(status: string, id: number) {
@@ -56,7 +56,7 @@ const managerApi = {
         console.log(status);
         console.log(id);
     
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("accessToken2");
     
         return axiosClient.put(
             url,
@@ -70,10 +70,23 @@ const managerApi = {
     },
     
 
-    uploadContractDocument(request: ContractUpload){
-        const url = `/contract-document/upload?contractId=${request.contractId}`;
-        return axiosClient.post(url, request);
-    }
+    // uploadContractDocument(request: ContractUpload){
+    //     const url = `/contract-document/upload?contractId=${request.contractId}`;
+    //     return axiosClient.post(url, request);
+    // }
+
+    uploadContractDocument(contractId: number, file: File) {
+        const url = `/contract-document/upload?contractId=${contractId}`
+    
+        const formData = new FormData()
+        formData.append("file", file)
+    
+        return axiosClient.post(url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      },
 }
 
 export default managerApi;

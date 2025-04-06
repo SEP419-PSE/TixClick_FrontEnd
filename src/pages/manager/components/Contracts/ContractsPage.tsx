@@ -53,9 +53,10 @@ import {
 import { ContractDocumentDTO, ContractDTO, VietQR } from "../../../../interface/manager/Contracts";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { ManagerHeader } from "../ManagerHeader";
+import { UploadDocumentDialog } from "./UploadDocument";
 
 export default function ContractsPage() {
-  const [contracts, setContracts] = useState<ContractDTO[]>([]);
+  const [contracts, setContracts] = useState<any[]>([])
   const [contractDocument, setContractDocument] = useState<ContractDocumentDTO[]>([])
 
   // const [newContract, setNewContract] = useState({
@@ -68,13 +69,13 @@ export default function ContractsPage() {
   //   status: "Draft",
   // })
 
-  const [selectedContract, setSelectedContract] = useState<ContractDTO>();
-  const [selectedContractDocument, setSelectedContractDocument] = useState<ContractDocumentDTO>();
-console.log(setContractDocument, setSelectedContractDocument)
-  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<ContractDTO>()
+  const [selectedContractDocument, setSelectedContractDocument] = useState<ContractDocumentDTO>()
+  console.log(setContractDocument, setSelectedContractDocument)
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false)
 
-  const [selectedDocument, setSelectedDocument] = useState("");
-  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState("")
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
   const [documentDetails, setDocumentDetails] = useState({
     name: "",
     type: "",
@@ -84,55 +85,54 @@ console.log(setContractDocument, setSelectedContractDocument)
     lastModified: "",
     version: "",
     description: "",
-  });
+  })
 
-  const [paymentCode, setPaymentCode] = useState("");
+  const [paymentCode, setPaymentCode] = useState("")
   const [vietQRParams, setVietQRParams] = useState<VietQR>({
     bankID: "",
     accountID: "",
     amount: "",
     description: "",
-  });
+  })
+
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
+  const [selectedContractForUpload, setSelectedContractForUpload] = useState<number | null>(null)
 
   const generateVietQRUrl = () => {
     if (!vietQRParams.bankID || !vietQRParams.accountID) {
-      return null;
+      return null
     }
 
-    const encodedDescription = encodeURIComponent(
-      vietQRParams.description || ""
-    );
-    const amount = vietQRParams.amount
-      ? Number.parseInt(vietQRParams.amount)
-      : selectedContract?.totalAmount
+    const encodedDescription = encodeURIComponent(vietQRParams.description || "")
+    const amount = vietQRParams.amount ? Number.parseInt(vietQRParams.amount) : selectedContract?.totalAmount
 
-    return `https://img.vietqr.io/image/${vietQRParams.bankID}-${vietQRParams.accountID}-compact.png?amount=${amount}&addInfo=${encodedDescription}&accountName=Contract%20Payment`;
-  };
+    return `https://img.vietqr.io/image/${vietQRParams.bankID}-${vietQRParams.accountID}-compact.png?amount=${amount}&addInfo=${encodedDescription}&accountName=Contract%20Payment`
+  }
 
   const handlePaymentConfirmation = () => {
     if (paymentCode.trim() === "") {
-      toast.error("Please enter a payment confirmation code");
-      return;
+      toast.error("Please enter a payment confirmation code")
+      return
     }
 
     toast.success("Payment confirmed", {
       description: `Payment for contract ${selectedContract?.accountId} has been confirmed.`,
-    });
-    setPaymentCode("");
-  };
+    })
+    setPaymentCode("")
+  }
 
   const handleViewDocumentDetails = (doc: string) => {
-    setSelectedDocument(doc);
+    setSelectedDocument(doc)
 
-    const fileExtension = doc.split(".").pop() || "";
+    const fileExtension = doc.split(".").pop() || ""
     const fileType =
       fileExtension === "pdf"
         ? "PDF Document"
         : fileExtension === "docx"
-        ? "Word Document"
-        : fileExtension === "xlsx"
-        ? "Excel Spreadsheet"
-        : "Document";
+          ? "Word Document"
+          : fileExtension === "xlsx"
+            ? "Excel Spreadsheet"
+            : "Document"
 
     setDocumentDetails({
       name: doc,
@@ -144,18 +144,95 @@ console.log(setContractDocument, setSelectedContractDocument)
       version: "1.2",
       description: `This is the ${doc} file for contract.`,
       // description: `This is the ${doc} file for contract ${selectedContract.name}.`,
+    })
 
-    });
+    setIsAttachmentModalOpen(true)
+  }
 
-    setIsAttachmentModalOpen(true);
-  };
+  const handleUploadDocument = (id: number) => {
+    setSelectedContractForUpload(id)
+    setIsUploadDialogOpen(true)
+  }
 
-  const handleUploadDocument = (id: any) => {
-    toast.success("Document Uploaded", {
-      description: "The document has been successfully uploaded.",
-    });
-    console.log(id);
-  };
+  const handleUploadSuccess = async () => {
+    // Refresh the contract list to show the new document
+    await fetchContractList()
+
+    // If we have a selected contract, update its documents
+    if (selectedContract && selectedContractForUpload === selectedContract.contractId) {
+      const contractData = contracts.find((item: any) => item.contractDTO.contractId === selectedContract.contractId)
+
+      if (contractData && contractData.contractDocumentDTOS) {
+        setContractDocument(contractData.contractDocumentDTOS)
+      }
+    }
+  }
+
+  // const handleUploadDocument = async (id: number) => {
+  //   try {
+  //     // Create a file input element
+  //     const fileInput = document.createElement('input');
+  //     fileInput.type = 'file';
+  //     fileInput.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt';
+
+  //     // Handle file selection
+  //     fileInput.onchange = async (e) => {
+  //       const files = (e.target as HTMLInputElement).files;
+  //       if (!files || files.length === 0) return;
+
+  //       const file = files[0];
+
+  //       try {
+  //         // Show loading toast
+  //         toast.loading("Uploading document...");
+
+  //         // Call the API to upload the document
+  //         const response = await managerApi.uploadContractDocument(id, file);
+
+  //         // Handle successful upload
+  //         if (response.data && response.data.code === 0) {
+  //           toast.dismiss();
+  //           toast.success("Document Uploaded", {
+  //             description: "The document has been successfully uploaded."
+  //           });
+
+  //           // Refresh the contract list to show the new document
+  //           await fetchContractList();
+
+  //           // If we have a selected contract, update its documents
+  //           if (selectedContract && selectedContract.contractId === id) {
+  //             const contractData = contracts.find((item: any) =>
+  //               item.contractDTO.contractId === id
+  //             );
+
+  //             if (contractData && contractData.contractDocumentDTOS) {
+  //               setContractDocument(contractData.contractDocumentDTOS);
+  //             }
+  //           }
+  //         } else {
+  //           toast.dismiss();
+  //           toast.error("Upload Failed", {
+  //             description: response.data.message || "Failed to upload document."
+  //           });
+  //         }
+  //       } catch (error) {
+  //         toast.dismiss();
+  //         toast.error("Upload Failed", {
+  //           description: "An error occurred while uploading the document."
+  //         });
+  //         console.error("Error uploading document:", error);
+  //       }
+  //     };
+
+  //     // Trigger the file input click
+  //     fileInput.click();
+  //   } catch (error) {
+  //     toast.error("Upload Failed", {
+  //       description: "An error occurred while preparing the upload."
+  //     });
+  //     console.error("Error in upload process:", error);
+  //   }
+  // };
 
   // const handleDownloadDocument = (id: number, doc: string) => {
   //   toast.success("Document Downloaded", {
@@ -212,46 +289,71 @@ console.log(setContractDocument, setSelectedContractDocument)
   // };
 
   const getDocumentIcon = (doc: string) => {
-    const fileExtension = doc.split(".").pop()?.toLowerCase() || "";
+    const fileExtension = doc.split(".").pop()?.toLowerCase() || ""
 
     switch (fileExtension) {
       case "pdf":
-        return <FileText className="h-5 w-5 text-red-400" />;
+        return <FileText className="h-5 w-5 text-red-400" />
       case "docx":
       case "doc":
-        return <FileText className="h-5 w-5 text-blue-400" />;
+        return <FileText className="h-5 w-5 text-blue-400" />
       case "xlsx":
       case "xls":
-        return <FileText className="h-5 w-5 text-green-400" />;
+        return <FileText className="h-5 w-5 text-green-400" />
       default:
-        return <FileText className="h-5 w-5 text-gray-400" />;
+        return <FileText className="h-5 w-5 text-gray-400" />
     }
-  };
+  }
 
   const fetchContractList = async () => {
     try {
-      const res: any = await managerApi.getAllContract();
-      console.log("Contract List:", res.data.result);
+      const res: any = await managerApi.getAllContract()
+      console.log("Contract List:", res.data.result)
       if (res.data.result && res.data.result.length > 0) {
-        setContracts(res.data.result);
+        setContracts(res.data.result)
+
+        // If we have a selected contract, also set its documents
+        if (selectedContract) {
+          const contractData = res.data.result.find(
+            (item: any) => item.contractDTO.contractId === selectedContract.contractId,
+          )
+          if (contractData && contractData.contractDocumentDTOS) {
+            setContractDocument(contractData.contractDocumentDTOS)
+            setSelectedContractDocument(contractData.contractDocumentDTOS[0])
+          }
+        }
       }
     } catch (error) {
-      console.error("Error fetching contract:", error);
-      toast.error("Failed to fetch contract");
+      console.error("Error fetching contract:", error)
+      toast.error("Failed to fetch contract")
     }
-  };
+  }
 
   useEffect(() => {
     const initUseEffect = async () => {
-      await fetchContractList();
-    };
-    initUseEffect();
-  }, []);
+      await fetchContractList()
+    }
+    initUseEffect()
+  }, [])
 
   const openContractModal = (contract: ContractDTO) => {
-    setSelectedContract(contract);
-    setIsContractModalOpen(true);
-  };
+    setSelectedContract(contract)
+
+    // Find the contract documents for this contract
+    const contractData = contracts.find((item: any) => item.contractDTO.contractId === contract.contractId)
+
+    if (contractData && contractData.contractDocumentDTOS) {
+      setContractDocument(contractData.contractDocumentDTOS)
+      if (contractData.contractDocumentDTOS.length > 0) {
+        setSelectedContractDocument(contractData.contractDocumentDTOS[0])
+      }
+    } else {
+      setContractDocument([])
+      setSelectedContractDocument(undefined)
+    }
+
+    setIsContractModalOpen(true)
+  }
 
   useEffect(() => {
     if (selectedContract && selectedContract.contractId) {
@@ -260,24 +362,18 @@ console.log(setContractDocument, setSelectedContractDocument)
         accountID: "31410001689304",
         amount: selectedContract.totalAmount.toString(),
         description: `Payment for contract #${selectedContract.contractId}`,
-      });
+      })
     }
-  }, [selectedContract]);
+  }, [selectedContract])
 
   return (
     <>
-      <ManagerHeader
-        heading="Contracts"
-        text="Manage and track all contracts"
-      />
+      <ManagerHeader heading="Contracts" text="Manage and track all contracts" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-2">
             <Search className="text-gray-400" />
-            <Input
-              className="w-[300px] bg-[#2A2A2A] text-white"
-              placeholder="Search contracts..."
-            />
+            <Input className="w-[300px] bg-[#2A2A2A] text-white" placeholder="Search contracts..." />
           </div>
           <div className="flex items-center space-x-2">
             <Select>
@@ -300,12 +396,8 @@ console.log(setContractDocument, setSelectedContractDocument)
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="service">Service Agreement</SelectItem>
                 <SelectItem value="licensing">Licensing Agreement</SelectItem>
-                <SelectItem value="partnership">
-                  Partnership Agreement
-                </SelectItem>
-                <SelectItem value="maintenance">
-                  Maintenance Agreement
-                </SelectItem>
+                <SelectItem value="partnership">Partnership Agreement</SelectItem>
+                <SelectItem value="maintenance">Maintenance Agreement</SelectItem>
                 <SelectItem value="consulting">Consulting Agreement</SelectItem>
               </SelectContent>
             </Select>
@@ -325,66 +417,44 @@ console.log(setContractDocument, setSelectedContractDocument)
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contracts.map((contract) => (
-              <TableRow
-                key={contract.contractId}
-                className="border-[#333333] hover:bg-[#2A2A2A]"
-              >
-                <TableCell className="font-medium text-white">
-                  {contract.commission}
-                </TableCell>
-                <TableCell className="text-white">{contract.companyId}</TableCell>
-                <TableCell className="text-white">{contract.contractType}</TableCell>
-                {/* <TableCell className="text-white">
-                  {contract.startDate}
-                </TableCell>
-                <TableCell className="text-white">{contract.endDate}</TableCell> */}
-                <TableCell className="text-white">
-                  {/* ${contract.value.toLocaleString()} */}
-                </TableCell>
-                {/* <TableCell className="text-white">
-                  {getStatusBadge(contract.status)}
-                </TableCell> */}
-                {/* <TableCell className="text-white">
-                  <Progress value={contract.progress} className="w-[60px]" />
-                </TableCell> */}
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="bg-[#2A2A2A] text-white"
-                    >
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => openContractModal(contract)}
-                      >
-                        View details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleUploadDocument(contract.contractId)}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload document
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-yellow-500">
-                        <Bell className="mr-2 h-4 w-4" />
-                        Set reminder
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-500">
-                        Terminate contract
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            {contracts.map((contractItem) => {
+              const contract = contractItem.contractDTO
+              return (
+                <TableRow key={contract.contractId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                  <TableCell className="font-medium text-white">{contract.contractName}</TableCell>
+                  <TableCell className="text-white">Company {contract.companyId}</TableCell>
+                  <TableCell className="text-white">{contract.contractType}</TableCell>
+                  <TableCell className="text-white">{contract.startDate || "N/A"}</TableCell>
+                  <TableCell className="text-white">{contract.endDate || "N/A"}</TableCell>
+                  <TableCell className="text-white">${contract.totalAmount?.toLocaleString() || "0"}</TableCell>
+                  <TableCell className="text-white">{contract.status || "N/A"}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => openContractModal(contract)}>View details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleUploadDocument(contract.contractId)}>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload document
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-yellow-500">
+                          <Bell className="mr-2 h-4 w-4" />
+                          Set reminder
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-500">Terminate contract</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </main>
@@ -393,9 +463,7 @@ console.log(setContractDocument, setSelectedContractDocument)
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
           <DialogHeader>
             <DialogTitle>Contract Details</DialogTitle>
-            <DialogDescription>
-              View and manage the details of the selected contract.
-            </DialogDescription>
+            <DialogDescription>View and manage the details of the selected contract.</DialogDescription>
           </DialogHeader>
           {selectedContract && (
             <Tabs defaultValue="details" className="w-full">
@@ -409,77 +477,55 @@ console.log(setContractDocument, setSelectedContractDocument)
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Contract Name</Label>
-                    <div>{selectedContract.commission}</div>
+                    <div>{selectedContract.contractName}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Company</Label>
-                    <div>{selectedContract.companyId}</div>
+                    <div>Company {selectedContract.companyId}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Type</Label>
                     <div>{selectedContract.contractType}</div>
                   </div>
-                  {/* <div className="grid grid-cols-2 items-center gap-4">
+                  <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Start Date</Label>
-                    <div>{selectedContract.startDate}</div>
+                    <div>{selectedContract.startDate || "Not specified"}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">End Date</Label>
-                    <div>{selectedContract.endDate}</div>
-                  </div> */}
+                    <div>{selectedContract.endDate || "Not specified"}</div>
+                  </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Value</Label>
-                    <div>${selectedContract.totalAmount.toLocaleString()}</div>
+                    <div>${selectedContract.totalAmount?.toLocaleString() || "0"}</div>
                   </div>
-                  {/* <div className="grid grid-cols-2 items-center gap-4">
+                  <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Status</Label>
-                    <div className="flex items-center">
-                      {getStatusIcon(selectedContract.status)}
-                      <span className="ml-2">{selectedContract.status}</span>
-                    </div>
-                  </div> */}
-                  {/* <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Progress</Label>
-                    <Progress
-                      value={selectedContract.progress}
-                      className="w-[200px]"
-                    />
-                  </div> */}
+                    <div>{selectedContract.status || "Not specified"}</div>
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label className="text-right">Commission</Label>
+                    <div>{selectedContract.commission || "Not specified"}</div>
+                  </div>
                 </div>
               </TabsContent>
               <TabsContent value="documents">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Contract Documents
-                  </h3>
-                  {selectedContract.contractId == selectedContractDocument?.contractId 
-                  ? (
+                  <h3 className="text-lg font-semibold mb-2">Contract Documents</h3>
+                  {contractDocument && contractDocument.length > 0 ? (
                     <ul className="space-y-2">
-                      {contractDocument.map((doc:any, index:any) => (
-                        <li
-                          key={index}
-                          className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                        >
+                      {contractDocument.map((doc, index) => (
+                        <li key={index} className="flex items-center justify-between p-2 rounded hover:bg-[#333333]">
                           <div className="flex items-center">
-                            {getDocumentIcon(doc)}
-                            <span className="ml-2">{doc}</span>
+                            {getDocumentIcon(doc.fileName)}
+                            <span className="ml-2">{doc.fileName}</span>
                           </div>
                           <div className="flex gap-2 text-black">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewDocumentDetails(doc)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => handleViewDocumentDetails(doc.fileName)}>
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              // onClick={() =>
-                              //   handleDownloadDocument(selectedContract.contractId, doc)
-                              // }
-                            >
+                            <Button variant="outline" size="sm">
                               <Download className="mr-2 h-4 w-4" />
                               Download
                             </Button>
@@ -490,10 +536,7 @@ console.log(setContractDocument, setSelectedContractDocument)
                   ) : (
                     <p>No documents uploaded yet.</p>
                   )}
-                  <Button
-                    className="mt-4"
-                    onClick={() => handleUploadDocument(selectedContract.contractId)}
-                  >
+                  <Button className="mt-4" onClick={() => handleUploadDocument(selectedContract.contractId)}>
                     <Upload className="mr-2 h-4 w-4" />
                     Upload New Document
                   </Button>
@@ -501,28 +544,20 @@ console.log(setContractDocument, setSelectedContractDocument)
               </TabsContent>
               <TabsContent value="timeline">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Contract Timeline
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2">Contract Timeline</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
-                        Start
-                      </div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Start</div>
                       <div className="w-4 h-4 rounded-full bg-green-500"></div>
                       {/* <div className="ml-2">{selectedContract.startDate}</div> */}
                     </div>
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
-                        Current
-                      </div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Current</div>
                       <div className="w-4 h-4 rounded-full bg-blue-500"></div>
                       <div className="ml-2">Today</div>
                     </div>
                     <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">
-                        End
-                      </div>
+                      <div className="w-12 text-right mr-4 text-sm text-gray-500">End</div>
                       <div className="w-4 h-4 rounded-full bg-red-500"></div>
                       {/* <div className="ml-2">{selectedContract.endDate}</div> */}
                     </div>
@@ -535,16 +570,12 @@ console.log(setContractDocument, setSelectedContractDocument)
               </TabsContent>
               <TabsContent value="payment">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-4">
-                    Contract Payment
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-4">Contract Payment</h3>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="p-4 bg-[#1E1E1E] rounded-lg">
-                        <h4 className="text-md font-medium mb-2">
-                          Payment Details
-                        </h4>
+                        <h4 className="text-md font-medium mb-2">Payment Details</h4>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="text-gray-400">Contract Value:</div>
                           <div>${selectedContract.totalAmount}</div>
@@ -561,20 +592,15 @@ console.log(setContractDocument, setSelectedContractDocument)
                           <div className="text-gray-400">Account Number:</div>
                           <div>{vietQRParams.accountID}</div>
                           <div className="text-gray-400">Description:</div>
-                          <div className="truncate">
-                            {vietQRParams.description}
-                          </div>
+                          <div className="truncate">{vietQRParams.description}</div>
                         </div>
                       </div>
 
                       <div className="p-4 bg-[#1E1E1E] rounded-lg">
-                        <h4 className="text-md font-medium mb-2">
-                          Confirm Payment
-                        </h4>
+                        <h4 className="text-md font-medium mb-2">Confirm Payment</h4>
                         <div className="space-y-3">
                           <p className="text-sm text-gray-400">
-                            After completing payment, enter the confirmation
-                            code below:
+                            After completing payment, enter the confirmation code below:
                           </p>
                           <div className="flex space-x-2">
                             <Input
@@ -583,9 +609,7 @@ console.log(setContractDocument, setSelectedContractDocument)
                               onChange={(e) => setPaymentCode(e.target.value)}
                               className="bg-[#2A2A2A]"
                             />
-                            <Button onClick={handlePaymentConfirmation}>
-                              Confirm
-                            </Button>
+                            <Button onClick={handlePaymentConfirmation}>Confirm</Button>
                           </div>
                         </div>
                       </div>
@@ -593,13 +617,8 @@ console.log(setContractDocument, setSelectedContractDocument)
 
                     <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
                       <div className="mb-4 text-center">
-                        <h4 className="text-md font-medium mb-1">
-                          Scan to Pay
-                        </h4>
-                        <p className="text-sm text-gray-400">
-                          Scan this VietQR code to make payment for this
-                          contract
-                        </p>
+                        <h4 className="text-md font-medium mb-1">Scan to Pay</h4>
+                        <p className="text-sm text-gray-400">Scan this VietQR code to make payment for this contract</p>
                       </div>
 
                       <Dialog>
@@ -615,9 +634,7 @@ console.log(setContractDocument, setSelectedContractDocument)
                               />
                             ) : (
                               <div className="w-48 h-48 flex flex-col items-center justify-center text-black">
-                                <p className="text-center text-sm">
-                                  Loading payment QR code...
-                                </p>
+                                <p className="text-center text-sm">Loading payment QR code...</p>
                               </div>
                             )}
                           </div>
@@ -625,21 +642,18 @@ console.log(setContractDocument, setSelectedContractDocument)
 
                         <DialogContent className="flex flex-col items-center p-6">
                           {generateVietQRUrl() && (
-                            <img
-                              src={generateVietQRUrl() || ""}
-                              alt="VietQR Payment Code"
-                              className="w-80 h-80"
-                            />
+                            <img src={generateVietQRUrl() || ""} alt="VietQR Payment Code" className="w-80 h-80" />
                           )}
                         </DialogContent>
                       </Dialog>
 
                       <p className="text-xs text-gray-400 text-center">
                         Payment reference: {selectedContract.contractId}-
-                        {selectedContract.companyId
+                        {
+                          selectedContract.companyId
                           // .replace(/\s+/g, "")
                           // .toLowerCase()
-                          }
+                        }
                       </p>
                     </div>
                   </div>
@@ -653,24 +667,17 @@ console.log(setContractDocument, setSelectedContractDocument)
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={isAttachmentModalOpen}
-        onOpenChange={setIsAttachmentModalOpen}
-      >
+      <Dialog open={isAttachmentModalOpen} onOpenChange={setIsAttachmentModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle>Document Details</DialogTitle>
-            <DialogDescription>
-              View details for {selectedDocument}
-            </DialogDescription>
+            <DialogDescription>View details for {selectedDocument}</DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
             <div className="flex items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
               {getDocumentIcon(selectedDocument)}
-              <span className="ml-2 text-xl font-medium">
-                {selectedDocument}
-              </span>
+              <span className="ml-2 text-xl font-medium">{selectedDocument}</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-4">
@@ -683,21 +690,15 @@ console.log(setContractDocument, setSelectedContractDocument)
                 <p>{documentDetails.size}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">
-                  Uploaded By
-                </h4>
+                <h4 className="text-sm font-medium text-gray-400">Uploaded By</h4>
                 <p>{documentDetails.uploadedBy}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">
-                  Upload Date
-                </h4>
+                <h4 className="text-sm font-medium text-gray-400">Upload Date</h4>
                 <p>{documentDetails.uploadedDate}</p>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-400">
-                  Last Modified
-                </h4>
+                <h4 className="text-sm font-medium text-gray-400">Last Modified</h4>
                 <p>{documentDetails.lastModified}</p>
               </div>
               <div>
@@ -712,9 +713,7 @@ console.log(setContractDocument, setSelectedContractDocument)
             </div>
 
             <div className="mt-4 p-3 bg-[#1E1E1E] rounded-lg">
-              <h4 className="text-sm font-medium text-gray-400 mb-2">
-                Document History
-              </h4>
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Document History</h4>
               <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
                   <span>Created document</span>
@@ -752,12 +751,16 @@ console.log(setContractDocument, setSelectedContractDocument)
                 Upload New Version
               </Button>
             </div>
-            <Button onClick={() => setIsAttachmentModalOpen(false)}>
-              Close
-            </Button>
+            <Button onClick={() => setIsAttachmentModalOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <UploadDocumentDialog
+        contractId={selectedContractForUpload || 0}
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </>
-  );
+  )
 }

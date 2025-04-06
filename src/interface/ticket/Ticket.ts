@@ -11,3 +11,14 @@ export interface TicketResponse {
     zoneName: string | null;
     quantity: number;
 }
+
+
+export interface TicketPurchaseRequest {
+    zoneId: number;
+    seatId: number;
+    eventActivityId: number;
+    ticketId: number;
+    eventId: number;
+    quantity: number;
+  }
+  
