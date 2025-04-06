@@ -1,4 +1,4 @@
-import { ContractUpload } from "../../interface/manager/Contracts";
+// import { ContractUpload } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
 

@@ -71,7 +71,7 @@ export default function ContractsPage() {
 
   const [selectedContract, setSelectedContract] = useState<ContractDTO>()
   const [selectedContractDocument, setSelectedContractDocument] = useState<ContractDocumentDTO>()
-  console.log(setContractDocument, setSelectedContractDocument)
+  console.log(selectedContractDocument, setSelectedContractDocument)
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
 
   const [selectedDocument, setSelectedDocument] = useState("")

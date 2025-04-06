@@ -9,9 +9,9 @@ import { formatMoney } from "../lib/utils";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 
-type SeatStatus = "available" | "disabled"
-type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
-type ViewMode = "edit" | "preview"
+// type SeatStatus = "available" | "disabled"
+// type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
+// type ViewMode = "edit" | "preview"
 export type SectionType = "SEATED" | "STANDING"
 
 // Utility functions
