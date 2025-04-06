@@ -23,6 +23,20 @@ const eventApi = {
     const url = `${baseURL}/consumer/${id}`;
     return axiosClient.get(url);
   },
+  countView: (eventId: number) => {
+    const url = `${baseURL}/count-view/${eventId}`;
+    return axiosClient.post(url);
+  },
+  search: (
+    startDate?: string,
+    endDate?: string,
+    eventType?: string,
+    eventName?: string,
+    eventCategory?: string[]
+  ) => {
+    const url = `${baseURL}/filter?startDate=${startDate}&endDate=${endDate}&eventType=${eventType}&eventName=${eventName}&eventCategory=${eventCategory}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;

@@ -33,9 +33,6 @@ import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import NotificationPage from "./pages/manager/components/Notifications/NotificationPage";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
-import {
-  default as OrganizerCenter,
-} from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
@@ -46,6 +43,9 @@ import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
 import TicketBooking from "./pages/TicketBooking";
 import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
+import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
+import SearchPage from "./pages/consumer/SearchPage";
+import OrganizerCenter from "./pages/organizer";
 import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
 
 export default function App() {
@@ -75,6 +75,12 @@ export default function App() {
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
           </Route>
+
+          <Route
+            path="event-detail/:id/booking-ticket-no-seatmap"
+            element={<TicketBookingNoneSeatmap />}
+          />
+          <Route path="/search" element={<SearchPage />} />
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
