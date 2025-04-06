@@ -33,8 +33,10 @@ export const convertHHMMtoHHMMSS = (time: string): string => {
   return time; // nếu không đúng định dạng thì giữ nguyên
 };
 
-export const formatDateVietnamese = (dateString: string): string => {
-  const date = new Date(dateString);
+export const formatDateVietnamese = (
+  dateString: string | undefined
+): string => {
+  const date = new Date(dateString ? dateString : "");
   return date.toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "long",
@@ -42,7 +44,10 @@ export const formatDateVietnamese = (dateString: string): string => {
   });
 };
 
-export const formatTimeFe = (timeStr: string): string => timeStr.slice(0, 5);
+export const formatTimeFe = (timeStr: string | undefined): string => {
+  if (timeStr == undefined) return "";
+  return timeStr.slice(0, 5);
+};
 
 export const formatMoney = (amount: number | undefined): string => {
   return amount?.toLocaleString("vi-VN") + " ₫";

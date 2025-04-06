@@ -10,6 +10,7 @@ export interface CreateEvent {
 export interface EventType {
   id: number;
   name: string;
+  englishName?: string;
 }
 
 interface ImageEvent {

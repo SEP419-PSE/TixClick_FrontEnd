@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { Menu, Search, X } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { FaFacebookSquare, FaYoutube } from "react-icons/fa";
@@ -63,6 +63,17 @@ const HeroSlider = () => {
       }
     }
   };
+
+  const submitSearchValue = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const searchValue = formData.get("searchValue") as string;
+    navigate(`/search?event-name=${searchValue}`);
+
+    console.log(searchValue);
+  };
+
   return (
     <div className="lg:mb-8">
       <div className="relative">
@@ -120,10 +131,14 @@ const HeroSlider = () => {
           </button>
         </header>
 
-        <form className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4">
+        <form
+          onSubmit={submitSearchValue}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4"
+        >
           <div className="relative w-full">
             <input
               type="text"
+              name="searchValue"
               placeholder="Tìm kiếm sự kiện..."
               className="w-full bg-transparent border-2 border-white text-white placeholder-white rounded-full py-3 px-5 pr-12 outline-none focus:ring-2 focus:ring-white transition-all duration-300 sm:text-sm"
             />
@@ -153,32 +168,44 @@ const HeroSlider = () => {
           </div>
         </div>
         <div className="text-black my-8">
-        <ul className="space-y-4">
-      <li>
-        <a href="/ticketManagement" className="flex items-center gap-2 py-3 px-6 hover:bg-pse-black/20">
-          <LuTicketCheck size={24} />
-          Vé đã mua
-        </a>
-      </li>
-      <li>
-        <a href="/consumerCenter" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
-          <RiCalendarEventLine size={24} />
-          Sự kiện của tôi
-        </a>
-      </li>
-      <li>
-        <a href="/profileForm" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
-          <CgProfile size={24} />
-          Trang cá nhân
-        </a>
-      </li>
-      <li>
-        <a href="/logout" className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20">
-          <LuLogOut size={24} />
-          Đăng xuất
-        </a>
-      </li>
-    </ul>
+          <ul className="space-y-4">
+            <li>
+              <a
+                href="/ticketManagement"
+                className="flex items-center gap-2 py-3 px-6 hover:bg-pse-black/20"
+              >
+                <LuTicketCheck size={24} />
+                Vé đã mua
+              </a>
+            </li>
+            <li>
+              <a
+                href="/consumerCenter"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+              >
+                <RiCalendarEventLine size={24} />
+                Sự kiện của tôi
+              </a>
+            </li>
+            <li>
+              <a
+                href="/profileForm"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+              >
+                <CgProfile size={24} />
+                Trang cá nhân
+              </a>
+            </li>
+            <li>
+              <a
+                href="/logout"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+              >
+                <LuLogOut size={24} />
+                Đăng xuất
+              </a>
+            </li>
+          </ul>
         </div>
         <div className="text-white rounded-tl-[60px] flex justify-end items-center gap-4 mt-auto text-right p-6 bg-pse-black">
           <span className="border p-2 rounded-full">

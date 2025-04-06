@@ -35,7 +35,9 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
           <div className="text-pse-green-second font-semibold">
             {eventDetail?.locationName}
           </div>
-          <div className="absolute top-5 left-5">{eventDetail?.location}</div>
+          <div className="absolute top-5 left-5 truncate">
+            {eventDetail?.location}
+          </div>
         </p>
         <div className="max-[1150px]:hidden absolute bottom-28 w-[95%] h-[1px] bg-white rounded-full">
           <div className="text-[20px] font-extrabold my-2">

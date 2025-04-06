@@ -1,7 +1,4 @@
-import {
-  LoginRequest,
-  RegisterRequest,
-} from "../interface/AuthInterface";
+import { LoginRequest, RegisterRequest } from "../interface/AuthInterface";
 import axiosClient from "./axiosClient";
 
 const baseURL = "/auth";
@@ -27,11 +24,14 @@ const authApi = {
     const refreshToken = localStorage.getItem("refreshToken");
     if (!refreshToken) throw new Error("Missing refresh token");
 
-    const res = await axiosClient.post("/auth/refresh-token", {
-      refreshToken,
-    });
-
-    return res.data; // { accessToken: string }
+    try {
+      const res = await axiosClient.post("/auth/refresh-token", {
+        token: refreshToken,
+      });
+      return res;
+    } catch (error) {
+      throw new Error("Refresh token expired or invalid", error);
+    }
   },
 };
 

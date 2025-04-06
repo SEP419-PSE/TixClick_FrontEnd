@@ -130,7 +130,7 @@ const TabEvent = () => {
           className=" pt-4 pb-2 flex overflow-x-auto lg:overflow-x-hidden gap-4"
         >
           {thisWeekList.map((item) => (
-            <div>
+            <div key={item.id}>
               <NavLink to="event-detail">
                 <div className="lg:relative group w-[300px] overflow-hidden cursor-pointer">
                   <img
