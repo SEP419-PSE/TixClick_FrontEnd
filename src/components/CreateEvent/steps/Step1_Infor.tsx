@@ -111,12 +111,15 @@ export default function StepOne({
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
       formData.append("typeEvent", eventMode);
-      formData.append("urlonline", joinUrl);
+      formData.append("urlOnline", joinUrl);
       if (companies)
         formData.append("companyId", companies?.companyId.toString());
 
       formData.append("logoURL", logoImage);
       formData.append("bannerURL", background);
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
       const response = await eventApi.create(formData);
       console.log(response);

@@ -1,14 +1,24 @@
-import { Calendar, Clock, DollarSign, MapPin, Search, Ticket, Users, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import NoEvent from '../../../assets/NoEvent.png'
-import { Event } from '../../../interface/organizer/Organizer'
-import { EventFilter } from '../../organizer/components/EventFilter'
-import { useLanguage } from '../../organizer/components/LanguageContext'
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  MapPin,
+  Search,
+  Ticket,
+  Users,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import NoEvent from "../../../assets/NoEvent.png";
+import { Event } from "../../../interface/organizer/Organizer";
+import { EventFilter } from "../../organizer/components/EventFilter";
+import { useLanguage } from "../../organizer/components/LanguageContext";
 const mockEvents = [
   {
     id: 1,
     title: "Lễ hội âm nhạc mùa hè 2023",
-    image: "https://helio.vn/media/uploads/2023/07/20/dem-nhac-hoi-tan-huong-mua-he-da-nang-20231.jpg",
+    image:
+      "https://helio.vn/media/uploads/2023/07/20/dem-nhac-hoi-tan-huong-mua-he-da-nang-20231.jpg",
     date: "15/07/2023",
     time: "18:00 - 23:00",
     location: "Công viên Lê Văn Tám, TP.HCM",
@@ -26,7 +36,8 @@ const mockEvents = [
   {
     id: 2,
     title: "Workshop Thiết kế UX/UI",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDo0FSv40pRQ7WHMDPKKdqZY8PPGtTlCX4xg&s",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDo0FSv40pRQ7WHMDPKKdqZY8PPGtTlCX4xg&s",
     date: "22/08/2023",
     time: "09:00 - 17:00",
     location: "Dreamplex Coworking Space, TP.HCM",
@@ -44,7 +55,8 @@ const mockEvents = [
   {
     id: 3,
     title: "Triển lãm Công nghệ 2023",
-    image: "https://toquoc.mediacdn.vn/280518851207290880/2023/10/12/photo1697004165886-1697004166027392762544-1697110920928-1697110921909247407384.png",
+    image:
+      "https://toquoc.mediacdn.vn/280518851207290880/2023/10/12/photo1697004165886-1697004166027392762544-1697110920928-1697110921909247407384.png",
     date: "10/09/2023",
     time: "08:00 - 18:00",
     location: "Trung tâm Hội chợ và Triển lãm Sài Gòn (SECC)",
@@ -62,7 +74,8 @@ const mockEvents = [
   {
     id: 4,
     title: "Hội thảo Khởi nghiệp",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj_WqaE8Fr6Y2_c1cA-9y60BKm0w82ko15IQ&s",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj_WqaE8Fr6Y2_c1cA-9y60BKm0w82ko15IQ&s",
     date: "05/06/2023",
     time: "13:30 - 17:30",
     location: "Đại học Bách Khoa TP.HCM",
@@ -80,7 +93,8 @@ const mockEvents = [
   {
     id: 5,
     title: "Hội chợ Ẩm thực Quốc tế",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf6ByMXnrEnSQdPnmP4pltg8T4gaDqF17K7w&s",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf6ByMXnrEnSQdPnmP4pltg8T4gaDqF17K7w&s",
     date: "15/05/2023",
     time: "10:00 - 22:00",
     location: "Nhà Văn hóa Thanh niên, TP.HCM",
@@ -110,48 +124,48 @@ const mockEvents = [
       { name: "VIP", price: "250,000đ", sold: 0 },
     ],
   },
-]
+];
 
 export default function Consumer() {
-  const { t } = useLanguage()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [activeFilter, setActiveFilter] = useState("all")
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents)
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>()
+  const { t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>();
 
   useEffect(() => {
-    let result = mockEvents
+    let result = mockEvents;
 
     if (activeFilter !== "all") {
-      result = result.filter((event) => event.status === activeFilter)
+      result = result.filter((event) => event.status === activeFilter);
     }
 
     if (searchTerm.trim() !== "") {
       result = result.filter(
         (event) =>
           event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.location.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          event.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    setFilteredEvents(result)
-  }, [searchTerm, activeFilter])
+    setFilteredEvents(result);
+  }, [searchTerm, activeFilter]);
 
-  const handleSearch = (e:any) => {
-    setSearchTerm(e.target.value)
-  }
+  const handleSearch = (e: any) => {
+    setSearchTerm(e.target.value);
+  };
 
-  const handleFilterChange = (filter:any) => {
-    setActiveFilter(filter)
-  }
+  const handleFilterChange = (filter: any) => {
+    setActiveFilter(filter);
+  };
 
-  const handleEventClick = (event:any) => {
-    setSelectedEvent(event)
-  }
+  const handleEventClick = (event: any) => {
+    setSelectedEvent(event);
+  };
 
   const closeEventDetails = () => {
-    setSelectedEvent(null)
-  }
+    setSelectedEvent(null);
+  };
 
   return (
     <div className="bg-[#1e1e1e] min-h-screen">
@@ -163,7 +177,7 @@ export default function Consumer() {
             <input
               type="text"
               placeholder={t.search}
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white text-black"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -182,28 +196,34 @@ export default function Consumer() {
                 onClick={() => handleEventClick(event)}
               >
                 <div className="relative">
-                  <img src={event.image || "/placeholder.svg"} alt={event.title} className="w-full h-48 object-cover" />
+                  <img
+                    src={event.image || "/placeholder.svg"}
+                    alt={event.title}
+                    className="w-full h-48 object-cover"
+                  />
                   <div className="absolute top-3 right-3">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
                         event.status === "upcoming"
                           ? "bg-[#00B14F] text-white"
                           : event.status === "past"
-                            ? "bg-gray-600 text-white"
-                            : "bg-yellow-500 text-white"
+                          ? "bg-gray-600 text-white"
+                          : "bg-yellow-500 text-white"
                       }`}
                     >
                       {event.status === "upcoming"
                         ? "Sắp diễn ra"
                         : event.status === "past"
-                          ? "Đã kết thúc"
-                          : "Chờ duyệt"}
+                        ? "Đã kết thúc"
+                        : "Chờ duyệt"}
                     </span>
                   </div>
                 </div>
 
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-white line-clamp-2">{event.title}</h3>
+                  <h3 className="text-lg font-semibold text-white line-clamp-2">
+                    {event.title}
+                  </h3>
 
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center text-gray-400">
@@ -212,18 +232,24 @@ export default function Consumer() {
                     </div>
                     <div className="flex items-center text-gray-400">
                       <MapPin className="w-4 h-4 mr-2" />
-                      <span className="text-sm line-clamp-1">{event.location}</span>
+                      <span className="text-sm line-clamp-1">
+                        {event.location}
+                      </span>
                     </div>
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-gray-400 text-sm">Vé đã bán</p>
-                      <p className="text-white font-medium">{event.ticketsSold}</p>
+                      <p className="text-white font-medium">
+                        {event.ticketsSold}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">Doanh thu</p>
-                      <p className="text-[#00B14F] font-medium">{event.revenue}</p>
+                      <p className="text-[#00B14F] font-medium">
+                        {event.revenue}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -233,7 +259,11 @@ export default function Consumer() {
         ) : (
           <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
             <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
-              <img src={NoEvent || "/placeholder.svg"} alt="No events" className="w-16 h-16 opacity-50" />
+              <img
+                src={NoEvent || "/placeholder.svg"}
+                alt="No events"
+                className="w-16 h-16 opacity-50"
+              />
             </div>
             <p className="text-white/60">No events found</p>
           </div>
@@ -261,21 +291,23 @@ export default function Consumer() {
                     selectedEvent.status === "upcoming"
                       ? "bg-[#00B14F] text-white"
                       : selectedEvent.status === "past"
-                        ? "bg-gray-600 text-white"
-                        : "bg-yellow-500 text-white"
+                      ? "bg-gray-600 text-white"
+                      : "bg-yellow-500 text-white"
                   }`}
                 >
                   {selectedEvent.status === "upcoming"
                     ? "Sắp diễn ra"
                     : selectedEvent.status === "past"
-                      ? "Đã kết thúc"
-                      : "Chờ duyệt"}
+                    ? "Đã kết thúc"
+                    : "Chờ duyệt"}
                 </span>
               </div>
             </div>
 
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">{selectedEvent.title}</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">
+                {selectedEvent.title}
+              </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="space-y-4">
@@ -309,7 +341,9 @@ export default function Consumer() {
                     <Users className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
                     <div>
                       <p className="text-white font-medium">Số người tham dự</p>
-                      <p className="text-gray-400">{selectedEvent.attendees} người</p>
+                      <p className="text-gray-400">
+                        {selectedEvent.attendees} người
+                      </p>
                     </div>
                   </div>
 
@@ -317,7 +351,9 @@ export default function Consumer() {
                     <Ticket className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
                     <div>
                       <p className="text-white font-medium">Vé đã bán</p>
-                      <p className="text-gray-400">{selectedEvent.ticketsSold} vé</p>
+                      <p className="text-gray-400">
+                        {selectedEvent.ticketsSold} vé
+                      </p>
                     </div>
                   </div>
 
@@ -337,24 +373,33 @@ export default function Consumer() {
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Loại vé</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Loại vé
+                </h3>
                 <div className="bg-[#1e1e1e] rounded-lg p-4">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-700">
-                        <th className="text-left py-2 text-gray-400">Loại vé</th>
+                        <th className="text-left py-2 text-gray-400">
+                          Loại vé
+                        </th>
                         <th className="text-left py-2 text-gray-400">Giá</th>
                         <th className="text-left py-2 text-gray-400">Đã bán</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedEvent.ticketTypes.map((ticket:any, index:any) => (
-                        <tr key={index} className="border-b border-gray-700 last:border-0">
-                          <td className="py-3 text-white">{ticket.name}</td>
-                          <td className="py-3 text-white">{ticket.price}</td>
-                          <td className="py-3 text-white">{ticket.sold}</td>
-                        </tr>
-                      ))}
+                      {selectedEvent.ticketTypes.map(
+                        (ticket: any, index: any) => (
+                          <tr
+                            key={index}
+                            className="border-b border-gray-700 last:border-0"
+                          >
+                            <td className="py-3 text-white">{ticket.name}</td>
+                            <td className="py-3 text-white">{ticket.price}</td>
+                            <td className="py-3 text-white">{ticket.sold}</td>
+                          </tr>
+                        )
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -371,5 +416,5 @@ export default function Consumer() {
         </div>
       )}
     </div>
-  )
+  );
 }

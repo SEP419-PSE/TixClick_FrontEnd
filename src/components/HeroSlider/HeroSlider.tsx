@@ -47,18 +47,19 @@ const HeroSlider = () => {
   const hanldeClickCreateEvent = async () => {
     try {
       const response = await companyApi.isAccountHaveCompany();
-      console.log(response.data.code);
+      console.log(response);
       if (response.data.code == 200) {
         navigate("/create-event");
       }
     } catch (error) {
+      console.log(error);
       const axiosError = error as AxiosError<{ message: string }>;
       if (axiosError.response) {
         navigate("/create-company", {
           state: toast.error("Bạn cần phải tạo công ty trước"),
         });
       } else {
-        console.log("Lỗi không xác định:", axiosError.message);
+        console.log("Lỗi không xác định:", axiosError);
         toast.error("Đã xảy ra lỗi, vui lòng thử lại");
       }
     }

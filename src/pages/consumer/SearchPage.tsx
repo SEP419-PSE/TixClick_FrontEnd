@@ -24,23 +24,19 @@ const SearchPage = () => {
   useEffect(() => {
     console.log("call lại list");
     const fetchData = async () => {
-      if (eventName.trim() !== "") {
-        const response = await eventApi.search(
-          startDate,
-          endDate,
-          eventMode,
-          eventName,
-          selectedItems
-        );
-        console.log(response);
-        setEventList(response.data.result || []);
-      } else {
-        setEventList([]); // clear nếu không có keyword
-      }
+      const response = await eventApi.search(
+        startDate,
+        endDate,
+        eventMode,
+        eventName,
+        selectedItems
+      );
+      console.log(response);
+      setEventList(response.data.result || []);
     };
 
     fetchData();
-  }, [searchParams, eventName, eventMode, startDate, endDate, selectedItems]);
+  }, [searchParams, eventName]);
 
   useEffect(() => {
     console.log("Láy dữ liệu từ URL");
@@ -163,7 +159,6 @@ const SearchPage = () => {
     }
 
     setSearchParams(params);
-    setOpenFilter(false);
 
     // ✅ Gọi lại API bất kể eventName rỗng hay không
     const response = await eventApi.search(
@@ -178,7 +173,7 @@ const SearchPage = () => {
 
   return (
     <div className="bg-pse-black px-4 py-4">
-      <div className="relative flex mb-4">
+      <div className="relative  flex mb-4">
         <button className="absolute left-0 top-0 border border-white rounded-full w-fit h-fit">
           <ChevronLeft />
         </button>

@@ -58,15 +58,6 @@ const FilterEvent = ({
 }: Props) => {
   return (
     <div className="flex gap-4">
-      {/* <Button className="bg-pse-gray/50 focus:bg-pse-green">
-        <span>
-          <FaCalendar />
-        </span>
-        Tất cả các ngày
-        <span>
-          <FaAngleDown />
-        </span>
-      </Button> */}
       <Button
         onClick={handleOpenFilter}
         className="bg-pse-gray/50 focus:bg-pse-green"
@@ -80,7 +71,7 @@ const FilterEvent = ({
         </span>
       </Button>
       {openFilter == true && (
-        <div className="fixed flex flex-col bottom-0 left-0 w-full max-w-sm h-[85%] px-4 py-4 bg-white text-black rounded-t-lg">
+        <div className="fixed flex flex-col bottom-0 left-0 w-full max-w-sm h-[85%] lg:h-[100%] px-4 py-4 bg-white text-black rounded-t-lg">
           <div className="relative flex w-full mb-2 justify-center items-center font-bold">
             <p className="">Bộ lọc</p>
             <button onClick={handleCloseFilter} className="absolute right-0">

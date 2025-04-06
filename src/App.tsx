@@ -46,6 +46,7 @@ import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
+import Member from "./pages/consumer/components/Member/Member";
 
 export default function App() {
   return (
@@ -106,6 +107,7 @@ export default function App() {
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
+              <Route path="members" element={<Member />} />
             </Route>
 
             <Route path="ticketManagement" element={<TicketPage />} />

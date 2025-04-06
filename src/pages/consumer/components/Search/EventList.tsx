@@ -11,7 +11,7 @@ type Props = {
 
 const EventList: React.FC<Props> = ({ eventList }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 ">
       {eventList.length == 0 && (
         <div className="col-span-2 md:col-span-4">
           <EmptyList label="Không có sự kiện phù hợp" />
