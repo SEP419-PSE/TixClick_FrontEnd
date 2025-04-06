@@ -46,6 +46,7 @@ import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
+import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
 
 export default function App() {
   return (
@@ -138,6 +139,8 @@ export default function App() {
 
           {/* Chat app */}
           <Route path="chat" element={<ChatApp />} />
+          <Route path="template" element={<ContractTemplate />} />
+
         </Routes>
       </BrowserRouter>
     </div>
