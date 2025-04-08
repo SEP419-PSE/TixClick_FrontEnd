@@ -1,4 +1,4 @@
-import { Delete, Search, User, X } from "lucide-react";
+import { Search, User, X } from "lucide-react";
 import { Input } from "../../../../components/ui/input";
 import { Button } from "../../../../components/ui/button";
 import Popup from "../../../../components/Popup/Popup";
@@ -13,21 +13,18 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { Checkbox } from "../../../../components/ui/checkbox";
-import { MailList, SubRole } from "../../../../interface/consumer/Member";
+import {
+  MailList,
+  MemberResponse,
+  SubRole,
+} from "../../../../interface/consumer/Member";
 import accountApi from "../../../../services/accountApi";
 import { AccountResponse } from "../../../../interface/manager/Account";
 import { toast, Toaster } from "sonner";
 import memberApi from "../../../../services/memberApi";
 import companyApi from "../../../../services/companyApi";
-
-const subRoles = [
-  { id: 1, name: "Admin", value: "ADMIN" },
-  {
-    id: 2,
-    name: "Nhân viên",
-    value: "EMPLOYEE",
-  },
-];
+import MemberList from "./MemberList";
+import { subRoles, TOAST_MESSAGE } from "../../../../constants/constants";
 
 const Member = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -38,6 +35,8 @@ const Member = () => {
   const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>(
     {}
   );
+  const [searchMember, setSearchMember] = useState<string>();
+  const [members, setMembers] = useState<MemberResponse[]>([]);
   const [checkedAccounts, setCheckedAccounts] = useState<Set<string>>(
     new Set()
   );
@@ -65,6 +64,18 @@ const Member = () => {
     fetchData();
   }, [debouncedSearch]);
 
+  const fetchMembers = async () => {
+    const companyId = (await companyApi.isAccountHaveCompany()).data.result
+      .companyId;
+    const response = await memberApi.getMembers(companyId);
+    if (response.data.result.length != 0) {
+      setMembers(response.data.result);
+    }
+  };
+  useEffect(() => {
+    fetchMembers();
+  }, []);
+
   const handleSearchEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchEmail(e.target.value);
   };
@@ -89,7 +100,16 @@ const Member = () => {
       mailList: mailList,
     });
     console.log(response);
+    if (response.data.code == 201) {
+      toast.success(TOAST_MESSAGE.successCreateMember);
+    }
   };
+
+  const filterMembers = searchMember
+    ? members.filter((member) =>
+        member.email.toLowerCase().includes(searchMember.toLowerCase())
+      )
+    : members; // nếu searchMember rỗng thì trả lại toàn bộ danh sách
 
   console.log(mailList);
 
@@ -100,7 +120,9 @@ const Member = () => {
         <div className="relative w-full my-8 sm:w-96">
           <input
             type="text"
-            placeholder={"Tìm kiếm thành viên"}
+            value={searchMember}
+            onChange={(e) => setSearchMember(e.target.value)}
+            placeholder={"Tìm email"}
             className="w-full pl-10 pr-4 py-2 rounded-lg bg-white text-black"
           />
           <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
@@ -266,6 +288,11 @@ const Member = () => {
         </Popup>
       </div>
       <Toaster position="top-center" />
+
+      {/* Member list */}
+      <div>
+        <MemberList members={filterMembers} fetchMembers={fetchMembers} />
+      </div>
     </div>
   );
 };
