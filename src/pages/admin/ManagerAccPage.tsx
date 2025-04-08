@@ -36,6 +36,8 @@ export default function AccountsPage() {
       username: newAccount.username, 
       role: "MANAGER" 
     };
+
+    console.log("request:", requestBody)
   
     adminApi.createManager(requestBody)
       .then(response => {

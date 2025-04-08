@@ -366,6 +366,21 @@ export default function ContractsPage() {
     }
   }, [selectedContract])
 
+  const getStatusBadge = (status: any) => {
+    switch (status) {
+      case "Active":
+        return <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">Active</span>
+      case "Pending":
+        return <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">Pending</span>
+      case "Draft":
+        return <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">Draft</span>
+      case "Expired":
+        return <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">Expired</span>
+      default:
+        return <span className="px-2 py-1 rounded-lg bg-gray-500/20 text-gray-500">{status}</span>
+    }
+  }
+
   return (
     <>
       <ManagerHeader heading="Contracts" text="Manage and track all contracts" />
@@ -427,7 +442,7 @@ export default function ContractsPage() {
                   <TableCell className="text-white">{contract.startDate || "N/A"}</TableCell>
                   <TableCell className="text-white">{contract.endDate || "N/A"}</TableCell>
                   <TableCell className="text-white">${contract.totalAmount?.toLocaleString() || "0"}</TableCell>
-                  <TableCell className="text-white">{contract.status || "N/A"}</TableCell>
+                  <TableCell>{getStatusBadge(contract.status || "N/A")}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -501,7 +516,7 @@ export default function ContractsPage() {
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Status</Label>
-                    <div>{selectedContract.status || "Not specified"}</div>
+                    <div>{getStatusBadge(selectedContract.status || "Unknown")}</div>
                   </div>
                   <div className="grid grid-cols-2 items-center gap-4">
                     <Label className="text-right">Commission</Label>
@@ -544,28 +559,49 @@ export default function ContractsPage() {
               </TabsContent>
               <TabsContent value="timeline">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-2">Contract Timeline</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Start</div>
-                      <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                      {/* <div className="ml-2">{selectedContract.startDate}</div> */}
+                  <h3 className="text-lg font-semibold mb-4">Contract Timeline</h3>
+                  <div className="relative pl-6 border-l-2 border-gray-600 space-y-6 ml-4">
+                    {/* Contract Start */}
+                    <div className="relative">
+                      <div className="absolute w-4 h-4 rounded-full bg-green-500 -left-[18px]"></div>
+                      <div className="mb-1 text-sm font-medium">Contract Start</div>
+                      <div className="text-sm text-gray-400">{selectedContract?.startDate || "Not specified"}</div>
                     </div>
-                    <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">Current</div>
-                      <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                      <div className="ml-2">Today</div>
+
+                    {/* Document Uploads */}
+                    {contractDocument && contractDocument.length > 0 ? (
+                      contractDocument.map((doc, index) => (
+                        <div className="relative" key={index}>
+                          <div className="absolute w-4 h-4 rounded-full bg-blue-500 -left-[18px]"></div>
+                          <div className="mb-1 text-sm font-medium">Document Uploaded: {doc.fileName}</div>
+                          <div className="text-sm text-gray-400">
+                            {doc.uploadDate || new Date().toISOString().split("T")[0]}
+                          </div>
+                          <div className="text-sm text-gray-400">Uploaded by: {doc.uploadedBy || "System User"}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="relative">
+                        <div className="absolute w-4 h-4 rounded-full bg-gray-500 -left-[18px]"></div>
+                        <div className="mb-1 text-sm font-medium">No documents uploaded yet</div>
+                        <div className="text-sm text-gray-400">Upload documents to track contract progress</div>
+                      </div>
+                    )}
+
+                    {/* Current Date */}
+                    <div className="relative">
+                      <div className="absolute w-4 h-4 rounded-full bg-purple-500 -left-[18px]"></div>
+                      <div className="mb-1 text-sm font-medium">Current Date</div>
+                      <div className="text-sm text-gray-400">{new Date().toISOString().split("T")[0]}</div>
                     </div>
-                    <div className="flex items-center">
-                      <div className="w-12 text-right mr-4 text-sm text-gray-500">End</div>
-                      <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                      {/* <div className="ml-2">{selectedContract.endDate}</div> */}
+
+                    {/* Contract End */}
+                    <div className="relative">
+                      <div className="absolute w-4 h-4 rounded-full bg-red-500 -left-[18px]"></div>
+                      <div className="mb-1 text-sm font-medium">Contract End</div>
+                      <div className="text-sm text-gray-400">{selectedContract?.endDate || "Not specified"}</div>
                     </div>
                   </div>
-                  {/* <Progress
-                    value={selectedContract.progress}
-                    className="w-full mt-4 bg-blue-500"
-                  /> */}
                 </div>
               </TabsContent>
               <TabsContent value="payment">
