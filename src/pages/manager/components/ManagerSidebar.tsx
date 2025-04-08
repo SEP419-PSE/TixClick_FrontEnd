@@ -7,7 +7,7 @@ import {
   LogOut,
   UserCheck
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router"
 import { toast, Toaster } from "sonner"
 import Logo from "../../../assets/Logo.png"
@@ -21,12 +21,18 @@ export function DashboardSidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const [currentPath, setCurrentPath] = useState("")
+
+  useEffect(() => {
+    const path = location.pathname.replace(/^\/manager\/?/, "")
+    setCurrentPath(path)
+  }, [location.pathname])
 
   const isActive = (path: string) => {
-    if (path === "" && location.pathname === "/manager") {
+    if (path === "" && (location.pathname === "/manager" || location.pathname === "/manager/")) {
       return true
     }
-    return location.pathname.includes(`/manager/${path}`)
+    return currentPath === path || currentPath.startsWith(`${path}/`)
   }
 
   const handleLogout = () => {
@@ -42,8 +48,6 @@ export function DashboardSidebar() {
       navigate("/superLogin")
     }, 1000)
   }
-
-
 
   return (
     <Sidebar>
@@ -113,8 +117,11 @@ export function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/manager-dashboard/notifications" className="flex items-center">
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("notifications") && "bg-orange-100 text-orange-600 font-medium")}
+            >
+              <Link to="notifications" className="flex items-center">
                 <Bell className="mr-2 h-5 w-5" />
                 <span>Notifications</span>
               </Link>
@@ -169,4 +176,3 @@ export function DashboardSidebar() {
     </Sidebar>
   )
 }
-

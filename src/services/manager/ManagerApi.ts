@@ -33,6 +33,11 @@ const managerApi = {
     //     return axiosClient.patch(url, {header});
     // }
 
+    getContractsByEventId(eventId: number) {
+        const url = `/contract-document/all_by_event/{eventId}?eventId=${eventId}`;
+        return axiosClient.get(url);
+    },
+
     approveCompany(status: string, companyVerificationId: number) {
         const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
         console.log("url:", url);
