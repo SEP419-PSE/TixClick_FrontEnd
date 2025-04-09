@@ -109,7 +109,7 @@ export function UploadDocumentDialog({ contractId, isOpen, onClose, onSuccess }:
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isUploading}>
+          <Button variant="outline" className="text-black" onClick={onClose} disabled={isUploading}>
             Cancel
           </Button>
           <Button onClick={handleUpload} disabled={!file || isUploading}>
