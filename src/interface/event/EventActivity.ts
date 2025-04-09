@@ -7,3 +7,9 @@ export interface EventActivity {
   endTicketSale: Date;
   eventId: number;
 }
+
+export interface EventActivityResponse extends EventActivity {
+  eventActivityId: number;
+  seatMapId: number;
+  createdBy: number;
+}

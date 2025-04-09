@@ -47,6 +47,7 @@ import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
 import Member from "./pages/consumer/components/Member/Member";
+import Tasks from "./pages/consumer/components/Tasks/Tasks";
 
 export default function App() {
   return (
@@ -108,6 +109,7 @@ export default function App() {
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
               <Route path="members" element={<Member />} />
+              <Route path="tasks" element={<Tasks />} />
             </Route>
 
             <Route path="ticketManagement" element={<TicketPage />} />

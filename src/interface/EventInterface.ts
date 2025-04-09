@@ -24,21 +24,25 @@ export interface EventForConsumer {
 }
 
 export interface EventDetailResponse {
+  eventId: number;
   eventName: string;
-  location: string;
   locationName: string;
+  location: string;
+  status: EventStatus;
+  typeEvent: string;
+  countView: number;
   logoURL: string;
   bannerURL: string;
-  companyURL: string;
-  companyName: string;
-  descriptionCompany: string;
-  status: string;
-  typeEvent: string;
   description: string;
-  categoryId: string;
-  eventActivityDTOList: EventActivityDTOList[];
-  price: number;
+  startDate: string;
+  endDate: string;
+  urlOnline: null;
+  eventCategory: string;
+  eventCategoryId: number;
+  countTicketSold: null;
+  totalRevenue: null;
   haveSeatMap: boolean;
+  eventActivityDTOList: EventActivityDTOList[];
 }
 
 export interface EventActivityDTOList {
@@ -68,4 +72,13 @@ export interface Ticket {
   seatBackgroundColor: string;
   accountId: number;
   eventId: number;
+}
+
+export enum EventStatus {
+  DRAFT = "DRAFT",
+  PENDING_APPROVAL = "PENDING_APPOREVAL",
+  SCHEDULED = "SCHEDULED",
+  ON_GOING = "ON_GOING",
+  COMPLETED = "COMPLETED",
+  REJECTED = "REJECTED",
 }

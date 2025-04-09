@@ -19,6 +19,18 @@ export interface MemberResponse {
   status: MemberStatus;
 }
 
+export interface MemberActivityRequest {
+  eventActivityId: number;
+  memberIds: number[];
+}
+
+export interface MemberOfTaskResponse {
+  member: MemberResponse;
+  memberActivityId: number;
+  status: string;
+  eventActivityId: number;
+}
+
 export type SubRole = "ADMIN" | "EMPLOYEE";
 
 export type MemberStatus = "ACTIVE" | "INACTIVE";

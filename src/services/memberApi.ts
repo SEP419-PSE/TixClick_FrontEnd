@@ -1,5 +1,6 @@
 import {
   CreateMemberRequest,
+  MemberActivityRequest,
   MemberStatus,
 } from "../interface/consumer/Member";
 import axiosClient from "./axiosClient";
@@ -22,6 +23,14 @@ const memberApi = {
   changeStatus: (id: number, status: MemberStatus) => {
     const url = `${memberUrl}/update-status/${id}/${status}`;
     return axiosClient.put(url);
+  },
+  addMemberToActivity: (data: MemberActivityRequest) => {
+    const url = `/member-activity`;
+    return axiosClient.post(url, data);
+  },
+  getMembersByEventActivityId: (eventActivityId: number) => {
+    const url = `/member-activity/${eventActivityId}`;
+    return axiosClient.get(url);
   },
 };
 

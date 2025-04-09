@@ -24,6 +24,7 @@ const translations = {
       createEvent: "Tạo sự kiện",
       terms: "Điều khoản cho Ban tổ chức",
       members: "Thành viên ban tổ chức",
+      tasks: "Phân chia công việc",
     },
     account: "Tài khoản",
     language: "Ngôn ngữ",
@@ -33,6 +34,7 @@ const translations = {
       reports: "Quản lý báo cáo",
       terms: "Điều khoản cho Ban tổ chức",
       members: "Thành viên ban tổ chức",
+      tasks: "Phân chia công việc",
     },
     myEvents: {
       search: "Tìm kiếm sự kiện",
@@ -132,6 +134,7 @@ const translations = {
       createEvent: "Create Event",
       terms: "Organizer Terms",
       members: "Company Employee",
+      tasks: "Tasks",
     },
     account: "Account",
     language: "Language",
@@ -141,6 +144,7 @@ const translations = {
       reports: "Reports Management",
       terms: "Organizer Terms",
       members: "Company Employee",
+      tasks: "Tasks",
     },
     myEvents: {
       search: "Search events",

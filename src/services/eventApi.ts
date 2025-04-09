@@ -11,6 +11,14 @@ const eventApi = {
       },
     });
   },
+  update: (data: FormData) => {
+    const url = `${baseURL}/update`;
+    return axiosClient.put(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
   approveEvent: (eventId: number) => {
     const url = `${baseURL}/request-approval/${eventId}`;
     return axiosClient.get(url);
@@ -35,6 +43,10 @@ const eventApi = {
     eventCategory?: string[]
   ) => {
     const url = `${baseURL}/filter?startDate=${startDate}&endDate=${endDate}&eventType=${eventType}&eventName=${eventName}&eventCategory=${eventCategory}`;
+    return axiosClient.get(url);
+  },
+  getAllByCompany: (companyId: number) => {
+    const url = `${baseURL}/dashboard/${companyId}`;
     return axiosClient.get(url);
   },
 };

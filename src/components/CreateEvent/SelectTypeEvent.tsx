@@ -5,9 +5,16 @@ type Props = {
   listType: EventType[];
   choice: string;
   setChoice: React.Dispatch<React.SetStateAction<string>>;
+  selectedId: number | null;
 };
 
-const SelectTypeEvent = ({ label, listType, choice, setChoice }: Props) => {
+const SelectTypeEvent = ({
+  label,
+  listType,
+  choice,
+  setChoice,
+  selectedId,
+}: Props) => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChoice(e.target.value);
   };
@@ -29,7 +36,7 @@ const SelectTypeEvent = ({ label, listType, choice, setChoice }: Props) => {
         {listType.map((type, index) => (
           <option
             className={`hover:bg-gray-200 ${
-              choice === type.name && "font-semibold text-white bg-pse-green"
+              selectedId === type.id && "font-semibold text-white bg-pse-green"
             }`}
             key={index}
             value={type.id}
