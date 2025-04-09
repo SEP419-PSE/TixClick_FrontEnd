@@ -12,9 +12,10 @@ import { Separator } from "../../../components/ui/separator"
 const payOsApi = {
   createPayment: async (ticketPurchaseId: number, accessToken:string) => {
     try {
+      console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
       const returnUrl = `${window.location.origin}/payment/queue`
 
-      const response = await fetch("/payment/pay-os-create", {
+      const response = await fetch("https://160.191.175.172:8443/payment/pay-os-create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,6 +33,7 @@ const payOsApi = {
           returnUrl: returnUrl, 
         }),
       })
+      console.log("payment response", response)
 
       if (!response.ok) {
         throw new Error("Failed to create payment")
@@ -46,7 +48,7 @@ const payOsApi = {
 
   checkPaymentStatus: async (orderCode: string) => {
     try {
-      const response = await fetch(`/payment/payos_call_back?orderCode=${orderCode}`, {
+      const response = await fetch(`https://160.191.175.172:8443/payment/payos_call_back?orderCode=${orderCode}`, {
         method: "GET",
         headers: {
           Accept: "*/*",

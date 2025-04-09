@@ -1,15 +1,14 @@
-import { LuEye } from "react-icons/lu";
-import CustomDivider from "../../components/Divider/CustomDivider";
-import { LuEyeClosed } from "react-icons/lu";
-import authApi from "../../services/authApi";
-import { LoginRequest } from "../../interface/AuthInterface";
-import { toast } from "sonner";
-import { NavLink, useNavigate } from "react-router";
-import { AuthContext } from "../../contexts/AuthProvider";
 import { motion } from "framer-motion";
+import { LuEye, LuEyeClosed } from "react-icons/lu";
+import { NavLink, useNavigate } from "react-router";
+import { toast } from "sonner";
+import CustomDivider from "../../components/Divider/CustomDivider";
+import { AuthContext } from "../../contexts/AuthProvider";
+import { LoginRequest } from "../../interface/AuthInterface";
+import authApi from "../../services/authApi";
 
-import GoogleImg from "../../assets/google.png";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import GoogleImg from "../../assets/google.png";
 // import { ERROR_RESPONSE } from "../../constants/constants";
 
 const SignInForm = () => {
@@ -42,7 +41,7 @@ const SignInForm = () => {
         console.log(response.data);
         localStorage.setItem("accessToken", response.data.result.accessToken);
         localStorage.setItem("refreshToken", response.data.result.refreshToken);
-        authContext?.login();
+        authContext?.login;
         if (response.data.result.status == true) {
           navigate("/");
           toast.success("Đăng nhập thành công");
