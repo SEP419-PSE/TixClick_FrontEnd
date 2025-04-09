@@ -109,6 +109,22 @@ export default function EventsPage() {
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
 
+  const [editFormData, setEditFormData] = useState<{
+    eventId?: number
+    eventName?: string
+    location?: string
+    locationName?: string
+    startDate?: string
+    endDate?: string
+    status?: string
+    typeEvent?: string
+    description?: string
+    categoryId?: number
+    logoURL?: string
+    bannerURL?: string
+    urlOnline?: string
+  }>({})
+
   // Contract Scanner State
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
@@ -140,10 +156,9 @@ export default function EventsPage() {
     }
   }
 
-  // Update the fetchRelatedContracts function to use the correct API endpoint
   const fetchRelatedContracts = async (eventId: number) => {
+    console.log("eventId:", eventId)
     try {
-      // Use the correct API endpoint to get contract documents by event ID
       const res: any = await managerApi.getContractsByEventId(eventId)
       console.log("Related Contract Documents:", res.data.result)
       if (res.data.result && res.data.result.length > 0) {
@@ -164,6 +179,7 @@ export default function EventsPage() {
     }
     initUseEffect()
   }, [])
+  
 
   // Handle file drop for contract scanner
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -643,7 +659,7 @@ export default function EventsPage() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>Edit event information</DropdownMenuItem>
                       {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
-                      <DropdownMenuItem>View associated contracts</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleViewRelatedContracts}>View associated contracts</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
                     </DropdownMenuContent>
