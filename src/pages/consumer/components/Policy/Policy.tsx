@@ -25,13 +25,11 @@ export default function Policy() {
   const [searchQuery, setSearchQuery] = useState("")
   console.log(setSearchQuery)
   const [selectedPdf, setSelectedPdf] = useState({
-    title:"",
+    title: "",
     url: "",
-    
   })
   const [isPdfDialogOpen, setIsPdfDialogOpen] = useState(false)
-  const [selectedTermId, setSelectedTermId] = useState("1") 
-
+  const [selectedTermId, setSelectedTermId] = useState("1")
 
   const policyPdfs = {
     "1": {
@@ -40,7 +38,7 @@ export default function Policy() {
     },
     "2": {
       icon: <Shield className="h-4 w-4" />,
-      pdfUrl: "https://res.cloudinary.com/dxypmsqdo/image/upload/v1743223292/namphan/lrlrg7dhxzwph2bq62x7.pdf",
+      pdfUrl: "https://res.cloudinary.com/dxypmsqdo/image/upload/v1743223294/namphan/rcquujnhji0zkfnb2bga.pdf",
     },
     "3": {
       icon: <HelpCircle className="h-4 w-4" />,
@@ -62,11 +60,9 @@ export default function Policy() {
     setIsPdfDialogOpen(true)
   }
 
-
   const selectedTerm = t.terms.items.find((term) => term.id === selectedTermId) || t.terms.items[0]
 
-  const selectedPdfInfo = policyPdfs[selectedTermId as keyof typeof policyPdfs] || policyPdfs["1"];
-
+  const selectedPdfInfo = policyPdfs[selectedTermId as keyof typeof policyPdfs] || policyPdfs["1"]
 
   return (
     <div className="min-h-screen bg-[#121212]">
@@ -74,19 +70,19 @@ export default function Policy() {
         <div className="max-w-5xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.nav.terms}</h1>
           <div className="mb-8 flex items-center text-sm text-gray-500">
-          <Clock className="h-4 w-4 mr-2" />
-          <span>{t.language === "en" ? "Last updated: March 15, 2025" : "Cập nhật lần cuối: 15/03/2025"}</span>
-        </div>
+            <Clock className="h-4 w-4 mr-2" />
+            <span>{t.language === "en" ? "Last updated: March 15, 2025" : "Cập nhật lần cuối: 15/03/2025"}</span>
+          </div>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-6">
         <Tabs defaultValue="content" className="w-full">
           <TabsList className="bg-[#1E1E1E] border-b border-gray-800 w-full justify-start overflow-x-auto mb-6">
-            <TabsTrigger value="content" className="data-[state=active]:bg-[#ff8a00] data-[state=active]:text-white">
+            {/* <TabsTrigger value="content" className="data-[state=active]:bg-[#ff8a00] data-[state=active]:text-white">
               <FileText className="h-4 w-4 mr-2" />
               {t.language === "en" ? "Content" : "Nội dung"}
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger value="documents" className="data-[state=active]:bg-[#ff8a00] data-[state=active]:text-white">
               <FileDown className="h-4 w-4 mr-2" />
               {t.language === "en" ? "Documents" : "Tài liệu"}
@@ -180,14 +176,15 @@ export default function Policy() {
                 <Card className="bg-[#1E1E1E] border-gray-800 overflow-hidden hover:border-gray-700 transition-all duration-300">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-2">
-                    {selectedPdfInfo.icon}
+                      {selectedPdfInfo.icon}
                       <CardTitle className="text-white text-lg">{selectedTerm.title}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div
                       className="aspect-[16/9] bg-gray-900 rounded-md flex items-center justify-center mb-4 relative group cursor-pointer overflow-hidden w-full"
-                      onClick={() => handleViewPdf(selectedPdfInfo.pdfUrl, selectedTerm.title)}                    >
+                      onClick={() => handleViewPdf(selectedPdfInfo.pdfUrl, selectedTerm.title)}
+                    >
                       <img
                         src={selectedPdfInfo.pdfUrl || "/placeholder.svg"}
                         alt={selectedTerm.title}
@@ -197,7 +194,7 @@ export default function Policy() {
                         <Eye className="h-12 w-12 text-white" />
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                      <p className="text-white text-sm font-medium">{selectedTerm.title}</p>
+                        <p className="text-white text-sm font-medium">{selectedTerm.title}</p>
                         <p className="text-gray-400 text-xs">
                           PDF • {t.language === "en" ? "Last updated: March 15, 2025" : "Cập nhật: 15/03/2025"}
                         </p>
@@ -257,7 +254,6 @@ export default function Policy() {
         <DialogContent className="bg-[#1E1E1E] text-white border-gray-800 max-w-5xl h-[80vh] p-0">
           <DialogHeader className="p-4 border-b border-gray-800 flex flex-row items-center justify-between">
             <DialogTitle className="text-xl font-bold text-white">{selectedPdf?.title}</DialogTitle>
-            
           </DialogHeader>
           <div className="flex-1 h-full p-4 overflow-auto">
             <div className="bg-white rounded-md h-full w-full overflow-hidden">

@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle, Download, Eye, FileText, Filter, Loader2, MoreHorizontal, Search, Upload, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Download, Eye, FileText, Filter, Loader2, MoreHorizontal, Search, Upload } from "lucide-react"
 import * as pdfjs from "pdfjs-dist"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
@@ -772,7 +772,7 @@ export default function EventsPage() {
             <div className="flex gap-2">
               {selectedEvent?.status === "PENDING_APPROVAL" && (
                 <>
-                  <Button
+                  {/* <Button
                     className="bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => handleApprove("SCHEDULED", selectedEvent?.eventId ?? 0)}
                   >
@@ -780,7 +780,7 @@ export default function EventsPage() {
                   </Button>
                   <Button onClick={handleReject} className="bg-red-600 hover:bg-red-700 text-white">
                     <XCircle className="mr-2 h-4 w-4" /> Reject
-                  </Button>
+                  </Button> */}
                 </>
               )}
               {selectedEvent?.status === "SCHEDULED" && (

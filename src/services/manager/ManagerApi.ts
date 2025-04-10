@@ -61,7 +61,7 @@ const managerApi = {
         console.log(status);
         console.log(id);
     
-        const token = localStorage.getItem("accessToken2");
+        const token = localStorage.getItem("accessToken");
     
         return axiosClient.put(
             url,
