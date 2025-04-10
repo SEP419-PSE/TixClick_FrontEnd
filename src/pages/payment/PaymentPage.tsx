@@ -82,7 +82,9 @@ export default function PaymentPage() {
       if (parsedData.apiResponses) {
         console.log("Ticket API response:", parsedData.apiResponses.ticket)
         console.log("Seat API responses:", parsedData.apiResponses.seats)
-        console.log("Purchase API response:", parsedData.apiResponses.purchase)
+        // console.log("Purchase API response:", parsedData.apiResponses.purchase.JSON.stringify())
+        console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
+
       }
     } else {
       // If no data is found, redirect back to the booking page

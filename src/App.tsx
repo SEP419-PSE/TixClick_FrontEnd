@@ -41,12 +41,12 @@ import TicketPage from "./pages/ticket/TicketPage";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
-import TicketBooking from "./pages/TicketBooking";
-import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
-import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
-import OrganizerCenter from "./pages/organizer";
 import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
+import OrganizerCenter from "./pages/organizer";
+import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
+import TicketBooking from "./pages/TicketBooking";
+import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 
 export default function App() {
   return (
@@ -87,6 +87,9 @@ export default function App() {
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
             <Route path="payment/queue" element={<PaymentQueuePage />} />
+            {/* <Route path="/payment-return" element={<PaymentReturnPage />} /> */}
+
+
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />

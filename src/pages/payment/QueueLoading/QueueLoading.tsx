@@ -46,9 +46,9 @@ const payOsApi = {
     }
   },
 
-  checkPaymentStatus: async (orderCode: string) => {
+  checkPaymentStatus: async () => {
     try {
-      const response = await fetch(`https://160.191.175.172:8443/payment/payos_call_back?orderCode=${orderCode}`, {
+      const response = await fetch(`https://160.191.175.172:8443/payment/payos_call_back`, {
         method: "GET",
         headers: {
           Accept: "*/*",
@@ -101,7 +101,7 @@ export default function PaymentQueuePage() {
         setProgress(100)
 
         payOsApi
-          .checkPaymentStatus(orderCode)
+          .checkPaymentStatus()
           .then((response) => {
             console.log("Payment verification response:", response)
           })
@@ -113,7 +113,7 @@ export default function PaymentQueuePage() {
         setPaymentError("Thanh toán đã bị hủy")
       } else {
         payOsApi
-          .checkPaymentStatus(orderCode)
+          .checkPaymentStatus()
           .then((response) => {
             console.log("Payment status response:", response)
             if (response.data?.status === "PAID") {
