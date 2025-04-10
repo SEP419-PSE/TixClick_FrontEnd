@@ -1,4 +1,5 @@
 // import { ContractUpload } from "../../interface/manager/Contracts";
+import { Contract } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
 
@@ -16,7 +17,13 @@ const managerApi = {
 
     getAllContract(){
         const url = "/contract/all";
-        return axiosClient.get(url);
+        const token = localStorage.getItem('accessToken2');
+
+        return axiosClient.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
     },
 
     getAllPayment(){
@@ -92,6 +99,11 @@ const managerApi = {
           },
         })
       },
+
+    updateContract(request: Contract){
+        const url = "/contract/createContractAndContractDetail";
+        return axiosClient.post(url, request);
+    }
 }
 
 export default managerApi;
