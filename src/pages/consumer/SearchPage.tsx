@@ -18,178 +18,142 @@ const SearchPage = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState(100000);
   const currentDate = new Date().toISOString().split("T")[0];
 
-  // Gọi API khi event-name thay đổi
   useEffect(() => {
-    console.log("call lại list");
-    const fetchData = async () => {
-      const response = await eventApi.search(
-        startDate,
-        endDate,
-        eventMode,
-        eventName,
-        selectedItems
-      );
-      console.log(response);
-      setEventList(response.data.result || []);
+    const handleResize = () => {
+      setOpenFilter(window.innerWidth > 1024);
     };
 
-    fetchData();
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    console.log("Call lại list");
+    const params: any = {
+      eventName: searchParams.get("event-name") || undefined,
+      startDate: searchParams.get("startDate") || undefined,
+      endDate: searchParams.get("endDate") || undefined,
+      eventType: searchParams.get("eventMode") || undefined,
+      eventCategory:
+        searchParams.get("types")?.split(",").filter(Boolean) || undefined,
+      maxPrice: searchParams.get("maxPrice")
+        ? Number(searchParams.get("maxPrice"))
+        : undefined,
+    };
+
+    eventApi.search(params).then((response) => {
+      console.log(response);
+      setEventList(response.data.result || []);
+    });
   }, [searchParams, eventName]);
 
   useEffect(() => {
-    console.log("Láy dữ liệu từ URL");
-    const start = searchParams.get("startDate");
-    const end = searchParams.get("endDate");
-    const mode = searchParams.get("eventMode");
-    const types = searchParams.get("types");
-
-    if (start) setStartDate(start);
-    if (end) setEndDate(end);
-    if (mode) setEventMode(mode);
-    if (types) setSelectedItems(types.split(","));
+    setStartDate(searchParams.get("startDate") || "");
+    setEndDate(searchParams.get("endDate") || "");
+    setEventMode(searchParams.get("eventMode") || "");
+    setSelectedItems(
+      searchParams.get("types")?.split(",").filter(Boolean) || []
+    );
+    setMaxPrice(
+      searchParams.get("maxPrice")
+        ? Number(searchParams.get("maxPrice"))
+        : 100000
+    );
   }, [searchParams]);
 
+  const updateSearchParam = (key: string, value?: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set(key, value);
+    else params.delete(key);
+    setSearchParams(params);
+  };
+
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedStartDate = e.target.value;
-    const currentDate = new Date().toISOString().split("T")[0];
-
-    // Kiểm tra startDate không nhỏ hơn ngày hiện tại
-    if (selectedStartDate < currentDate) {
+    const selected = e.target.value;
+    if (selected < currentDate) {
       toast.warning("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
+    } else if (endDate && selected >= endDate) {
+      toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
     } else {
-      setStartDate(selectedStartDate);
-
-      // Kiểm tra endDate phải lớn hơn startDate nếu endDate đã được chọn
-      if (endDate && selectedStartDate >= endDate) {
-        toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-      }
+      setStartDate(selected);
+      updateSearchParam("startDate", selected);
     }
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedEndDate = e.target.value;
-
-    // Kiểm tra endDate phải lớn hơn startDate
-    if (startDate && selectedEndDate <= startDate) {
+    const selected = e.target.value;
+    if (startDate && selected <= startDate) {
       toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
     } else {
-      setEndDate(selectedEndDate);
+      setEndDate(selected);
+      updateSearchParam("endDate", selected);
     }
   };
 
-  // Hàm cập nhật trạng thái khi toggle thay đổi
   const handleToggleChange = (value: string) => {
-    setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(value)) {
-        // Nếu đã chọn, thì bỏ chọn
-        return prevSelectedItems.filter((item) => item !== value);
-      } else {
-        // Nếu chưa chọn, thì thêm vào mảng
-        return [...prevSelectedItems, value];
-      }
-    });
+    const updated = selectedItems.includes(value)
+      ? selectedItems.filter((item) => item !== value)
+      : [...selectedItems, value];
+    setSelectedItems(updated);
+    updateSearchParam("types", updated.join(","));
   };
 
   const handleSwitchChange = (checked: boolean) => {
-    setEventMode(checked ? "Online" : "Offline");
+    const value = checked ? "Online" : "Offline";
+    setEventMode(value);
+    updateSearchParam("eventMode", value);
   };
 
-  const hanldeOpenFilter = () => {
-    setOpenFilter(true);
-  };
-
-  const hanldeCloseFilter = () => {
-    setOpenFilter(false);
-  };
+  const handleOpenFilter = () => setOpenFilter(true);
+  const handleCloseFilter = () => setOpenFilter(false);
 
   const resetForm = () => {
     setStartDate("");
     setEndDate("");
     setEventMode("");
     setSelectedItems([]);
+    setMaxPrice(100000);
+
     const params = new URLSearchParams(searchParams);
     params.delete("startDate");
     params.delete("endDate");
     params.delete("eventMode");
     params.delete("types");
+    params.delete("maxPrice");
     setSearchParams(params);
   };
 
-  const onSubmitSearch = async (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
-    const searchValue = formData.get("eventName")?.toString().trim() || "";
-
-    const currentParams = new URLSearchParams(searchParams);
-
-    currentParams.set("event-name", searchValue);
-    setSearchParams(currentParams);
-
-    // ✅ Gọi lại fetch thủ công nếu chuỗi rỗng
-    if (searchValue === "") {
-      const response = await eventApi.search(
-        startDate,
-        endDate,
-        eventMode,
-        "",
-        selectedItems
-      );
-      setEventList(response.data.result || []);
-    }
+    console.log(formData.get("event-name"));
+    const searchValue = formData.get("event-name")?.toString().trim() || "";
+    updateSearchParam("event-name", searchValue || undefined);
   };
 
-  const submitForm = async () => {
-    const params = new URLSearchParams(searchParams);
-    if (startDate) params.set("startDate", startDate);
-    else params.delete("startDate");
-
-    if (endDate) params.set("endDate", endDate);
-    else params.delete("endDate");
-
-    if (eventMode) params.set("eventMode", eventMode);
-    else params.delete("eventMode");
-
-    if (selectedItems.length > 0) {
-      params.set("types", selectedItems.join(","));
-    } else {
-      params.delete("types");
-    }
-
-    setSearchParams(params);
-
-    // ✅ Gọi lại API bất kể eventName rỗng hay không
-    const response = await eventApi.search(
-      startDate,
-      endDate,
-      eventMode,
-      eventName,
-      selectedItems
-    );
-    setEventList(response.data.result || []);
+  const submitForm = () => {
+    updateSearchParam("startDate", startDate || undefined);
+    updateSearchParam("endDate", endDate || undefined);
+    updateSearchParam("eventMode", eventMode || undefined);
+    updateSearchParam("types", selectedItems.join(",") || undefined);
+    updateSearchParam("maxPrice", maxPrice.toString() || undefined);
   };
 
   return (
-    <div className="bg-pse-black px-4 py-4">
-      <div className="relative  flex mb-4">
-        <button className="absolute left-0 top-0 border border-white rounded-full w-fit h-fit">
-          <ChevronLeft />
-        </button>
-        <div className="mx-auto text-lg font-bold">Tìm kiếm</div>
-      </div>
-
+    <div className="bg-pse-black pl-[400px] px-4 py-4">
       <form onSubmit={onSubmitSearch} className="mb-4 flex">
-        <div className="flex w-full max-w-sm items-center mx-auto space-x-2">
+        <div className="flex w-full max-w-md items-center space-x-2">
           <Input
             className="bg-transparent"
             type="text"
-            name="eventName"
+            name="event-name"
             placeholder="Sự kiện bạn muốn tìm"
             defaultValue={eventName}
           />
-
           <Button
             className="bg-white text-black hover:bg-opacity-80"
             type="submit"
@@ -197,31 +161,31 @@ const SearchPage = () => {
             Tìm kiếm
           </Button>
         </div>
-
-        {/* Date picker */}
       </form>
-      <div className="mb-4">
-        <FilterEvent
-          currentDate={currentDate}
-          endDate={endDate}
-          eventMode={eventMode}
-          handleCloseFilter={hanldeCloseFilter}
-          handleEndDateChange={handleEndDateChange}
-          handleStartDateChange={handleStartDateChange}
-          handleSwitchChange={handleSwitchChange}
-          handleToggleChange={handleToggleChange}
-          resetForm={resetForm}
-          selectedItems={selectedItems}
-          startDate={startDate}
-          submitForm={submitForm}
-          handleOpenFilter={hanldeOpenFilter}
-          openFilter={openFilter}
-        />
-      </div>
+      <EventList eventList={eventList} />
 
-      <div>
-        <EventList eventList={eventList} />
-      </div>
+      <FilterEvent
+        currentDate={currentDate}
+        endDate={endDate}
+        eventMode={eventMode}
+        handleCloseFilter={handleCloseFilter}
+        handleEndDateChange={handleEndDateChange}
+        handleStartDateChange={handleStartDateChange}
+        handleSwitchChange={handleSwitchChange}
+        handleToggleChange={handleToggleChange}
+        resetForm={resetForm}
+        selectedItems={selectedItems}
+        startDate={startDate}
+        submitForm={submitForm}
+        handleOpenFilter={handleOpenFilter}
+        openFilter={openFilter}
+        maxPrice={maxPrice}
+        onChangePrice={(price) => {
+          setMaxPrice(price);
+          updateSearchParam("maxPrice", price.toString());
+        }}
+        maxLimit={2000000}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { Calendar, MapPin, Ticket } from "lucide-react";
 import { Button } from "../components/ui/button";
 import CustomDivider from "../components/Divider/CustomDivider";
-import { formatMoney } from "../lib/utils";
+import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
 import { Input } from "../components/ui/input";
 import { useEffect, useState } from "react";
 import { Card } from "../components/ui/card";
@@ -196,7 +196,24 @@ const TicketBookingNoneSeatmap = () => {
                 className="text-pse-green-second"
               />
             </span>
-            19:30, 12 tháng 4, 2025
+            {eventInfor?.eventActivityDTOList != undefined &&
+              formatTimeFe(
+                eventInfor.eventActivityDTOList.find(
+                  (x) => x.eventActivityId == Number(activityEventId)
+                )?.startTimeEvent
+              ) +
+                ` - ` +
+                formatTimeFe(
+                  eventInfor.eventActivityDTOList.find(
+                    (x) => x.eventActivityId == Number(activityEventId)
+                  )?.endTimeEvent
+                ) +
+                `, ` +
+                formatDateVietnamese(
+                  eventInfor.eventActivityDTOList
+                    .find((x) => x.eventActivityId == Number(activityEventId))
+                    ?.dateEvent.toString()
+                )}
           </div>
           <div className="flex items-center gap-1">
             <span>

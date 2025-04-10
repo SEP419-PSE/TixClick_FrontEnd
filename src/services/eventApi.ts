@@ -35,14 +35,27 @@ const eventApi = {
     const url = `${baseURL}/count-view/${eventId}`;
     return axiosClient.post(url);
   },
-  search: (
-    startDate?: string,
-    endDate?: string,
-    eventType?: string,
-    eventName?: string,
-    eventCategory?: string[]
-  ) => {
-    const url = `${baseURL}/filter?startDate=${startDate}&endDate=${endDate}&eventType=${eventType}&eventName=${eventName}&eventCategory=${eventCategory}`;
+  search: (params: {
+    startDate?: string;
+    endDate?: string;
+    eventType?: string;
+    eventName?: string;
+    eventCategory?: string[];
+    maxPrice?: number;
+  }) => {
+    const queryParams = new URLSearchParams();
+
+    if (params.startDate) queryParams.append("startDate", params.startDate);
+    if (params.endDate) queryParams.append("endDate", params.endDate);
+    if (params.eventType) queryParams.append("eventType", params.eventType);
+    if (params.eventName) queryParams.append("eventName", params.eventName);
+    if (params.eventCategory && params.eventCategory.length > 0)
+      queryParams.append("eventCategory", params.eventCategory.join(","));
+    queryParams.append("minPrice", "0"); // luôn có minPrice
+    if (params.maxPrice !== undefined)
+      queryParams.append("maxPrice", params.maxPrice.toString());
+
+    const url = `${baseURL}/filter?${queryParams.toString()}`;
     return axiosClient.get(url);
   },
   getAllByCompany: (companyId: number) => {

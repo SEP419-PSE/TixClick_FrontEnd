@@ -19,15 +19,15 @@ export function ConsumerSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navigation = [
-    { name: t.sidebar.myEvents, href: "/consumerCenter", icon: FileText },
+    { name: t.sidebar.myEvents, href: "/company", icon: FileText },
     {
       name: t.sidebar.reports,
-      href: "/consumerCenter/reports",
+      href: "/company/reports",
       icon: BarChart3,
     },
-    { name: t.sidebar.terms, href: "/consumerCenter/policies", icon: Book },
-    { name: t.sidebar.members, href: "/consumerCenter/members", icon: Contact },
-    { name: t.sidebar.tasks, href: "/consumerCenter/tasks", icon: FaTasks },
+    { name: t.sidebar.terms, href: "/company/policies", icon: Book },
+    { name: t.sidebar.members, href: "/company/members", icon: Contact },
+    { name: t.sidebar.tasks, href: "/company/tasks", icon: FaTasks },
   ];
 
   return (

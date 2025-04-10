@@ -70,7 +70,7 @@ const HeroSlider = () => {
 
     const formData = new FormData(e.currentTarget);
     const searchValue = formData.get("searchValue") as string;
-    navigate(`/search?event-name=${searchValue}`);
+    navigate(`/search?event-name=${searchValue}&maxPrice=${100000}`);
 
     console.log(searchValue);
   };
@@ -105,7 +105,11 @@ const HeroSlider = () => {
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
                 <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
-                <li className="px-4 py-2 hover:opacity-60">Sự kiện của tôi</li>
+                <NavLink to="/company">
+                  <li className="px-4 py-2 hover:opacity-60">
+                    Sự kiện của tôi
+                  </li>
+                </NavLink>
                 <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
                 <button onClick={hanldeClickCreateEvent}>
                   <li className="px-4 py-2 border rounded-md hover:opacity-60">

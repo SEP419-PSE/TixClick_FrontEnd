@@ -2,7 +2,12 @@ import React from "react";
 import { CiCalendar } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { EventDetailResponse } from "../../interface/EventInterface";
-import { formatMoney } from "../../lib/utils";
+import {
+  formatDateVietnamese,
+  formatMoney,
+  formatTimeFe,
+} from "../../lib/utils";
+import { NavLink, useNavigate } from "react-router";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
@@ -26,7 +31,16 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
           <span>
             <CiCalendar size={18} color="white" className="mr-1" />
           </span>
-          20:30 - 22:30, 15 Tháng 03, 2025
+          <div>
+            {eventDetail?.eventActivityDTOList != undefined &&
+              formatTimeFe(eventDetail.eventActivityDTOList[0].startTimeEvent) +
+                ` - ` +
+                formatTimeFe(eventDetail.eventActivityDTOList[0].endTimeEvent) +
+                `, ` +
+                formatDateVietnamese(
+                  eventDetail.eventActivityDTOList[0].dateEvent.toString()
+                )}
+          </div>
         </p>
         <p className="relative flex items-center text-[#c4c4cf]">
           <span>
@@ -46,9 +60,18 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
               {formatMoney(eventDetail?.price)}
             </span>
           </div>
-          <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
-            Mua vé ngay
-          </button>
+          <NavLink
+            to={{
+              pathname: eventDetail?.haveSeatMap
+                ? "booking-ticket"
+                : "booking-ticket-no-seatmap",
+              search: `?eventId=${eventDetail?.eventId}&eventActivityId=${eventDetail?.eventActivityDTOList?.[0].eventActivityId}`,
+            }}
+          >
+            <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
+              Mua vé ngay
+            </button>
+          </NavLink>
         </div>
       </div>
     </div>

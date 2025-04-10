@@ -147,10 +147,8 @@ export default function Consumer() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [filteredEvents, setFilteredEvents] = useState<EventDetailResponse[]>(
-    []
-  );
+  const [activeFilter, setActiveFilter] = useState("ALL");
+  const [events, setEvents] = useState<EventDetailResponse[]>([]);
   const [selectedEvent, setSelectedEvent] =
     useState<EventDetailResponse | null>();
 
@@ -159,9 +157,9 @@ export default function Consumer() {
       .companyId;
     const eventsResponse = await eventApi.getAllByCompany(companyId);
     if (eventsResponse.data.result.length > 0) {
-      setFilteredEvents(eventsResponse.data.result);
+      setEvents(eventsResponse.data.result);
     } else {
-      setFilteredEvents([]);
+      setEvents([]);
     }
     console.log(eventsResponse);
   };
@@ -169,24 +167,6 @@ export default function Consumer() {
   useEffect(() => {
     fetchEvents();
   }, []);
-
-  // useEffect(() => {
-  //   let result = mockEvents;
-
-  //   if (activeFilter !== "all") {
-  //     result = result.filter((event) => event.status === activeFilter);
-  //   }
-
-  //   if (searchTerm.trim() !== "") {
-  //     result = result.filter(
-  //       (event) =>
-  //         event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //         event.location.toLowerCase().includes(searchTerm.toLowerCase())
-  //     );
-  //   }
-
-  //   setFilteredEvents(result);
-  // }, [searchTerm, activeFilter]);
 
   const handleSearch = (e: any) => {
     setSearchTerm(e.target.value);
@@ -209,8 +189,19 @@ export default function Consumer() {
   };
 
   const goTask = (eventId: number) => {
-    navigate(`/consumerCenter/tasks?eventId=${eventId}`);
+    navigate(`/company/tasks?eventId=${eventId}`);
   };
+
+  const filteredEvents = events.filter((event) => {
+    const matchSearch = event.eventName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchFilter = activeFilter === "ALL" || event.status === activeFilter;
+    return matchSearch && matchFilter;
+  });
+
+  console.log(activeFilter);
+
   return (
     <div className="bg-[#1e1e1e] min-h-screen">
       <main className="p-6">

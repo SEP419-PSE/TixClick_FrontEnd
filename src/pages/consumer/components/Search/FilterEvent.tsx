@@ -11,6 +11,7 @@ import {
   ToggleGroupItem,
 } from "../../../../components/ui/toggle-group";
 import { toast, Toaster } from "sonner";
+import PriceRangeSlider from "./PriceRangeSLider";
 
 interface EventTypeEngLishName extends EventType {
   englishName: string;
@@ -38,6 +39,9 @@ type Props = {
   handleToggleChange: (name: string) => void;
   submitForm: () => void;
   resetForm: () => void;
+  maxPrice: number;
+  onChangePrice: (newMaxPrice: number) => void;
+  maxLimit?: number;
 };
 
 const FilterEvent = ({
@@ -55,12 +59,15 @@ const FilterEvent = ({
   selectedItems,
   startDate,
   submitForm,
+  maxPrice,
+  maxLimit,
+  onChangePrice,
 }: Props) => {
   return (
     <div className="flex gap-4">
       <Button
         onClick={handleOpenFilter}
-        className="bg-pse-gray/50 focus:bg-pse-green"
+        className="bg-pse-gray/50 focus:bg-pse-green lg:hidden"
       >
         <span>
           <FaFilter />
@@ -74,7 +81,10 @@ const FilterEvent = ({
         <div className="fixed flex flex-col bottom-0 left-0 w-full max-w-sm h-[85%] lg:h-[100%] px-4 py-4 bg-white text-black rounded-t-lg">
           <div className="relative flex w-full mb-2 justify-center items-center font-bold">
             <p className="">Bộ lọc</p>
-            <button onClick={handleCloseFilter} className="absolute right-0">
+            <button
+              onClick={handleCloseFilter}
+              className="absolute right-0 lg:hidden"
+            >
               <FaXmark />
             </button>
           </div>
@@ -82,7 +92,7 @@ const FilterEvent = ({
           <div className="w-full h-[1px] bg-pse-gray/50"></div>
           <div className="flex my-4 justify-between gap-4">
             <div className="flex flex-col gap-2 w-full">
-              <label>Ngày diễn ra</label>
+              <label className="font-semibold">Ngày diễn ra</label>
               <input
                 value={startDate}
                 onChange={handleStartDateChange}
@@ -92,7 +102,7 @@ const FilterEvent = ({
               />
             </div>
             <div className="flex flex-col gap-2 w-full">
-              <label>Ngày kết thúc</label>
+              <label className="font-semibold">Ngày kết thúc</label>
               <input
                 value={endDate}
                 onChange={handleEndDateChange}
@@ -112,7 +122,9 @@ const FilterEvent = ({
           </div>
           <div className="w-full h-[1px] bg-pse-gray/50"></div>
           <div className="my-4">
-            <div className="mb-2 flex justify-start">Thể loại</div>
+            <div className="mb-2 flex justify-start font-semibold">
+              Thể loại
+            </div>
             <ToggleGroup
               className="flex flex-wrap justify-start"
               type="multiple"
@@ -136,13 +148,20 @@ const FilterEvent = ({
               ))}
             </ToggleGroup>
           </div>
+          <div className="py-4">
+            <PriceRangeSlider
+              maxPrice={maxPrice}
+              onChange={onChangePrice}
+              maxLimit={2000000}
+            />
+          </div>
           <div className="mt-auto flex justify-between gap-4">
             <Button onClick={resetForm} className="w-full" variant={"outline"}>
               Thiết lập lại
             </Button>
-            <Button onClick={submitForm} className="w-full bg-pse-black">
+            {/* <Button onClick={submitForm} className="w-full bg-pse-black">
               Áp dụng
-            </Button>
+            </Button> */}
           </div>
         </div>
       )}

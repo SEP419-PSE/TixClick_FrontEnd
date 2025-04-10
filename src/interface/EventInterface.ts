@@ -43,6 +43,7 @@ export interface EventDetailResponse {
   totalRevenue: null;
   haveSeatMap: boolean;
   eventActivityDTOList: EventActivityDTOList[];
+  price: number;
 }
 
 export interface EventActivityDTOList {

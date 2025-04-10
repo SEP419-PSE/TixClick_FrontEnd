@@ -177,7 +177,7 @@ const Tasks = () => {
                   </Button>
 
                   {isOpenMenu[activity.eventActivityId] && (
-                    <div className="absolute mt-2 p-2 border max-h-[200px] overflow-y-auto text-sm bg-white text-black rounded-md">
+                    <div className="absolute top-12 p-2 border max-h-[200px] overflow-y-auto text-sm bg-white text-black rounded-md">
                       <div className="flex ">
                         <p className="ml-2 my-2 text-[18px] italic font-semibold">
                           Danh sách thành viên
@@ -246,7 +246,7 @@ const Tasks = () => {
             <p className="text-white/60">
               Không có hoạt động nào của sự kiện này
             </p>
-            <NavLink to="/consumerCenter">
+            <NavLink to="/company">
               <Button className="my-2 bg-black hover:bg-pse-green transition-all duration-300">
                 Đi đến sự kiện để phân công
               </Button>

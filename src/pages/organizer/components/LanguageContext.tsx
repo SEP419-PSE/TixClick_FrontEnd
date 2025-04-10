@@ -8,9 +8,10 @@ const translations = {
     search: "Tìm kiếm sự kiện",
     filters: {
       all: "Tất cả",
-      upcoming: "SẮP DIỄN RA",
-      past: "ĐÃ QUA",
-      pending: "CHỜ DUYỆT",
+      upcoming: "Diễn ra",
+      past: "Đã qua",
+      pending: "Chờ duyệt",
+      reject: "Bị hủy",
     },
     menu: {
       tickets: "Vé đã mua",
@@ -117,10 +118,11 @@ const translations = {
     title: "Created Events",
     search: "Search events",
     filters: {
-      all: "All",
+      all: "ALL",
       upcoming: "UPCOMING",
       past: "PAST",
       pending: "PENDING",
+      reject: "REJECT",
     },
     menu: {
       tickets: "My Tickets",

@@ -104,7 +104,7 @@ export default function App() {
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
 
-            <Route path="consumerCenter" element={<RootLayouts />}>
+            <Route path="company" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
@@ -129,13 +129,13 @@ export default function App() {
           </Route>
 
           {/* Account Company */}
-          <Route path="company" element={<CompanyDashBoard />}>
+          {/* <Route path="company" element={<CompanyDashBoard />}>
             <Route index element={<HomeCompany />} />
             <Route path="events" element={<ManageEvents />} />
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />
-          </Route>
+          </Route> */}
 
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />
