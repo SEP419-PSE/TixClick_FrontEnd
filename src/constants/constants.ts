@@ -22,3 +22,17 @@ export const ERROR_RESPONSE = {
     return "Tài khoản chưa được kích hoạt";
   },
 };
+
+export const subRoles = [
+  { id: 1, name: "Admin", value: "ADMIN" },
+  {
+    id: 2,
+    name: "Nhân viên",
+    value: "EMPLOYEE",
+  },
+];
+
+export const TOAST_MESSAGE = {
+  successCreateMember: "Tạo member thành công",
+  successUpdateMember: "Cập nhật thành công",
+};

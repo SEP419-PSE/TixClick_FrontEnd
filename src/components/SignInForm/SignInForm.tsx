@@ -41,7 +41,8 @@ const SignInForm = () => {
         console.log(response.data);
         localStorage.setItem("accessToken", response.data.result.accessToken);
         localStorage.setItem("refreshToken", response.data.result.refreshToken);
-        authContext?.login;
+        authContext?.login(response.data.result.accessToken);
+        authContext?.setTokenForAxios("user", response.data.result.accessToken);
         if (response.data.result.status == true) {
           navigate("/");
           toast.success("Đăng nhập thành công");

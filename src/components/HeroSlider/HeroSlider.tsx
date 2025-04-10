@@ -47,18 +47,19 @@ const HeroSlider = () => {
   const hanldeClickCreateEvent = async () => {
     try {
       const response = await companyApi.isAccountHaveCompany();
-      console.log(response.data.code);
+      console.log(response);
       if (response.data.code == 200) {
         navigate("/create-event");
       }
     } catch (error) {
+      console.log(error);
       const axiosError = error as AxiosError<{ message: string }>;
       if (axiosError.response) {
         navigate("/create-company", {
           state: toast.error("Bạn cần phải tạo công ty trước"),
         });
       } else {
-        console.log("Lỗi không xác định:", axiosError.message);
+        console.log("Lỗi không xác định:", axiosError);
         toast.error("Đã xảy ra lỗi, vui lòng thử lại");
       }
     }
@@ -69,7 +70,7 @@ const HeroSlider = () => {
 
     const formData = new FormData(e.currentTarget);
     const searchValue = formData.get("searchValue") as string;
-    navigate(`/search?event-name=${searchValue}`);
+    navigate(`/search?event-name=${searchValue}&maxPrice=${100000}`);
 
     console.log(searchValue);
   };
@@ -104,8 +105,14 @@ const HeroSlider = () => {
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
                 <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
-                <li className="px-4 py-2 hover:opacity-60">Sự kiện của tôi</li>
-                <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                <NavLink to="/company">
+                  <li className="px-4 py-2 hover:opacity-60">
+                    Sự kiện của tôi
+                  </li>
+                </NavLink>
+                <NavLink to="/profileForm">
+                  <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                </NavLink>
                 <button onClick={hanldeClickCreateEvent}>
                   <li className="px-4 py-2 border rounded-md hover:opacity-60">
                     Tạo sự kiện

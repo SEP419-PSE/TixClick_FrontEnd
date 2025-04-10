@@ -1410,7 +1410,6 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
           </div>
         </div>
       </Popup>
-      <Toaster />
 
       <div className="flex justify-between mt-6">
         <button
