@@ -12,11 +12,6 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageContract from "./pages/company/components/ManageContract";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import ManageMember from "./pages/company/components/ManageMember";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -41,8 +36,10 @@ import TicketPage from "./pages/ticket/TicketPage";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
-import TicketBooking from "./pages/TicketBooking";
+import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
+
 import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
+import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
@@ -88,6 +85,7 @@ export default function App() {
             {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
             <Route path="payment/queue" element={<PaymentQueuePage />} />
+            {/* <Route path="/payment-return" element={<PaymentReturnPage />} /> */}
 
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
@@ -142,6 +140,7 @@ export default function App() {
 
           {/* Chat app */}
           <Route path="chat" element={<ChatApp />} />
+          <Route path="template" element={<ContractTemplate />} />
         </Routes>
       </BrowserRouter>
     </div>

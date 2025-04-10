@@ -27,7 +27,7 @@ export default function NotificationPage() {
   // Function to connect to WebSocket
   // Make connectWebSocket depend on currentUser
   const connectWebSocket = () => {
-    if (!context?.accessToken || currentUser === "unknown") {
+    if (!context?.accessToken2 || currentUser === "unknown") {
       console.log("Waiting for user information before connecting...");
       return;
     }
@@ -35,9 +35,9 @@ export default function NotificationPage() {
     console.log("Connecting to WebSocket for user:", currentUser);
 
     const client = new Client({
-      brokerURL: "wss://160.191.175.172:8443/wss",
+      brokerURL: "ws://160.191.175.172:8080/ws",
       connectHeaders: {
-        Authorization: `Bearer ${context.accessToken}`,
+        Authorization: `Bearer ${context.accessToken2}`,
       },
       debug: function (str) {
         console.log("STOMP: " + str);
@@ -95,9 +95,9 @@ export default function NotificationPage() {
   // Split the useEffect into two - one for user extraction and one for WebSocket
   useEffect(() => {
     // Extract username from token
-    if (context?.accessToken) {
+    if (context?.accessToken2) {
       try {
-        const tokenParts = context.accessToken.split(".");
+        const tokenParts = context.accessToken2.split(".");
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           setCurrentUser(payload.sub || "unknown");
@@ -107,7 +107,7 @@ export default function NotificationPage() {
         console.error("Error parsing token:", e);
       }
     }
-  }, [context?.accessToken]);
+  }, [context?.accessToken2]);
 
   // Separate useEffect for WebSocket that depends on currentUser
   useEffect(() => {
@@ -129,14 +129,14 @@ export default function NotificationPage() {
         console.log("🔌 WebSocket disconnected");
       }
     };
-  }, [currentUser, context?.accessToken]);
+  }, [currentUser, context?.accessToken2]);
 
   // Extract username from token
   useEffect(() => {
     // Get username from token
-    if (context?.accessToken) {
+    if (context?.accessToken2) {
       try {
-        const tokenParts = context.accessToken.split(".");
+        const tokenParts = context.accessToken2.split(".");
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           setCurrentUser(payload.sub || "unknown");
@@ -157,7 +157,7 @@ export default function NotificationPage() {
         console.log("🔌 WebSocket disconnected");
       }
     };
-  }, [context?.accessToken]);
+  }, [context?.accessToken2]);
 
   // Fetch initial notifications
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function NotificationPage() {
     };
 
     fetchNotifications();
-  }, [context?.accessToken]);
+  }, [context?.accessToken2]);
 
   const filteredNotifications = notifications.filter((notification) => {
     if (filter === "unread" && notification.read) return false;

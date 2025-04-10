@@ -9,9 +9,9 @@ import { formatMoney } from "../lib/utils";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 
-type SeatStatus = "available" | "disabled"
-type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
-type ViewMode = "edit" | "preview"
+// type SeatStatus = "available" | "disabled"
+// type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
+// type ViewMode = "edit" | "preview"
 export type SectionType = "SEATED" | "STANDING"
 
 // Utility functions
@@ -40,7 +40,7 @@ export interface ISeat {
   id: string
   row: number
   column: number
-  // status: SeatStatus;
+  status: string;
   price: number
   seatTypeId: string
   x?: number
@@ -76,8 +76,10 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
   const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null)
 
   const handleSeatClick = (seat: ISeat) => {
+    if(!seat.status) return
     onSeatClick(seat, section.name)
   }
+  
 
   return (
     <Draggable position={{ x: section.x, y: section.y }} disabled={true} bounds="parent">
@@ -261,15 +263,22 @@ const TicketBooking = () => {
 
   // Function to get the seat color based on selection status
   const getSeatColor = (seat: ISeat): string => {
-    // Check if seat is selected to highlight it
+    // Nếu seat.status là falsy (null, undefined, false, ""), dùng màu xám
+    if (!seat.status) {
+      return "#d1d5db" // gray-300, bạn có thể chọn màu khác như "#9ca3af" (gray-400)
+    }
+  
+    // Nếu ghế đang được chọn thì dùng màu highlight
     const isSelected = selectedSeats.some((s) => s.id === seat.id)
     if (isSelected) {
-      return "#059669" // Highlight selected seat with a green color
+      return "#059669" // green-600
     }
-
+  
+    // Dùng màu của loại ghế nếu có, ngược lại dùng màu mặc định
     const seatType = seatTypes.find((type) => type.id == seat.seatTypeId)
-    return seatType ? seatType.color : "#6b7280" // Use actual color from seat type or gray-500 as default
+    return seatType ? seatType.color : "#6b7280" // gray-500 mặc định
   }
+  
 
   // Handle seat click
   const handleSeatClick = (seat: ISeat, sectionName: string) => {

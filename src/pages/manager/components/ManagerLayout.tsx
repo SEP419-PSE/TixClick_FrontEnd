@@ -14,7 +14,7 @@ export default function DashboardLayout() {
       <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
         <DashboardSidebar />
         <div className="flex flex-col">
-          <Outlet /> 
+          <Outlet />
         </div>
       </div>
     </SidebarProvider>

@@ -1,4 +1,5 @@
-import { ContractUpload } from "../../interface/manager/Contracts";
+// import { ContractUpload } from "../../interface/manager/Contracts";
+import { Contract } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
 
@@ -16,7 +17,13 @@ const managerApi = {
 
     getAllContract(){
         const url = "/contract/all";
-        return axiosClient.get(url);
+        const token = localStorage.getItem('accessToken2');
+
+        return axiosClient.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
     },
 
     getAllPayment(){
@@ -32,6 +39,11 @@ const managerApi = {
     // const url = `/company-verification/${companyVerificationId}/approve?status=${status}`
     //     return axiosClient.patch(url, {header});
     // }
+
+    getContractsByEventId(eventId: number) {
+        const url = `/contract-document/all_by_event/{eventId}?eventId=${eventId}`;
+        return axiosClient.get(url);
+    },
 
     approveCompany(status: string, companyVerificationId: number) {
         const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
@@ -56,7 +68,7 @@ const managerApi = {
         console.log(status);
         console.log(id);
     
-        const token = localStorage.getItem("accessToken2");
+        const token = localStorage.getItem("accessToken");
     
         return axiosClient.put(
             url,
@@ -87,6 +99,11 @@ const managerApi = {
           },
         })
       },
+
+    updateContract(request: Contract){
+        const url = "/contract/createContractAndContractDetail";
+        return axiosClient.post(url, request);
+    }
 }
 
 export default managerApi;

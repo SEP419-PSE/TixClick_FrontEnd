@@ -1,5 +1,4 @@
-
-import { AlertCircle, CheckCircle, FileText, Filter, Loader2, MoreHorizontal, Search, Upload, XCircle } from "lucide-react"
+import { AlertCircle, CheckCircle, Download, Eye, FileText, Filter, Loader2, MoreHorizontal, Search, Upload } from "lucide-react"
 import * as pdfjs from "pdfjs-dist"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
@@ -103,10 +102,28 @@ export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<EventResponse>()
   const [isEventModalOpen, setIsEventModalOpen] = useState(false)
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
+  const [relatedContracts, setRelatedContracts] = useState<any[]>([])
+  const [isRelatedContractsModalOpen, setIsRelatedContractsModalOpen] = useState(false)
   const [filterStatus, setFilterStatus] = useState("all")
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
+
+  const [editFormData, setEditFormData] = useState<{
+    eventId?: number
+    eventName?: string
+    location?: string
+    locationName?: string
+    startDate?: string
+    endDate?: string
+    status?: string
+    typeEvent?: string
+    description?: string
+    categoryId?: number
+    logoURL?: string
+    bannerURL?: string
+    urlOnline?: string
+  }>({})
 
   // Contract Scanner State
   const [file, setFile] = useState<File | null>(null)
@@ -128,23 +145,41 @@ export default function EventsPage() {
 
   const fetchEventList = async () => {
     try {
-      const res: any = await managerApi.getAllEvent();
-      console.log("Event List:", res.data.result);
+      const res: any = await managerApi.getAllEvent()
+      console.log("Event List:", res.data.result)
       if (res.data.result && res.data.result.length > 0) {
-        setEvents(res.data.result);
+        setEvents(res.data.result)
       }
     } catch (error) {
-      console.error("Error fetching contract:", error);
-      toast.error("Failed to fetch contract");
+      console.error("Error fetching contract:", error)
+      toast.error("Failed to fetch contract")
     }
-  };
+  }
+
+  const fetchRelatedContracts = async (eventId: number) => {
+    console.log("eventId:", eventId)
+    try {
+      const res: any = await managerApi.getContractsByEventId(eventId)
+      console.log("Related Contract Documents:", res.data.result)
+      if (res.data.result && res.data.result.length > 0) {
+        setRelatedContracts(res.data.result)
+      } else {
+        setRelatedContracts([])
+      }
+    } catch (error) {
+      console.error("Error fetching related contract documents:", error)
+      toast.error("Failed to fetch related contract documents")
+      setRelatedContracts([])
+    }
+  }
 
   useEffect(() => {
     const initUseEffect = async () => {
-      await fetchEventList();
-    };
-    initUseEffect();
-  }, []);
+      await fetchEventList()
+    }
+    initUseEffect()
+  }, [])
+  
 
   // Handle file drop for contract scanner
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -310,13 +345,13 @@ export default function EventsPage() {
       const worker = await (createWorker as any)({
         logger: (m: { status: string; progress?: number }) => {
           if (m.status === "recognizing text" && m.progress !== undefined) {
-            setProgress(m.progress * 100);
+            setProgress(m.progress * 100)
           }
         },
-      });
-      
-      await (worker as any).loadLanguage('vie+eng');
-      await (worker as any).initialize('vie+eng');
+      })
+
+      await (worker as any).loadLanguage("vie+eng")
+      await (worker as any).initialize("vie+eng")
 
       const image = imageRef.current
       const extractedData: ContractData = {}
@@ -455,61 +490,58 @@ export default function EventsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "DRAFT":
-        return <span className="px-2 py-1 bg-slate-300 text-black rounded-md">Draft</span>;
+        return <span className="px-2 py-1 bg-slate-300 text-black rounded-md">Draft</span>
       case "SCHEDULED":
-        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Scheduled</span>;
+        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Scheduled</span>
       case "PENDING_APPROVAL":
-        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>;
+        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>
       case "COMPLETED":
-        return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-md">Pending</span>;
+        return <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded-md">Pending</span>
       default:
-        return null;
+        return null
     }
-    
   }
 
   const handleApprove = async (status: string, id: number) => {
-    if (!selectedEvent) return;
+    if (!selectedEvent) return
 
     try {
-        const response = await managerApi.approveEvent(status, id);
-        console.log("✅ Approved successfully:", response);
+      const response = await managerApi.approveEvent(status, id)
+      console.log("✅ Approved successfully:", response)
 
-        const updatedEvents = events.map((event) =>
-            event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event
-        );
+      const updatedEvents = events.map((event) =>
+        event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event,
+      )
 
-        setEvents(updatedEvents);
-        setSelectedEvent({ ...selectedEvent, status: "APPROVED" });
+      setEvents(updatedEvents)
+      setSelectedEvent({ ...selectedEvent, status: "APPROVED" })
 
-        toast.success("Event Approved", {
-            description: "The event has been successfully approved.",
-        });
+      toast.success("Event Approved", {
+        description: "The event has been successfully approved.",
+      })
     } catch (error: any) {
-        console.error("❌ Error approving event:", error);
+      console.error("❌ Error approving event:", error)
 
-        toast.error("Approval Failed", {
-            description: error?.response?.data?.message || "Something went wrong.",
-        });
+      toast.error("Approval Failed", {
+        description: error?.response?.data?.message || "Something went wrong.",
+      })
     }
-};
+  }
 
-  
   const handleReject = () => {
-    if (!selectedEvent) return;
-  
+    if (!selectedEvent) return
+
     const updatedEvents = events.map((event) =>
-      event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event
-    );
-  
-    setEvents(updatedEvents);
-    setSelectedEvent({ ...selectedEvent, status: "REJECTED" });
-  
+      event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event,
+    )
+
+    setEvents(updatedEvents)
+    setSelectedEvent({ ...selectedEvent, status: "REJECTED" })
+
     toast.success("Event Rejected", {
       description: "The event has been rejected.",
-    });
-  };
-  
+    })
+  }
 
   const handleCreateContract = () => {
     setIsContractModalOpen(true)
@@ -519,6 +551,13 @@ export default function EventsPage() {
     setExtractedData({})
     setShowRegions(false)
     setPdfDocument(null)
+  }
+
+  const handleViewRelatedContracts = async () => {
+    if (!selectedEvent) return
+
+    await fetchRelatedContracts(selectedEvent.eventId)
+    setIsRelatedContractsModalOpen(true)
   }
 
   return (
@@ -620,7 +659,7 @@ export default function EventsPage() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>Edit event information</DropdownMenuItem>
                       {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
-                      <DropdownMenuItem>View associated contracts</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleViewRelatedContracts}>View associated contracts</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
                     </DropdownMenuContent>
@@ -733,20 +772,26 @@ export default function EventsPage() {
             <div className="flex gap-2">
               {selectedEvent?.status === "PENDING_APPROVAL" && (
                 <>
-                  <Button className="bg-green-600 hover:bg-green-700 text-white"
-                     onClick={() => handleApprove("SCHEDULED", selectedEvent?.eventId ?? 0)}
+                  {/* <Button
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => handleApprove("SCHEDULED", selectedEvent?.eventId ?? 0)}
                   >
                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
                   </Button>
                   <Button onClick={handleReject} className="bg-red-600 hover:bg-red-700 text-white">
                     <XCircle className="mr-2 h-4 w-4" /> Reject
-                  </Button>
+                  </Button> */}
                 </>
               )}
               {selectedEvent?.status === "SCHEDULED" && (
-                <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <FileText className="mr-2 h-4 w-4" /> Create Contract
-                </Button>
+                <>
+                  <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <FileText className="mr-2 h-4 w-4" /> Create Contract
+                  </Button>
+                  <Button onClick={handleViewRelatedContracts} className="bg-purple-600 hover:bg-purple-700 text-white">
+                    <FileText className="mr-2 h-4 w-4" /> View Contracts
+                  </Button>
+                </>
               )}
             </div>
           </DialogFooter>
@@ -924,7 +969,7 @@ export default function EventsPage() {
 
           <DialogFooter>
             <Button
-            className="text-black"
+              className="text-black"
               variant="outline"
               onClick={() => {
                 setIsContractModalOpen(false)
@@ -936,6 +981,87 @@ export default function EventsPage() {
             >
               Cancel
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Related Contracts Dialog */}
+      <Dialog open={isRelatedContractsModalOpen} onOpenChange={setIsRelatedContractsModalOpen}>
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Related Contracts</DialogTitle>
+            <DialogDescription>Contracts associated with: {selectedEvent?.eventName}</DialogDescription>
+          </DialogHeader>
+
+          {relatedContracts.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
+                  <TableHead className="text-white">File Name</TableHead>
+                  <TableHead className="text-white">File Type</TableHead>
+                  <TableHead className="text-white">Status</TableHead>
+                  <TableHead className="text-white">Upload Date</TableHead>
+                  <TableHead className="text-white text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {relatedContracts.map((document) => (
+                  <TableRow key={document.contractDocumentId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                    <TableCell className="font-medium text-white">{document.fileName}</TableCell>
+                    <TableCell className="text-white">{document.fileType}</TableCell>
+                    <TableCell className="text-white">{document.status}</TableCell>
+                    <TableCell className="text-white">
+                      {document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          {document.fileURL && (
+                            <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Document
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="py-8 text-center">
+              <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+              <h3 className="text-lg font-medium mb-2">No Contract Documents Found</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                There are no contract documents associated with this event yet.
+              </p>
+              {selectedEvent?.status === "SCHEDULED" && (
+                <Button
+                  onClick={() => {
+                    setIsRelatedContractsModalOpen(false)
+                    handleCreateContract()
+                  }}
+                >
+                  <FileText className="mr-2 h-4 w-4" /> Create Contract
+                </Button>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button onClick={() => setIsRelatedContractsModalOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
