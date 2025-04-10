@@ -1,4 +1,4 @@
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Search } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { Input } from "../../components/ui/input";
 import { EventDetailResponse } from "../../interface/EventInterface";
@@ -145,18 +145,22 @@ const SearchPage = () => {
 
   return (
     <div className="bg-pse-black pl-[400px] px-4 py-4">
-      <form onSubmit={onSubmitSearch} className="mb-4 flex">
-        <div className="flex w-full max-w-md items-center space-x-2">
-          <Input
-            className="bg-transparent"
-            type="text"
-            name="event-name"
-            placeholder="Sự kiện bạn muốn tìm"
-            defaultValue={eventName}
-          />
+      <form onSubmit={onSubmitSearch} className="mb-6 flex justify-center">
+        <div className="flex w-full max-w-xl items-center gap-2">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              name="event-name"
+              type="text"
+              defaultValue={eventName}
+              placeholder="Tìm kiếm sự kiện..."
+              className="pl-10 text-black"
+            />
+          </div>
           <Button
-            className="bg-white text-black hover:bg-opacity-80"
             type="submit"
+            variant="default"
+            className="bg-white text-black hover:bg-opacity-80"
           >
             Tìm kiếm
           </Button>

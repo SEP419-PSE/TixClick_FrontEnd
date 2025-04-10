@@ -9,8 +9,11 @@ import { useSearchParams } from "react-router";
 import ticketMappingApi from "../services/ticketMappingApi";
 import eventApi from "../services/eventApi";
 import { EventDetailResponse } from "../interface/EventInterface";
+import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+import { toast, Toaster } from "sonner";
+import axios, { AxiosError } from "axios";
 
-interface Ticket {
+interface TicketResponse {
   id: number;
   ticket: TicketClass;
   quantity: number;
@@ -32,11 +35,25 @@ interface TicketClass {
   accountId: number;
   eventId: number;
 }
+
+export interface TicketPurchaseRequest {
+  ticketPurchaseRequests: TicketPurchaseRequestElement[];
+}
+
+export interface TicketPurchaseRequestElement {
+  zoneId: number;
+  seatId: number;
+  eventActivityId: number;
+  ticketId: number;
+  eventId: number;
+  quantity: number;
+}
+
 const TicketBookingNoneSeatmap = () => {
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("eventId");
   const activityEventId = searchParams.get("eventActivityId");
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<TicketResponse[]>([]);
   const [totalQuantity, setTotalQuantity] = useState<number>(0);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [eventInfor, setEventInfor] =
@@ -47,27 +64,28 @@ const TicketBookingNoneSeatmap = () => {
       >
     >();
 
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(
-          Number(activityEventId)
+  const fetchTickets = async () => {
+    try {
+      const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(
+        Number(activityEventId)
+      );
+      // console.log(ticketResponse);
+      if (ticketResponse.data.result.length !== 0) {
+        const updatedTickets = ticketResponse.data.result.map(
+          (ticket: TicketResponse) => ({
+            ...ticket,
+            purchaseQuantity: 0,
+          })
         );
-        // console.log(ticketResponse);
-        if (ticketResponse.data.result.length !== 0) {
-          const updatedTickets = ticketResponse.data.result.map(
-            (ticket: Ticket) => ({
-              ...ticket,
-              purchaseQuantity: 0,
-            })
-          );
-          setTickets(updatedTickets);
-        }
-      } catch (error) {
-        console.log(error);
+        setTickets(updatedTickets);
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
     fetchTickets();
+    setTotalQuantity(0);
   }, [activityEventId]);
 
   useEffect(() => {
@@ -116,6 +134,50 @@ const TicketBookingNoneSeatmap = () => {
     );
     setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1);
   };
+
+  const createTicketPurchase = async () => {
+    const ticketPurchaseRequest: TicketPurchaseRequest = {
+      ticketPurchaseRequests: tickets
+        .filter(
+          (ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0
+        )
+        .map((ticket) => ({
+          ticketId: ticket.ticket.ticketId,
+          quantity: ticket.purchaseQuantity as number,
+          eventId: ticket.ticket.eventId,
+          eventActivityId: Number(activityEventId),
+          seatId: 0,
+          zoneId: 0,
+        })),
+    };
+
+    try {
+      console.log("Đang gửi yêu cầu mua vé:", ticketPurchaseRequest);
+
+      const response = await ticketPurchase.createPurchase(
+        ticketPurchaseRequest
+      );
+
+      toast.success("Mua vé thành công");
+      console.log("🎉 Purchase thành công:", response.data);
+      await fetchTickets();
+
+      // Redirect hoặc làm gì tiếp theo ở đây
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message || "Lỗi từ server không xác định";
+        console.error("Lỗi Axios:", errorMessage, error.response?.data);
+
+        toast.error(`Lỗi khi mua vé: ${errorMessage}`);
+      } else {
+        console.error("Lỗi không phải Axios:", error);
+        toast.error("Có lỗi xảy ra khi mua vé");
+      }
+    }
+  };
+
+  // console.log(tickets);
 
   return (
     <div className="flex flex-col h-auto lg:min-h-screen lg:flex-row">
@@ -257,6 +319,7 @@ const TicketBookingNoneSeatmap = () => {
           </div>
 
           <Button
+            onClick={createTicketPurchase}
             className={`w-full ${
               totalPrice != 0
                 ? "bg-pse-green text-white"
@@ -270,6 +333,7 @@ const TicketBookingNoneSeatmap = () => {
           </Button>
         </div>
       </div>
+      <Toaster position="top-center" />
     </div>
   );
 };

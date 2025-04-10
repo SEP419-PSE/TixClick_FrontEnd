@@ -15,6 +15,7 @@ import ImageUpload from "../ImageUpload";
 import TextInput from "../InputText";
 import SelectTypeEvent from "../SelectTypeEvent";
 import TextEditor from "../TextEditor";
+import { Card } from "../../ui/card";
 
 const eventTypes: EventType[] = [
   { id: 1, name: "Music" },
@@ -183,7 +184,7 @@ export default function StepOne({
   return (
     <div className="text-black text-[16px]">
       {isLoading && <LoadingFullScreen />}
-      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -209,9 +210,9 @@ export default function StepOne({
           text={eventName}
           setText={setEventName}
         />
-      </section>
+      </Card>
 
-      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
         <p className="text-white">Địa chỉ sự kiện</p>
         <div className="flex flex-col space-y-2 text-white">
           <div className="flex items-center space-x-6 my-2">
@@ -267,9 +268,9 @@ export default function StepOne({
             />
           </div>
         )}
-      </section>
+      </Card>
 
-      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
         <SelectTypeEvent
           selectedId={typeEventid}
           choice={typeEvent}
@@ -277,14 +278,15 @@ export default function StepOne({
           label="Thể loại sự kiện"
           listType={eventTypes}
         />
-      </section>
+      </Card>
 
-      <section className="bg-pse-black-light p-4 rounded-lg mb-8 shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
-      </section>
+      </Card>
 
-      <section className=" bg-pse-black-light md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8 shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8">
+        {" "}
         <div className="md:w-[70%]">
           <p className="text-white font-semibold">{companies?.companyName}</p>
           <p className="text-white font-light">{companies?.description}</p>
@@ -296,7 +298,7 @@ export default function StepOne({
             className="w-[275px] h-[275px]"
           />
         </div>
-      </section>
+      </Card>
 
       <div className="flex justify-between mt-6">
         <button

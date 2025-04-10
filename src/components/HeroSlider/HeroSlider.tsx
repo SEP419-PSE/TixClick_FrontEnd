@@ -110,7 +110,9 @@ const HeroSlider = () => {
                     Sự kiện của tôi
                   </li>
                 </NavLink>
-                <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                <NavLink to="/profileForm">
+                  <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                </NavLink>
                 <button onClick={hanldeClickCreateEvent}>
                   <li className="px-4 py-2 border rounded-md hover:opacity-60">
                     Tạo sự kiện

@@ -156,7 +156,11 @@ const FilterEvent = ({
             />
           </div>
           <div className="mt-auto flex justify-between gap-4">
-            <Button onClick={resetForm} className="w-full" variant={"outline"}>
+            <Button
+              onClick={resetForm}
+              className="w-full bg-pse-black text-white transition-all duration-500"
+              variant={"outline"}
+            >
               Thiết lập lại
             </Button>
             {/* <Button onClick={submitForm} className="w-full bg-pse-black">

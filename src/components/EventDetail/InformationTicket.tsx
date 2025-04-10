@@ -15,6 +15,7 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
     setActiveShowTicket(activeShowTicket === id ? null : id);
   };
 
+  console.log(eventDetail);
   return (
     <div className="p-3 bg-white/80 ">
       <div className="bg-pse-black-light space-y-4 rounded-md w-full max-w-[700px] mx-auto">
