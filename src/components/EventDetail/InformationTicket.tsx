@@ -44,19 +44,25 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                   {formatDateVietnamese(activity.dateEvent.toString())}
                 </span>
               </p>
-              <NavLink
-                className={"ml-auto"}
-                to={{
-                  pathname: eventDetail.haveSeatMap
-                    ? "booking-ticket"
-                    : "booking-ticket-no-seatmap",
-                  search: `?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`,
-                }}
-              >
-                <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
-                  Mua vé ngay
-                </button>
-              </NavLink>
+              {activity.soldOut ? (
+                <NavLink
+                  className={"ml-auto"}
+                  to={{
+                    pathname: eventDetail.haveSeatMap
+                      ? "booking-ticket"
+                      : "booking-ticket-no-seatmap",
+                    search: `?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`,
+                  }}
+                >
+                  <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
+                    Mua vé ngay
+                  </button>
+                </NavLink>
+              ) : (
+                <p className="ml-auto bg-red-200 text-pse-error/80 flex w-fit h-fit px-2 py-1 rounded-md">
+                  Hết vé
+                </p>
+              )}
             </div>
             {activeShowTicket === activity.eventActivityId && (
               <div className="bg-black border-t border-white transition-all duration-500">

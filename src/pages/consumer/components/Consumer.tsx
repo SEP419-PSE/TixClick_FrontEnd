@@ -29,6 +29,7 @@ import clsx from "clsx";
 import { Button } from "../../../components/ui/button";
 import { NavLink, useNavigate } from "react-router";
 import { FaTasks } from "react-icons/fa";
+import { MdExpandMore } from "react-icons/md";
 
 // const mockEvents = [
 //   {
@@ -151,6 +152,11 @@ export default function Consumer() {
   const [events, setEvents] = useState<EventDetailResponse[]>([]);
   const [selectedEvent, setSelectedEvent] =
     useState<EventDetailResponse | null>();
+  const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
+
+  const onChangeActiveTicket = (id: number) => {
+    setActiveShowTicket(activeShowTicket === id ? null : id);
+  };
 
   const fetchEvents = async () => {
     const companyId = (await companyApi.isAccountHaveCompany()).data.result
@@ -511,45 +517,77 @@ export default function Consumer() {
                 )}
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Loại vé
-                </h3>
-                <div className="bg-[#1e1e1e] rounded-lg p-4">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="text-left py-2 text-gray-400">
-                          Loại vé
-                        </th>
-                        <th className="text-left py-2 text-gray-400">Giá</th>
-                        <th className="text-left py-2 text-gray-400">Đã bán</th>
-                      </tr>
-                    </thead>
-                    {/* <tbody>
-                      {selectedEvent.ticketTypes.map(
-                        (ticket: any, index: any) => (
-                          <tr
-                            key={index}
-                            className="border-b border-gray-700 last:border-0"
-                          >
-                            <td className="py-3 text-white">{ticket.name}</td>
-                            <td className="py-3 text-white">{ticket.price}</td>
-                            <td className="py-3 text-white">{ticket.sold}</td>
-                          </tr>
-                        )
+              <div className="w-full bg-white/80 rounded-lg">
+                <div className="bg-pse-black-light space-y-4 rounded-md w-full mx-auto">
+                  <div className="p-3 border-b text-[18px] text-pse-green-second border-white font-extrabold">
+                    Thông tin vé
+                  </div>
+                  {selectedEvent.eventActivityDTOList?.map((activity) => (
+                    <div
+                      key={activity.eventActivityId}
+                      className="border-b border-white"
+                    >
+                      <div
+                        onClick={() =>
+                          onChangeActiveTicket(activity.eventActivityId)
+                        }
+                        className="px-3 pb-3 font-semibold flex items-center cursor-pointer"
+                      >
+                        <span>
+                          <MdExpandMore
+                            size={22}
+                            // className={`mr-2 transition-all duration-500 ${
+                            //   activeShowTicket === ticket.id && "rotate-180"
+                            // }`}
+                          />
+                        </span>
+                        <p className="flex flex-col">
+                          {formatTimeFe(activity.startTimeEvent)} -{" "}
+                          {formatTimeFe(activity.endTimeEvent)},{" "}
+                          <span>
+                            {" "}
+                            {formatDateVietnamese(
+                              activity.dateEvent.toString()
+                            )}
+                          </span>
+                        </p>
+                        <NavLink
+                          className={"ml-auto"}
+                          to={{
+                            pathname: selectedEvent.haveSeatMap
+                              ? `/event-detail/${selectedEvent.eventId}/booking-ticket`
+                              : `/event-detail/${selectedEvent.eventId}/booking-ticket-no-seatmap`,
+                            search: `?eventId=${activity.eventId}&eventActivityId=${activity.eventActivityId}`,
+                          }}
+                        >
+                          <button className="ml-auto bg-pse-green-second text-white font-semibold hover:bg-pse-green-third px-4 py-2 rounded-md transition-all duration-300">
+                            Mua vé ngay
+                          </button>
+                        </NavLink>
+                      </div>
+                      {activeShowTicket === activity.eventActivityId && (
+                        <div className="bg-black border-t border-white transition-all duration-500">
+                          <ul className="">
+                            {activity.tickets?.map((ticket) => (
+                              <li
+                                key={ticket.ticketId}
+                                className="odd:bg-pse-black-light/50 even:bg-pse-black-light/20 py-4 pl-11 pr-4 flex justify-between"
+                              >
+                                <span className="font-semibold">
+                                  {ticket.ticketName}
+                                </span>
+                                <span className="text-pse-green-second font-semibold ">
+                                  {formatMoney(ticket.price)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       )}
-                    </tbody> */}
-                  </table>
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              {/* <div className="flex justify-end gap-4">
-                <Button variant="outline" className="text-black hover:bg-gray-400" onClick={closeEventDetails}>
-                  Đóng
-                </Button>
-                <Button className="bg-[#00B14F] hover:bg-[#00B14F]/90">Chỉnh sửa sự kiện</Button>
-              </div> */}
             </div>
           </div>
         </div>

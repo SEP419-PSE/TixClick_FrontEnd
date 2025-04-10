@@ -57,6 +57,7 @@ export interface EventActivityDTOList {
   seatMapId: number;
   eventId: number;
   createdBy: number;
+  soldOut: boolean;
   tickets: Ticket[];
 }
 
