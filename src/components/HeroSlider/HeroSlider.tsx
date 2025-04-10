@@ -104,7 +104,9 @@ const HeroSlider = () => {
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
-                <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
+                <NavLink to="/ticketManagement">
+                  <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
+                </NavLink>
                 <NavLink to="/company">
                   <li className="px-4 py-2 hover:opacity-60">
                     Sự kiện của tôi
