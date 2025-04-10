@@ -9,6 +9,7 @@ import { XCircle } from "lucide-react";
 import BankDropdown from "./components/BankDropDown";
 import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 import { useNavigate } from "react-router";
+import { Card } from "../../components/ui/card";
 
 const banks = [
   { id: "970436", bankName: "Vietcombank" },
@@ -114,9 +115,12 @@ const CreateCompany = () => {
   return (
     <div className="min-h-screen mt-16 flex items-center justify-center">
       {loading && <LoadingFullScreen />}
-      <div className="bg-pse-black-light flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
-        <p className="font-semibold text-[18px] mb-4">Đăng ký công ty</p>
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
+        <p className="font-semibold text-[18px] mb-4 text-white">
+          Đăng ký công ty
+        </p>
         <ImageUpload
+          // previewImage={null}
           height={275}
           width={275}
           label="Thêm ảnh công ty"
@@ -213,7 +217,7 @@ const CreateCompany = () => {
         <ButtonNeon onClick={handleRegisterCompany}>
           {loading ? "Đang thực hiện ..." : "Đăng ký"}
         </ButtonNeon>
-      </div>
+      </Card>
     </div>
   );
 };
