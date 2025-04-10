@@ -39,3 +39,29 @@ export interface ContractUpload {
   contractId: number;
   file: string
 }
+
+export interface ContractDetailDTO {
+  contractDetailId: number;
+  contractDetailName: string;
+  contractDetailCode: string;
+  description: string;
+  contractAmount: number;
+  contractPayDate: string; 
+  status: string; 
+  contractId: number;
+}
+
+export interface Contract {
+  contractId: number;
+  contractName: string;
+  totalAmount: number;
+  commission: string;
+  contractType: string;
+  startDate: string; 
+  endDate: string;
+  status: string; 
+  accountId: number;
+  eventId: number;
+  companyId: number;
+  contractDetailDTOS: ContractDetailDTO[];
+}
