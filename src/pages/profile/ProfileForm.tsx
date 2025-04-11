@@ -68,15 +68,47 @@ export default function ProfileForm() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // setLoading(true)
 
-    setTimeout(() => {
-      // setLoading(false)
-      setEditMode(false)
-    }, 1000)
+    const nameParts = formData.fullName.trim().split(" ")
+    const lastName = nameParts.slice(0, -1).join(" ")
+    const firstName = nameParts.slice(-1)[0]
+
+    const updateData = {
+      firstName,
+      lastName,
+      phone: formData.phone,
+      email: formData.email,
+    }
+
+    try {
+      const response = await profileApi.updateProfile(updateData)
+
+      if (response.data.success) {
+        // setProfile((prev) => ({
+        //   ...prev,
+        //   ...updateData,
+        // }))
+
+        setEditMode(false)
+      } else {
+        console.error("Failed to update profile:", response.data.message)
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error)
+    }
   }
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim(),
+        phone: profile.phone || "",
+        email: profile.email || "",
+      })
+    }
+  }, [profile])
 
   // const handleGoBack = () => {
   //   navigate(-1)
@@ -88,11 +120,10 @@ export default function ProfileForm() {
         {/* <header className="fixed top-0 left-0 right-0 z-10 bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
           
         </header> */}
-        <Header/>
-        
+        <Header />
 
         <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-28">
-            {/* <Button
+          {/* <Button
               variant="ghost"
               className="flex items-center text-[#FF8A00] hover:bg-[#2A2A2A] mr-96"
               onClick={handleGoBack}
@@ -205,7 +236,7 @@ export default function ProfileForm() {
                         <div className="relative">
                           <Input
                             name="fullName"
-                            value={`${profile?.lastName || ""} ${profile?.firstName || ""}`}
+                            value={formData.fullName}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
@@ -220,7 +251,7 @@ export default function ProfileForm() {
                           <Input
                             name="phone"
                             type="tel"
-                            value={profile?.phone}
+                            value={formData.phone}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
@@ -235,7 +266,7 @@ export default function ProfileForm() {
                           <Input
                             name="email"
                             type="email"
-                            value={profile?.email}
+                            value={formData.email}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
@@ -250,13 +281,10 @@ export default function ProfileForm() {
                           className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                           // disabled={loading}
                         >
-                          
-                        
                           <div className="flex items-center">
                             <Check className="mr-2 h-4 w-4" />
                             Lưu thông tin
                           </div>
-                        
                         </Button>
                       )}
                     </form>

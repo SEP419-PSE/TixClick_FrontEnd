@@ -25,7 +25,7 @@ const payOsApi = {
               ticketPurchaseId: ticketPurchaseId,
             },
           ],
-          expiredTime: 1000,
+          expiredTime: 900,
           voucherCode: "",
           returnUrl: returnUrl,
         }),
@@ -70,7 +70,7 @@ const payOsApi = {
 
     try {
       // Determine if we should use query parameters or not
-      let url = "https://160.191.175.172:8443/payment/payos_call_back"
+      let url = "https://160.191.175.172:8443/api/payment/payos_call_back"
 
       // If queryParams is provided and not empty, append them to the URL
       if (queryParams) {

@@ -297,7 +297,7 @@ const handleContractVerification = async (
     console.log("Response data:", data);
 
     toast.dismiss();
-    if (data.code === 0) {
+    if (data.code === 200) {
       toast.success(
         `Contract ${status === "APPROVED" ? "approved" : "rejected"} successfully`
       );

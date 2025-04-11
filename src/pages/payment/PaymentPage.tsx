@@ -17,7 +17,7 @@ import { Separator } from "../../components/ui/separator"
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
     try {
-      const response = await fetch("https://160.191.175.172:8443/ticket-purchase/create", {
+      const response = await fetch("https://160.191.175.172:8443/api/ticket-purchase/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,8 +48,6 @@ export default function PaymentPage() {
   const navigate = useNavigate()
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
-
-  const storedTicketId = localStorage.getItem("ticketId") ? JSON.parse(localStorage.getItem("ticketId")!) : undefined
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -82,9 +80,7 @@ export default function PaymentPage() {
       if (parsedData.apiResponses) {
         console.log("Ticket API response:", parsedData.apiResponses.ticket)
         console.log("Seat API responses:", parsedData.apiResponses.seats)
-        // console.log("Purchase API response:", parsedData.apiResponses.purchase.JSON.stringify())
         console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
-
       }
     } else {
       // If no data is found, redirect back to the booking page
@@ -106,12 +102,12 @@ export default function PaymentPage() {
       return selectedSeatsData.apiResponses.purchase
     }
 
-    // Otherwise, prepare the ticket purchase requests based on the selected seats
+    // Create a ticket purchase request for each selected seat
     const ticketPurchaseRequests = selectedSeatsData.seats.map((seat: any) => ({
       zoneId: seat.zoneId || 0,
-      seatId: seat.id, // Use seatId property if available, otherwise use id
+      seatId: seat.seatId, // Use the correct seatId from each seat
       eventActivityId: Number(selectedSeatsData.eventInfo.activityId),
-      ticketId: storedTicketId, // Use the ticketId from the seat info
+      ticketId: seat.ticketId, // Use the ticketId from each seat
       eventId: Number(selectedSeatsData.eventInfo.id),
       quantity: 1, // For seated tickets, quantity is always 1
     }))
@@ -328,7 +324,7 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.seatId || index} className="flex justify-between text-sm">
+                    <div key={seat.id || index} className="flex justify-between text-sm">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           1x
@@ -434,7 +430,7 @@ export default function PaymentPage() {
               <div className="bg-[#2A2A2A] p-3 rounded-md">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.seatId || index} className="flex items-center mb-1">
+                    <div key={seat.id || index} className="flex items-center mb-1">
                       <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
                         1x
                       </div>
@@ -534,4 +530,3 @@ export default function PaymentPage() {
     </div>
   )
 }
-
