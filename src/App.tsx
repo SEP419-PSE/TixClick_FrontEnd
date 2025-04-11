@@ -12,11 +12,6 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
-import CompanyDashBoard from "./pages/company/CompanyDashBoard";
-import HomeCompany from "./pages/company/components/HomeCompany";
-import ManageContract from "./pages/company/components/ManageContract";
-import ManageEvents from "./pages/company/components/ManageEvents";
-import ManageMember from "./pages/company/components/ManageMember";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -41,12 +36,15 @@ import TicketPage from "./pages/ticket/TicketPage";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
 import ProfileCompany from "./pages/company/components/ProfileCompany";
-import SearchPage from "./pages/consumer/SearchPage";
 import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
-import OrganizerCenter from "./pages/organizer";
+
 import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
+import SearchPage from "./pages/consumer/SearchPage";
+import OrganizerCenter from "./pages/organizer";
+import Member from "./pages/consumer/components/Member/Member";
+import Tasks from "./pages/consumer/components/Tasks/Tasks";
 
 export default function App() {
   return (
@@ -89,8 +87,6 @@ export default function App() {
             <Route path="payment/queue" element={<PaymentQueuePage />} />
             {/* <Route path="/payment-return" element={<PaymentReturnPage />} /> */}
 
-
-
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
@@ -106,10 +102,12 @@ export default function App() {
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
 
-            <Route path="consumerCenter" element={<RootLayouts />}>
+            <Route path="company" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="policies" element={<Policy />} />
+              <Route path="members" element={<Member />} />
+              <Route path="tasks" element={<Tasks />} />
             </Route>
 
             <Route path="ticketManagement" element={<TicketPage />} />
@@ -129,13 +127,13 @@ export default function App() {
           </Route>
 
           {/* Account Company */}
-          <Route path="company" element={<CompanyDashBoard />}>
+          {/* <Route path="company" element={<CompanyDashBoard />}>
             <Route index element={<HomeCompany />} />
             <Route path="events" element={<ManageEvents />} />
             <Route path="members" element={<ManageMember />} />
             <Route path="contracts" element={<ManageContract />} />
             <Route path="profile" element={<ProfileCompany />} />
-          </Route>
+          </Route> */}
 
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />
@@ -143,7 +141,6 @@ export default function App() {
           {/* Chat app */}
           <Route path="chat" element={<ChatApp />} />
           <Route path="template" element={<ContractTemplate />} />
-
         </Routes>
       </BrowserRouter>
     </div>

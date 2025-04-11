@@ -1,6 +1,6 @@
-import { createContext, ReactNode, useContext, useState } from 'react'
+import { createContext, ReactNode, useContext, useState } from "react";
 
-type Language = 'en' | 'vi'
+type Language = "en" | "vi";
 
 const translations = {
   vi: {
@@ -8,9 +8,10 @@ const translations = {
     search: "Tìm kiếm sự kiện",
     filters: {
       all: "Tất cả",
-      upcoming: "SẮP DIỄN RA",
-      past: "ĐÃ QUA",
-      pending: "CHỜ DUYỆT",
+      upcoming: "Diễn ra",
+      past: "Đã qua",
+      pending: "Chờ duyệt",
+      reject: "Bị hủy",
     },
     menu: {
       tickets: "Vé đã mua",
@@ -23,6 +24,8 @@ const translations = {
       fileManagement: "Quản lý xuất file",
       createEvent: "Tạo sự kiện",
       terms: "Điều khoản cho Ban tổ chức",
+      members: "Thành viên ban tổ chức",
+      tasks: "Phân chia công việc",
     },
     account: "Tài khoản",
     language: "Ngôn ngữ",
@@ -31,6 +34,8 @@ const translations = {
       myEvents: "Sự kiện của tôi",
       reports: "Quản lý báo cáo",
       terms: "Điều khoản cho Ban tổ chức",
+      members: "Thành viên ban tổ chức",
+      tasks: "Phân chia công việc",
     },
     myEvents: {
       search: "Tìm kiếm sự kiện",
@@ -113,10 +118,11 @@ const translations = {
     title: "Created Events",
     search: "Search events",
     filters: {
-      all: "All",
+      all: "ALL",
       upcoming: "UPCOMING",
       past: "PAST",
       pending: "PENDING",
+      reject: "REJECT",
     },
     menu: {
       tickets: "My Tickets",
@@ -129,6 +135,8 @@ const translations = {
       fileManagement: "File Management",
       createEvent: "Create Event",
       terms: "Organizer Terms",
+      members: "Company Employee",
+      tasks: "Tasks",
     },
     account: "Account",
     language: "Language",
@@ -137,6 +145,8 @@ const translations = {
       myEvents: "My Events",
       reports: "Reports Management",
       terms: "Organizer Terms",
+      members: "Company Employee",
+      tasks: "Tasks",
     },
     myEvents: {
       search: "Search events",
@@ -215,18 +225,20 @@ const translations = {
       applyFilter: "Apply Filter",
     },
   },
-}
+};
 
 interface LanguageContextType {
-  language: Language
-  t: typeof translations.en
-  setLanguage: (lang: Language) => void
+  language: Language;
+  t: typeof translations.en;
+  setLanguage: (lang: Language) => void;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("vi")
+  const [language, setLanguage] = useState<Language>("vi");
 
   return (
     <LanguageContext.Provider
@@ -238,13 +250,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </LanguageContext.Provider>
-  )
+  );
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext)
+  const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within LanguageProvider')
+    throw new Error("useLanguage must be used within LanguageProvider");
   }
-  return context
+  return context;
 }

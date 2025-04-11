@@ -1,15 +1,17 @@
-import { Tab } from '@headlessui/react'
+import { Tab } from "@headlessui/react";
 
-import { useLanguage } from './LanguageContext'
+import { useLanguage } from "./LanguageContext";
+import { Key } from "lucide-react";
 
-export function EventFilter({ onFilterChange}:any) {
-  const { t } = useLanguage()
+export function EventFilter({ onFilterChange }: any) {
+  const { t } = useLanguage();
   const categories = [
-    { key: "all", label: t.filters.all },
-    { key: "upcoming", label: t.filters.upcoming },
-    { key: "past", label: t.filters.past },
-    { key: "pending", label: t.filters.pending },
-  ]
+    { key: "ALL", label: t.filters.all },
+    { key: "SCHEDULED", label: t.filters.upcoming },
+    { key: "COMPLETED", label: t.filters.past },
+    { key: "DRAFT", label: t.filters.pending },
+    { key: "REJECTED", label: t.filters.reject },
+  ];
 
   return (
     <div className="w-full max-w-md px-2 sm:px-0">
@@ -34,5 +36,5 @@ export function EventFilter({ onFilterChange}:any) {
         </Tab.List>
       </Tab.Group>
     </div>
-  )
+  );
 }

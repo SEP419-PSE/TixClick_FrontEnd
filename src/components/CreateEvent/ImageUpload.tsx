@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UploadCloud } from "lucide-react";
 
 interface ImageUploadProps {
+  previewImage: string | null;
   width: number;
   height: number;
   label: string;
@@ -10,6 +11,7 @@ interface ImageUploadProps {
 }
 
 export default function ImageUpload({
+  previewImage,
   width,
   height,
   label,
@@ -17,6 +19,14 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (previewImage) {
+      setPreview(previewImage);
+    } else {
+      setPreview(null);
+    }
+  }, [previewImage]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
