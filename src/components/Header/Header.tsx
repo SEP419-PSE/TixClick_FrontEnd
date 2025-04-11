@@ -88,19 +88,19 @@ const Header = () => {
               >
                 <ul className="rounded-lg">
                   <Link to="/ticketManagement">
-                    <li className="flex items-center gap-2 p-3 hover:bg-pse-gray rounded-tl-lg rounded-tr-lg">
+                    <li className="flex items-center gap-2 p-3 hover:bg-pse-gray/50 rounded-tl-lg rounded-tr-lg">
                       <LuTicketCheck size={24} />
                       Vé đã mua
                     </li>
                   </Link>
-                  <Link to="/consumerCenter">
-                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray">
+                  <Link to="/company">
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray/50">
                       <RiCalendarEventLine size={24} />
                       Sự kiện của tôi
                     </li>
                   </Link>
                   <Link to="/profileForm">
-                    <li className="flex items-center p-3 gap-2 hover:bg-pse-black/20">
+                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray/50">
                       <CgProfile size={24} />
                       Trang cá nhân
                     </li>
