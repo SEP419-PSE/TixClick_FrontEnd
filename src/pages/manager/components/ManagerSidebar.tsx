@@ -14,19 +14,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog"
+import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover"
+import { ScrollArea } from "../../../components/ui/scroll-area"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuBadge,
 } from "../../../components/ui/sidebar"
 import { cn } from "../../../lib/utils"
-import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover"
-import { ScrollArea } from "../../../components/ui/scroll-area"
 // Import the AuthContext and Client from stomp/stompjs at the top
 import { Client } from "@stomp/stompjs"
 import { useContext, useEffect, useRef, useState } from "react"
@@ -154,7 +154,7 @@ export function DashboardSidebar() {
 
       try {
         setLoading(true)
-        const response = await fetch("https://160.191.175.172:8443/notification/notifications", {
+        const response = await fetch("https://tixclick.site/api/notification/notifications", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${context.accessToken2}`,

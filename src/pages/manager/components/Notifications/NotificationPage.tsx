@@ -165,7 +165,7 @@ export default function NotificationPage() {
       try {
         setLoading(true);
         const response = await fetch(
-          "https://160.191.175.172:8443/notification/notifications",
+          "https://tixclick.site/api/notification/notifications",
           {
             headers: {
               "Content-Type": "application/json",

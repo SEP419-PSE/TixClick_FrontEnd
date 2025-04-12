@@ -1,3 +1,4 @@
+import { Profile } from "../../interface/profile/Profile";
 import axiosClient from "../axiosClient";
 
 const profileApi = {
@@ -7,7 +8,7 @@ const profileApi = {
         return axiosClient.get(url);
       },
 
-    updateProfile(data: any) {
+    updateProfile(data: Profile) {
         const url = "/account/update-profile";
         return axiosClient.post(url, data);
       },
