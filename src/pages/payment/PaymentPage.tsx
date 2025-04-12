@@ -17,7 +17,7 @@ import { Separator } from "../../components/ui/separator"
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
     try {
-      const response = await fetch("https://160.191.175.172:8443/api/ticket-purchase/create", {
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
