@@ -1,23 +1,48 @@
-import { AlertCircle, CheckCircle, Download, Eye, FileText, Filter, Loader2, MoreHorizontal, Search, Upload } from "lucide-react"
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Eye,
+  FileText,
+  Filter,
+  Loader2,
+  MoreHorizontal,
+  Search,
+  Upload,
+} from "lucide-react"
 import * as pdfjs from "pdfjs-dist"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
 import { createWorker } from "tesseract.js"
 import { Button } from "../../../../components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../../components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
 import { Label } from "../../../../components/ui/label"
 import { Progress } from "../../../../components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
-import { EventResponse } from "../../../../interface/manager/EventType"
+import type { EventResponse } from "../../../../interface/manager/EventType"
 import managerApi from "../../../../services/manager/ManagerApi"
 import { ManagerHeader } from "../ManagerHeader"
-
-
 
 const eventTypes = [
   "Conference",
@@ -109,21 +134,9 @@ export default function EventsPage() {
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
 
-  // const [editFormData, setEditFormData] = useState<{
-  //   eventId?: number
-  //   eventName?: string
-  //   location?: string
-  //   locationName?: string
-  //   startDate?: string
-  //   endDate?: string
-  //   status?: string
-  //   typeEvent?: string
-  //   description?: string
-  //   categoryId?: number
-  //   logoURL?: string
-  //   bannerURL?: string
-  //   urlOnline?: string
-  // }>({})
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
 
   // Contract Scanner State
   const [file, setFile] = useState<File | null>(null)
@@ -134,8 +147,8 @@ export default function EventsPage() {
   const [activeTab, setActiveTab] = useState("upload")
   const [showRegions, setShowRegions] = useState(false)
   const [calibratedRegions, _] = useState<TemplateRegion[]>(templateRegions)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const [pdfCurrentPage, setPdfCurrentPage] = useState(1)
+  const [totalPdfPages, setTotalPdfPages] = useState(1)
   const [pdfDocument, setPdfDocument] = useState<any>(null)
   const [fileType, setFileType] = useState<string>("")
 
@@ -179,7 +192,6 @@ export default function EventsPage() {
     }
     initUseEffect()
   }, [])
-  
 
   // Handle file drop for contract scanner
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -199,7 +211,7 @@ export default function EventsPage() {
             const arrayBuffer = reader.result as ArrayBuffer
             const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
             setPdfDocument(pdf)
-            setTotalPages(pdf.numPages)
+            setTotalPdfPages(pdf.numPages)
 
             // Render first page
             const page = await pdf.getPage(1)
@@ -219,7 +231,7 @@ export default function EventsPage() {
 
             // Convert canvas to data URL
             setPreview(canvas.toDataURL("image/png"))
-            setCurrentPage(1)
+            setPdfCurrentPage(1)
           } catch (error) {
             console.error("Error loading PDF:", error)
             toast.error("PDF Error", {
@@ -252,7 +264,7 @@ export default function EventsPage() {
 
   // Change PDF page
   const changePdfPage = async (newPage: number) => {
-    if (!pdfDocument || newPage < 1 || newPage > totalPages) return
+    if (!pdfDocument || newPage < 1 || newPage > totalPdfPages) return
 
     try {
       const page = await pdfDocument.getPage(newPage)
@@ -272,7 +284,7 @@ export default function EventsPage() {
 
       // Convert canvas to data URL
       setPreview(canvas.toDataURL("image/png"))
-      setCurrentPage(newPage)
+      setPdfCurrentPage(newPage)
     } catch (error) {
       console.error("Error changing PDF page:", error)
     }
@@ -502,47 +514,6 @@ export default function EventsPage() {
     }
   }
 
-  // const handleApprove = async (status: string, id: number) => {
-  //   if (!selectedEvent) return
-
-  //   try {
-  //     const response = await managerApi.approveEvent(status, id)
-  //     console.log("✅ Approved successfully:", response)
-
-  //     const updatedEvents = events.map((event) =>
-  //       event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event,
-  //     )
-
-  //     setEvents(updatedEvents)
-  //     setSelectedEvent({ ...selectedEvent, status: "APPROVED" })
-
-  //     toast.success("Event Approved", {
-  //       description: "The event has been successfully approved.",
-  //     })
-  //   } catch (error: any) {
-  //     console.error("❌ Error approving event:", error)
-
-  //     toast.error("Approval Failed", {
-  //       description: error?.response?.data?.message || "Something went wrong.",
-  //     })
-  //   }
-  // }
-
-  // const handleReject = () => {
-  //   if (!selectedEvent) return
-
-  //   const updatedEvents = events.map((event) =>
-  //     event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event,
-  //   )
-
-  //   setEvents(updatedEvents)
-  //   setSelectedEvent({ ...selectedEvent, status: "REJECTED" })
-
-  //   toast.success("Event Rejected", {
-  //     description: "The event has been rejected.",
-  //   })
-  // }
-
   const handleCreateContract = () => {
     setIsContractModalOpen(true)
     setActiveTab("upload")
@@ -559,6 +530,15 @@ export default function EventsPage() {
     await fetchRelatedContracts(selectedEvent.eventId)
     setIsRelatedContractsModalOpen(true)
   }
+
+  // Pagination functions
+  const paginate = (items: any[], page: number, itemsPerPage: number) => {
+    const startIndex = (page - 1) * itemsPerPage
+    return items.slice(startIndex, startIndex + itemsPerPage)
+  }
+
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage)
+  const paginatedEvents = paginate(filteredEvents, currentPage, itemsPerPage)
 
   return (
     <>
@@ -618,57 +598,303 @@ export default function EventsPage() {
             </DropdownMenu>
           </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-              <TableHead className="text-white">Event Name</TableHead>
-              <TableHead className="text-white">Date</TableHead>
-              <TableHead className="text-white">Location</TableHead>
-              <TableHead className="text-white">Organizer</TableHead>
-              <TableHead className="text-white">Type</TableHead>
-              <TableHead className="text-white">Status</TableHead>
-              <TableHead className="text-white text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredEvents.map((event) => (
-              <TableRow key={event.eventId} className="border-[#333333] hover:bg-[#2A2A2A]">
-                <TableCell className="font-medium text-white">{event.eventName}</TableCell>
-                <TableCell className="text-white">{event.eventName}</TableCell>
-                <TableCell className="text-white">{event.location}</TableCell>
-                <TableCell className="text-white">{event.companyName}</TableCell>
-                <TableCell className="text-white">{event.typeEvent}</TableCell>
-                <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedEvent(event)
-                          setIsEventModalOpen(true)
-                        }}
-                      >
-                        View details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>Edit event information</DropdownMenuItem>
-                      {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
-                      <DropdownMenuItem onClick={handleViewRelatedContracts}>View associated contracts</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <div>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
+                <TableHead className="text-white">Event Name</TableHead>
+                <TableHead className="text-white">Date</TableHead>
+                <TableHead className="text-white">Location</TableHead>
+                <TableHead className="text-white">Organizer</TableHead>
+                <TableHead className="text-white">Type</TableHead>
+                <TableHead className="text-white">Status</TableHead>
+                <TableHead className="text-white text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedEvents.map((event) => (
+                <TableRow key={event.eventId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                  <TableCell className="font-medium text-white">{event.eventName}</TableCell>
+                  <TableCell className="text-white">{event.eventName}</TableCell>
+                  <TableCell className="text-white">{event.location}</TableCell>
+                  <TableCell className="text-white">{event.companyName}</TableCell>
+                  <TableCell className="text-white">{event.typeEvent}</TableCell>
+                  <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedEvent(event)
+                            setIsEventModalOpen(true)
+                          }}
+                        >
+                          View details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>Edit event information</DropdownMenuItem>
+                        {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
+                        <DropdownMenuItem onClick={handleViewRelatedContracts}>
+                          View associated contracts
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* Pagination Controls */}
+          <div className="mt-6 border-t border-[#333333] pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-gray-400">
+                  Showing{" "}
+                  <span className="font-medium text-white">
+                    {Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length)}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium text-white">
+                    {Math.min(currentPage * itemsPerPage, filteredEvents.length)}
+                  </span>{" "}
+                  of <span className="font-medium text-white">{filteredEvents.length}</span> events
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value))
+                    setCurrentPage(1) // Reset to first page when changing items per page
+                  }}
+                >
+                  <SelectTrigger className="w-[110px] h-9 bg-[#2A2A2A] text-white border-[#333333]">
+                    <SelectValue placeholder="Per page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5 per page</SelectItem>
+                    <SelectItem value="10">10 per page</SelectItem>
+                    <SelectItem value="15">15 per page</SelectItem>
+                    <SelectItem value="20">20 per page</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <nav className="flex items-center space-x-1" aria-label="Pagination">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">First page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-chevrons-left"
+                    >
+                      <path d="m11 17-5-5 5-5" />
+                      <path d="m18 17-5-5 5-5" />
+                    </svg>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <span className="sr-only">Previous page</span>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+
+                  {totalPages <= 5 ? (
+                    // If 5 or fewer pages, show all page numbers
+                    Array.from({ length: totalPages }, (_, i) => (
+                      <Button
+                        key={i + 1}
+                        variant={currentPage === i + 1 ? "default" : "outline"}
+                        size="icon"
+                        className={`h-9 w-9 ${
+                          currentPage === i + 1
+                            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                            : "bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333]"
+                        } rounded-md`}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        <span>{i + 1}</span>
+                      </Button>
+                    ))
+                  ) : (
+                    // If more than 5 pages, show a smart subset
+                    <>
+                      {/* Always show first page */}
+                      <Button
+                        variant={currentPage === 1 ? "default" : "outline"}
+                        size="icon"
+                        className={`h-9 w-9 ${
+                          currentPage === 1
+                            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                            : "bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333]"
+                        } rounded-md`}
+                        onClick={() => setCurrentPage(1)}
+                      >
+                        <span>1</span>
+                      </Button>
+
+                      {/* Show ellipsis if current page is > 3 */}
+                      {currentPage > 3 && (
+                        <span className="mx-1 text-gray-400 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-more-horizontal"
+                          >
+                            <circle cx="12" cy="12" r="1" />
+                            <circle cx="19" cy="12" r="1" />
+                            <circle cx="5" cy="12" r="1" />
+                          </svg>
+                        </span>
+                      )}
+
+                      {/* Show page before current if not first or second page */}
+                      {currentPage > 2 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                          onClick={() => setCurrentPage(currentPage - 1)}
+                        >
+                          <span>{currentPage - 1}</span>
+                        </Button>
+                      )}
+
+                      {/* Show current page if not first or last */}
+                      {currentPage !== 1 && currentPage !== totalPages && (
+                        <Button
+                          variant="default"
+                          size="icon"
+                          className="h-9 w-9 bg-blue-600 hover:bg-blue-700 text-white border-blue-600 rounded-md"
+                        >
+                          <span>{currentPage}</span>
+                        </Button>
+                      )}
+
+                      {/* Show page after current if not last or second-to-last */}
+                      {currentPage < totalPages - 1 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                          onClick={() => setCurrentPage(currentPage + 1)}
+                        >
+                          <span>{currentPage + 1}</span>
+                        </Button>
+                      )}
+
+                      {/* Show ellipsis if current page is < totalPages - 2 */}
+                      {currentPage < totalPages - 2 && (
+                        <span className="mx-1 text-gray-400 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="lucide lucide-more-horizontal"
+                          >
+                            <circle cx="12" cy="12" r="1" />
+                            <circle cx="19" cy="12" r="1" />
+                            <circle cx="5" cy="12" r="1" />
+                          </svg>
+                        </span>
+                      )}
+
+                      {/* Always show last page */}
+                      <Button
+                        variant={currentPage === totalPages ? "default" : "outline"}
+                        size="icon"
+                        className={`h-9 w-9 ${
+                          currentPage === totalPages
+                            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                            : "bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333]"
+                        } rounded-md`}
+                        onClick={() => setCurrentPage(totalPages)}
+                      >
+                        <span>{totalPages}</span>
+                      </Button>
+                    </>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Next page</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="sr-only">Last page</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-chevrons-right"
+                    >
+                      <path d="m6 17 5-5-5-5" />
+                      <path d="m13 17 5-5-5-5" />
+                    </svg>
+                  </Button>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
@@ -864,24 +1090,24 @@ export default function EventsPage() {
                   </div>
 
                   {/* PDF Navigation Controls */}
-                  {fileType === "application/pdf" && totalPages > 1 && (
+                  {fileType === "application/pdf" && totalPdfPages > 1 && (
                     <div className="flex items-center justify-center gap-2 mt-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => changePdfPage(currentPage - 1)}
-                        disabled={currentPage <= 1}
+                        onClick={() => changePdfPage(pdfCurrentPage - 1)}
+                        disabled={pdfCurrentPage <= 1}
                       >
                         Previous
                       </Button>
                       <span className="text-sm">
-                        Page {currentPage} of {totalPages}
+                        Page {pdfCurrentPage} of {totalPdfPages}
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => changePdfPage(currentPage + 1)}
-                        disabled={currentPage >= totalPages}
+                        onClick={() => changePdfPage(pdfCurrentPage + 1)}
+                        disabled={pdfCurrentPage >= totalPdfPages}
                       >
                         Next
                       </Button>
@@ -1068,9 +1294,3 @@ export default function EventsPage() {
     </>
   )
 }
-
-
-
-
-
-
