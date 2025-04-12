@@ -6,7 +6,8 @@ type TimeInputProps = {
   id: string;
   value: string;
   onChange: (value: string) => void;
-  className?: string; // Thêm className vào đây để dễ tùy chỉnh style
+  className?: string;
+  error?: string;
 };
 
 const TimeInput = ({
@@ -15,16 +16,20 @@ const TimeInput = ({
   value,
   onChange,
   className,
+  error,
 }: TimeInputProps) => (
-  <div className="grid gap-2">
+  <div className="grid gap-1">
     <Label htmlFor={id}>{label}</Label>
     <Input
       id={id}
       type="time"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`border border-input bg-background text-white shadow-sm ${className}`} // Thêm className vào đây
+      className={`border ${
+        error ? "border-red-500" : "border-input"
+      } bg-background text-white shadow-sm ${className}`}
     />
+    {error && <span className="text-sm text-red-500">{error}</span>}
   </div>
 );
 

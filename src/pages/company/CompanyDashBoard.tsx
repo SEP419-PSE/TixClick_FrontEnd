@@ -14,7 +14,7 @@ const CompanyDashBoard = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [connectionStatus, setConnectionStatus] = useState("Disconnected");
   const [currentUser, setCurrentUser] = useState<string>("");
-  console.log(currentUser,messages,connectionStatus)
+  console.log(currentUser, messages, connectionStatus);
   const [openNotification, setOpenNotification] = useState<boolean>(false);
   const location = useLocation();
   const data = useNotifications();
@@ -48,7 +48,7 @@ const CompanyDashBoard = () => {
   }, [context?.accessToken]);
 
   const connectWebSocket = () => {
-    const brokerURL = `ws://160.191.175.172:8080/ws?token=${context?.accessToken}`;
+    const brokerURL = `wss://tixclick.site/ws?token=${context?.accessToken}`;
     console.log("🔗 WebSocket URL:", brokerURL);
 
     const client = new Client({

@@ -40,5 +40,7 @@ export const TOAST_MESSAGE = {
   signUpSucces: "Đăng ký tài khoản thành công",
   signUpFail: "Đăng ký tài khoản thất bại",
   sentOTPsuccess: "Mã OTP đã được gửi lại",
+  emmptyEventActivity:
+    "Vui lòng điền đầy đủ thông tin cho hoạt động trước khi thêm loại vé",
   error: "Đã có lỗi xảy ra",
 };
