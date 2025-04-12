@@ -418,13 +418,13 @@ const handleContractVerification = async (
 
   const getStatusBadge = (status: any) => {
     switch (status) {
-      case "Active":
+      case "APPROVED":
         return (
           <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">
-            Active
+            Approved
           </span>
         );
-      case "Pending":
+      case "PENDING":
         return (
           <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">
             Pending
