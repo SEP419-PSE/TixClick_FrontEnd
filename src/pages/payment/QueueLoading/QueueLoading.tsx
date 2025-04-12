@@ -13,7 +13,7 @@ const payOsApi = {
       console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
       const returnUrl = `${window.location.origin}/payment/queue`
 
-      const response = await fetch("https://160.191.175.172:8443/payment/pay-os-create", {
+      const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,7 +25,7 @@ const payOsApi = {
               ticketPurchaseId: ticketPurchaseId,
             },
           ],
-          expiredTime: 1000,
+          expiredTime: 900,
           voucherCode: "",
           returnUrl: returnUrl,
         }),
@@ -70,7 +70,7 @@ const payOsApi = {
 
     try {
       // Determine if we should use query parameters or not
-      let url = "https://160.191.175.172:8443/payment/payos_call_back"
+      let url = "https://tixclick.site/api/payment/payos_call_back"
 
       // If queryParams is provided and not empty, append them to the URL
       if (queryParams) {

@@ -22,7 +22,7 @@ export default function NotificationPage() {
 
   const stompClient = useRef<Client | null>(null);
 
-  console.log(error);
+  // console.log(error);
 
   // Function to connect to WebSocket
   // Make connectWebSocket depend on currentUser
@@ -35,7 +35,7 @@ export default function NotificationPage() {
     console.log("Connecting to WebSocket for user:", currentUser);
 
     const client = new Client({
-      brokerURL: "ws://160.191.175.172:8080/ws",
+      brokerURL: `wss://tixclick.site/ws?token=${context?.accessToken2}`,
       connectHeaders: {
         Authorization: `Bearer ${context.accessToken2}`,
       },
@@ -53,37 +53,24 @@ export default function NotificationPage() {
       console.log(`Subscribing to /user/${currentUser}/queue/notifications`);
 
       client.subscribe(
-        `/user/${currentUser}/queue/notifications`,
-        function (message) {
-          try {
-            const newNotification = JSON.parse(message.body);
-            console.log("📬 New notification received:", newNotification);
-
-            // Add to notifications list
-            setNotifications((prev) => [
-              {
-                ...newNotification,
-                type:
-                  newNotification.type ||
-                  ["message", "order", "user", "document", "system", "email"][
-                    Math.floor(Math.random() * 6)
-                  ],
-              },
-              ...prev,
-            ]);
-
-            // Show toast notification
+        "/user/specific/messages",
+        async function (message) {
+          if (message.body) {
+            console.log("📬 Notification event received:", message.body);
+      
+            await fetchNotifications(); 
+      
             toast.success("Thông báo mới", {
-              description:
-                newNotification.content ||
-                newNotification.message ||
-                "Bạn có thông báo mới",
+              description: "Danh sách thông báo đã được cập nhật.",
             });
-          } catch (err) {
-            console.error("❌ Error processing WebSocket message:", err);
+          } else {
+            console.warn("⚠️ Received empty message from WebSocket");
           }
         }
       );
+      
+      
+      
     };
 
     // Rest of your client setup...
@@ -160,54 +147,54 @@ export default function NotificationPage() {
   }, [context?.accessToken2]);
 
   // Fetch initial notifications
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          "https://160.191.175.172:8443/notification/notifications",
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${context?.accessToken2}`,
-            },
-          }
-        );
-
-
-        if (!response.ok) {
-          throw new Error("Lỗi khi tải thông báo");
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "https://tixclick.site/api/notification/notifications",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${context?.accessToken2}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        console.log("Dữ liệu từ API:", data);
 
-        if (data && Array.isArray(data.result)) {
-          const enhancedNotifications = data.result.map(
-            (notification: Notification) => ({
-              ...notification,
-              type:
-                notification.type ||
-                ["message", "order", "user", "document", "system", "email"][
-                  Math.floor(Math.random() * 6)
-                ],
-            })
-          );
-          setNotifications(enhancedNotifications);
-        } else {
-          console.error("Dữ liệu từ API không đúng định dạng:", data);
-          setNotifications([]);
-        }
-
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
-        console.error("Error fetching notifications:", err);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Lỗi khi tải thông báo");
       }
-    };
 
+      const data = await response.json();
+      console.log("Dữ liệu từ API:", data);
+
+      if (data && Array.isArray(data.result)) {
+        const enhancedNotifications = data.result.map(
+          (notification: Notification) => ({
+            ...notification,
+            type:
+              notification.type ||
+              ["message", "order", "user", "document", "system", "email"][
+                Math.floor(Math.random() * 6)
+              ],
+          })
+        );
+        setNotifications(enhancedNotifications);
+      } else {
+        console.error("Dữ liệu từ API không đúng định dạng:", data);
+        setNotifications([]);
+      }
+
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
+      console.error("Error fetching notifications:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchNotifications();
   }, [context?.accessToken2]);
 

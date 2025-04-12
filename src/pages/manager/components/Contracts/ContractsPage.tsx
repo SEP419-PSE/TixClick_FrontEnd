@@ -263,7 +263,7 @@ const handleContractVerification = async (
       toast.error("No access token found. Please login again.");
       return;
     }
-    const url = `https://160.191.175.172:8443/contract/approve?contractId=${contractId}&status=${status}`;
+    const url = `https://tixclick.site/api/contract/approve?contractId=${contractId}&status=${status}`;
     
     console.log("Request URL:", url);
     console.log("contractId:", contractId);
@@ -297,7 +297,7 @@ const handleContractVerification = async (
     console.log("Response data:", data);
 
     toast.dismiss();
-    if (data.code === 0) {
+    if (data.code === 200) {
       toast.success(
         `Contract ${status === "APPROVED" ? "approved" : "rejected"} successfully`
       );

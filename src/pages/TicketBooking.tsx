@@ -1,13 +1,15 @@
-import { Calendar, MapPin, Ticket } from "lucide-react";
-import { useEffect, useState } from "react";
-import Draggable from "react-draggable";
-import { useNavigate, useSearchParams } from "react-router";
-import CustomDivider from "../components/Divider/CustomDivider";
-import Header from "../components/Header/Header";
-import { Button } from "../components/ui/button";
-import { formatMoney } from "../lib/utils";
-import seatmapApi from "../services/seatmapApi";
-import ticketApi from "../services/ticketApi";
+import type React from "react"
+
+import { Calendar, MapPin, Ticket } from "lucide-react"
+import { useEffect, useState } from "react"
+import Draggable from "react-draggable"
+import { useNavigate, useSearchParams } from "react-router"
+import CustomDivider from "../components/Divider/CustomDivider"
+import Header from "../components/Header/Header"
+import { Button } from "../components/ui/button"
+import { formatMoney } from "../lib/utils"
+import seatmapApi from "../services/seatmapApi"
+import ticketApi from "../services/ticketApi"
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -40,7 +42,7 @@ export interface ISeat {
   id: string
   row: number
   column: number
-  status: string;
+  status: string
   price: number
   seatTypeId: string
   x?: number
@@ -65,6 +67,15 @@ export interface ISection {
   zoneActivityId?: number // Added to ensure we can access this property
 }
 
+// Helper function to generate seat label
+const generateSeatLabel = (row: number, column: number): string => {
+  // Convert row index to letter (0 -> A, 1 -> B, etc.)
+  const rowLetter = String.fromCharCode(65 + row)
+  // Column is 0-based, so add 1 for display
+  const seatNumber = column + 1
+  return `${rowLetter}${seatNumber}`
+}
+
 interface DraggableSectionProps {
   section: ISection
   seatTypes: SeatTypeEdit[]
@@ -76,10 +87,9 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
   const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null)
 
   const handleSeatClick = (seat: ISeat) => {
-    if(!seat.status) return
+    if (!seat.status) return
     onSeatClick(seat, section.name)
   }
-  
 
   return (
     <Draggable position={{ x: section.x, y: section.y }} disabled={true} bounds="parent">
@@ -161,6 +171,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
                       ></div>
                     )
                   const seatColor = getSeatColor(seat)
+                  const seatLabel = generateSeatLabel(rowIndex, colIndex)
+
                   return (
                     <div
                       key={colIndex}
@@ -185,8 +197,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({ section, seatTypes,
                       onMouseEnter={() => setHoveredSeat(seat)}
                       onMouseLeave={() => setHoveredSeat(null)}
                     >
-                      {String.fromCharCode(65 + rowIndex)}
-                      {colIndex + 1}
+                      {seatLabel}
 
                       {hoveredSeat && hoveredSeat.id == seat.id && (
                         <div
@@ -267,18 +278,17 @@ const TicketBooking = () => {
     if (!seat.status) {
       return "#d1d5db" // gray-300, bạn có thể chọn màu khác như "#9ca3af" (gray-400)
     }
-  
+
     // Nếu ghế đang được chọn thì dùng màu highlight
     const isSelected = selectedSeats.some((s) => s.id === seat.id)
     if (isSelected) {
       return "#059669" // green-600
     }
-  
+
     // Dùng màu của loại ghế nếu có, ngược lại dùng màu mặc định
     const seatType = seatTypes.find((type) => type.id == seat.seatTypeId)
     return seatType ? seatType.color : "#6b7280" // gray-500 mặc định
   }
-  
 
   // Handle seat click
   const handleSeatClick = (seat: ISeat, sectionName: string) => {
@@ -287,11 +297,9 @@ const TicketBooking = () => {
 
     // Find the corresponding ticket by matching seatTypeId with ticket id in the seatTypes array
     // In this case, the seatTypeId is the same as the ticket id
-    const ticket = seatTypes.find((type) => type.id === seat.seatTypeId);
-    const ticketId = ticket ? ticket.ticketId : undefined;
+    const ticket = seatTypes.find((type) => type.id === seat.seatTypeId)
+    const ticketId = ticket ? ticket.ticketId : undefined
     console.log("ticketId:", ticketId)
-    localStorage.setItem("ticketId", JSON.stringify(ticket?.ticketId));
-
 
     // Get zoneId from the section or from the seat if available
     const section = sections.find((s) => s.name === sectionName)
@@ -301,29 +309,28 @@ const TicketBooking = () => {
     console.log("Zone ID:", zoneId)
     console.log("Ticket ID:", ticketId)
 
+    // Create the correct seat label using our helper function
+    const seatLabel = generateSeatLabel(seat.row, seat.column)
+
     // Create rich seat info object
     const seatInfo: SelectedSeatInfo = {
       ...seat,
       sectionName,
       typeName: seatType?.name || "Unknown Type",
       formattedPrice: formatCurrency(seatType?.price || 0),
-      seatLabel: `${String.fromCharCode(65 + seat.row)}${seat.column + 1}`,
+      seatLabel: seatLabel,
       ticketId: ticketId, // Add the ticketId to the seat info
       zoneId: zoneId, // Add the zoneId to the seat info
     }
-    
 
     // Check if seat is already selected
-    const isSelected = selectedSeats.some((s) => s.seatId === seat.seatId)
-    const seatId = seat.seatId
-    localStorage.setItem("seatId", JSON.stringify(seat.seatId));
+    const isSelected = selectedSeats.some((s) => s.id === seat.id)
 
-
-    console.log("seat ID:",seatId)
+    console.log("seat ID:", seat.seatId)
 
     if (isSelected) {
       // Remove the seat if already selected
-      setSelectedSeats((prev) => prev.filter((s) => s.seatId !== seat.seatId))
+      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id))
       console.log("Unselected seat:", seatInfo)
     } else {
       // Add the seat if not already selected
@@ -334,10 +341,10 @@ const TicketBooking = () => {
     // Log the full seat info for debugging
     console.log("Seat details:", {
       id: seat.id,
+      seatId: seat.seatId,
       row: seat.row,
       column: seat.column,
-      rowLabel: String.fromCharCode(65 + seat.row),
-      seatLabel: String.fromCharCode(65 + seat.row) + (seat.column + 1),
+      seatLabel: seatLabel,
       section: sectionName,
       seatType: seatType?.name,
       price: seatType?.price,
@@ -355,11 +362,6 @@ const TicketBooking = () => {
     }, 0)
   }
 
-
-  const storedSeatId = localStorage.getItem("seatId")
-  ? JSON.parse(localStorage.getItem("seatId")!)
-  : undefined;
-  
   // Hàm xử lý việc chuyển đến trang thanh toán
   const handleProceedToPayment = () => {
     if (selectedSeats.length === 0) return
@@ -367,7 +369,7 @@ const TicketBooking = () => {
     // Prepare ticket purchase requests
     const ticketPurchaseRequests = selectedSeats.map((seat) => ({
       zoneId: seat.zoneId || 0,
-      seatId: storedSeatId, // Use seatId property if available, otherwise use id
+      seatId: seat.seatId, // Use the individual seat's seatId
       eventActivityId: Number(eventActivityId),
       ticketId: seat.ticketId, // Use the ticketId we added to the seat info
       eventId: Number(eventId),
@@ -425,70 +427,77 @@ const TicketBooking = () => {
             ))}
           </div>
         </div>
-        <div className="fixed flex flex-col top-0 right-0 h-full w-80 pt-[70px] bg-white p-6 shadow-md border border-gray-200">
-          <div className="my-4 space-y-4">
-            <div className="text-[18px] font-semibold">Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!</div>
-            <div className="flex items-center gap-1 font-medium">
-              <span>
-                <Calendar size={20} fill="white" className="text-pse-green-second" />
-              </span>
-              19:30, 12 tháng 4, 2025
-            </div>
-            <div className="flex items-center gap-1">
-              <span>
-                <MapPin size={20} fill="white" className="text-pse-green-second" />
-              </span>
-              Nhà Hát Kịch IDECAF
-            </div>
-          </div>
-          <CustomDivider />
-
-          <div className="space-y-3">
-            <h3 className="text-black font-semibold mb-4">Chú thích loại ghế</h3>
-            {/* Map mảng ticketType ở đây */}
-            {seatTypes.map((seatType) => (
-              <div
-                key={seatType.id}
-                className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
-              >
-                <div className="w-8 h-8 rounded-lg shadow-md mr-3" style={{ backgroundColor: seatType.color }}></div>
-                <div>
-                  <div className="font-medium text-gray-900">{seatType.name}</div>
-                  <div className="text-sm text-gray-600">{formatCurrency(seatType.price)}</div>
-                </div>
+        <div className="fixed flex flex-col top-0 right-0 h-full w-80 pt-[70px] bg-white shadow-md border border-gray-200">
+          <div className="overflow-y-auto flex-1 p-6">
+            <div className="my-4 space-y-4">
+              <div className="text-[18px] font-semibold">Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!</div>
+              <div className="flex items-center gap-1 font-medium">
+                <span>
+                  <Calendar size={20} fill="white" className="text-pse-green-second" />
+                </span>
+                19:30, 12 tháng 4, 2025
               </div>
-            ))}
-          </div>
+              <div className="flex items-center gap-1">
+                <span>
+                  <MapPin size={20} fill="white" className="text-pse-green-second" />
+                </span>
+                Nhà Hát Kịch IDECAF
+              </div>
+            </div>
+            <CustomDivider />
 
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-3">Ghế đã chọn:</h3>
-            {selectedSeats.length > 0 ? (
-              <div className="space-y-2">
-                {selectedSeats.map((seat) => (
-                  <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <div className="font-medium">
-                        {seat.sectionName} - {seat.seatLabel}
-                      </div>
-                      <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
-                    </div>
-                    <div className="text-sm text-gray-600">{seat.typeName}</div>
+            <div className="space-y-3">
+              <h3 className="text-black font-semibold mb-4">Chú thích loại ghế</h3>
+              {/* Map mảng ticketType ở đây */}
+              {seatTypes.map((seatType) => (
+                <div
+                  key={seatType.id}
+                  className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
+                >
+                  <div className="w-8 h-8 rounded-lg shadow-md mr-3" style={{ backgroundColor: seatType.color }}></div>
+                  <div>
+                    <div className="font-medium text-gray-900">{seatType.name}</div>
+                    <div className="text-sm text-gray-600">{formatCurrency(seatType.price)}</div>
                   </div>
-                ))}
-                <div className="flex justify-between font-medium mt-2 pt-2 border-t border-gray-200">
-                  <div>Tổng tiền:</div>
-                  <div>{formatCurrency(calculateTotal())}</div>
                 </div>
-              </div>
-            ) : (
-              <p className="text-gray-500 italic">Chưa chọn ghế nào.</p>
-            )}
+              ))}
+            </div>
+
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-3">Ghế đã chọn:</h3>
+              {selectedSeats.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedSeats.map((seat) => (
+                    <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <div className="font-medium">
+                          {seat.sectionName} - {seat.seatLabel}
+                        </div>
+                        <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {seat.typeName} (ID: {seat.seatId})
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex justify-between font-medium mt-2 pt-2 border-t border-gray-200">
+                    <div>Tổng tiền:</div>
+                    <div>{formatCurrency(calculateTotal())}</div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-500 italic">Chưa chọn ghế nào.</p>
+              )}
+            </div>
           </div>
 
-          <div className="mt-auto bg-pse-black-light text-white -mx-[26px] -my-[26px] p-4 pb-4">
+          {/* Footer cố định ở dưới cùng */}
+          <div className="bg-pse-black-light text-white p-4">
             <div className="mb-2 flex items-center text-xs gap-1">
               <Ticket fill="white" className="text-pse-black-light" />
-              {selectedSeats.length > 0 ? selectedSeats.map((seat) => seat.seatLabel).join(", ") : "Chưa chọn ghế"}
+              {selectedSeats.length > 0
+                ? selectedSeats.map((seat) => `${seat.sectionName} ${seat.seatLabel}`).join(", ")
+                : "Chưa chọn ghế"}
             </div>
 
             <Button

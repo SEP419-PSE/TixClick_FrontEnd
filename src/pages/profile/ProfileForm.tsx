@@ -1,7 +1,16 @@
 import { motion } from "framer-motion";
-import { Camera, Check, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
+import {
+  Calendar,
+  Camera,
+  Check,
+  Edit2,
+  Mail,
+  Phone,
+  User,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
+import { toast } from "sonner";
 import Header from "../../components/Header/Header";
 import {
   Avatar,
@@ -19,6 +28,11 @@ import {
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 
+// Define an extended profile interface to include fullName
+interface ExtendedProfile extends Profile {
+  fullName?: string;
+}
+
 export default function ProfileForm() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -26,14 +40,10 @@ export default function ProfileForm() {
   const [zoom, setZoom] = useState(1);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: profile?.firstName,
-    lastName: profile?.lastName,
-    phone: profile?.phone,
-    email: profile?.email,
-  });
-
-  // const navigate = useNavigate()
+  const [formData, setFormData] = useState<ExtendedProfile>(
+    {} as ExtendedProfile
+  );
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,6 +54,8 @@ export default function ProfileForm() {
   };
 
   const handleCropComplete = () => {
+    // Here you would usually process the cropped image
+    // For now, we'll just close the cropper
     setImage(null);
   };
 
@@ -55,6 +67,7 @@ export default function ProfileForm() {
       }
     } catch (error) {
       console.error("Lỗi khi lấy profile:", error);
+      toast.error("Không thể tải thông tin người dùng");
     }
   };
 
@@ -75,40 +88,79 @@ export default function ProfileForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    // setLoading(true)
+    setLoading(true);
 
-    setTimeout(() => {
-      // setLoading(false)
-      setEditMode(false);
-    }, 1000);
+    try {
+      // Split the full name into first name and last name
+      const nameParts = formData.fullName?.trim().split(" ") || [];
+      let firstName = "";
+      let lastName = "";
+
+      if (nameParts.length > 0) {
+        firstName = nameParts.pop() || ""; // Get the last word as firstName
+        lastName = nameParts.join(" "); // Join the rest as lastName
+      }
+
+      // Make sure we have the required fields with proper types
+      if (!profile?.accountId) {
+        throw new Error("Missing account ID");
+      }
+
+      const updateData: Profile = {
+        firstName,
+        lastName,
+        phone: formData.phone || "",
+        email: formData.email || "",
+        dob: formData.dob || "",
+        avatarURL: formData.avatarURL || profile?.avatarURL || "",
+        accountId: profile.accountId,
+        userName: profile.userName || "",
+        roleId: profile.roleId || 0,
+        active: profile.active !== undefined ? profile.active : true,
+      };
+
+      // Call the API
+      const response = await profileApi.updateProfile(updateData);
+
+      if (response.data && response.data.success) {
+        // Update the local profile state with type safety
+        setProfile({
+          ...updateData,
+        });
+
+        toast.success("Cập nhật thông tin thành công!");
+        setEditMode(false);
+      } else {
+        // Handle API error with message
+        toast.error(response.data?.message || "Cập nhật thất bại");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // const handleGoBack = () => {
-  //   navigate(-1)
-  // }
-
-  console.log(formData);
+  useEffect(() => {
+    if (profile) {
+      // Create an extended profile object with fullName
+      const extendedProfile: ExtendedProfile = {
+        ...profile,
+        fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim(),
+      };
+      setFormData(extendedProfile);
+    }
+  }, [profile]);
 
   return (
     <>
-      <div className="min-h-screen bg-[#1E1E1E] text-gray-200 flex flex-col ">
-        {/* <header className="fixed top-0 left-0 right-0 z-10 bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
-          
-        </header> */}
+      <div className="min-h-screen bg-[#1E1E1E] text-gray-200 flex flex-col">
         <Header />
 
         <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-28">
-          {/* <Button
-              variant="ghost"
-              className="flex items-center text-[#FF8A00] hover:bg-[#2A2A2A] mr-96"
-              onClick={handleGoBack}
-            >
-              <ChevronLeft className="h-5 w-5 mr-1" />
-              <span className="font-medium">Quay lại</span>
-            </Button> */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <div className="bg-[#1A1A1A] rounded-2xl shadow-xl overflow-hidden border border-[#2A2A2A]">
@@ -167,12 +219,12 @@ export default function ProfileForm() {
 
                     <div className="flex items-center text-gray-400">
                       <Phone className="h-5 w-5 mr-3 text-[#FF8A00]" />
-                      <span>{profile?.phone}</span>
+                      <span>{profile?.phone || "Chưa cập nhật"}</span>
                     </div>
 
                     <div className="flex items-center text-gray-400">
                       <Mail className="h-5 w-5 mr-3 text-[#FF8A00]" />
-                      <span>{profile?.email}</span>
+                      <span>{profile?.email || "Chưa cập nhật"}</span>
                     </div>
                   </div>
                 </div>
@@ -237,8 +289,8 @@ export default function ProfileForm() {
                         </label>
                         <div className="relative">
                           <Input
-                            name="lastName"
-                            value={`${profile?.lastName || ""}`}
+                            name="fullName"
+                            value={formData.fullName || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -257,7 +309,7 @@ export default function ProfileForm() {
                           <Input
                             name="phone"
                             type="tel"
-                            value={profile?.phone}
+                            value={formData.phone || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -278,12 +330,35 @@ export default function ProfileForm() {
                             type="email"
                             value={profile?.email}
                             onChange={handleInputChange}
-                            disabled={true}
+                            disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
                               !editMode ? "opacity-80" : ""
                             }`}
                           />
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-300">
+                          Ngày sinh
+                        </label>
+                        <div className="relative">
+                          <Input
+                            name="dob"
+                            type="date"
+                            value={
+                              typeof formData.dob === "string"
+                                ? formData.dob
+                                : ""
+                            }
+                            onChange={handleInputChange}
+                            disabled={!editMode}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
+                          />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
                       </div>
 
@@ -291,12 +366,19 @@ export default function ProfileForm() {
                         <Button
                           type="submit"
                           className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                          // disabled={loading}
+                          disabled={loading}
                         >
-                          <div className="flex items-center">
-                            <Check className="mr-2 h-4 w-4" />
-                            Lưu thông tin
-                          </div>
+                          {loading ? (
+                            <div className="flex items-center">
+                              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                              Đang lưu
+                            </div>
+                          ) : (
+                            <div className="flex items-center">
+                              <Check className="mr-2 h-4 w-4" />
+                              Lưu thông tin
+                            </div>
+                          )}
                         </Button>
                       )}
                     </form>
@@ -360,14 +442,17 @@ export default function ProfileForm() {
                         {zoom.toFixed(1)}x
                       </span>
                     </div>
-                    <Sliders
-                      // value={[zoom]}
-                      min={1}
-                      max={3}
-                      // step={0.1}
-                      // onValueChange={(value) => setZoom(value[0])}
-                      className="py-1"
-                    />
+                    <div className="flex items-center">
+                      <input
+                        type="range"
+                        min="1"
+                        max="3"
+                        step="0.1"
+                        value={zoom}
+                        onChange={(e) => setZoom(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-between gap-4">
@@ -381,16 +466,8 @@ export default function ProfileForm() {
                     <Button
                       className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                       onClick={handleCropComplete}
-                      // disabled={loading}
                     >
-                      {/* {loading ? (
-                      <div className="flex items-center">
-                        <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Đang lưu
-                      </div>
-                    ) : (
-                      "Lưu ảnh"
-                    )} */}
+                      Lưu ảnh
                     </Button>
                   </div>
                 </div>

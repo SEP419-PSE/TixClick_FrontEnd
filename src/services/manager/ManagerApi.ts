@@ -7,17 +7,19 @@ import axiosClient from "../axiosClient";
 const managerApi = {
     getAllCompany() {
         const url = "/company/manager";
-        const token = localStorage.getItem('accessToken2');
+        const token = localStorage.getItem("accessToken2");
         return axiosClient.get(url, {
             headers: {
                 Authorization: `Bearer ${token}`
-            }
-        });
+            }   
+        }
+    );
+       
     },
 
     getAllContract(){
         const url = "/contract/all";
-        const token = localStorage.getItem('accessToken2');
+        const token = localStorage.getItem("accessToken2");
 
         return axiosClient.get(url, {
             headers: {
