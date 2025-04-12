@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Camera, Check, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
+import { Calendar, Camera, Check, Edit2, Mail, Phone, Sliders, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import Header from "../../components/Header/Header";
@@ -22,6 +22,8 @@ export default function ProfileForm() {
     fullName: "",
     phone: "",
     email: "",
+    dob: "",
+    avatarURL: "",
   })
 
   // const navigate = useNavigate()
@@ -80,6 +82,8 @@ export default function ProfileForm() {
       lastName,
       phone: formData.phone,
       email: formData.email,
+      dob:formData.dob,
+      avatarURL: formData.avatarURL,
     }
 
     try {
@@ -106,8 +110,11 @@ export default function ProfileForm() {
         fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim(),
         phone: profile.phone || "",
         email: profile.email || "",
+        dob: profile.dob ? new Date(profile.dob).toISOString().split("T")[0] : "",
+        avatarURL: profile.avatarURL || "",
       })
     }
+    
   }, [profile])
 
   // const handleGoBack = () => {
@@ -273,11 +280,28 @@ export default function ProfileForm() {
                         </div>
                       </div>
 
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-300">Ngày sinh</label>
+                        <div className="relative">
+                          <Input
+                            name="dob"
+                            type="date"
+                            value={formData.dob}
+                            onChange={handleInputChange}
+                            disabled={!editMode}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
+                          />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+
+
                       {editMode && (
                         <Button
                           type="submit"
                           className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
                           // disabled={loading}
+                          onClick={handleSubmit}
                         >
                           <div className="flex items-center">
                             <Check className="mr-2 h-4 w-4" />

@@ -13,7 +13,7 @@ const payOsApi = {
       console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
       const returnUrl = `${window.location.origin}/payment/queue`
 
-      const response = await fetch("https://160.191.175.172:8443/payment/pay-os-create", {
+      const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
