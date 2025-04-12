@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  Plus,
-  Trash2,
   CalendarCheck,
   Ticket,
   Save,
   X,
+  CalendarIcon,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import {
@@ -17,12 +18,25 @@ import {
 import { Button } from "../../ui/button";
 import eventApi from "../../../services/event/eventApi";
 import {
+  cn,
   convertHHMMtoHHMMSS,
   formatDate,
   formatDateTime,
+  formatDateVietnamese,
+  formatMoney,
+  formatTimeFe,
 } from "../../../lib/utils";
 import { toast } from "sonner";
 import { StepProps } from "./Step1_Infor";
+import { Card, CardContent, CardTitle } from "../../ui/card";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { Calendar } from "../../ui/calendar";
+import { format } from "date-fns";
+import TimeInput from "../../Input/TimeInput";
+import Popup from "../../Popup/Popup";
+import { TOAST_MESSAGE } from "../../../constants/constants";
 
 interface TicketType {
   ticketCode: string;
@@ -71,6 +85,15 @@ const StepTwo: React.FC<StepProps> = ({
     null
   );
   const [newTicket, setNewTicket] = useState<TicketType>({ ...defaultTicket });
+  const [errors, setErrors] = useState<{
+    [key: number]: {
+      startTimeEvent?: string;
+      endTimeEvent?: string;
+      startTicketSale?: string;
+      endTicketSale?: string;
+      dateEvent?: string;
+    };
+  }>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
@@ -135,6 +158,22 @@ const StepTwo: React.FC<StepProps> = ({
 
   const saveTicket = () => {
     if (currentActivityIndex === null) return;
+    const currentActivity = activities[currentActivityIndex];
+
+    // Kiểm tra các field bắt buộc
+    const isActivityValid =
+      currentActivity.activityName &&
+      currentActivity.dateEvent &&
+      currentActivity.endTicketSale &&
+      currentActivity.endTimeEvent &&
+      currentActivity.startTicketSale &&
+      currentActivity.startTimeEvent;
+
+    if (!isActivityValid) {
+      toast.warning(TOAST_MESSAGE.emmptyEventActivity);
+      setIsTicketModalOpen(false);
+      return;
+    }
     const updated = [...activities];
     updated[currentActivityIndex].tickets?.push(newTicket);
     setActivities(updated);
@@ -187,7 +226,7 @@ const StepTwo: React.FC<StepProps> = ({
     toast.success(response.data.message);
     const queryParams = new URLSearchParams({
       id: eventId.toString(),
-      step: "3",
+      step: hasSeatMap ? "3" : "4",
     }).toString();
     await navigate(`?${queryParams}`);
   };
@@ -233,75 +272,445 @@ const StepTwo: React.FC<StepProps> = ({
         <div className="space-y-6">
           <button
             onClick={handleAddActivity}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="flex items-center gap-2 bg-pse-green hover:bg-pse-green/80 text-white px-4 py-2 rounded"
           >
             <CalendarCheck size={18} /> Thêm Activity
           </button>
 
           {activities.map((activity, index) => (
-            <div
-              key={index}
-              className="border rounded-lg shadow-sm p-5 bg-white space-y-4"
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">
-                  Hoạt động #{index + 1}
-                </h3>
-                <button
+            <Card className="px-4 py-2 bg-gradient-to-b from-black/20 to-pse-green/50 text-white">
+              <CardTitle className="flex justify-between items-center mb-4 mt-2 ml-4 text-[20px] font-bold">
+                <p>Hoạt động {index + 1}</p>
+                <X
+                  className="hover:text-pse-error cursor-pointer"
                   onClick={() => handleRemoveActivity(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  {
-                    label: "Tên hoạt động",
-                    key: "activityName",
-                    type: "text",
-                  },
-                  { label: "Ngày diễn ra", key: "dateEvent", type: "date" },
-                  { label: "Giờ bắt đầu", key: "startTimeEvent", type: "time" },
-                  { label: "Giờ kết thúc", key: "endTimeEvent", type: "time" },
-                  {
-                    label: "Bắt đầu bán vé",
-                    key: "startTicketSale",
-                    type: "datetime-local",
-                  },
-                  {
-                    label: "Kết thúc bán vé",
-                    key: "endTicketSale",
-                    type: "datetime-local",
-                  },
-                ].map(({ label, key, type }) => (
-                  <div key={key}>
-                    <label className="block mb-1 text-sm font-medium">
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      value={
-                        key === "dateEvent"
-                          ? activity.dateEvent.toISOString().split("T")[0]
-                          : (activity as any)[key]
-                      }
-                      className="w-full border px-3 py-2 rounded text-black"
-                      onChange={(e) => {
-                        const updated = [...activities];
-                        if (key === "dateEvent") {
-                          updated[index].dateEvent = new Date(e.target.value);
-                        } else {
-                          (updated[index] as any)[key] = e.target.value;
+                />
+              </CardTitle>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 1. Tên hoạt động */}
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="activityName">Tên hoạt động</Label>
+                  <Input
+                    className="bg-transparent"
+                    id="activityName"
+                    type="text"
+                    value={activity.activityName || ""}
+                    onChange={(e) => {
+                      const updated = [...activities];
+                      updated[index].activityName = e.target.value;
+                      setActivities(updated);
+                    }}
+                  />
+                </div>
+                {/* 2. Ngày diễn ra */}
+                <div className="flex flex-col gap-2">
+                  <Label>Ngày diễn ra</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-transparent",
+                          !activity.dateEvent && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.dateEvent
+                          ? format(activity.dateEvent, "dd/MM/yyyy")
+                          : "Chọn ngày"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
                         }
-                        setActivities(updated);
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
+                        mode="single"
+                        selected={activity.dateEvent}
+                        onSelect={(date) => {
+                          const updated = [...activities];
+                          const startTicketSaleDate = new Date(
+                            activity.startTicketSale || ""
+                          );
+                          const endTicketSaleDate = new Date(
+                            activity.endTicketSale || ""
+                          );
 
+                          if (
+                            date &&
+                            (date <= startTicketSaleDate ||
+                              date <= endTicketSaleDate)
+                          ) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                dateEvent:
+                                  "Ngày diễn ra phải sau ngày bắt đầu và kết thúc bán vé",
+                              },
+                            }));
+                          } else {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: { ...prev[index], dateEvent: "" },
+                            }));
+                            updated[index].dateEvent = date!;
+                            setActivities(updated);
+                          }
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {errors[index]?.dateEvent && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors[index]?.dateEvent}
+                    </p>
+                  )}
+                </div>
+                {/* Giờ bắt đầu */}
+                <TimeInput
+                  className="bg-transparent"
+                  label="Giờ bắt đầu"
+                  id={`startTimeEvent-${index}`}
+                  value={activity.startTimeEvent || ""}
+                  onChange={(value) => {
+                    const updated = [...activities];
+                    updated[index].startTimeEvent = value;
+                    setActivities(updated);
+
+                    const end = updated[index].endTimeEvent;
+                    if (end) {
+                      const [sh, sm] = value.split(":").map(Number);
+                      const [eh, em] = end.split(":").map(Number);
+                      if (eh * 60 + em <= sh * 60 + sm) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [index]: {
+                            ...prev[index],
+                            startTimeEvent: "Giờ kết thúc phải sau giờ bắt đầu",
+                          },
+                        }));
+                      } else {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [index]: { ...prev[index], startTimeEvent: "" },
+                        }));
+                      }
+                    }
+                  }}
+                  error={errors[index]?.startTimeEvent}
+                />
+
+                {/* Giờ kết thúc */}
+                <TimeInput
+                  className="bg-transparent"
+                  label="Giờ kết thúc"
+                  id={`endTimeEvent-${index}`}
+                  value={activity.endTimeEvent || ""}
+                  onChange={(value) => {
+                    const updated = [...activities];
+                    const start = updated[index].startTimeEvent;
+
+                    if (start) {
+                      const [sh, sm] = start.split(":").map(Number);
+                      const [eh, em] = value.split(":").map(Number);
+                      if (eh * 60 + em <= sh * 60 + sm) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [index]: {
+                            ...prev[index],
+                            endTimeEvent: "Giờ kết thúc phải sau giờ bắt đầu",
+                          },
+                        }));
+                        return;
+                      } else {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [index]: { ...prev[index], endTimeEvent: "" },
+                        }));
+                      }
+                    }
+
+                    updated[index].endTimeEvent = value;
+                    setActivities(updated);
+                  }}
+                  error={errors[index]?.endTimeEvent}
+                />
+                {/* 5. Bắt đầu bán vé */}
+                <div className="flex flex-col gap-2">
+                  <Label>Bắt đầu bán vé</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-white text-left font-normal bg-transparent",
+                          !activity.startTicketSale && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.startTicketSale ? (
+                          format(
+                            new Date(activity.startTicketSale),
+                            "dd/MM/yyyy HH:mm"
+                          )
+                        ) : (
+                          <div className="text-pse-gray">Chọn ngày và giờ</div>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="space-y-2">
+                      <Calendar
+                        mode="single"
+                        disabled={(date) => date < new Date()}
+                        selected={
+                          activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                            : undefined
+                        }
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const updated = [...activities];
+                          const old = new Date(
+                            activity.startTicketSale || Date.now()
+                          );
+                          old.setFullYear(date.getFullYear());
+                          old.setMonth(date.getMonth());
+                          old.setDate(date.getDate());
+
+                          const now = new Date();
+                          const eventDate = activity.dateEvent
+                            ? new Date(activity.dateEvent)
+                            : null;
+
+                          if (old <= now) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                startTicketSale:
+                                  "Ngày bắt đầu bán vé phải sau thời điểm hiện tại",
+                              },
+                            }));
+                          } else if (eventDate && old >= eventDate) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                startTicketSale:
+                                  "Ngày bắt đầu bán vé phải trước ngày diễn ra sự kiện",
+                              },
+                            }));
+                          } else {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: { ...prev[index], startTicketSale: "" },
+                            }));
+                            updated[index].startTicketSale = old.toISOString();
+                            setActivities(updated);
+                          }
+                        }}
+                      />
+
+                      <Input
+                        type="time"
+                        value={
+                          activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                                .toTimeString()
+                                .slice(0, 5)
+                            : "00:00"
+                        }
+                        onChange={(e) => {
+                          const [hour, minute] = e.target.value.split(":");
+                          const updated = [...activities];
+                          const date = new Date(
+                            activity.startTicketSale || new Date()
+                          );
+                          date.setHours(Number(hour));
+                          date.setMinutes(Number(minute));
+                          updated[index].startTicketSale = date.toISOString();
+                          setActivities(updated);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {errors[index]?.startTicketSale && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors[index]?.startTicketSale}
+                    </p>
+                  )}
+                </div>
+                {/* 6. Kết thúc bán vé */}
+                <div className="flex flex-col gap-2">
+                  <Label>Kết thúc bán vé</Label>
+                  <Popover>
+                    <PopoverTrigger className="text-white" asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-transparent",
+                          !activity.endTicketSale && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.endTicketSale ? (
+                          format(
+                            new Date(activity.endTicketSale),
+                            "dd/MM/yyyy HH:mm"
+                          )
+                        ) : (
+                          <div className="text-pse-gray">Chọn ngày và giờ</div>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="space-y-2">
+                      <Calendar
+                        disabled={(date) => {
+                          const now = new Date();
+                          const eventDate = activity.dateEvent
+                            ? new Date(activity.dateEvent)
+                            : undefined;
+
+                          // Nếu không có eventDate thì chỉ cần check > now
+                          if (!eventDate) {
+                            return date < now;
+                          }
+
+                          const eventLimit = new Date(eventDate);
+                          eventLimit.setDate(eventLimit.getDate() - 1);
+
+                          return date < now || date >= eventLimit;
+                        }}
+                        mode="single"
+                        selected={
+                          activity.endTicketSale
+                            ? new Date(activity.endTicketSale)
+                            : undefined
+                        }
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const updated = [...activities];
+                          const old = new Date(
+                            activity.endTicketSale || Date.now()
+                          );
+                          old.setFullYear(date.getFullYear());
+                          old.setMonth(date.getMonth());
+                          old.setDate(date.getDate());
+
+                          const startDate = activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                            : null;
+                          const eventDate = activity.dateEvent
+                            ? new Date(activity.dateEvent)
+                            : null;
+
+                          if (startDate && old <= startDate) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                endTicketSale:
+                                  "Ngày kết thúc bán vé phải sau ngày bắt đầu",
+                              },
+                            }));
+                          } else if (
+                            eventDate &&
+                            old >=
+                              new Date(
+                                eventDate.getFullYear(),
+                                eventDate.getMonth(),
+                                eventDate.getDate() - 1
+                              )
+                          ) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                endTicketSale:
+                                  "Phải kết thúc bán vé trước ngày diễn ra sự kiện 1 ngày",
+                              },
+                            }));
+                          } else {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: { ...prev[index], endTicketSale: "" },
+                            }));
+                            updated[index].endTicketSale = old.toISOString();
+                            setActivities(updated);
+                          }
+                        }}
+                      />
+                      <Input
+                        type="time"
+                        value={
+                          activity.endTicketSale
+                            ? new Date(activity.endTicketSale)
+                                .toTimeString()
+                                .slice(0, 5)
+                            : "00:00"
+                        }
+                        onChange={(e) => {
+                          const [hour, minute] = e.target.value.split(":");
+                          const updated = [...activities];
+                          const date = new Date(
+                            activity.endTicketSale || new Date()
+                          );
+                          date.setHours(Number(hour));
+                          date.setMinutes(Number(minute));
+
+                          const startDate = activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                            : null;
+                          const eventDate = activity.dateEvent
+                            ? new Date(activity.dateEvent)
+                            : null;
+
+                          if (startDate && date <= startDate) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                endTicketSale:
+                                  "Ngày kết thúc bán vé phải sau ngày bắt đầu",
+                              },
+                            }));
+                          } else if (
+                            eventDate &&
+                            date >=
+                              new Date(
+                                eventDate.getFullYear(),
+                                eventDate.getMonth(),
+                                eventDate.getDate() - 1
+                              )
+                          ) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: {
+                                ...prev[index],
+                                endTicketSale:
+                                  "Phải kết thúc bán vé trước ngày diễn ra sự kiện 1 ngày",
+                              },
+                            }));
+                          } else {
+                            setErrors((prev) => ({
+                              ...prev,
+                              [index]: { ...prev[index], endTicketSale: "" },
+                            }));
+                            updated[index].endTicketSale = date.toISOString();
+                            setActivities(updated);
+                          }
+                        }}
+                      />
+                    </PopoverContent>
+                    {errors[index]?.endTicketSale && (
+                      <p className="text-sm text-red-500 mt-1">
+                        {errors[index]?.endTicketSale}
+                      </p>
+                    )}
+                  </Popover>
+                </div>
+              </CardContent>
               {!hasSeatMap && (
                 <div className="pt-4 border-t space-y-3">
                   <div className="flex justify-between items-center">
@@ -310,7 +719,7 @@ const StepTwo: React.FC<StepProps> = ({
                     </h4>
                     <button
                       onClick={() => openTicketModal(index)}
-                      className="text-green-600 hover:text-green-800 flex items-center gap-1"
+                      className="text-white hover:text-white/80 flex items-center gap-1"
                     >
                       <Plus size={16} /> Thêm vé
                     </button>
@@ -319,13 +728,57 @@ const StepTwo: React.FC<StepProps> = ({
                   {activity.tickets?.map((ticket, tIndex) => (
                     <div
                       key={tIndex}
-                      className="bg-gray-50 border rounded p-4 flex justify-between items-center"
+                      className="bg-white relative border p-4 flex justify-between h-auto items-center"
                     >
-                      <div>
-                        <p className="font-medium">{ticket.ticketName}</p>
-                        <p className="text-sm text-gray-500">
-                          {ticket.price.toLocaleString()} VND
+                      <div className="absolute hidden lg:flex justify-center items-center bg-[#3D5685] top-0 left-0 w-[10%] h-full">
+                        <p className="-rotate-90 uppercase">
+                          {ticket.ticketName}
                         </p>
+                      </div>
+                      <div className="lg:pl-[10%] w-[90%] text-black flex flex-col justify-between">
+                        <p className="font-bold text-[20px] uppercase mb-2">
+                          {ticket.ticketName}
+                        </p>
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <section className="flex flex-col gap-1">
+                            <p className="text-black/80 uppercase text-xs">
+                              Số lượng
+                            </p>
+                            <p className="font-medium bg-[#3D7485] bg-opacity-15 p-2">
+                              {ticket.quantity}
+                            </p>
+                          </section>
+                          <section className="flex flex-col gap-1">
+                            <p className="text-black/80 uppercase text-xs">
+                              Giá
+                            </p>
+                            <p className="font-medium bg-[#3D7485] bg-opacity-15 p-2">
+                              {formatMoney(ticket.price)}
+                            </p>
+                          </section>
+                          <section className="flex flex-col gap-1">
+                            <p className="text-black/80 uppercase text-xs">
+                              Ngày
+                            </p>
+                            <p className="font-medium bg-[#3D7485] bg-opacity-15 p-2">
+                              {formatDateVietnamese(
+                                activity.dateEvent.toString()
+                              )}
+                            </p>
+                          </section>
+                          <section className="flex flex-col gap-1">
+                            <p className="text-black/80 uppercase text-xs">
+                              Thời gian
+                            </p>
+                            <p className="font-medium bg-[#3D7485] bg-opacity-15 p-2">
+                              {formatTimeFe(activity.startTimeEvent) +
+                                " - " +
+                                formatTimeFe(activity.endTimeEvent)}
+                            </p>
+                          </section>
+                          {/* QR Image */}
+                          <div></div>
+                        </div>
                       </div>
                       <button
                         onClick={() => handleRemoveTicket(index, tIndex)}
@@ -337,57 +790,47 @@ const StepTwo: React.FC<StepProps> = ({
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
-      {/* Ticket Modal */}
-      {isTicketModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-6 space-y-4 relative">
-            <button
-              onClick={() => setIsTicketModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black"
-            >
-              <X size={20} />
-            </button>
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Ticket size={18} /> Thêm vé
-            </h3>
-            {[
-              { label: "Tên vé", key: "ticketName" },
-              { label: "Giá", key: "price", type: "number" },
-              { label: "Số lượng", key: "quantity", type: "number" },
-              { label: "Mua tối đa", key: "maxQuantity", type: "number" },
-            ].map(({ label, key, type }) => (
-              <div key={key}>
-                <label className="block mb-1 text-sm font-medium">
-                  {label}
-                </label>
-                <input
-                  type={type || "text"}
-                  className="w-full border px-3 py-2 rounded text-black"
-                  value={(newTicket as any)[key]}
-                  onChange={(e) =>
-                    setNewTicket((prev) => ({
-                      ...prev,
-                      [key]:
-                        type === "number" ? +e.target.value : e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            ))}
-            <button
-              onClick={saveTicket}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-            >
-              <Save size={18} /> Lưu vé
-            </button>
-          </div>
+      <Popup
+        isOpen={isTicketModalOpen}
+        onClose={() => setIsTicketModalOpen(false)}
+        title="Thêm vé"
+      >
+        <div className="bg-transparent w-full max-w-md rounded-lg p-4 space-y-4 relative">
+          {[
+            { label: "Tên vé", key: "ticketName" },
+            { label: "Giá", key: "price", type: "number" },
+            { label: "Số lượng", key: "quantity", type: "number" },
+            { label: "Mua tối đa", key: "maxQuantity", type: "number" },
+          ].map(({ label, key, type }) => (
+            <div key={key}>
+              <label className="block mb-1 text-sm font-medium">{label}</label>
+              <input
+                type={type || "text"}
+                className="w-full border px-3 py-2 rounded text-black"
+                value={(newTicket as any)[key]}
+                onChange={(e) =>
+                  setNewTicket((prev) => ({
+                    ...prev,
+                    [key]: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          ))}
+          <button
+            onClick={saveTicket}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+          >
+            <Save size={18} /> Lưu vé
+          </button>
         </div>
-      )}
+      </Popup>
+
       <div className="flex justify-between mt-6">
         <button
           className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"

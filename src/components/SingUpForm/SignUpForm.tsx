@@ -1,6 +1,5 @@
-import { LuEye } from "react-icons/lu";
+import { LuEye, LuEyeClosed } from "react-icons/lu";
 import CustomDivider from "../../components/Divider/CustomDivider";
-import { LuEyeClosed } from "react-icons/lu";
 import authApi from "../../services/authApi";
 import { RegisterRequest } from "../../interface/AuthInterface";
 import { toast } from "sonner";
@@ -8,134 +7,184 @@ import { NavLink, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 
 import GoogleImg from "../../assets/google.png";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
+
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { TOAST_MESSAGE } from "../../constants/constants";
+
+const schema = yup.object({
+  userName: yup
+    .string()
+    .required("Tên đăng nhập không được để trống")
+    .min(6, "Ít nhất 6 ký tự")
+    .max(20, "Không quá 20 ký tự"),
+  password: yup
+    .string()
+    .required("Mật khẩu không được để trống")
+    .min(6, "Mật khẩu ít nhất 6 kí tự"),
+  email: yup
+    .string()
+    .required("Email không được để trống")
+    .email("Email không hợp lệ"),
+  firstName: yup.string().required("Tên không được để trống"),
+  lastName: yup.string().required("Họ không được để trống"),
+});
 
 const SignUpForm = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<RegisterRequest>({
-    userName: "",
-    password: "",
-    email: "",
-    firstName: "",
-    lastName: "",
+  const [isShowPassword, setIsShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterRequest>({
+    resolver: yupResolver(schema),
   });
 
-  const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const onChangeShowPassword = () => setIsShowPassword(!isShowPassword);
 
-  const onChangeShowPassword = () => {
-    setIsShowPassword(!isShowPassword);
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (data: RegisterRequest) => {
     setIsLoading(true);
     authApi
-      .signUp(formData)
+      .signUp(data)
       .then((response) => {
-        console.log(response.data);
-        const isSuccess = response.data.code === 200 && "Đăng kí thành công";
+        console.log(response);
+        const isSuccess =
+          response.data.code === 200 && TOAST_MESSAGE.signUpSucces;
         toast.success(isSuccess);
-        navigate("/auth/signin");
+        navigate("/auth/code", { state: data.email });
       })
       .catch((error) => {
-        console.log(error);
-        toast.warning(error.response.data.message);
+        toast.warning(
+          error.response?.data?.message || TOAST_MESSAGE.signInFail
+        );
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   };
 
   return (
     <motion.div
-      initial={{ x: 500 }} // Vị trí ban đầu bên trái ngoài màn hình
-      animate={{ x: 0 }} // Vị trí cuối cùng
+      initial={{ x: 500 }}
+      animate={{ x: 0 }}
       transition={{ duration: 1.5 }}
-      className="px-3 py-6 lg:px-8 lg:py-12 w-[550px] h-screen"
+      className="px-3 pt-6 pb-20 lg:px-8 lg:py-12 w-[550px] h-auto"
     >
-      <div className="hidden lg:flex items-center mb-12 gap-2 font-bold text-[20px]">
+      <div className="hidden lg:flex items-center gap-2 font-bold text-[20px]">
         <img src={GoogleImg} width={64} />
         <p>Event booking</p>
       </div>
       <p className="font-bold text-[22px] my-4">Tham gia với chúng tôi</p>
-      <form onSubmit={handleSubmit}>
-        <div className="my-4">
-          <input
-            name="userName"
-            value={formData.userName}
-            onChange={handleChange}
-            placeholder="Tên đăng nhập"
-            className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
-          />
-          <div className="flex items-center my-2 bg-[#e5e5e5] rounded-md px-4 py-2 text-[#808080] w-full">
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="my-4 space-y-3">
+          <div>
             <input
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              type={isShowPassword ? "text" : "password"}
-              placeholder="Nhập mật khẩu"
-              className="w-full bg-[#e5e5e5] outline-none"
+              {...register("userName")}
+              placeholder="Tên đăng nhập"
+              className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
             />
-            <span>
-              {isShowPassword ? (
-                <LuEyeClosed
-                  onClick={onChangeShowPassword}
-                  size={20}
-                  className="text-[#4d4d4d]"
-                />
-              ) : (
-                <LuEye
-                  onClick={onChangeShowPassword}
-                  size={20}
-                  className="text-[#4d4d4d]"
-                />
-              )}
-            </span>
+            {errors.userName && (
+              <p className="text-red-500 text-sm">{errors.userName.message}</p>
+            )}
           </div>
-          <input
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
-          />
-          <div className="my-2 flex gap-2">
+
+          <div>
+            <div className="flex items-center bg-[#e5e5e5] rounded-md px-4 py-2 text-[#808080] w-full">
+              <input
+                {...register("password")}
+                type={isShowPassword ? "text" : "password"}
+                placeholder="Nhập mật khẩu"
+                className="w-full bg-[#e5e5e5] outline-none"
+              />
+              <span>
+                {isShowPassword ? (
+                  <LuEyeClosed
+                    onClick={onChangeShowPassword}
+                    size={20}
+                    className="text-[#4d4d4d] cursor-pointer"
+                  />
+                ) : (
+                  <LuEye
+                    onClick={onChangeShowPassword}
+                    size={20}
+                    className="text-[#4d4d4d] cursor-pointer"
+                  />
+                )}
+              </span>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div>
             <input
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="Tên"
-              className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-[50%]"
+              {...register("email")}
+              placeholder="Email"
+              className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
             />
-            <input
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Họ"
-              className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-[50%]"
-            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <div className="w-[50%]">
+              <input
+                {...register("firstName")}
+                placeholder="Tên"
+                className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm">
+                  {errors.firstName.message}
+                </p>
+              )}
+            </div>
+            <div className="w-[50%]">
+              <input
+                {...register("lastName")}
+                placeholder="Họ"
+                className="px-4 py-2 bg-[#e5e5e5] outline-none rounded-md text-[#808080] w-full"
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm">
+                  {errors.lastName.message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
+
         <button
-          disabled={isLoading && true}
+          disabled={isLoading}
           type="submit"
-          className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80"
+          className="bg-pse-green text-white flex justify-center w-full font-bold rounded-md py-2 hover:opacity-80"
         >
-          {isLoading ? "..." : "Đăng kí"}
+          {isLoading ? (
+            <div className="mr-3 size-5 animate-spin flex justify-center items-center">
+              <LoaderCircle />
+            </div>
+          ) : (
+            "Đăng kí"
+          )}
         </button>
       </form>
+
       <div className="my-8">
         <CustomDivider />
       </div>
+
       <button className="bg-[#333333] flex justify-center items-center font-light gap-2 text-white w-full rounded-md py-2 hover:opacity-80">
         <img src={GoogleImg} width={24} />
-        Hoặc đăng kí bằng Goolge
+        Hoặc đăng kí bằng Google
       </button>
+
       <div className="my-4 text-center font-light">
         Bạn đã có tài khoản?{" "}
         <NavLink to="/auth/signin">
@@ -144,6 +193,7 @@ const SignUpForm = () => {
           </span>
         </NavLink>
       </div>
+
       <div className="lg:hidden flex items-center justify-center mt-16 gap-2 font-bold text-[20px]">
         <img src={GoogleImg} width={64} />
         <p>Event booking</p>

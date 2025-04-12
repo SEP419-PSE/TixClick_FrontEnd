@@ -32,12 +32,9 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import ChatApp from "./pages/chat/ChatApp";
-import ProfileCompany from "./pages/company/components/ProfileCompany";
 import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
-
 import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
@@ -45,6 +42,7 @@ import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
 import Member from "./pages/consumer/components/Member/Member";
 import Tasks from "./pages/consumer/components/Tasks/Tasks";
+import Revenue from "./pages/consumer/components/Revenue/Revenue";
 
 export default function App() {
   return (
@@ -108,6 +106,7 @@ export default function App() {
               <Route path="policies" element={<Policy />} />
               <Route path="members" element={<Member />} />
               <Route path="tasks" element={<Tasks />} />
+              <Route path="revenue" element={<Revenue />} />
             </Route>
 
             <Route path="ticketManagement" element={<TicketPage />} />

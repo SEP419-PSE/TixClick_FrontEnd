@@ -4,13 +4,15 @@ import { FormEvent, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import authApi from "../../services/authApi";
 import { toast } from "sonner";
+import { TOAST_MESSAGE } from "../../constants/constants";
+import LoadingInButton from "../Loading/LoadingInButton";
 const EnterCode = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state;
-  //   console.log(state);
   const length: number = 6;
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
+  const [isSendingOtp, setIsSendingOtp] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, value: string) => {
@@ -36,20 +38,37 @@ const EnterCode = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const convertOTP = otp.join("");
-    // console.log(state, convertOTP);
+    console.log(state, convertOTP);
     authApi
       .verifyOTP(state, convertOTP)
       .then((response) => {
         console.log(response);
         if (response.data.code === 200) {
           toast.success(response.data.message);
-          navigate("/");
+          navigate("/auth/signin");
         }
       })
       .catch((error) => {
         console.log(error);
         toast.error(error.response.data.message);
       });
+  };
+
+  const sentOtpAgain = async () => {
+    try {
+      setIsSendingOtp(true);
+      const otpResponse = await authApi.sendOTP(state);
+      if (otpResponse.data.code == 200) {
+        toast.success(TOAST_MESSAGE.sentOTPsuccess);
+      } else {
+        toast.error(TOAST_MESSAGE.error);
+      }
+    } catch (error) {
+      toast.error(TOAST_MESSAGE.error);
+      console.log(error);
+    } finally {
+      setIsSendingOtp(false);
+    }
   };
 
   return (
@@ -77,7 +96,7 @@ const EnterCode = () => {
               key={index}
               ref={(el) => {
                 inputRefs.current[index] = el;
-              }}              
+              }}
               type="text"
               value={digit}
               maxLength={1}
@@ -87,12 +106,22 @@ const EnterCode = () => {
             />
           ))}
         </div>
-        <button
-          type="submit"
-          className="bg-pse-green my-5 text-white w-full font-bold rounded-md py-2 hover:opacity-80"
-        >
-          Xác thực
-        </button>
+        <div className="flex my-5 gap-4">
+          <button
+            type="button"
+            disabled={isSendingOtp ? true : false}
+            onClick={sentOtpAgain}
+            className="bg-white text-pse-green flex justify-center border border-pse-gray/50 w-full font-bold rounded-md py-2 hover:opacity-80"
+          >
+            {isSendingOtp ? <LoadingInButton /> : "Gửi lại"}
+          </button>
+          <button
+            type="submit"
+            className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80"
+          >
+            Xác thực
+          </button>
+        </div>
       </form>
     </motion.div>
   );

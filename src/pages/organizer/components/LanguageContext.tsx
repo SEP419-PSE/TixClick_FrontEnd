@@ -36,6 +36,7 @@ const translations = {
       terms: "Điều khoản cho Ban tổ chức",
       members: "Thành viên ban tổ chức",
       tasks: "Phân chia công việc",
+      revenue: "Doanh thu",
     },
     myEvents: {
       search: "Tìm kiếm sự kiện",
@@ -137,6 +138,7 @@ const translations = {
       terms: "Organizer Terms",
       members: "Company Employee",
       tasks: "Tasks",
+      revenue: "Revenue",
     },
     account: "Account",
     language: "Language",
@@ -147,6 +149,7 @@ const translations = {
       terms: "Organizer Terms",
       members: "Company Employee",
       tasks: "Tasks",
+      revenue: "Revenue",
     },
     myEvents: {
       search: "Search events",

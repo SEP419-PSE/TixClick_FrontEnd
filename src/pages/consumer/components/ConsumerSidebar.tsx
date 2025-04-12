@@ -5,10 +5,10 @@ import {
   ChevronRight,
   FileText,
   Contact,
-  Cookie,
+  CircleDollarSign,
 } from "lucide-react";
 import { useState } from "react";
-import { href, Link, useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { cn } from "../../../lib/utils";
 import { useLanguage } from "../../organizer/components/LanguageContext";
 import { FaTasks } from "react-icons/fa";
@@ -28,6 +28,11 @@ export function ConsumerSidebar() {
     { name: t.sidebar.terms, href: "/company/policies", icon: Book },
     { name: t.sidebar.members, href: "/company/members", icon: Contact },
     { name: t.sidebar.tasks, href: "/company/tasks", icon: FaTasks },
+    {
+      name: t.sidebar.revenue,
+      href: "/company/revenue",
+      icon: CircleDollarSign,
+    },
   ];
 
   return (
