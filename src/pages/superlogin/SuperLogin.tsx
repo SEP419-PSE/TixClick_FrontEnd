@@ -43,6 +43,7 @@ export default function SuperLogin() {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.removeItem("accessToken");
 
     // Kiểm tra dữ liệu đầu vào
     if (!credentials.userName || !credentials.password) {
