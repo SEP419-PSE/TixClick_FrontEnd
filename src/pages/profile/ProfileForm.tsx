@@ -117,9 +117,7 @@ export default function ProfileForm() {
   return (
     <>
       <div className="min-h-screen bg-[#1E1E1E] text-gray-200 flex flex-col ">
-        {/* <header className="fixed top-0 left-0 right-0 z-10 bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4">
           
-        </header> */}
         <Header />
 
         <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-28">
