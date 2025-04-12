@@ -1389,7 +1389,7 @@ const handleContractVerification = async (
                 Upload New Version
               </Button>
             </div>
-            <Button onClick={() => setIsAttachmentModalOpen(false)}>
+            <Button className="text-black" onClick={() => setIsAttachmentModalOpen(false)}>
               Close
             </Button>
           </DialogFooter>
