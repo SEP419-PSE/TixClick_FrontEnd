@@ -35,4 +35,12 @@ export const subRoles = [
 export const TOAST_MESSAGE = {
   successCreateMember: "Tạo member thành công",
   successUpdateMember: "Cập nhật thành công",
+  signInSucces: "Đăng nhập tài khoản thành công",
+  signInFail: "Đăng nhập tài khoản thất bại",
+  signUpSucces: "Đăng ký tài khoản thành công",
+  signUpFail: "Đăng ký tài khoản thất bại",
+  sentOTPsuccess: "Mã OTP đã được gửi lại",
+  emmptyEventActivity:
+    "Vui lòng điền đầy đủ thông tin cho hoạt động trước khi thêm loại vé",
+  error: "Đã có lỗi xảy ra",
 };

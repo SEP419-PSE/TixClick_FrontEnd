@@ -9,6 +9,8 @@ import authApi from "../../services/authApi";
 
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import GoogleImg from "../../assets/google.png";
+import { LoaderCircle } from "lucide-react";
+import { TOAST_MESSAGE } from "../../constants/constants";
 // import { ERROR_RESPONSE } from "../../constants/constants";
 
 const SignInForm = () => {
@@ -37,23 +39,30 @@ const SignInForm = () => {
     authApi
       .signIn(formData)
       .then((response) => {
-        localStorage.clear();
-        console.log(response.data);
-        localStorage.setItem("accessToken", response.data.result.accessToken);
-        localStorage.setItem("refreshToken", response.data.result.refreshToken);
-        authContext?.login(response.data.result.accessToken);
-        authContext?.setTokenForAxios("user", response.data.result.accessToken);
         if (response.data.result.status == true) {
+          localStorage.clear();
+          console.log(response.data);
+          localStorage.setItem("accessToken", response.data.result.accessToken);
+          localStorage.setItem(
+            "refreshToken",
+            response.data.result.refreshToken
+          );
+          authContext?.login(response.data.result.accessToken);
+          authContext?.setTokenForAxios(
+            "user",
+            response.data.result.accessToken
+          );
           navigate("/");
           toast.success("Đăng nhập thành công");
         } else {
-          navigate("/auth/verify");
+          navigate("/auth/code", { state: response.data.result.email });
+          toast.error("Bạn cần phải kích hoạt tài khoản");
         }
       })
       .catch((error) => {
         console.log(error);
         if (error.response.data.message == "Tài khoản chưa được kích hoạt")
-          navigate("/auth/verify");
+          navigate("/auth/code", { state: error.response.data.email });
         toast.error(error.response.data.message);
       })
       .finally(() => {
@@ -127,9 +136,15 @@ const SignInForm = () => {
         <button
           disabled={isLoading && true}
           type="submit"
-          className="bg-pse-green text-white w-full font-bold rounded-md py-2 hover:opacity-80"
+          className="bg-pse-green text-white flex justify-center w-full font-bold rounded-md py-2 hover:opacity-80"
         >
-          {isLoading ? "..." : "Đăng nhập"}
+          {isLoading ? (
+            <div className="mr-3 size-5 animate-spin flex justify-center items-center">
+              <LoaderCircle />
+            </div>
+          ) : (
+            "Đăng nhập"
+          )}
         </button>
       </form>
       <div className="my-8">

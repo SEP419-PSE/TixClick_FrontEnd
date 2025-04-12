@@ -1,13 +1,30 @@
 import { motion } from "framer-motion";
-import { Calendar, Camera, Check, Edit2, Mail, Phone, User } from "lucide-react";
+import {
+  Calendar,
+  Camera,
+  Check,
+  Edit2,
+  Mail,
+  Phone,
+  User,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { toast } from "sonner";
 import Header from "../../components/Header/Header";
-import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 
@@ -23,7 +40,9 @@ export default function ProfileForm() {
   const [zoom, setZoom] = useState(1);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<ExtendedProfile>({} as ExtendedProfile);
+  const [formData, setFormData] = useState<ExtendedProfile>(
+    {} as ExtendedProfile
+  );
   const [loading, setLoading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +97,7 @@ export default function ProfileForm() {
       const nameParts = formData.fullName?.trim().split(" ") || [];
       let firstName = "";
       let lastName = "";
-      
+
       if (nameParts.length > 0) {
         firstName = nameParts.pop() || ""; // Get the last word as firstName
         lastName = nameParts.join(" "); // Join the rest as lastName
@@ -99,16 +118,16 @@ export default function ProfileForm() {
         accountId: profile.accountId,
         userName: profile.userName || "",
         roleId: profile.roleId || 0,
-        active: profile.active !== undefined ? profile.active : true
+        active: profile.active !== undefined ? profile.active : true,
       };
 
       // Call the API
       const response = await profileApi.updateProfile(updateData);
-      
+
       if (response.data && response.data.success) {
         // Update the local profile state with type safety
         setProfile({
-          ...updateData
+          ...updateData,
         });
 
         toast.success("Cập nhật thông tin thành công!");
@@ -130,7 +149,7 @@ export default function ProfileForm() {
       // Create an extended profile object with fullName
       const extendedProfile: ExtendedProfile = {
         ...profile,
-        fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim()
+        fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim(),
       };
       setFormData(extendedProfile);
     }
@@ -159,7 +178,10 @@ export default function ProfileForm() {
                 <div className="px-6 pb-6 -mt-16 flex flex-col items-center">
                   <div className="relative">
                     <Avatar className="h-32 w-32 border-4 border-[#1A1A1A] shadow-lg">
-                      <AvatarImage src={profile?.avatarURL || ""} alt="Avatar" />
+                      <AvatarImage
+                        src={profile?.avatarURL || ""}
+                        alt="Avatar"
+                      />
                       <AvatarFallback className="text-3xl bg-gradient-to-br from-[#FF8A00] to-[#FF9A20] text-white">
                         {getInitials(profile?.firstName, profile?.lastName)}
                       </AvatarFallback>
@@ -183,7 +205,9 @@ export default function ProfileForm() {
                     </div>
                   </div>
 
-                  <h2 className="mt-4 text-xl font-bold text-white">{profile?.userName || "Người dùng"}</h2>
+                  <h2 className="mt-4 text-xl font-bold text-white">
+                    {profile?.userName || "Người dùng"}
+                  </h2>
 
                   <div className="w-full mt-6 space-y-4">
                     <div className="flex items-center text-gray-400">
@@ -243,21 +267,44 @@ export default function ProfileForm() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">Họ và tên</label>
+                        <label className="text-sm font-medium text-gray-300">
+                          Tên
+                        </label>
+                        <div className="relative">
+                          <Input
+                            name="firstName"
+                            value={`${profile?.firstName || ""} `}
+                            onChange={handleInputChange}
+                            disabled={!editMode}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
+                          />
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-300">
+                          Họ
+                        </label>
                         <div className="relative">
                           <Input
                             name="fullName"
                             value={formData.fullName || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
                           />
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">Số điện thoại</label>
+                        <label className="text-sm font-medium text-gray-300">
+                          Số điện thoại
+                        </label>
                         <div className="relative">
                           <Input
                             name="phone"
@@ -265,37 +312,51 @@ export default function ProfileForm() {
                             value={formData.phone || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
                           />
                           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">Email</label>
+                        <label className="text-sm font-medium text-gray-300">
+                          Email
+                        </label>
                         <div className="relative">
                           <Input
                             name="email"
                             type="email"
-                            value={formData.email || ""}
+                            value={profile?.email}
                             onChange={handleInputChange}
                             disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
                           />
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">Ngày sinh</label>
+                        <label className="text-sm font-medium text-gray-300">
+                          Ngày sinh
+                        </label>
                         <div className="relative">
                           <Input
                             name="dob"
                             type="date"
-                            value={typeof formData.dob === 'string' ? formData.dob : ''}
+                            value={
+                              typeof formData.dob === "string"
+                                ? formData.dob
+                                : ""
+                            }
                             onChange={handleInputChange}
                             disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${!editMode ? "opacity-80" : ""}`}
+                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                              !editMode ? "opacity-80" : ""
+                            }`}
                           />
                           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
@@ -326,13 +387,17 @@ export default function ProfileForm() {
 
                 <TabsContent value="security">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
+                    <p className="text-gray-400">
+                      Tính năng bảo mật sẽ được cập nhật sau
+                    </p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="preferences">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
+                    <p className="text-gray-400">
+                      Tính năng tùy chọn sẽ được cập nhật sau
+                    </p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -348,7 +413,9 @@ export default function ProfileForm() {
               className="bg-[#1A1A1A] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-[#2A2A2A]"
             >
               <div className="p-4 bg-gradient-to-r from-[#FF8A00] to-[#FF9A20] text-white">
-                <h3 className="text-lg font-semibold text-center">Chỉnh sửa ảnh đại diện</h3>
+                <h3 className="text-lg font-semibold text-center">
+                  Chỉnh sửa ảnh đại diện
+                </h3>
               </div>
 
               <div className="p-6">
@@ -368,8 +435,12 @@ export default function ProfileForm() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <label className="text-sm font-medium text-gray-300">Phóng to</label>
-                      <span className="text-sm text-gray-400">{zoom.toFixed(1)}x</span>
+                      <label className="text-sm font-medium text-gray-300">
+                        Phóng to
+                      </label>
+                      <span className="text-sm text-gray-400">
+                        {zoom.toFixed(1)}x
+                      </span>
                     </div>
                     <div className="flex items-center">
                       <input

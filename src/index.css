@@ -89,3 +89,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    background-color: transparent; /* Nền trong suốt */
+    filter: invert(100%) sepia(100%) saturate(1000%) hue-rotate(180deg); /* Chỉnh màu */
+  }
+}
