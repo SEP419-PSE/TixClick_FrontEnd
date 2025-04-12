@@ -87,7 +87,7 @@ export function DashboardSidebar() {
       }
 
       const client = new Client({
-        brokerURL: "ws://160.191.175.172:8080/ws",
+        brokerURL: "wss://tixclick.site/ws",
         connectHeaders: {
           Authorization: `Bearer ${context.accessToken2}`,
         },
