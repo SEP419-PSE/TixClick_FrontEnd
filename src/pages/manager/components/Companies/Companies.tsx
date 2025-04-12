@@ -132,47 +132,18 @@ export default function CompanyApprovalsPage() {
     toast.success("Document rejected")
   }
 
-  // const fetchCompaniesList = async () => {
-  //   try {
-  //     const res: any = await managerApi.getAllCompany()
-  //     console.log("Company List Huy:", res)
-  //     if (res.data.result && res.data.result.length > 0) {
-  //       setCompanies(res.data.result)
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching companies:", error)
-  //     toast.error("Failed to fetch companies")
-  //   }
-  // }
-
   const fetchCompaniesList = async () => {
     try {
-      const response = await fetch("https://tixclick.site/api/company/manager", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken2")}` 
-        }
-      })
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`)
-      }
-  
-      const data = await response.json()
-  
-      if (data?.success && data?.result?.length > 0) {
-        setCompanies(data.result)
-        toast.success("Lấy danh sách công ty thành công")
-      } else {
-        toast.warning("Không tìm thấy công ty nào")
+      const res: any = await managerApi.getAllCompany()
+      console.log("Company List Huy:", res)
+      if (res.data.result && res.data.result.length > 0) {
+        setCompanies(res.data.result)
       }
     } catch (error) {
       console.error("Error fetching companies:", error)
-      toast.error("Không thể lấy danh sách công ty")
+      toast.error("Failed to fetch companies")
     }
   }
-  
 
   useEffect(() => {
     const initUseEffect = async () => {
