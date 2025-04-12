@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { UploadCloud } from "lucide-react";
 
 interface ImageUploadProps {
-  previewImage: string | null;
+  previewImage?: string | null;
   width: number;
   height: number;
   label: string;
