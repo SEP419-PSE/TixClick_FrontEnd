@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  Plus,
-  Trash2,
   CalendarCheck,
   Ticket,
   Save,
   X,
+  CalendarIcon,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import {
@@ -17,12 +18,20 @@ import {
 import { Button } from "../../ui/button";
 import eventApi from "../../../services/event/eventApi";
 import {
+  cn,
   convertHHMMtoHHMMSS,
   formatDate,
   formatDateTime,
 } from "../../../lib/utils";
 import { toast } from "sonner";
 import { StepProps } from "./Step1_Infor";
+import { Card, CardContent, CardTitle } from "../../ui/card";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { Calendar } from "../../ui/calendar";
+import { format } from "date-fns";
+import TimeInput from "../../Input/TimeInput";
 
 interface TicketType {
   ticketCode: string;
@@ -233,75 +242,225 @@ const StepTwo: React.FC<StepProps> = ({
         <div className="space-y-6">
           <button
             onClick={handleAddActivity}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="flex items-center gap-2 bg-pse-green hover:bg-pse-green/80 text-white px-4 py-2 rounded"
           >
             <CalendarCheck size={18} /> Thêm Activity
           </button>
 
           {activities.map((activity, index) => (
-            <div
-              key={index}
-              className="border rounded-lg shadow-sm p-5 bg-white space-y-4"
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">
-                  Hoạt động #{index + 1}
-                </h3>
-                <button
-                  onClick={() => handleRemoveActivity(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
+            <Card className="px-4 py-2 bg-gradient-to-b from-black/20 to-pse-green/50 text-white">
+              <CardTitle className="mb-2 ml-4 text-[20px] font-bold">
+                Hoạt động {index + 1}
+              </CardTitle>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 1. Tên hoạt động */}
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="activityName">Tên hoạt động</Label>
+                  <Input
+                    className="bg-transparent"
+                    id="activityName"
+                    type="text"
+                    value={activity.activityName || ""}
+                    onChange={(e) => {
+                      const updated = [...activities];
+                      updated[index].activityName = e.target.value;
+                      setActivities(updated);
+                    }}
+                  />
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  {
-                    label: "Tên hoạt động",
-                    key: "activityName",
-                    type: "text",
-                  },
-                  { label: "Ngày diễn ra", key: "dateEvent", type: "date" },
-                  { label: "Giờ bắt đầu", key: "startTimeEvent", type: "time" },
-                  { label: "Giờ kết thúc", key: "endTimeEvent", type: "time" },
-                  {
-                    label: "Bắt đầu bán vé",
-                    key: "startTicketSale",
-                    type: "datetime-local",
-                  },
-                  {
-                    label: "Kết thúc bán vé",
-                    key: "endTicketSale",
-                    type: "datetime-local",
-                  },
-                ].map(({ label, key, type }) => (
-                  <div key={key}>
-                    <label className="block mb-1 text-sm font-medium">
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      value={
-                        key === "dateEvent"
-                          ? activity.dateEvent.toISOString().split("T")[0]
-                          : (activity as any)[key]
-                      }
-                      className="w-full border px-3 py-2 rounded text-black"
-                      onChange={(e) => {
-                        const updated = [...activities];
-                        if (key === "dateEvent") {
-                          updated[index].dateEvent = new Date(e.target.value);
-                        } else {
-                          (updated[index] as any)[key] = e.target.value;
+                {/* 2. Ngày diễn ra */}
+                <div className="flex flex-col gap-2">
+                  <Label>Ngày diễn ra</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-transparent",
+                          !activity.dateEvent && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.dateEvent
+                          ? format(activity.dateEvent, "dd/MM/yyyy")
+                          : "Chọn ngày"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={activity.dateEvent}
+                        onSelect={(date) => {
+                          const updated = [...activities];
+                          updated[index].dateEvent = date!;
+                          setActivities(updated);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {/* 3. Giờ bắt đầu */}
+                <TimeInput
+                  className="bg-transparent"
+                  label="Giờ bắt đầu"
+                  id="startTimeEvent"
+                  value={activity.startTimeEvent || ""}
+                  onChange={(value) => {
+                    const updated = [...activities];
+                    updated[index].startTimeEvent = value;
+                    setActivities(updated);
+                  }}
+                />
+
+                {/* 4. Giờ kết thúc */}
+                <TimeInput
+                  className="bg-transparent"
+                  label="Giờ kết thúc"
+                  id="endTimeEvent"
+                  value={activity.endTimeEvent || ""}
+                  onChange={(value) => {
+                    const updated = [...activities];
+                    updated[index].endTimeEvent = value;
+                    setActivities(updated);
+                  }}
+                />
+
+                {/* 5. Bắt đầu bán vé */}
+                <div className="flex flex-col gap-2">
+                  <Label>Bắt đầu bán vé</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-transparent",
+                          !activity.startTicketSale && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.startTicketSale
+                          ? format(
+                              new Date(activity.startTicketSale),
+                              "dd/MM/yyyy HH:mm"
+                            )
+                          : "Chọn ngày và giờ"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="space-y-2">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                            : undefined
                         }
-                        setActivities(updated);
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const updated = [...activities];
+                          const old = new Date(
+                            activity.startTicketSale || Date.now()
+                          );
+                          old.setFullYear(date.getFullYear());
+                          old.setMonth(date.getMonth());
+                          old.setDate(date.getDate());
+                          updated[index].startTicketSale = old.toISOString();
+                          setActivities(updated);
+                        }}
+                      />
+                      <Input
+                        type="time"
+                        value={
+                          activity.startTicketSale
+                            ? new Date(activity.startTicketSale)
+                                .toTimeString()
+                                .slice(0, 5)
+                            : "00:00"
+                        }
+                        onChange={(e) => {
+                          const [hour, minute] = e.target.value.split(":");
+                          const updated = [...activities];
+                          const date = new Date(
+                            activity.startTicketSale || new Date()
+                          );
+                          date.setHours(Number(hour));
+                          date.setMinutes(Number(minute));
+                          updated[index].startTicketSale = date.toISOString();
+                          setActivities(updated);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
 
+                {/* 6. Kết thúc bán vé */}
+                <div className="flex flex-col gap-2">
+                  <Label>Kết thúc bán vé</Label>
+                  <Popover>
+                    <PopoverTrigger className="text-white" asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-transparent",
+                          !activity.endTicketSale && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {activity.endTicketSale
+                          ? format(
+                              new Date(activity.endTicketSale),
+                              "dd/MM/yyyy HH:mm"
+                            )
+                          : "Chọn ngày và giờ"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="space-y-2">
+                      <Calendar
+                        mode="single"
+                        selected={
+                          activity.endTicketSale
+                            ? new Date(activity.endTicketSale)
+                            : undefined
+                        }
+                        onSelect={(date) => {
+                          if (!date) return;
+                          const updated = [...activities];
+                          const old = new Date(
+                            activity.endTicketSale || Date.now()
+                          );
+                          old.setFullYear(date.getFullYear());
+                          old.setMonth(date.getMonth());
+                          old.setDate(date.getDate());
+                          updated[index].endTicketSale = old.toISOString();
+                          setActivities(updated);
+                        }}
+                      />
+                      <Input
+                        type="time"
+                        value={
+                          activity.endTicketSale
+                            ? new Date(activity.endTicketSale)
+                                .toTimeString()
+                                .slice(0, 5)
+                            : "00:00"
+                        }
+                        onChange={(e) => {
+                          const [hour, minute] = e.target.value.split(":");
+                          const updated = [...activities];
+                          const date = new Date(
+                            activity.endTicketSale || new Date()
+                          );
+                          date.setHours(Number(hour));
+                          date.setMinutes(Number(minute));
+                          updated[index].endTicketSale = date.toISOString();
+                          setActivities(updated);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </CardContent>
               {!hasSeatMap && (
                 <div className="pt-4 border-t space-y-3">
                   <div className="flex justify-between items-center">
@@ -310,7 +469,7 @@ const StepTwo: React.FC<StepProps> = ({
                     </h4>
                     <button
                       onClick={() => openTicketModal(index)}
-                      className="text-green-600 hover:text-green-800 flex items-center gap-1"
+                      className="text-white hover:text-white/80 flex items-center gap-1"
                     >
                       <Plus size={16} /> Thêm vé
                     </button>
@@ -337,7 +496,7 @@ const StepTwo: React.FC<StepProps> = ({
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           ))}
         </div>
       )}
