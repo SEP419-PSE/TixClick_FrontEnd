@@ -70,8 +70,8 @@ export default function ContractsPage() {
     ContractDocumentDTO[]
   >([]);
 
-  const [selectedContractCreate, setSelectedContractCreate] =
-    useState<Contract>();
+  // const [selectedContractCreate, setSelectedContractCreate] =
+  //   useState<Contract>();
   const [isProcessing, setIsProcessing] = useState(false);
   const [editFormData, setEditFormData] = useState<Contract>({
     contractId: 0,
@@ -133,16 +133,16 @@ export default function ContractsPage() {
   >(null);
 
   // Add state for contract detail form
-  const [contractDetailForm, setContractDetailForm] = useState({
-    contractDetailId: 0,
-    contractDetailName: "",
-    contractDetailCode: "",
-    description: "",
-    contractAmount: 0,
-    contractPayDate: "",
-    status: "",
-    contractId: 0,
-  });
+  // const [contractDetailForm, setContractDetailForm] = useState({
+  //   contractDetailId: 0,
+  //   contractDetailName: "",
+  //   contractDetailCode: "",
+  //   description: "",
+  //   contractAmount: 0,
+  //   contractPayDate: "",
+  //   status: "",
+  //   contractId: 0,
+  // });
 
   const generateVietQRUrl = () => {
     if (!vietQRParams.bankID || !vietQRParams.accountID) {
@@ -372,38 +372,38 @@ const handleContractVerification = async (
   };
 
   // Function to add a new contract detail to the form
-  const addContractDetail = () => {
-    setEditFormData({
-      ...editFormData,
-      contractDetailDTOS: [
-        ...editFormData.contractDetailDTOS,
-        {
-          contractDetailId: 0,
-          contractDetailName: "",
-          contractDetailCode: "",
-          description: "",
-          contractAmount: 0,
-          contractPayDate: "",
-          status: "",
-          contractId: selectedContract?.contractId || 0,
-        },
-      ],
-    });
-  };
+  // const addContractDetail = () => {
+  //   setEditFormData({
+  //     ...editFormData,
+  //     contractDetailDTOS: [
+  //       ...editFormData.contractDetailDTOS,
+  //       {
+  //         contractDetailId: 0,
+  //         contractDetailName: "",
+  //         contractDetailCode: "",
+  //         description: "",
+  //         contractAmount: 0,
+  //         contractPayDate: "",
+  //         status: "",
+  //         contractId: selectedContract?.contractId || 0,
+  //       },
+  //     ],
+  //   });
+  // };
 
   // Function to update a contract detail in the form
-  const updateContractDetail = (index: number, field: string, value: any) => {
-    const updatedDetails = [...editFormData.contractDetailDTOS];
-    updatedDetails[index] = {
-      ...updatedDetails[index],
-      [field]: value,
-    };
+  // const updateContractDetail = (index: number, field: string, value: any) => {
+  //   const updatedDetails = [...editFormData.contractDetailDTOS];
+  //   updatedDetails[index] = {
+  //     ...updatedDetails[index],
+  //     [field]: value,
+  //   };
 
-    setEditFormData({
-      ...editFormData,
-      contractDetailDTOS: updatedDetails,
-    });
-  };
+  //   setEditFormData({
+  //     ...editFormData,
+  //     contractDetailDTOS: updatedDetails,
+  //   });
+  // };
 
   useEffect(() => {
     if (selectedContract && selectedContract.contractId) {

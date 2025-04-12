@@ -11,7 +11,7 @@ import eventApi from "../services/eventApi";
 import { EventDetailResponse } from "../interface/EventInterface";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 import { toast, Toaster } from "sonner";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 interface TicketResponse {
   id: number;

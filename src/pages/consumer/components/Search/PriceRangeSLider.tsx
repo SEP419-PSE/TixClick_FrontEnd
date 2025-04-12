@@ -1,4 +1,3 @@
-import React from "react";
 import { formatMoney } from "../../../../lib/utils";
 
 type Props = {

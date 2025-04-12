@@ -37,9 +37,9 @@ const Member = () => {
   );
   const [searchMember, setSearchMember] = useState<string>();
   const [members, setMembers] = useState<MemberResponse[]>([]);
-  const [checkedAccounts, setCheckedAccounts] = useState<Set<string>>(
-    new Set()
-  );
+  // const [checkedAccounts, setCheckedAccounts] = useState<Set<string>>(
+  //   new Set()
+  // );
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {

@@ -109,21 +109,21 @@ export default function EventsPage() {
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
 
-  const [editFormData, setEditFormData] = useState<{
-    eventId?: number
-    eventName?: string
-    location?: string
-    locationName?: string
-    startDate?: string
-    endDate?: string
-    status?: string
-    typeEvent?: string
-    description?: string
-    categoryId?: number
-    logoURL?: string
-    bannerURL?: string
-    urlOnline?: string
-  }>({})
+  // const [editFormData, setEditFormData] = useState<{
+  //   eventId?: number
+  //   eventName?: string
+  //   location?: string
+  //   locationName?: string
+  //   startDate?: string
+  //   endDate?: string
+  //   status?: string
+  //   typeEvent?: string
+  //   description?: string
+  //   categoryId?: number
+  //   logoURL?: string
+  //   bannerURL?: string
+  //   urlOnline?: string
+  // }>({})
 
   // Contract Scanner State
   const [file, setFile] = useState<File | null>(null)
@@ -502,46 +502,46 @@ export default function EventsPage() {
     }
   }
 
-  const handleApprove = async (status: string, id: number) => {
-    if (!selectedEvent) return
+  // const handleApprove = async (status: string, id: number) => {
+  //   if (!selectedEvent) return
 
-    try {
-      const response = await managerApi.approveEvent(status, id)
-      console.log("✅ Approved successfully:", response)
+  //   try {
+  //     const response = await managerApi.approveEvent(status, id)
+  //     console.log("✅ Approved successfully:", response)
 
-      const updatedEvents = events.map((event) =>
-        event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event,
-      )
+  //     const updatedEvents = events.map((event) =>
+  //       event.eventId === selectedEvent.eventId ? { ...event, status: "APPROVED" } : event,
+  //     )
 
-      setEvents(updatedEvents)
-      setSelectedEvent({ ...selectedEvent, status: "APPROVED" })
+  //     setEvents(updatedEvents)
+  //     setSelectedEvent({ ...selectedEvent, status: "APPROVED" })
 
-      toast.success("Event Approved", {
-        description: "The event has been successfully approved.",
-      })
-    } catch (error: any) {
-      console.error("❌ Error approving event:", error)
+  //     toast.success("Event Approved", {
+  //       description: "The event has been successfully approved.",
+  //     })
+  //   } catch (error: any) {
+  //     console.error("❌ Error approving event:", error)
 
-      toast.error("Approval Failed", {
-        description: error?.response?.data?.message || "Something went wrong.",
-      })
-    }
-  }
+  //     toast.error("Approval Failed", {
+  //       description: error?.response?.data?.message || "Something went wrong.",
+  //     })
+  //   }
+  // }
 
-  const handleReject = () => {
-    if (!selectedEvent) return
+  // const handleReject = () => {
+  //   if (!selectedEvent) return
 
-    const updatedEvents = events.map((event) =>
-      event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event,
-    )
+  //   const updatedEvents = events.map((event) =>
+  //     event.eventId === selectedEvent.eventId ? { ...event, status: "REJECTED" } : event,
+  //   )
 
-    setEvents(updatedEvents)
-    setSelectedEvent({ ...selectedEvent, status: "REJECTED" })
+  //   setEvents(updatedEvents)
+  //   setSelectedEvent({ ...selectedEvent, status: "REJECTED" })
 
-    toast.success("Event Rejected", {
-      description: "The event has been rejected.",
-    })
-  }
+  //   toast.success("Event Rejected", {
+  //     description: "The event has been rejected.",
+  //   })
+  // }
 
   const handleCreateContract = () => {
     setIsContractModalOpen(true)
