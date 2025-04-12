@@ -48,21 +48,24 @@ const managerApi = {
     },
 
     approveCompany(status: string, companyVerificationId: number) {
-        const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
-        console.log("url:", url);
-        console.log(status)
-        console.log(companyVerificationId)
+        const url = `/company-verification/${companyVerificationId}/approve`
     
-
-        const token = localStorage.getItem("accessToken2");
-        return axiosClient.patch(url, {
+        // Get token from localStorage
+        const token = localStorage.getItem("accessToken2")
+    
+        // Return the axios request with proper headers configuration
+        return axiosClient.patch(
+          url,
+          {}, // Empty body since data is in URL
+          {
+            params: { status }, // Add status as a query parameter
             headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-    
-
-    },
+              Authorization: `Bearer ${token}`,
+            },
+            timeout: 10000, // Add a timeout to prevent long-hanging requests
+          },
+        )
+      },
     
     approveEvent(status: string, id: number) {
         const url = `/event/${id}/approve/${status}`;
