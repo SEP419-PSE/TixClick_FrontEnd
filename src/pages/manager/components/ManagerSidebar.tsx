@@ -100,7 +100,7 @@ export function DashboardSidebar() {
       })
 
       client.onConnect = () => {
-        client.subscribe(`/user/${currentUser}/queue/notifications`, (message) => {
+        client.subscribe(`/user/specific/messages`, (message) => {
           try {
             const newNotification = JSON.parse(message.body)
 

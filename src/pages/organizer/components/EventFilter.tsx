@@ -1,7 +1,6 @@
 import { Tab } from "@headlessui/react";
 
 import { useLanguage } from "./LanguageContext";
-import { Key } from "lucide-react";
 
 export function EventFilter({ onFilterChange }: any) {
   const { t } = useLanguage();

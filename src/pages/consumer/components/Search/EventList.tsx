@@ -1,5 +1,4 @@
 import React from "react";
-import Img from "../../../../assets/1c7973947f9b163b2376dc6bdc0c6540.jpg";
 import { EventDetailResponse } from "../../../../interface/EventInterface";
 import { formatDateVietnamese, formatMoney } from "../../../../lib/utils";
 import { CiCalendar } from "react-icons/ci";

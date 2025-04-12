@@ -43,12 +43,12 @@ export default function CompanyApprovalsPage() {
 
         fetchCompaniesList();
 
-        if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
-            setIsReviewModalOpen(false);
-            setIsDocumentModalOpen(true);
-        } else {
-            completeApproval();
-        }
+        // if (!documents.some((doc) => doc.company_id === selectedCompany?.companyId)) {
+        //     setIsReviewModalOpen(false);
+        //     setIsDocumentModalOpen(true);
+        // } else {
+        //     completeApproval();
+        // }
     } catch (error) {
         console.error("❌ Approval failed:", error);
     }
