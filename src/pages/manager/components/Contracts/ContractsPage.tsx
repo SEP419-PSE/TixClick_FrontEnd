@@ -540,10 +540,10 @@ export default function ContractsPage() {
                         <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => openContractModal(contract)}>View details</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => openEditModal(contract)}>
+                          {/* <DropdownMenuItem onClick={() => openEditModal(contract)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit contract
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuItem onClick={() => handleUploadDocument(contract.contractId)}>
                             <Upload className="mr-2 h-4 w-4" />
                             Upload document
@@ -1179,7 +1179,6 @@ export default function ContractsPage() {
               </Select>
             </div>
 
-            {/* Contract Details Create Form */}
             <div className="grid items-center gap-4 bg-[#1E1E1E] p-4 rounded-lg">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="contractDetailName" className="text-right">

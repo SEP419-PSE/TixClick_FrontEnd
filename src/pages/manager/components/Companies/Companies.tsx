@@ -155,7 +155,7 @@ export default function CompanyApprovalsPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-[#252525] hover:bg-[#2A2A2A]">
-                <TableHead className="text-white w-12 text-center">#</TableHead>
+                <TableHead className="text-white w-12 text-center">No</TableHead>
                 <TableHead className="text-white">Company Name</TableHead>
                 <TableHead className="text-white">Code Tax</TableHead>
                 <TableHead className="text-white">Contact Person</TableHead>
@@ -571,7 +571,7 @@ export default function CompanyApprovalsPage() {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-[#252525] hover:bg-[#2A2A2A]">
-                        <TableHead className="text-white w-12 text-center">#</TableHead>
+                        <TableHead className="text-white w-12 text-center">No</TableHead>
                         <TableHead className="text-white">Document Name</TableHead>
                         <TableHead className="text-white">Type</TableHead>
                         <TableHead className="text-white">Upload Date</TableHead>

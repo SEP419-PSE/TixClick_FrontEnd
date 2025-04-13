@@ -59,8 +59,8 @@ export interface EventResponse {
   location: string;
   locationName: string;
   description: string;
-  bannerUrl: string;
-  logoUrl: string;
+  bannerURL: string;
+  logoURL: string;
   status: string |"PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "SCHEDULED"; 
   typeEvent: "Offline" | "Online"; 
   organizerId: number;
