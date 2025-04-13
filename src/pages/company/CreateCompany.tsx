@@ -20,9 +20,9 @@ export const banks = [
   { id: "970416", bankName: "ACB" },
   { id: "970432", bankName: "VPBank" },
   { id: "970403", bankName: "Sacombank" },
-  { id: "970423", bankName: "Techcombank" },
+  { id: "970423", bankName: "TPBank" },
   { id: "970441", bankName: "VIB" },
-  { id: "970454", bankName: "TPBank" },
+  { id: "970407", bankName: "Techcombank" },
 ];
 
 const CreateCompany = () => {
