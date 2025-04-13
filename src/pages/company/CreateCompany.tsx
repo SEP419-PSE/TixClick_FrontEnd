@@ -87,6 +87,7 @@ const CreateCompany = () => {
       companyData.append("address", address);
       companyData.append("description", description);
       companyData.append("codeTax", codeTax);
+      companyData.append("ownerCard", ownerCard);
       companyData.append("bankingName", bankingName);
       companyData.append("bankingCode", bankingCode);
       companyData.append("nationalId", cccd);
@@ -102,7 +103,7 @@ const CreateCompany = () => {
       const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
       if (response.data.code == 200) {
-        navigate("/company");
+        navigate("/company/information");
         toast.success("Tạo công ty thành công", { position: "top-center" });
       }
     } catch (error) {

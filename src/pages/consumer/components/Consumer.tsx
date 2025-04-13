@@ -1,5 +1,6 @@
 import {
   Calendar,
+  ChartPie,
   Clock,
   DollarSign,
   MapPin,
@@ -137,7 +138,7 @@ export default function Consumer() {
                     }}
                     whileTap={{ scale: 0.98 }}
                     key={event.eventId}
-                    className="bg-[#2a2a2a] rounded-lg overflow-hidden border border-gray-800 hover:border-[#00B14F] transition-colors cursor-pointer"
+                    className="bg-[#2a2a2a] rounded-lg overflow-hidden hover:border hover:border-pse-green transition-colors cursor-pointer"
                     onClick={() => handleEventClick(event)}
                   >
                     <div className="relative">
@@ -245,6 +246,14 @@ export default function Consumer() {
                             <FaTasks />
                             Phân công
                           </Button>
+                          <NavLink
+                            to={`events/${event.eventId}/summary-revenue`}
+                          >
+                            <Button className="bg-blue-700 hover:bg-opacity-80">
+                              <ChartPie />
+                              Tổng quan
+                            </Button>
+                          </NavLink>
                         </div>
                       </div>
 

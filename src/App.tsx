@@ -44,6 +44,10 @@ import Member from "./pages/consumer/components/Member/Member";
 import Tasks from "./pages/consumer/components/Tasks/Tasks";
 import Revenue from "./pages/consumer/components/Revenue/Revenue";
 import Information from "./pages/consumer/components/Information/Information";
+import EventManagement from "./pages/consumer/components/Event/EventManagement";
+import SummaryRevenue from "./pages/consumer/components/Event/SummaryRevenue";
+import Order from "./pages/consumer/components/Event/Order";
+import CheckIn from "./pages/consumer/components/Event/CheckIn";
 
 export default function App() {
   return (
@@ -104,12 +108,28 @@ export default function App() {
             <Route path="company" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
-              <Route path="policies" element={<Policy />} />
+              <Route path="policies" element={<Policy />} />e
               <Route path="members" element={<Member />} />
-              <Route path="tasks" element={<Tasks />} />
-              <Route path="revenue" element={<Revenue />} />
               <Route path="information" element={<Information />} />
             </Route>
+
+            {/* Event Management */}
+            <Route
+              path="/company/events/:eventId"
+              element={<EventManagement />}
+            >
+              <Route
+                index
+                path="summary-revenue"
+                element={<SummaryRevenue />}
+              />
+              <Route path="orders" element={<Order />} />
+              <Route path="revenue" element={<Revenue />} />
+              <Route path="check-in" element={<CheckIn />} />
+              <Route path="tasks" element={<Tasks />} />
+            </Route>
+
+            <Route />
 
             <Route path="ticketManagement" element={<TicketPage />} />
 

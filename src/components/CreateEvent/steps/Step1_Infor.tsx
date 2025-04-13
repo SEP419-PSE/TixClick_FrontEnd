@@ -84,8 +84,7 @@ export default function StepOne({
     const isValid =
       editorContent.trim() !== "<p><br></p>" &&
       eventName.trim() !== "" &&
-      (joinUrl.trim() !== "" ||
-        (locationEvent.trim() !== "" && address.trim() !== "")) &&
+      (joinUrl.trim() !== "" || (locationEvent !== "" && address !== "")) &&
       typeEvent !== "" &&
       (logoImage !== null || logoImageUrl !== null) &&
       (background !== null || backgroundUrl !== null);
@@ -108,9 +107,9 @@ export default function StepOne({
   const submitInfo = async () => {
     if (
       editorContent.trim() == "<p><br></p>" ||
-      eventName.trim() == "" ||
-      locationEvent.trim() == "" ||
-      address.trim() == "" ||
+      eventName == "" ||
+      locationEvent == "" ||
+      address == "" ||
       typeEvent == "" ||
       (logoImage == null && logoImageUrl == null) ||
       (background == null && backgroundUrl == null)

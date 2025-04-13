@@ -29,7 +29,7 @@ const Information = () => {
   }
 
   return (
-    <div className="w-full min-h-[calc(100vh-70px)] flex justify-center items-center">
+    <div className="w-full bg-gradient-to-b from-pse-green min-h-[calc(100vh-70px)] flex justify-center items-center">
       {isLoading ? (
         <LoadingFullScreen />
       ) : (
