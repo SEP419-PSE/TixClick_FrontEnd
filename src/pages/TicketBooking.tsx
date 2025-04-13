@@ -238,6 +238,7 @@ export interface SelectedSeatInfo extends ISeat {
   typeName: string
   formattedPrice: string
   seatLabel: string
+  rcCode: string // Added this property to store the seat coordinate
   ticketId?: number // Added to store the ticket ID
   zoneId?: number // Added to store the zone ID
 }
@@ -305,6 +306,8 @@ const TicketBooking = () => {
     const section = sections.find((s) => s.name === sectionName)
     const zoneId = seat.zoneActivityId || section?.zoneActivityId || Number.parseInt(section?.id || "0")
 
+    const rcCode = seat.id.split("-").slice(1).join("-")
+
     console.log("Found section:", section)
     console.log("Zone ID:", zoneId)
     console.log("Ticket ID:", ticketId)
@@ -319,6 +322,7 @@ const TicketBooking = () => {
       typeName: seatType?.name || "Unknown Type",
       formattedPrice: formatCurrency(seatType?.price || 0),
       seatLabel: seatLabel,
+      rcCode: rcCode, // Store the seat coordinate
       ticketId: ticketId, // Add the ticketId to the seat info
       zoneId: zoneId, // Add the zoneId to the seat info
     }
@@ -471,12 +475,12 @@ const TicketBooking = () => {
                     <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
                       <div className="flex justify-between items-center">
                         <div className="font-medium">
-                          {seat.sectionName} - {seat.seatLabel}
+                          {seat.sectionName}: {seat.rcCode}
                         </div>
                         <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
                       </div>
                       <div className="text-sm text-gray-600">
-                        {seat.typeName} (ID: {seat.seatId})
+                        {seat.typeName} 
                       </div>
                     </div>
                   ))}
