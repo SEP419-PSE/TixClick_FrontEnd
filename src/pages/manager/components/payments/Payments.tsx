@@ -492,7 +492,7 @@ export default function PaymentsPage() {
             <Button
               variant="outline"
               onClick={() => setIsPaymentModalOpen(false)}
-              className="border-[#3A3A3A] hover:bg-[#2A2A2A] hover:text-white"
+              className="text-black border-[#3A3A3A] hover:bg-[#2A2A2A] hover:text-white"
             >
               Close
             </Button>

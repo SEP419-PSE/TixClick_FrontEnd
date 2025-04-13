@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "../../../../components/ui/button";
-import { FaCalendar, FaFilter } from "react-icons/fa6";
+import {  FaFilter } from "react-icons/fa6";
 import { FaAngleDown } from "react-icons/fa6";
 import { FaXmark } from "react-icons/fa6";
 import { Switch } from "../../../../components/ui/switch";
@@ -10,7 +10,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "../../../../components/ui/toggle-group";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "sonner";
 import PriceRangeSlider from "./PriceRangeSLider";
 
 interface EventTypeEngLishName extends EventType {
@@ -58,9 +58,7 @@ const FilterEvent = ({
   resetForm,
   selectedItems,
   startDate,
-  submitForm,
   maxPrice,
-  maxLimit,
   onChangePrice,
 }: Props) => {
   return (

@@ -5,21 +5,6 @@ export interface customAccount {
   phoneNumber: string | null;
 }
 
-export interface Company {
-  companyId: number;
-  companyName: string;
-  codeTax: string;
-  bankingName: string;
-  bankingCode: string;
-  nationalId: string;
-  logoURL: string;
-  description: string;
-  address: string;
-  status: "PENDING" | "ACTIVE" | "INACTIVE";
-  companyVerificationId: number;
-  customAccount: customAccount;
-}
-
 
 
 export interface Document {
@@ -32,4 +17,34 @@ export interface Document {
 }
 
 
+export interface CompanyDocument {
+  companyDocumentId: number
+  companyId: number
+  fileName: string
+  fileType: string
+  fileURL: string
+  uploadDate: string
+}
 
+export interface CustomAccount {
+  email: string
+  firstName: string
+  lastName: string
+  phoneNumber: string | null
+}
+
+export interface Company {
+  address: string
+  bankingCode: string
+  bankingName: string
+  codeTax: string
+  companyDocument: CompanyDocument[]
+  companyId: number
+  companyName: string
+  companyVerificationId: number
+  customAccount: CustomAccount
+  description: string
+  logoURL: string
+  nationalId: string
+  status: string
+}

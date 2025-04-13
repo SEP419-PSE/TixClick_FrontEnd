@@ -1,4 +1,4 @@
-import { ChevronLeft, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useSearchParams } from "react-router";
 import { Input } from "../../components/ui/input";
 import { EventDetailResponse } from "../../interface/EventInterface";

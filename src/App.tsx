@@ -85,11 +85,10 @@ export default function App() {
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
-            {/* <Route path="managerContracts" element={<ContractsPage />} /> */}
             <Route path="payment" element={<PaymentPage />} />
             <Route path="payment/queue" element={<PaymentQueuePage />} />
-            {/* <Route path="/payment-return" element={<PaymentReturnPage />} /> */}
 
+            {/* MANAGER DASHBOARD */}
             <Route path="manager-dashboard" element={<DashboardLayout />}>
               <Route index element={<ManagerOverview />} />
               <Route path="contracts" element={<ContractsPage />} />
@@ -105,6 +104,7 @@ export default function App() {
             <Route path="profileForm" element={<ProfileForm />} />
             <Route path="superLogin" element={<SuperLogin />} />
 
+            {/* COMPANY BOARD*/}
             <Route path="company" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
@@ -133,6 +133,7 @@ export default function App() {
 
             <Route path="ticketManagement" element={<TicketPage />} />
 
+            {/* ADMIN DASHBOARD */}
             <Route path="proAdmin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="events" element={<AdminEvent />} />
@@ -141,20 +142,7 @@ export default function App() {
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
 
-            {/*             
-            <Route path="managerManagement" element={<AccountsPage />} />
-            <Route path="event" element={<EventsPage />} />
-            <Route path="proAdmin/revenue" element={<RevenuePage />} /> */}
           </Route>
-
-          {/* Account Company */}
-          {/* <Route path="company" element={<CompanyDashBoard />}>
-            <Route index element={<HomeCompany />} />
-            <Route path="events" element={<ManageEvents />} />
-            <Route path="members" element={<ManageMember />} />
-            <Route path="contracts" element={<ManageContract />} />
-            <Route path="profile" element={<ProfileCompany />} />
-          </Route> */}
 
           <Route path="404" element={<ErrorPage />} />
           <Route path="vietqr" element={<VietQRGenerator />} />

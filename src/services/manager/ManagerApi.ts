@@ -48,40 +48,39 @@ const managerApi = {
     },
 
     approveCompany(status: string, companyVerificationId: number) {
-        const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
-        console.log("url:", url);
-        console.log(status)
-        console.log(companyVerificationId)
+        const url = `/company-verification/${companyVerificationId}/approve`
     
-
-        const token = localStorage.getItem("accessToken2");
-        return axiosClient.patch(url, {
+        const token = localStorage.getItem("accessToken2")
+    
+        return axiosClient.patch(
+          url,
+          {
+            params: { status }, 
             headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+              Authorization: `Bearer ${token}`,
+            },
+            timeout: 10000, 
+          },
+        )
+      },
     
-
-    },
-    
-    approveEvent(status: string, id: number) {
-        const url = `/event/${id}/approve/${status}`;
-        console.log("url:", url);
-        console.log(status);
-        console.log(id);
-    
-        const token = localStorage.getItem("accessToken");
-    
-        return axiosClient.put(
-            url,
-            {},  
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
-    },
+      approveEvent(status: string, eventId: number) {
+        const url = `/event/approve/${eventId}/${status}`
+        
+        const token = localStorage.getItem("accessToken2")
+        
+        return axiosClient.post(
+          url,
+          {}, 
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Accept": "*/*"
+            },
+            timeout: 10000, 
+          },
+        )
+      },
     
 
     // uploadContractDocument(request: ContractUpload){
@@ -102,10 +101,30 @@ const managerApi = {
         })
       },
 
+    uploadContractManager(file: File){
+        const url = "/contract/createContractAndContractDetail";
+        const token = localStorage.getItem("accessToken2")
+
+        return axiosClient.post(url, file, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Accept": "*/*"
+            },
+            timeout: 10000, 
+        });
+    },
+
     updateContract(request: Contract){
         const url = "/contract/createContractAndContractDetail";
         return axiosClient.post(url, request);
+    },
+
+    // /contract-payment/pay?transactionCode=7876&paymentId=679
+    payContractPayment(transactionCode: string, paymentId: number) {
+        const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
+        return axiosClient.get(url);
     }
+
 }
 
 export default managerApi;

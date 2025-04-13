@@ -3,8 +3,8 @@ import { NavLink, useParams, useSearchParams } from "react-router";
 import eventActivityApi from "../../../../services/eventActivityApi";
 import { EventActivityResponse } from "../../../../interface/event/EventActivity";
 import NoEvent from "../../../../assets/NoEvent.png";
-import { CalendarDays, Clock, Ticket, Trash2, User, X } from "lucide-react";
-import { formatDateVietnamese, formatTimeFe } from "../../../../lib/utils";
+import { CalendarDays, Clock, Ticket, Trash2, User } from "lucide-react";
+import { formatDateVietnamese } from "../../../../lib/utils";
 import { Button } from "../../../../components/ui/button";
 import { Checkbox } from "../../../../components/ui/checkbox";
 import companyApi from "../../../../services/companyApi";
@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import Popup from "../../../../components/Popup/Popup";
 
-type AssignmentMap = Record<number, number[]>;
+// type AssignmentMap = Record<number, number[]>;
 
 const Tasks = () => {
   const { eventId } = useParams<{ eventId: string }>();

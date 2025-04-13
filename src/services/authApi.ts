@@ -30,7 +30,7 @@ const authApi = {
       });
       return res;
     } catch (error) {
-      throw new Error("Refresh token expired or invalid", error);
+      throw new Error("Refresh token expired or invalid");
     }
   },
 };

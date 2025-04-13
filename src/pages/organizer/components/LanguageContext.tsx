@@ -28,6 +28,7 @@ const translations = {
       terms: "Điều khoản cho Ban tổ chức",
       members: "Thành viên ban tổ chức",
       tasks: "Phân chia công việc",
+      revenue: "Doanh thu",
     },
     account: "Tài khoản",
     language: "Ngôn ngữ",

@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import NoEvent from "../../../assets/NoEvent.png";
-import { Event } from "../../../interface/organizer/Organizer";
 import { EventFilter } from "../../organizer/components/EventFilter";
 import { useLanguage } from "../../organizer/components/LanguageContext";
 import companyApi from "../../../services/companyApi";

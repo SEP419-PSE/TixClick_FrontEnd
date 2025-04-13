@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Draggable from "react-draggable";
 import Popup from "../../components/Popup/Popup";
 import { Edit, Trash } from "lucide-react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import { useSearchParams } from "react-router";
 import ticketApi from "../../services/ticketApi";
 import seatmapApi from "../../services/seatmapApi";

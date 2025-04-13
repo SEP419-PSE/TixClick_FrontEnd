@@ -1,4 +1,4 @@
-import { ArrowUpDown, Calendar, Clock, MapPin, Search, Tag, Ticket } from "lucide-react"
+import { Armchair, ArrowUpDown, Calendar, Clock, LocateFixed, MapPin, Search, Tag, Ticket } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -257,6 +257,23 @@ export default function TicketManagement() {
                       <p>{new Date(selectedTicket.eventDate).toLocaleDateString("vi-VN")}</p>
                     </div>
                   </div>
+
+                  <div className="flex items-center gap-3">
+                    <LocateFixed className="w-5 h-5 text-[#ff8a00]" />
+                    <div>
+                      <p className="text-gray-400 text-sm">Khu vực</p>
+                      <p>{selectedTicket.zoneName}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Armchair className="w-5 h-5 text-[#ff8a00]" />
+                    <div>
+                      <p className="text-gray-400 text-sm">Mã ghế</p>
+                      <p>{selectedTicket.seatCode}</p>
+                    </div>
+                  </div>
+
 
                   <div className="flex items-center gap-3">
                     <Clock className="w-5 h-5 text-[#ff8a00]" />

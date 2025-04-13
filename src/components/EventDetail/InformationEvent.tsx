@@ -7,7 +7,7 @@ import {
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, } from "react-router";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
