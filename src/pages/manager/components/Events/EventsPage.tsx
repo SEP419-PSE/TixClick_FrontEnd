@@ -1,3 +1,5 @@
+"use client"
+
 import {
   CheckCircle,
   ChevronLeft,
@@ -191,6 +193,56 @@ export default function EventsPage() {
     }
   }
 
+  const handleUploadContract = async (file: File) => {
+    if (!file || !selectedEvent) return
+
+    try {
+      setIsUploading(true)
+      setUploadProgress(0)
+
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            return 95
+          }
+          return prev + 5
+        })
+      }, 200)
+
+      // Call the API endpoint with the file directly as specified in your API
+      const res = await managerApi.uploadContractManager(file)
+      console.log("Upload contract response:", res)
+
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
+      if (res.data && res.data.result) {
+        toast.success("Contract uploaded successfully")
+        // Refresh related contracts if needed
+        if (selectedEvent) {
+          await fetchRelatedContracts(selectedEvent.eventId)
+        }
+      } else {
+        toast.error("Failed to upload contract")
+      }
+
+      setTimeout(() => {
+        setIsContractModalOpen(false)
+        setFile(null)
+        setUploadProgress(0)
+        setIsUploading(false)
+      }, 1000)
+    } catch (error) {
+      console.error("Error uploading contract:", error)
+      toast.error("Upload Error", {
+        description: "There was an error uploading the contract. Please try again.",
+      })
+      setIsUploading(false)
+    }
+  }
+
   const navigateToEventPage = (eventId: number) => {
     // window.location.href = `/manager/event-details/${eventId}`
     navigate(`/manager/event-details/${eventId}`)
@@ -225,59 +277,7 @@ export default function EventsPage() {
   // Upload contract file
   const uploadContract = async () => {
     if (!file || !selectedEvent) return
-
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressInterval)
-            return 95
-          }
-          return prev + 5
-        })
-      }, 200)
-
-      // Example API call - replace with your actual endpoint
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("eventId", selectedEvent.eventId.toString())
-      formData.append("eventName", selectedEvent.eventName)
-
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/contracts/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        throw new Error("Failed to upload contract")
-      }
-
-      setUploadProgress(100)
-
-      toast.success("Contract Uploaded", {
-        description: "The contract has been successfully uploaded and linked to the event.",
-      })
-
-      setTimeout(() => {
-        setIsContractModalOpen(false)
-        setFile(null)
-        setUploadProgress(0)
-        setIsUploading(false)
-      }, 1000)
-    } catch (error) {
-      console.error("Error uploading contract:", error)
-      toast.error("Upload Error", {
-        description: "There was an error uploading the contract. Please try again.",
-      })
-      setIsUploading(false)
-    }
+    await handleUploadContract(file)
   }
 
   useEffect(() => {
@@ -946,8 +946,25 @@ export default function EventsPage() {
                 <input {...getInputProps()} />
                 <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-1">Drag & drop your contract</h3>
-                <p className="text-sm text-muted-foreground mb-4">Support for PDF and DOC/DOCX files only (max 10MB)</p>
-                <Button type="button" variant="secondary" className="mx-auto">
+                <p className="text-sm text-muted-foreground mb-4">Support for PDF files only (max 10MB)</p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="mx-auto"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const input = document.createElement("input")
+                    input.type = "file"
+                    input.accept = ".pdf,.doc,.docx"
+                    input.onchange = (event) => {
+                      const target = event.target as HTMLInputElement
+                      if (target && target.files && target.files[0]) {
+                        setFile(target.files[0])
+                      }
+                    }
+                    input.click()
+                  }}
+                >
                   <Upload className="w-4 h-4 mr-2" />
                   Browse Files
                 </Button>
@@ -983,6 +1000,7 @@ export default function EventsPage() {
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
+                    className="text-black"
                     onClick={() => {
                       setFile(null)
                       setUploadProgress(0)

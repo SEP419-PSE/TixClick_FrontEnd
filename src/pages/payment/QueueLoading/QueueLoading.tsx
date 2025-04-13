@@ -44,29 +44,29 @@ const payOsApi = {
   },
 
   checkPaymentStatus: async (queryParams: Record<string, string> | null = null) => {
-    try {
-      // Kiểm tra nếu có orderCode và status trong queryParams
-      // Nếu có, chúng ta có thể tin tưởng thông tin này thay vì gọi API
-      if (queryParams && queryParams.orderCode && queryParams.status) {
-        console.log("Using URL parameters for payment status instead of API call to avoid CORS issues")
+    // try {
+    //   // Kiểm tra nếu có orderCode và status trong queryParams
+    //   // Nếu có, chúng ta có thể tin tưởng thông tin này thay vì gọi API
+    //   if (queryParams && queryParams.orderCode && queryParams.status) {
+    //     console.log("Using URL parameters for payment status instead of API call to avoid CORS issues")
 
-        // Trả về kết quả dựa trên tham số URL
-        return {
-          data: {
-            status:
-              queryParams.status === "success" || queryParams.status === "PAID"
-                ? "PAID"
-                : queryParams.status === "cancel" || queryParams.status === "CANCELED"
-                  ? "CANCELED"
-                  : "PENDING",
-            message: "Payment status determined from URL parameters",
-            orderCode: queryParams.orderCode,
-          },
-        }
-      }
-    } catch (error) {
-      console.error("Error parsing URL parameters:", error)
-    }
+    //     // Trả về kết quả dựa trên tham số URL
+    //     return {
+    //       data: {
+    //         status:
+    //           queryParams.status === "success" || queryParams.status === "PAID"
+    //             ? "PAID"
+    //             : queryParams.status === "cancel" || queryParams.status === "CANCELED"
+    //               ? "CANCELED"
+    //               : "PENDING",
+    //         message: "Payment status determined from URL parameters",
+    //         orderCode: queryParams.orderCode,
+    //       },
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Error parsing URL parameters:", error)
+    // }
 
     try {
       // Determine if we should use query parameters or not
@@ -122,7 +122,7 @@ const payOsApi = {
 export default function PaymentQueuePage() {
   const [progress, setProgress] = useState(0)
   const [queuePosition, setQueuePosition] = useState(15)
-  const [estimatedTime, setEstimatedTime] = useState(180)
+  const [estimatedTime, setEstimatedTime] = useState(18000)
   const [isComplete, setIsComplete] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -466,7 +466,7 @@ export default function PaymentQueuePage() {
                   </div>
                 )}
                 <h1 className="text-xl font-bold">
-                  {isComplete || paymentStatus === "PAID" ? "Thanh toán thành công!" : "Đang xử lý thanh toán..."}
+                  {isComplete || paymentStatus === "PAID" ? "Thanh toán thành công!" : "Đã hủy thanh toán"}
                 </h1>
               </div>
 
