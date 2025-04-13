@@ -8,10 +8,12 @@ const translations = {
     search: "Tìm kiếm sự kiện",
     filters: {
       all: "Tất cả",
-      upcoming: "Diễn ra",
-      past: "Đã qua",
+      draft: "Nháp",
       pending: "Chờ duyệt",
-      reject: "Bị hủy",
+      approved: "Chờ hợp đồng",
+      scheduled: "Diễn ra",
+      completed: "Đã qua",
+      rejected: "Bị hủy",
     },
     menu: {
       tickets: "Vé đã mua",
@@ -38,6 +40,7 @@ const translations = {
       members: "Thành viên ban tổ chức",
       tasks: "Phân chia công việc",
       revenue: "Doanh thu",
+      information: "Thông tin công ty",
     },
     myEvents: {
       search: "Tìm kiếm sự kiện",
@@ -120,11 +123,13 @@ const translations = {
     title: "Created Events",
     search: "Search events",
     filters: {
-      all: "ALL",
-      upcoming: "UPCOMING",
-      past: "PAST",
-      pending: "PENDING",
-      reject: "REJECT",
+      all: "All",
+      draft: "Draft",
+      pending: "pending",
+      approved: "approved",
+      scheduled: "scheduled",
+      completed: "completed",
+      rejected: "rejected",
     },
     menu: {
       tickets: "My Tickets",
@@ -151,6 +156,7 @@ const translations = {
       members: "Company Employee",
       tasks: "Tasks",
       revenue: "Revenue",
+      information: "Company Information",
     },
     myEvents: {
       search: "Search events",

@@ -6,6 +6,10 @@ import SeatChartDesigner from "../../pages/seatmap/Seatmap";
 import FinalStep from "./steps/FinalStep";
 import eventApi from "../../services/eventApi";
 import { EventDetailResponse } from "../../interface/EventInterface";
+import companyApi from "../../services/companyApi";
+import { CompanyStatus } from "../../interface/company/Company";
+import { CgLogOff } from "react-icons/cg";
+import LockPage from "../Lock/LockPage";
 
 // import StepTwo from "./Steps/StepTwo"; // nếu có
 // import StepThree from "./Steps/StepThree"; // nếu có
@@ -14,6 +18,7 @@ export default function CreateEvent() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isStepValid, setIsStepValid] = useState<boolean>(false);
+  const [statusCompany, setStatusCompany] = useState<CompanyStatus>();
 
   // Lấy step từ URL, nếu không có thì mặc định là 0
   const getStepFromUrl = () => {
@@ -28,6 +33,19 @@ export default function CreateEvent() {
   };
   const [eventId, setEventId] = useState<number>(getEventIdFromUrl);
   const [event, setEvent] = useState<EventDetailResponse>();
+
+  const checkStatusCompany = async () => {
+    const response = await companyApi.isAccountHaveCompany();
+    console.log(response);
+    if (response.data.result) {
+      setStatusCompany(response.data.result.status);
+    }
+  };
+  // console.log(statusCompany);
+
+  useEffect(() => {
+    checkStatusCompany();
+  }, []);
 
   // Đồng bộ URL params với state khi URL thay đổi
   useEffect(() => {
@@ -114,6 +132,9 @@ export default function CreateEvent() {
         step == 3 ? "w-full bg-gray-200" : "max-w-[1000px]"
       }  mx-auto`}
     >
+      {(statusCompany == "PENDING" || statusCompany == "REJECTED") && (
+        <LockPage message="Công ty của bạn chưa được quyền thao tác do chưa được chấp nhận" />
+      )}
       <div className="mb-6">
         <p
           className={`${

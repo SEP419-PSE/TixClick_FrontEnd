@@ -73,7 +73,9 @@ const StepTwo: React.FC<StepProps> = ({
   isStepValid,
   setIsStepValid,
   updateStep,
+  event,
 }) => {
+  console.log(JSON.stringify(event?.eventActivityDTOList, null, 2));
   const [hasSeatMap, setHasSeatMap] = useState<boolean | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);

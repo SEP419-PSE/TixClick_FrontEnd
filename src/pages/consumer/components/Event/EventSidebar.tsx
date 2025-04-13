@@ -1,38 +1,30 @@
 import { motion } from "framer-motion";
 import {
-  BarChart3,
-  Book,
+  ChevronLeft,
   ChevronRight,
-  FileText,
-  Contact,
+  CircleCheck,
   CircleDollarSign,
-  Building2,
+  ClipboardList,
+  PieChart,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router";
-import { cn } from "../../../lib/utils";
-import { useLanguage } from "../../organizer/components/LanguageContext";
+import { NavLink } from "react-router";
+import { cn } from "../../../../lib/utils";
 import { FaTasks } from "react-icons/fa";
 
-export function ConsumerSidebar() {
-  const { t } = useLanguage();
-  const { pathname } = useLocation();
+export function EventSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navigation = [
-    { name: t.sidebar.myEvents, href: "/company", icon: FileText },
+    { name: "Tổng kết", href: "summary-revenue", icon: PieChart },
+    { name: "Danh sách đơn hàng", href: "orders", icon: ClipboardList },
+    { name: "Checkin", href: "check-in", icon: CircleCheck },
     {
-      name: t.sidebar.reports,
-      href: "/company/reports",
-      icon: BarChart3,
+      name: "Doanh thu",
+      href: "revenue",
+      icon: CircleDollarSign,
     },
-    { name: t.sidebar.terms, href: "/company/policies", icon: Book },
-    { name: t.sidebar.members, href: "/company/members", icon: Contact },
-    {
-      name: t.sidebar.information,
-      href: "/company/information",
-      icon: Building2,
-    },
+    { name: "Phân chia công việc", href: "tasks", icon: FaTasks },
   ];
 
   return (
@@ -77,44 +69,54 @@ export function ConsumerSidebar() {
         </div> */}
 
         <div className="flex-1 px-3 py-6">
+          {isCollapsed == false && (
+            <NavLink to="/company">
+              <button className="bg-white text-black flex items-center justify-center mb-4  py-2 rounded-lg w-full">
+                <ChevronLeft />
+                <span>Quản lý sự kiện</span>
+              </button>
+            </NavLink>
+          )}
+
           <div className="space-y-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={cn(
+            {navigation.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                className={({ isActive }) =>
+                  cn(
                     "group relative flex h-12 items-center overflow-hidden rounded-lg transition-all duration-300",
                     isActive
                       ? "bg-[#2A2A2A] text-white"
                       : "text-gray-400 hover:bg-[#2A2A2A]/50 hover:text-white",
                     isCollapsed ? "justify-center" : "px-4"
-                  )}
-                >
-                  {isActive && (
-                    <div className="absolute left-0 top-0 h-full w-1 bg-[#FF8A00]"></div>
-                  )}
-
-                  <div
-                    className={cn(
-                      "flex h-9 w-9 items-center justify-center rounded-lg transition-all",
-                      isActive
-                        ? "bg-[#FF8A00]/10 text-[#FF8A00]"
-                        : "text-gray-400 group-hover:text-white"
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <div className="absolute left-0 top-0 h-full w-1 bg-[#FF8A00]"></div>
                     )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                  </div>
-
-                  {!isCollapsed && (
-                    <span className="ml-3 text-sm font-medium">
-                      {item.name}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+                    <div
+                      className={cn(
+                        "flex h-9 w-9 items-center justify-center rounded-lg transition-all",
+                        isActive
+                          ? "bg-[#FF8A00]/10 text-[#FF8A00]"
+                          : "text-gray-400 group-hover:text-white"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    {!isCollapsed && (
+                      <span className="ml-3 text-sm font-medium">
+                        {item.name}
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
           </div>
         </div>
       </motion.nav>

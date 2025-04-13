@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, useSearchParams } from "react-router";
+import { NavLink, useParams, useSearchParams } from "react-router";
 import eventActivityApi from "../../../../services/eventActivityApi";
 import { EventActivityResponse } from "../../../../interface/event/EventActivity";
 import NoEvent from "../../../../assets/NoEvent.png";
@@ -19,8 +19,7 @@ import Popup from "../../../../components/Popup/Popup";
 // type AssignmentMap = Record<number, number[]>;
 
 const Tasks = () => {
-  const [searchParams] = useSearchParams();
-  const eventId = searchParams.get("eventId");
+  const { eventId } = useParams<{ eventId: string }>();
   const [tasks, setTasks] = useState<EventActivityResponse[]>([]);
   const [isOpenMenu, setIsOpenMenu] = useState<Record<number, boolean>>({});
   const [members, setMembers] = useState<MemberResponse[]>([]);
