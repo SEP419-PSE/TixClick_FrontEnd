@@ -11,3 +11,5 @@ export interface Company {
   status: string;
   representativeId: number;
 }
+
+export type CompanyStatus = "ACTIVE" | "PENDING" | "REJECTED";

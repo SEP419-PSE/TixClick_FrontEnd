@@ -6,6 +6,7 @@ import {
   FileText,
   Contact,
   CircleDollarSign,
+  Building2,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
@@ -32,6 +33,11 @@ export function ConsumerSidebar() {
       name: t.sidebar.revenue,
       href: "/company/revenue",
       icon: CircleDollarSign,
+    },
+    {
+      name: t.sidebar.information,
+      href: "/company/information",
+      icon: Building2,
     },
   ];
 

@@ -10,6 +10,7 @@ import BankDropdown from "./components/BankDropDown";
 import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 import { useNavigate } from "react-router";
 import { Card } from "../../components/ui/card";
+import BankCard from "./components/BankCard";
 
 const banks = [
   { id: "970436", bankName: "Vietcombank" },
@@ -33,6 +34,7 @@ const CreateCompany = () => {
   const [codeTax, setCodeTax] = useState("");
   const [bankingName, setBankingName] = useState("");
   const [bankingCode, setBankingCode] = useState("");
+  const [ownerCard, setOwnerCard] = useState("");
   const [cccd, setCccd] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -68,6 +70,7 @@ const CreateCompany = () => {
       !bankingName ||
       !bankingCode ||
       !cccd ||
+      !ownerCard ||
       files.length === 0
     ) {
       toast.error("Vui lòng điền đầy đủ thông tin", { position: "top-center" });
@@ -99,7 +102,7 @@ const CreateCompany = () => {
       const response = await companyApi.createCompanyandDocument(companyData);
       console.log(response);
       if (response.data.code == 200) {
-        navigate("/create-event");
+        navigate("/company");
         toast.success("Tạo công ty thành công", { position: "top-center" });
       }
     } catch (error) {
@@ -115,7 +118,7 @@ const CreateCompany = () => {
   return (
     <div className="min-h-screen mt-16 flex items-center justify-center">
       {loading && <LoadingFullScreen />}
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
         <p className="font-semibold text-[18px] mb-4 text-white">
           Đăng ký công ty
         </p>
@@ -142,6 +145,7 @@ const CreateCompany = () => {
           className="mt-4"
         />
         <TextInput
+          isTextArea={true}
           label="Mô tả công ty"
           maxLength={100}
           text={description}
@@ -153,17 +157,32 @@ const CreateCompany = () => {
           text={codeTax}
           setText={setCodeTax}
         />
-        <BankDropdown
-          banks={banks}
-          selectedBankName={bankingName}
-          onChange={setBankingName}
-        />
-        <TextInput
-          label="Số tài khoản"
-          maxLength={50}
-          text={bankingCode}
-          setText={setBankingCode}
-        />
+        <div className="w-full flex flex-col lg:flex-row justify-between gap-4 items-center">
+          <div className="lg:w-[45%]">
+            <BankDropdown
+              banks={banks}
+              selectedBankName={bankingName}
+              onChange={setBankingName}
+            />
+            <TextInput
+              label="Số tài khoản"
+              maxLength={50}
+              text={bankingCode}
+              setText={setBankingCode}
+            />
+            <TextInput
+              label="Chủ sở hữu"
+              maxLength={50}
+              text={ownerCard}
+              setText={setOwnerCard}
+            />
+          </div>
+          <BankCard
+            accountNumber={bankingCode}
+            bankName={bankingName}
+            ownerCard={ownerCard}
+          />
+        </div>
         <TextInput
           label="Căn cước công dân"
           maxLength={12}

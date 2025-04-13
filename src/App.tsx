@@ -43,6 +43,7 @@ import OrganizerCenter from "./pages/organizer";
 import Member from "./pages/consumer/components/Member/Member";
 import Tasks from "./pages/consumer/components/Tasks/Tasks";
 import Revenue from "./pages/consumer/components/Revenue/Revenue";
+import Information from "./pages/consumer/components/Information/Information";
 
 export default function App() {
   return (
@@ -107,6 +108,7 @@ export default function App() {
               <Route path="members" element={<Member />} />
               <Route path="tasks" element={<Tasks />} />
               <Route path="revenue" element={<Revenue />} />
+              <Route path="information" element={<Information />} />
             </Route>
 
             <Route path="ticketManagement" element={<TicketPage />} />

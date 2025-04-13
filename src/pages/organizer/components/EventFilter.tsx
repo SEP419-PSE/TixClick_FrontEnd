@@ -2,15 +2,18 @@ import { Tab } from "@headlessui/react";
 
 import { useLanguage } from "./LanguageContext";
 import { Key } from "lucide-react";
+import { Label } from "recharts";
 
 export function EventFilter({ onFilterChange }: any) {
   const { t } = useLanguage();
   const categories = [
     { key: "ALL", label: t.filters.all },
-    { key: "SCHEDULED", label: t.filters.upcoming },
-    { key: "COMPLETED", label: t.filters.past },
-    { key: "DRAFT", label: t.filters.pending },
-    { key: "REJECTED", label: t.filters.reject },
+    { key: "DRAFT", label: t.filters.draft },
+    { key: "PENDING", label: t.filters.pending },
+    { key: "APPROVED", label: t.filters.approved },
+    { key: "SCHEDULED", label: t.filters.scheduled },
+    { key: "COMPLETED", label: t.filters.completed },
+    { key: "REJECTED", label: t.filters.rejected },
   ];
 
   return (
