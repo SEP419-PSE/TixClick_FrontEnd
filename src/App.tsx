@@ -141,7 +141,6 @@ export default function App() {
               <Route path="managerManagement" element={<AccountsPage />} />
               <Route path="revenues" element={<RevenuePage />} />
             </Route>
-
           </Route>
 
           <Route path="404" element={<ErrorPage />} />
