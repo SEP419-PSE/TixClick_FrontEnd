@@ -193,6 +193,56 @@ export default function EventsPage() {
     }
   }
 
+  const handleUploadContract = async (file: File) => {
+    if (!file || !selectedEvent) return
+
+    try {
+      setIsUploading(true)
+      setUploadProgress(0)
+
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            return 95
+          }
+          return prev + 5
+        })
+      }, 200)
+
+      // Call the API endpoint with the file directly as specified in your API
+      const res = await managerApi.uploadContractManager(file)
+      console.log("Upload contract response:", res)
+
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
+      if (res.data && res.data.result) {
+        toast.success("Contract uploaded successfully")
+        // Refresh related contracts if needed
+        if (selectedEvent) {
+          await fetchRelatedContracts(selectedEvent.eventId)
+        }
+      } else {
+        toast.error("Failed to upload contract")
+      }
+
+      setTimeout(() => {
+        setIsContractModalOpen(false)
+        setFile(null)
+        setUploadProgress(0)
+        setIsUploading(false)
+      }, 1000)
+    } catch (error) {
+      console.error("Error uploading contract:", error)
+      toast.error("Upload Error", {
+        description: "There was an error uploading the contract. Please try again.",
+      })
+      setIsUploading(false)
+    }
+  }
+
   const navigateToEventPage = (eventId: number) => {
     // window.location.href = `/manager/event-details/${eventId}`
     navigate(`/manager/event-details/${eventId}`)
@@ -227,59 +277,7 @@ export default function EventsPage() {
   // Upload contract file
   const uploadContract = async () => {
     if (!file || !selectedEvent) return
-
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressInterval)
-            return 95
-          }
-          return prev + 5
-        })
-      }, 200)
-
-      // Example API call - replace with your actual endpoint
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("eventId", selectedEvent.eventId.toString())
-      formData.append("eventName", selectedEvent.eventName)
-
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/contracts/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      clearInterval(progressInterval)
-
-      if (!response.ok) {
-        throw new Error("Failed to upload contract")
-      }
-
-      setUploadProgress(100)
-
-      toast.success("Contract Uploaded", {
-        description: "The contract has been successfully uploaded and linked to the event.",
-      })
-
-      setTimeout(() => {
-        setIsContractModalOpen(false)
-        setFile(null)
-        setUploadProgress(0)
-        setIsUploading(false)
-      }, 1000)
-    } catch (error) {
-      console.error("Error uploading contract:", error)
-      toast.error("Upload Error", {
-        description: "There was an error uploading the contract. Please try again.",
-      })
-      setIsUploading(false)
-    }
+    await handleUploadContract(file)
   }
 
   useEffect(() => {
@@ -307,11 +305,11 @@ export default function EventsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "APPROVED":
-        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Approved</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Approved</span>
       case "PENDING":
-        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Pending</span>
       case "REJECTED":
-        return <span className="px-2 py-1 bg-red-500/20 text-red-500 rounded-md">Rejected</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">Rejected</span>
       default:
         return null
     }
@@ -400,7 +398,6 @@ export default function EventsPage() {
               <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
                 <DropdownMenuItem onClick={() => setSortBy("date")}>Date</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy("name")}>Name</DropdownMenuItem>
-                {/* <DropdownMenuItem onClick={() => setSortBy("attendees")}>Attendees</DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
                   {sortOrder === "asc" ? "Ascending" : "Descending"}
@@ -653,7 +650,6 @@ export default function EventsPage() {
                         </span>
                       )}
 
-                      {/* Always show last page */}
                       <Button
                         variant={currentPage === totalPages ? "default" : "outline"}
                         size="icon"
@@ -724,7 +720,6 @@ export default function EventsPage() {
           {selectedEvent && (
             <div className="flex-1 overflow-y-auto py-4 pr-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Left column - Basic Info */}
                 <div className="md:col-span-1 space-y-6">
                   <div className="bg-[#1E1E1E] rounded-lg p-4">
                     <h3 className="text-lg font-medium mb-3 flex items-center">
@@ -797,7 +792,6 @@ export default function EventsPage() {
                   </div>
                 </div>
 
-                {/* Right column - Description */}
                 <div className="md:col-span-2">
                   <div className="bg-[#1E1E1E] rounded-lg p-4 h-full">
                     <h3 className="text-lg font-medium mb-3 flex items-center">
@@ -934,7 +928,6 @@ export default function EventsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Contract Upload Dialog */}
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
@@ -953,8 +946,25 @@ export default function EventsPage() {
                 <input {...getInputProps()} />
                 <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-1">Drag & drop your contract</h3>
-                <p className="text-sm text-muted-foreground mb-4">Support for PDF and DOC/DOCX files only (max 10MB)</p>
-                <Button type="button" variant="secondary" className="mx-auto">
+                <p className="text-sm text-muted-foreground mb-4">Support for PDF files only (max 10MB)</p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="mx-auto"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const input = document.createElement("input")
+                    input.type = "file"
+                    input.accept = ".pdf,.doc,.docx"
+                    input.onchange = (event) => {
+                      const target = event.target as HTMLInputElement
+                      if (target && target.files && target.files[0]) {
+                        setFile(target.files[0])
+                      }
+                    }
+                    input.click()
+                  }}
+                >
                   <Upload className="w-4 h-4 mr-2" />
                   Browse Files
                 </Button>
@@ -990,6 +1000,7 @@ export default function EventsPage() {
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
+                    className="text-black"
                     onClick={() => {
                       setFile(null)
                       setUploadProgress(0)

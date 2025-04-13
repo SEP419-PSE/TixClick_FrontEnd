@@ -1,14 +1,14 @@
-import { useContext, useState, useEffect } from "react";
+import { AxiosError } from "axios";
+import { useContext, useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { LuLogOut, LuSearch, LuTicketCheck } from "react-icons/lu";
 import { RiCalendarEventLine } from "react-icons/ri";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
-import SearchBar from "../SearchBar/SearchBar";
 import companyApi from "../../services/companyApi";
-import { AxiosError } from "axios";
-import { toast } from "sonner";
+import SearchBar from "../SearchBar/SearchBar";
 
 const Header = () => {
   const location = useLocation();
@@ -59,7 +59,9 @@ const Header = () => {
         location.pathname !== "/" && "translate-y-0"
       } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >
-      <p className="text-[24px] font-semibold text-pse-green">TixClick</p>
+      <Link to="/">
+        <p className="text-[24px] font-semibold text-pse-green">TixClick</p>
+      </Link>
       <div className="ml-auto flex items-center gap-4">
         <SearchBar />
         <span className="lg:hidden p-[6px] border rounded-full">

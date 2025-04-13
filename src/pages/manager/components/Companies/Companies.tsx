@@ -37,7 +37,6 @@ export default function CompanyApprovalsPage() {
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
 
-  // Add state for active tab in review modal
   const [activeReviewTab, setActiveReviewTab] = useState("company-info")
 
   const handleReviewCompany = (company: any) => {

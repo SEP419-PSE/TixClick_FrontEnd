@@ -122,7 +122,7 @@ const payOsApi = {
 export default function PaymentQueuePage() {
   const [progress, setProgress] = useState(0)
   const [queuePosition, setQueuePosition] = useState(15)
-  const [estimatedTime, setEstimatedTime] = useState(180)
+  const [estimatedTime, setEstimatedTime] = useState(18000)
   const [isComplete, setIsComplete] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -466,7 +466,7 @@ export default function PaymentQueuePage() {
                   </div>
                 )}
                 <h1 className="text-xl font-bold">
-                  {isComplete || paymentStatus === "PAID" ? "Thanh toán thành công!" : "Đang xử lý thanh toán..."}
+                  {isComplete || paymentStatus === "PAID" ? "Thanh toán thành công!" : "Đã hủy thanh toán"}
                 </h1>
               </div>
 
