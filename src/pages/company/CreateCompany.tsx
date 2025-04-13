@@ -12,7 +12,7 @@ import { useNavigate } from "react-router";
 import { Card } from "../../components/ui/card";
 import BankCard from "./components/BankCard";
 
-const banks = [
+export const banks = [
   { id: "970436", bankName: "Vietcombank" },
   { id: "970418", bankName: "BIDV" },
   { id: "970422", bankName: "MB Bank" },
