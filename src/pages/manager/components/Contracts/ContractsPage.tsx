@@ -1,17 +1,14 @@
 import {
   Bell,
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   Download,
-  Edit,
   Eye,
   FileText,
   Loader2,
   MoreHorizontal,
   Search,
-  Upload,
-  XCircle,
+  Upload
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -47,8 +44,6 @@ export default function ContractsPage() {
   const [contracts, setContracts] = useState<any[]>([])
   const [contractDocument, setContractDocument] = useState<ContractDocumentDTO[]>([])
 
-  // const [selectedContractCreate, setSelectedContractCreate] =
-  //   useState<Contract>();
   const [isProcessing, setIsProcessing] = useState(false)
   const [editFormData, setEditFormData] = useState<Contract>({
     contractId: 0,
@@ -109,18 +104,6 @@ export default function ContractsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
 
-  // Add state for contract detail form
-  // const [contractDetailForm, setContractDetailForm] = useState({
-  //   contractDetailId: 0,
-  //   contractDetailName: "",
-  //   contractDetailCode: "",
-  //   description: "",
-  //   contractAmount: 0,
-  //   contractPayDate: "",
-  //   status: "",
-  //   contractId: 0,
-  // });
-
   const generateVietQRUrl = () => {
     if (!vietQRParams.bankID || !vietQRParams.accountID) {
       return null
@@ -133,6 +116,8 @@ export default function ContractsPage() {
   }
 
   const handlePaymentConfirmation = () => {
+
+
     if (paymentCode.trim() === "") {
       toast.error("Please enter a payment confirmation code")
       return
@@ -197,7 +182,6 @@ export default function ContractsPage() {
       if (res.data.result && res.data.result.length > 0) {
         setContracts(res.data.result)
 
-        // If we have a selected contract, also set its documents
         if (selectedContract) {
           const contractData = res.data.result.find(
             (item: any) => item.contractDTO.contractId === selectedContract.contractId,
@@ -373,11 +357,9 @@ export default function ContractsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "APPROVED":
-        return <span className="px-2 py-1 rounded-lg bg-green-500/20 text-green-500">Approved</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Approved</span>
       case "PENDING":
-        return <span className="px-2 py-1 rounded-lg bg-yellow-500/20 text-yellow-500">Pending</span>
-      case "Draft":
-        return <span className="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-500">Draft</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Pending</span>
       case "Expired":
         return <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">Expired</span>
       default:
@@ -544,10 +526,10 @@ export default function ContractsPage() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit contract
                           </DropdownMenuItem> */}
-                          <DropdownMenuItem onClick={() => handleUploadDocument(contract.contractId)}>
+                          {/* <DropdownMenuItem onClick={() => handleUploadDocument(contract.contractId)}>
                             <Upload className="mr-2 h-4 w-4" />
                             Upload document
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-yellow-500">
                             <Bell className="mr-2 h-4 w-4" />
@@ -890,10 +872,10 @@ export default function ContractsPage() {
                   ) : (
                     <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
                       <p className="mb-4 text-gray-400">No documents uploaded yet.</p>
-                      <Button onClick={() => handleUploadDocument(selectedContract.contractId)}>
+                      {/* <Button onClick={() => handleUploadDocument(selectedContract.contractId)}>
                         <Upload className="mr-2 h-4 w-4" />
                         Upload New Document
-                      </Button>
+                      </Button> */}
                     </div>
                   )}
                 </div>
@@ -1034,8 +1016,7 @@ export default function ContractsPage() {
               </TabsContent>
             </Tabs>
           )}
-          {/* Replace the DialogFooter in the contract modal with this: */}
-          <DialogFooter className="flex justify-between">
+          {/* <DialogFooter className="flex justify-between">
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -1064,8 +1045,7 @@ export default function ContractsPage() {
                 Reject Contract
               </Button>
             </div>
-            {/* <Button onClick={() => setIsContractModalOpen(false)}>Close</Button> */}
-          </DialogFooter>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
 

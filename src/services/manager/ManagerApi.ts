@@ -104,7 +104,14 @@ const managerApi = {
     updateContract(request: Contract){
         const url = "/contract/createContractAndContractDetail";
         return axiosClient.post(url, request);
+    },
+
+    // /contract-payment/pay?transactionCode=7876&paymentId=679
+    payContractPayment(transactionCode: string, paymentId: number) {
+        const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
+        return axiosClient.get(url);
     }
+
 }
 
 export default managerApi;

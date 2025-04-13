@@ -1,5 +1,3 @@
-"use client"
-
 import {
   CheckCircle,
   ChevronLeft,
@@ -307,11 +305,11 @@ export default function EventsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "APPROVED":
-        return <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded-md">Approved</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Approved</span>
       case "PENDING":
-        return <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 rounded-md">Pending</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Pending</span>
       case "REJECTED":
-        return <span className="px-2 py-1 bg-red-500/20 text-red-500 rounded-md">Rejected</span>
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">Rejected</span>
       default:
         return null
     }
@@ -400,7 +398,6 @@ export default function EventsPage() {
               <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
                 <DropdownMenuItem onClick={() => setSortBy("date")}>Date</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy("name")}>Name</DropdownMenuItem>
-                {/* <DropdownMenuItem onClick={() => setSortBy("attendees")}>Attendees</DropdownMenuItem> */}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
                   {sortOrder === "asc" ? "Ascending" : "Descending"}
@@ -653,7 +650,6 @@ export default function EventsPage() {
                         </span>
                       )}
 
-                      {/* Always show last page */}
                       <Button
                         variant={currentPage === totalPages ? "default" : "outline"}
                         size="icon"
@@ -724,7 +720,6 @@ export default function EventsPage() {
           {selectedEvent && (
             <div className="flex-1 overflow-y-auto py-4 pr-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Left column - Basic Info */}
                 <div className="md:col-span-1 space-y-6">
                   <div className="bg-[#1E1E1E] rounded-lg p-4">
                     <h3 className="text-lg font-medium mb-3 flex items-center">
@@ -797,7 +792,6 @@ export default function EventsPage() {
                   </div>
                 </div>
 
-                {/* Right column - Description */}
                 <div className="md:col-span-2">
                   <div className="bg-[#1E1E1E] rounded-lg p-4 h-full">
                     <h3 className="text-lg font-medium mb-3 flex items-center">
@@ -934,7 +928,6 @@ export default function EventsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Contract Upload Dialog */}
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
