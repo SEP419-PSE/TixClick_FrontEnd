@@ -39,8 +39,15 @@ const managerApi = {
   // }
 
   getContractsByEventId(eventId: number) {
-    const url = `/contract-document/all_by_event/{eventId}?eventId=${eventId}`;
-    return axiosClient.get(url);
+    const url = `/contract-document/all_by_event/${eventId}`;
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 10000,
+    });
   },
 
   approveCompany(status: string, companyVerificationId: number) {
