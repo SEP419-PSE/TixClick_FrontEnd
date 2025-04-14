@@ -26,8 +26,11 @@ export interface EventForConsumer {
 export interface EventDetailResponse {
   eventId: number;
   eventName: string;
+  address: string;
+  city: string;
+  district: string;
+  ward: string;
   locationName: string;
-  location: string;
   status: EventStatus;
   typeEvent: string;
   countView: number;

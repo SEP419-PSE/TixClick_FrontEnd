@@ -16,6 +16,9 @@ import TextInput from "../InputText";
 import SelectTypeEvent from "../SelectTypeEvent";
 import TextEditor from "../TextEditor";
 import { Card } from "../../ui/card";
+import { equalIgnoreCase } from "../../../lib/utils";
+import VietNamAddressPicker from "../VietNamAddessPicker";
+import { Input } from "../../ui/input";
 
 const eventTypes: EventType[] = [
   { id: 1, name: "Music" },
@@ -50,7 +53,12 @@ export default function StepOne({
   const [backgroundUrl, setBackGroundUrl] = useState<string | null>(null);
   const [eventName, setEventName] = useState("");
   const [locationEvent, setLocationEvent] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState({
+    province: "",
+    district: "",
+    ward: "",
+    address: "",
+  });
   const [typeEvent, setTypeEvent] = useState("");
   const [typeEventid, setTypeEventId] = useState<number | null>(null);
   const [editorContent, setEditorContent] = useState<string>("");
@@ -72,7 +80,6 @@ export default function StepOne({
       setBackGroundUrl(event.bannerURL);
       setEventName(event.eventName);
       setLocationEvent(event.locationName);
-      setAddress(event.location);
       setTypeEvent(event.eventCategoryId.toString());
       setTypeEventId(event.eventCategoryId);
       setEditorContent(event.description);
@@ -84,7 +91,7 @@ export default function StepOne({
     const isValid =
       editorContent.trim() !== "<p><br></p>" &&
       eventName.trim() !== "" &&
-      (joinUrl.trim() !== "" || (locationEvent !== "" && address !== "")) &&
+      (joinUrl.trim() !== "" || locationEvent !== "") &&
       typeEvent !== "" &&
       (logoImage !== null || logoImageUrl !== null) &&
       (background !== null || backgroundUrl !== null);
@@ -109,7 +116,6 @@ export default function StepOne({
       editorContent.trim() == "<p><br></p>" ||
       eventName == "" ||
       locationEvent == "" ||
-      address == "" ||
       typeEvent == "" ||
       (logoImage == null && logoImageUrl == null) ||
       (background == null && backgroundUrl == null)
@@ -125,7 +131,10 @@ export default function StepOne({
       const formData = new FormData();
       if (eventId) formData.append("eventId", eventId.toString());
       formData.append("eventName", eventName);
-      formData.append("location", address);
+      formData.append("address", address.address);
+      formData.append("ward", address.ward);
+      formData.append("district", address.district);
+      formData.append("city", address.province);
       formData.append("locationName", locationEvent);
       formData.append("categoryId", typeEvent);
       formData.append("description", editorContent);
@@ -180,11 +189,11 @@ export default function StepOne({
   // const prevStep = () => {
   //   setStep((prev) => Math.max(prev - 1, 0));
   // }
-
+  // console.log(address);
   return (
     <div className="text-black text-[16px]">
       {isLoading && <LoadingFullScreen />}
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -212,7 +221,7 @@ export default function StepOne({
         />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
         <p className="text-white">Địa chỉ sự kiện</p>
         <div className="flex flex-col space-y-2 text-white">
           <div className="flex items-center space-x-6 my-2">
@@ -221,11 +230,11 @@ export default function StepOne({
                 type="radio"
                 name="eventMode"
                 value="ONLINE"
-                checked={eventMode === "ONLINE"}
+                checked={equalIgnoreCase(eventMode, "Online")}
                 onChange={() => setEventMode("ONLINE")}
                 className="accent-pse-green w-4 h-4"
               />
-              <span>Online</span>
+              <span>Sự kiện Online</span>
             </label>
 
             <label className="flex items-center space-x-2">
@@ -233,15 +242,15 @@ export default function StepOne({
                 type="radio"
                 name="eventMode"
                 value="OFFLINE"
-                checked={eventMode === "OFFLINE"}
+                checked={equalIgnoreCase(eventMode, "Offline")}
                 onChange={() => setEventMode("OFFLINE")}
                 className="accent-pse-green w-4 h-4"
               />
-              <span>Offline</span>
+              <span>Sự kiện Offline</span>
             </label>
           </div>
         </div>
-        {eventMode == "OFFLINE" ? (
+        {equalIgnoreCase(eventMode, "Offline") ? (
           <>
             <TextInput
               maxLength={80}
@@ -249,16 +258,11 @@ export default function StepOne({
               text={locationEvent}
               setText={setLocationEvent}
             />
-            <TextInput
-              maxLength={80}
-              label="Địa chỉ"
-              text={address}
-              setText={setAddress}
-            />
+            <VietNamAddressPicker value={address} onChange={setAddress} />
           </>
         ) : (
           <div className="mx-1">
-            <input
+            <Input
               value={joinUrl}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setJoinUrl(e.target.value)
@@ -270,7 +274,7 @@ export default function StepOne({
         )}
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
         <SelectTypeEvent
           selectedId={typeEventid}
           choice={typeEvent}
@@ -280,12 +284,12 @@ export default function StepOne({
         />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/50 md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8">
         {" "}
         <div className="md:w-[70%]">
           <p className="text-white font-semibold">{companies?.companyName}</p>

@@ -52,3 +52,7 @@ export const formatTimeFe = (timeStr: string | undefined): string => {
 export const formatMoney = (amount: number | undefined): string => {
   return amount?.toLocaleString("vi-VN") + " ₫";
 };
+
+export const equalIgnoreCase = (a: string, b: string): boolean => {
+  return a.toLowerCase() === b.toLowerCase();
+};

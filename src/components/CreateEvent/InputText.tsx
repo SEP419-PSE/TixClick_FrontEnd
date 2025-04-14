@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 interface TextInputProps {
   maxLength: number;
@@ -38,7 +40,7 @@ export default function TextInput({
       <label className="text-white mb-[2px]">{label}</label>
 
       {isTextArea ? (
-        <textarea
+        <Textarea
           value={text}
           onChange={handleChange}
           placeholder={label}
@@ -47,7 +49,7 @@ export default function TextInput({
           rows={4} // có thể chỉnh số dòng tùy ý
         />
       ) : (
-        <input
+        <Input
           type="text"
           value={text}
           onChange={handleChange}

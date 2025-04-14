@@ -1,4 +1,11 @@
 import { EventType } from "../../interface/EventInterface";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 type Props = {
   label: string;
@@ -15,36 +22,31 @@ const SelectTypeEvent = ({
   setChoice,
   selectedId,
 }: Props) => {
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setChoice(e.target.value);
-  };
   return (
-    <div className="flex flex-col items-start gap-1 p-2">
-      <label htmlFor="selects" className="text-white">
+    <div className="flex flex-col items-start gap-1 p-2 w-full">
+      <label htmlFor="selects" className="text-white text-sm font-medium">
         {label}
       </label>
-      <select
-        value={choice}
-        onChange={handleChange}
-        name="selects"
-        id="selects"
-        className="px-2 py-2 outline-none text-[14px] w-full rounded-md"
-      >
-        <option value="" disabled selected>
-          Vui lòng chọn
-        </option>
-        {listType.map((type, index) => (
-          <option
-            className={`hover:bg-gray-200 ${
-              selectedId === type.id && "font-semibold text-white bg-pse-green"
-            }`}
-            key={index}
-            value={type.id}
-          >
-            {type.name}
-          </option>
-        ))}
-      </select>
+      <Select value={choice} onValueChange={setChoice}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Vui lòng chọn" />
+        </SelectTrigger>
+        <SelectContent>
+          {listType.map((type) => (
+            <SelectItem
+              key={type.id}
+              value={type.id.toString()}
+              className={`${
+                selectedId === type.id
+                  ? "bg-pse-green text-white font-semibold"
+                  : ""
+              }`}
+            >
+              {type.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };
