@@ -23,6 +23,9 @@ import memberApi from "../../../../services/memberApi";
 import { toast } from "sonner";
 import { Switch } from "../../../../components/ui/switch";
 import { Label } from "../../../../components/ui/label";
+import { motion } from "framer-motion";
+
+const MotionCard = motion(Card);
 
 type MemberProps = {
   members: MemberResponse[];
@@ -72,7 +75,10 @@ const MemberList: React.FC<MemberProps> = ({ members, fetchMembers }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {members.map((member) => (
-        <Card
+        <MotionCard
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           key={member.memberId}
           className={`${member.status == "ACTIVE" ? "bg-none" : "bg-white/85"}`}
         >
@@ -154,7 +160,7 @@ const MemberList: React.FC<MemberProps> = ({ members, fetchMembers }) => {
               {member.memberId === editMemberId ? "Hoàn tất" : "Chỉnh sửa"}
             </Button>
           </CardFooter>
-        </Card>
+        </MotionCard>
       ))}
     </div>
   );

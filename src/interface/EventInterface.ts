@@ -54,15 +54,15 @@ export interface EventActivityDTOList {
   endTimeEvent: string;
   startTicketSale: Date;
   endTicketSale: Date;
-  seatMapId: number;
+  seatMapId?: number;
   eventId: number;
-  createdBy: number;
-  soldOut: boolean;
-  tickets: Ticket[];
+  createdBy?: number;
+  soldOut?: boolean;
+  tickets?: Ticket[] | undefined;
 }
 
 export interface Ticket {
-  ticketId: number;
+  ticketId?: number;
   ticketName: string;
   ticketCode: string;
   createdDate: Date;
@@ -78,9 +78,9 @@ export interface Ticket {
 
 export enum EventStatus {
   DRAFT = "DRAFT",
-  PENDING_APPROVAL = "PENDING_APPOREVAL",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
   SCHEDULED = "SCHEDULED",
-  ON_GOING = "ON_GOING",
   COMPLETED = "COMPLETED",
   REJECTED = "REJECTED",
 }
