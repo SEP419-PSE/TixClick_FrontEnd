@@ -1052,81 +1052,94 @@ export default function EventsPage() {
 
       {/* Related Contracts Dialog */}
       <Dialog open={isRelatedContractsModalOpen} onOpenChange={setIsRelatedContractsModalOpen}>
-        <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
-          <DialogHeader>
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader className="border-b border-[#333333] pb-4">
             <DialogTitle>Related Contracts</DialogTitle>
             <DialogDescription>Contracts associated with: {selectedEvent?.eventName}</DialogDescription>
           </DialogHeader>
 
-          {relatedContracts.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-                  <TableHead className="text-white">File Name</TableHead>
-                  <TableHead className="text-white">File Type</TableHead>
-                  <TableHead className="text-white">Status</TableHead>
-                  <TableHead className="text-white">Upload Date</TableHead>
-                  <TableHead className="text-white text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {relatedContracts.map((document) => (
-                  <TableRow key={document.contractDocumentId} className="border-[#333333] hover:bg-[#2A2A2A]">
-                    <TableCell className="font-medium text-white">{document.fileName}</TableCell>
-                    <TableCell className="text-white">{document.fileType}</TableCell>
-                    <TableCell className="text-white">{document.status}</TableCell>
-                    <TableCell className="text-white">
-                      {document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : "N/A"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          {document.fileURL && (
-                            <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Document
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="py-8 text-center">
-              <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Contract Documents Found</h3>
-              <p className="text-sm text-gray-400 mb-4">
-                There are no contract documents associated with this event yet.
-              </p>
-              {selectedEvent?.status === "APPROVED" && (
-                <Button
-                  onClick={() => {
-                    setIsRelatedContractsModalOpen(false)
-                    handleCreateContract()
-                  }}
-                >
-                  <FileText className="mr-2 h-4 w-4" /> Create Contract
-                </Button>
-              )}
-            </div>
-          )}
+          <div className="flex-1 overflow-hidden py-4">
+            {relatedContracts.length > 0 ? (
+              <div className="overflow-auto max-h-[50vh] pr-2 description-scrollbar">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">File Name</TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">File Type</TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">Status</TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">Upload Date</TableHead>
+                      <TableHead className="text-white text-right sticky top-0 bg-[#2A2A2A] z-10">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatedContracts.map((document) => (
+                      <TableRow key={document.contractDocumentId} className="border-[#333333] hover:bg-[#2A2A2A]">
+                        <TableCell className="font-medium text-white">{document.fileName}</TableCell>
+                        <TableCell className="text-white">{document.fileType}</TableCell>
+                        <TableCell className="text-white">{document.status}</TableCell>
+                        <TableCell className="text-white">
+                          {document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : "N/A"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              {document.fileURL && (
+                                <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View Document
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="py-8 text-center">
+                <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+                <h3 className="text-lg font-medium mb-2">No Contract Documents Found</h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  There are no contract documents associated with this event yet.
+                </p>
+                {selectedEvent?.status === "APPROVED" && (
+                  <Button
+                    onClick={() => {
+                      setIsRelatedContractsModalOpen(false)
+                      handleCreateContract()
+                    }}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> Create Contract
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
 
-          <DialogFooter>
-            <Button onClick={() => setIsRelatedContractsModalOpen(false)}>Close</Button>
+          <DialogFooter className="border-t border-[#333333] pt-4 mt-auto">
+            <div className="flex justify-between w-full">
+              <Button
+                onClick={handleCreateContract}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={selectedEvent?.status !== "APPROVED"}
+              >
+                <FileText className="mr-2 h-4 w-4" /> Add New Contract
+              </Button>
+              <Button onClick={() => setIsRelatedContractsModalOpen(false)}>Close</Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
