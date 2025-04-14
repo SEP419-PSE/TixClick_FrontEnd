@@ -1,5 +1,3 @@
-"use client"
-
 import {
   CheckCircle,
   ChevronLeft,
@@ -93,17 +91,14 @@ export default function EventsPage() {
   const [sortBy, setSortBy] = useState("date")
   const [sortOrder, setSortOrder] = useState("asc")
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
 
-  // Contract Upload State
   const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const navigate = useNavigate()
 
-  // Add these state variables after the other state declarations (around line 75)
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
 
@@ -137,15 +132,12 @@ export default function EventsPage() {
     }
   }
 
-  // Update the handleApprove function to use the loading state
   const handleApprove = async (status: string, eventId: number) => {
     try {
       console.log("Approving event:", status, "| eventId:", eventId)
 
-      // Set loading state
       setIsApproving(true)
 
-      // Call the API with the correct method and parameters
       const res: any = await managerApi.approveEvent(status, eventId)
       console.log("Approval response:", res)
 
@@ -160,18 +152,15 @@ export default function EventsPage() {
       console.error("Error approving event:", error)
       toast.error("Failed to approve event. Please try again.")
     } finally {
-      // Reset loading state
       setIsApproving(false)
     }
   }
 
-  // Update the handleReject function to use the loading state
   const handleReject = async () => {
     if (!selectedEvent) return
     try {
       console.log("Rejecting event:", "REJECTED", "| eventId:", selectedEvent.eventId)
 
-      // Set loading state
       setIsRejecting(true)
 
       const res: any = await managerApi.approveEvent("REJECTED", selectedEvent.eventId)
@@ -188,35 +177,43 @@ export default function EventsPage() {
       console.error("Error rejecting event:", error)
       toast.error("Failed to reject event. Please try again.")
     } finally {
-      // Reset loading state
       setIsRejecting(false)
     }
   }
 
   const handleUploadContract = async (file: File) => {
-    if (!file || !selectedEvent) return
+    // if (!file || !selectedEvent) return
+
+    // let progressInterval: NodeJS.Timeout | undefined
 
     try {
       setIsUploading(true)
       setUploadProgress(0)
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressInterval)
-            return 95
-          }
-          return prev + 5
-        })
-      }, 200)
+      // progressInterval = setInterval(() => {
+      //   setUploadProgress((prev) => {
+      //     if (prev >= 95) {
+      //       if (progressInterval) clearInterval(progressInterval)
+      //       return 95
+      //     }
+      //     return prev + 5
+      //   })
+      // }, 200)
 
-      // Call the API endpoint with the file directly as specified in your API
+      // Log the file details before upload
+      console.log("Uploading file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: new Date(file.lastModified).toISOString(),
+      })
+
+      // Make the API call
       const res = await managerApi.uploadContractManager(file)
       console.log("Upload contract response:", res)
 
-      clearInterval(progressInterval)
-      setUploadProgress(100)
+      // if (progressInterval) clearInterval(progressInterval)
+      // setUploadProgress(100)
 
       if (res.data && res.data.result) {
         toast.success("Contract uploaded successfully")
@@ -226,6 +223,7 @@ export default function EventsPage() {
         }
       } else {
         toast.error("Failed to upload contract")
+        console.error("Upload failed with response:", res)
       }
 
       setTimeout(() => {
@@ -234,12 +232,38 @@ export default function EventsPage() {
         setUploadProgress(0)
         setIsUploading(false)
       }, 1000)
-    } catch (error) {
+    } catch (error: any) {
+      // Type assertion to any to handle error properties
       console.error("Error uploading contract:", error)
-      toast.error("Upload Error", {
-        description: "There was an error uploading the contract. Please try again.",
-      })
+
+      // More detailed error logging
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response data:", error.response.data)
+        console.error("Error response status:", error.response.status)
+        console.error("Error response headers:", error.response.headers)
+
+        toast.error(`Upload Error: ${error.response.status}`, {
+          description:
+            (error.response.data?.message as string) ||
+            "Server rejected the request. Please check file format and size.",
+        })
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Error request:", error.request)
+        toast.error("Upload Error", {
+          description: "No response received from server. Please check your connection.",
+        })
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        toast.error("Upload Error", {
+          description: (error.message as string) || "There was an error uploading the contract. Please try again.",
+        })
+      }
+
       setIsUploading(false)
+      // if (progressInterval) clearInterval(progressInterval)
     }
   }
 
@@ -424,7 +448,7 @@ export default function EventsPage() {
                 <TableRow key={event.eventId} className="border-[#333333] hover:bg-[#2A2A2A]">
                   <TableCell className="font-medium text-white">{event.eventName}</TableCell>
                   <TableCell className="text-white">{event.eventName}</TableCell>
-                  <TableCell className="text-white">{event.location}</TableCell>
+                  <TableCell className="text-white">{event.locationName}</TableCell>
                   <TableCell className="text-white">{event.companyName}</TableCell>
                   <TableCell className="text-white">{event.typeEvent}</TableCell>
                   <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>

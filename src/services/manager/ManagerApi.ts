@@ -101,18 +101,40 @@ const managerApi = {
         })
       },
 
-    uploadContractManager(file: File){
-        const url = "/contract/createContractAndContractDetail";
-        const token = localStorage.getItem("accessToken2")
+    // uploadContractManager(file: File){
+    //     const url = "/contract/createContractAndContractDetail";
+    //     const token = localStorage.getItem("accessToken2")
 
-        return axiosClient.post(url, file, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Accept": "*/*"
-            },
-            timeout: 10000, 
-        });
+    //     return axiosClient.post(url, file, {
+    //         headers: {
+    //           Authorization: `Bearer ${token}`,
+    //           "Accept": "m"
+    //         },
+    //         timeout: 10000, 
+    //     });
+    // },
+
+    uploadContractManager(file: File) {
+      const url = "/contract/createContractAndContractDetail"
+      const token = localStorage.getItem("accessToken2")
+  
+      // Create FormData and append the file with the exact key name "file"
+      const formData = new FormData()
+      formData.append("file", file)
+  
+      console.log("Uploading file:", file.name, file.size, file.type)
+  
+      return axiosClient.post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/pdf", 
+          Accept: "*/*",
+        },
+        timeout: 30000,
+        
+      })
     },
+    
 
     updateContract(request: Contract){
         const url = "/contract/createContractAndContractDetail";
