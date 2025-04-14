@@ -211,10 +211,10 @@ export default function ContractsPage() {
     setIsAttachmentModalOpen(true);
   };
 
-  const handleUploadDocument = (id: number) => {
-    setSelectedContractForUpload(id);
-    setIsUploadDialogOpen(true);
-  };
+  // const handleUploadDocument = (id: number) => {
+  //   setSelectedContractForUpload(id);
+  //   setIsUploadDialogOpen(true);
+  // };
 
   const handleUploadSuccess = async () => {
     // Refresh the contract list to show the new document
@@ -260,83 +260,83 @@ export default function ContractsPage() {
     }
   };
 
-  const handleContractVerification = async (
-    contractId: number,
-    status: "APPROVED" | "REJECTED"
-  ) => {
-    try {
-      toast.loading(
-        `${status === "APPROVED" ? "Approving" : "Rejecting"} contract...`
-      );
+  // const handleContractVerification = async (
+  //   contractId: number,
+  //   status: "APPROVED" | "REJECTED"
+  // ) => {
+  //   try {
+  //     toast.loading(
+  //       `${status === "APPROVED" ? "Approving" : "Rejecting"} contract...`
+  //     );
 
-      const accessToken = localStorage.getItem("accessToken2");
-      if (!accessToken) {
-        toast.dismiss();
-        toast.error("No access token found. Please login again.");
-        return;
-      }
-      const url = `https://tixclick.site/api/contract/approve?contractId=${contractId}&status=${status}`;
+  //     const accessToken = localStorage.getItem("accessToken2");
+  //     if (!accessToken) {
+  //       toast.dismiss();
+  //       toast.error("No access token found. Please login again.");
+  //       return;
+  //     }
+  //     const url = `https://tixclick.site/api/contract/approve?contractId=${contractId}&status=${status}`;
 
-      console.log("Request URL:", url);
-      console.log("contractId:", contractId);
-      console.log("contractStatus:", status);
+  //     console.log("Request URL:", url);
+  //     console.log("contractId:", contractId);
+  //     console.log("contractStatus:", status);
 
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          contractVerificationId: contractId,
-          status: status,
-        }),
-        mode: "cors",
-      });
+  //     const response = await fetch(url, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //       body: JSON.stringify({
+  //         contractVerificationId: contractId,
+  //         status: status,
+  //       }),
+  //       mode: "cors",
+  //     });
 
-      fetchContractList();
+  //     fetchContractList();
 
-      console.log("Response status:", response.status);
+  //     console.log("Response status:", response.status);
 
-      // Kiểm tra xem response có ok không trước khi parse JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API error response:", errorText);
-        throw new Error(`HTTP error ${response.status}: ${errorText}`);
-      }
+  //     // Kiểm tra xem response có ok không trước khi parse JSON
+  //     if (!response.ok) {
+  //       const errorText = await response.text();
+  //       console.error("API error response:", errorText);
+  //       throw new Error(`HTTP error ${response.status}: ${errorText}`);
+  //     }
 
-      const data = await response.json();
-      console.log("Response data:", data);
+  //     const data = await response.json();
+  //     console.log("Response data:", data);
 
-      toast.dismiss();
-      if (data.code === 200) {
-        toast.success(
-          `Contract ${
-            status === "APPROVED" ? "approved" : "rejected"
-          } successfully`
-        );
-        // Refresh the contract list
-        await fetchContractList();
-      } else {
-        toast.error(
-          `Failed to ${
-            status === "APPROVED" ? "approve" : "reject"
-          } contract: ${data.message}`
-        );
-      }
-    } catch (error) {
-      toast.dismiss();
-      console.error(
-        `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract:`,
-        error
-      );
-      toast.error(
-        `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-  };
+  //     toast.dismiss();
+  //     if (data.code === 200) {
+  //       toast.success(
+  //         `Contract ${
+  //           status === "APPROVED" ? "approved" : "rejected"
+  //         } successfully`
+  //       );
+  //       // Refresh the contract list
+  //       await fetchContractList();
+  //     } else {
+  //       toast.error(
+  //         `Failed to ${
+  //           status === "APPROVED" ? "approve" : "reject"
+  //         } contract: ${data.message}`
+  //       );
+  //     }
+  //   } catch (error) {
+  //     toast.dismiss();
+  //     console.error(
+  //       `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract:`,
+  //       error
+  //     );
+  //     toast.error(
+  //       `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract: ${
+  //         error instanceof Error ? error.message : "Unknown error"
+  //       }`
+  //     );
+  //   }
+  // };
 
   useEffect(() => {
     const initUseEffect = async () => {
@@ -366,27 +366,27 @@ export default function ContractsPage() {
   };
 
   // New function to handle opening the edit form
-  const openEditModal = (contract: Contract) => {
-    setSelectedContract(contract);
+  // const openEditModal = (contract: Contract) => {
+  //   setSelectedContract(contract);
 
-    // Prepare the data for editing
-    setEditFormData({
-      contractId: contract.contractId,
-      contractName: contract.contractName || "",
-      totalAmount: contract.totalAmount || 0,
-      commission: contract.commission || "",
-      contractType: contract.contractType || "",
-      startDate: contract.startDate || "",
-      endDate: contract.endDate || "",
-      status: contract.status || "",
-      accountId: contract.accountId || 0,
-      eventId: contract.eventId || 0,
-      companyId: contract.companyId || 0,
-      contractDetailDTOS: contract.contractDetailDTOS || [],
-    });
+  //   // Prepare the data for editing
+  //   setEditFormData({
+  //     contractId: contract.contractId,
+  //     contractName: contract.contractName || "",
+  //     totalAmount: contract.totalAmount || 0,
+  //     commission: contract.commission || "",
+  //     contractType: contract.contractType || "",
+  //     startDate: contract.startDate || "",
+  //     endDate: contract.endDate || "",
+  //     status: contract.status || "",
+  //     accountId: contract.accountId || 0,
+  //     eventId: contract.eventId || 0,
+  //     companyId: contract.companyId || 0,
+  //     contractDetailDTOS: contract.contractDetailDTOS || [],
+  //   });
 
-    setIsEditModalOpen(true);
-  };
+  //   setIsEditModalOpen(true);
+  // };
 
   // Function to add a new contract detail to the form
   // const addContractDetail = () => {
