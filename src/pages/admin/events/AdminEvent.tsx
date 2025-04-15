@@ -158,9 +158,6 @@ export default function AdminEvent() {
               <SelectItem value="theater">Theater</SelectItem>
             </SelectContent>
           </Select>
-          {/* <Button className="bg-[#00B14F] hover:bg-[#00963F]">
-            <Download className="mr-2 h-4 w-4" /> Export Report
-          </Button> */}
         </div>
       </div>
 

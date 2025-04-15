@@ -1,5 +1,3 @@
-"use client"
-
 import { motion } from "framer-motion"
 import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
 import { useEffect, useState } from "react"
