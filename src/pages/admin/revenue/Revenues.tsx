@@ -89,9 +89,6 @@ export default function RevenuePage() {
     <div className="p-6 bg-[#1E1E1E] text-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Revenue Analytics</h1>
-        {/* <Button onClick={handleExportData} className="bg-[#00B14F] hover:bg-[#00963F]">
-          <Download className="mr-2 h-4 w-4" /> Export Data
-        </Button> */}
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">

@@ -1,5 +1,3 @@
-"use client"
-
 import axios from "axios"
 import { Calendar, MapPin, Ticket } from "lucide-react"
 import { useEffect, useState } from "react"
