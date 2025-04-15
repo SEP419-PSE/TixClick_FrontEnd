@@ -7,15 +7,20 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../../components/ui/card";
+import { TicketReVenueDashBoardResponseList } from "../../../../../interface/revenue/Revenue";
+
+type Props = {
+  data: TicketReVenueDashBoardResponseList[] | undefined;
+};
 
 // Data mẫu: mỗi loại vé có doanh thu riêng
-const ticketRevenueData = [
-  { type: "Vé Thường", revenue: 3200000 },
-  { type: "Vé VIP", revenue: 5800000 },
-  { type: "Vé VVIP", revenue: 2400000 },
-];
+// const ticketRevenueData = [
+//   { type: "Vé Thường", revenue: 3200000 },
+//   { type: "Vé VIP", revenue: 5800000 },
+//   { type: "Vé VVIP", revenue: 2400000 },
+// ];
 
-console.log(JSON.stringify(ticketRevenueData, null, 2));
+// console.log(JSON.stringify(ticketRevenueData, null, 2));
 
 // Màu tương ứng từng loại vé
 const COLORS = [
@@ -27,12 +32,14 @@ const COLORS = [
 // Custom tooltip để hiển thị % và số tiền
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length > 0) {
-    const total = ticketRevenueData.reduce((acc, cur) => acc + cur.revenue, 0);
+    const total = payload.reduce((acc: number, cur: any) => acc + cur.value, 0);
     const value = payload[0].value;
+    const name = payload[0].name;
     const percent = ((value / total) * 100).toFixed(1);
+
     return (
       <div className="rounded-md border bg-background p-2 shadow-sm text-sm">
-        <div className="font-medium">{payload[0].name}</div>
+        <div className="font-medium">{name}</div>
         <div>{value.toLocaleString()} đ</div>
         <div>{percent}% tổng doanh thu</div>
       </div>
@@ -41,7 +48,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const TicketsRevenuePieChart = () => {
+const TicketsRevenuePieChart = ({ data }: Props) => {
+  // console.log(data);
+  if (data == undefined) return <>Không có dữ liệu</>;
   return (
     <Card className="bg-background text-foreground shadow-md rounded-2xl mt-8 border">
       <CardHeader>
@@ -52,15 +61,15 @@ const TicketsRevenuePieChart = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={ticketRevenueData}
-              dataKey="revenue"
+              data={data}
+              dataKey="value"
               nameKey="type"
               cx="50%"
               cy="50%"
               outerRadius={90}
               label
             >
-              {ticketRevenueData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}

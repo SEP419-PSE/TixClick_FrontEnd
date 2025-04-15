@@ -1,5 +1,11 @@
-import { TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+} from "recharts";
 import {
   Card,
   CardContent,
@@ -8,34 +14,72 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../../../components/ui/card";
+import { TrendingUp } from "lucide-react";
+import { EventActivityDashbroadResponseList } from "../../../../../interface/revenue/Revenue";
 import {
-  ChartConfig,
   ChartContainer,
-  ChartLegend,
   ChartLegendContent,
-  ChartTooltip,
   ChartTooltipContent,
 } from "../../../../../components/ui/chart";
 
-const chartData = [
-  { eventActivity: "Hoạt động 1", "Vé thường": 123, "Vé Vip": 150 },
-  { eventActivity: "Hoạt động 2", "Vé thường": 98, "Vé Vip": 180 },
+type Props = {
+  data: EventActivityDashbroadResponseList[] | undefined;
+};
+
+// Tạo mảng màu để dùng luân phiên
+const COLOR_PALETTE = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-6))",
 ];
 
-console.log(JSON.stringify(chartData, null, 2));
+// 1. Tạo chartConfig động
+const generateChartConfig = (data: EventActivityDashbroadResponseList[]) => {
+  const ticketTypes = new Set<string>();
 
-const chartConfig = {
-  "Vé thường": {
-    label: "Vé thường",
-    color: "hsl(var(--chart-1))",
-  },
-  "Vé Vip": {
-    label: "Vé Vip",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
+  data.forEach((item) => {
+    item.ticketDashBoardResponseList.forEach((ticket) =>
+      ticketTypes.add(ticket.name)
+    );
+  });
 
-const TicketsBarChart = () => {
+  const config: Record<string, { label: string; color: string }> = {};
+  Array.from(ticketTypes).forEach((ticketName, index) => {
+    config[ticketName] = {
+      label: ticketName,
+      color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+    };
+  });
+
+  return config;
+};
+
+// 2. Biến đổi dữ liệu sang dạng Recharts hiểu được
+const transformData = (
+  rawData: EventActivityDashbroadResponseList[]
+): Record<string, any>[] => {
+  return rawData.map((item) => {
+    const formatted: Record<string, any> = {
+      eventActivity: item.eventActivity,
+    };
+
+    item.ticketDashBoardResponseList.forEach((ticket) => {
+      formatted[ticket.name] = ticket.value;
+    });
+
+    return formatted;
+  });
+};
+
+const TicketsBarChart = ({ data }: Props) => {
+  if (!data || data.length === 0) return <>Không có dữ liệu</>;
+
+  const chartConfig = generateChartConfig(data);
+  const chartData = transformData(data);
+
   return (
     <Card className="text-black max-w-2xl bg-background text-foreground shadow-md rounded-2xl border">
       <CardHeader>
@@ -54,18 +98,16 @@ const TicketsBarChart = () => {
             />
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar
-              dataKey="Vé thường"
-              stackId="a"
-              fill={chartConfig["Vé thường"].color}
-              radius={[0, 0, 4, 4]}
-            />
-            <Bar
-              dataKey="Vé Vip"
-              stackId="a"
-              fill={chartConfig["Vé Vip"].color}
-              radius={[4, 4, 0, 0]}
-            />
+
+            {Object.keys(chartConfig).map((ticketName, index) => (
+              <Bar
+                key={ticketName}
+                dataKey={ticketName}
+                stackId="a"
+                fill={chartConfig[ticketName].color}
+                radius={index === 0 ? [0, 0, 4, 4] : [4, 4, 0, 0]}
+              />
+            ))}
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -394,7 +394,7 @@ export default function Consumer() {
                       </div>
 
                       <div className="flex items-start">
-                        <Clock className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <Clock className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">Thời gian</p>
                           <p className="text-gray-400">
@@ -408,7 +408,7 @@ export default function Consumer() {
                       </div>
 
                       <div className="flex items-start">
-                        <MapPin className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <MapPin className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">Địa điểm</p>
                           <p className="text-gray-400">
@@ -424,7 +424,7 @@ export default function Consumer() {
 
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <Users className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <Users className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">
                             Số luợt quan tâm
@@ -436,7 +436,7 @@ export default function Consumer() {
                       </div>
 
                       <div className="flex items-start">
-                        <Ticket className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <Ticket className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">Vé đã bán</p>
                           <p className="text-gray-400">
@@ -449,7 +449,7 @@ export default function Consumer() {
                       </div>
 
                       <div className="flex items-start">
-                        <DollarSign className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <DollarSign className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">Doanh thu</p>
                           <p className="text-gray-400">

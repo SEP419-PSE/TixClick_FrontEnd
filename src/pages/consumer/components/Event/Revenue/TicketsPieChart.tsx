@@ -13,26 +13,11 @@ import {
   CardTitle,
   CardDescription,
 } from "../../../../../components/ui/card";
+import { EventActivityDashbroadResponseList } from "../../../../../interface/revenue/Revenue";
 
-// Dữ liệu từng hoạt động
-const activitiesData = [
-  {
-    eventActivity: "Hoạt động 1",
-    tickets: [
-      { name: "Vé thường", value: 123 },
-      { name: "Vé Vip", value: 150 },
-    ],
-  },
-  {
-    eventActivity: "Hoạt động 2",
-    tickets: [
-      { name: "Vé thường", value: 98 },
-      { name: "Vé Vip", value: 180 },
-    ],
-  },
-];
-
-console.log(JSON.stringify(activitiesData, null, 2));
+type Props = {
+  data: EventActivityDashbroadResponseList[] | undefined;
+};
 
 const COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))"];
 
@@ -56,12 +41,17 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const TicketsPieChart = () => {
+const TicketsPieChart = ({ data }: Props) => {
+  // console.log(data);
+  if (data == undefined) return <div>Không có dữ liệu</div>;
   return (
     <div className="grid grid-rows-1 md:grid-rows-2 gap-8">
-      {activitiesData.map((activity, index) => {
-        const total = activity.tickets.reduce((sum, t) => sum + t.value, 0);
-        const pieData = activity.tickets.map((t) => ({
+      {data.map((activity, index) => {
+        const total = activity.ticketDashBoardResponseList.reduce(
+          (sum, t) => sum + t.value,
+          0
+        );
+        const pieData = activity.ticketDashBoardResponseList.map((t) => ({
           ...t,
           __total: total,
         }));

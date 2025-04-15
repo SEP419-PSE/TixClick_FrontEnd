@@ -1,19 +1,46 @@
+import { useEffect, useState } from "react";
 import { RevenueLineChart } from "./RevenueLineChart";
 import TicketsBarChart from "./TicketsBarChart";
 import TicketsPieChart from "./TicketsPieChart";
 import TicketsRevenuePieChart from "./TicketsRevenuePieChart";
+import { RevenueReponse } from "../../../../../interface/revenue/Revenue";
+import { useParams } from "react-router";
+import eventApi from "../../../../../services/eventApi";
 
 const Revenue = () => {
+  const { eventId } = useParams();
+  const [revenue, setRevenue] = useState<RevenueReponse>();
+
+  const fetchRevenue = async () => {
+    const response = await eventApi.getRevenue(Number(eventId));
+    if (response.data.result) {
+      setRevenue(response.data.result[0]);
+    }
+  };
+
+  useEffect(() => {
+    fetchRevenue();
+  }, [eventId]);
+
+  console.log(
+    "Revenue chung",
+    JSON.stringify(revenue?.eventActivityRevenueReportResponseList, null, 2)
+  );
+
   return (
     <div className="p-6 bg-white text-black">
       <div className="font-bold text-3xl mb-8">Doanh thu</div>
       <div className="grid lg:grid-cols-2 gap-8">
-        <TicketsBarChart />
-        <TicketsPieChart />
+        <TicketsBarChart data={revenue?.eventActivityDashbroadResponseList} />
+        <TicketsPieChart data={revenue?.eventActivityDashbroadResponseList} />
       </div>
       <div className="grid lg:grid-cols-2 gap-8">
-        <RevenueLineChart />
-        <TicketsRevenuePieChart />
+        <RevenueLineChart
+          data={revenue?.eventActivityRevenueReportResponseList}
+        />
+        <TicketsRevenuePieChart
+          data={revenue?.ticketReVenueDashBoardResponseList}
+        />
       </div>
     </div>
   );
