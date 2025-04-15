@@ -66,6 +66,8 @@ export default function Consumer() {
     fetchEvents();
   }, []);
 
+  console.log(events);
+
   const handleSearch = (e: any) => {
     setSearchTerm(e.target.value);
   };
@@ -199,7 +201,7 @@ export default function Consumer() {
                       </h3>
 
                       <div className="mt-4 space-y-2">
-                        <div className="flex items-center text-gray-400">
+                        <div className="flex items-center text-white">
                           <Calendar className="w-4 h-4 mr-2" />
                           <span className="text-sm">
                             {event.eventActivityDTOList.length != 0
@@ -209,11 +211,21 @@ export default function Consumer() {
                               : "Chưa có"}
                           </span>
                         </div>
-                        <div className="flex items-center text-gray-400">
+
+                        <div className="flex items-center text-white">
                           <MapPin className="w-4 h-4 mr-2" />
-                          <span className="text-sm line-clamp-1">
+                          <div className="text-sm line-clamp-1">
                             {event.locationName}
-                          </span>
+                          </div>
+                        </div>
+                        <div className="flex w-full top-4 text-gray-400">
+                          {event.address +
+                            ", " +
+                            event.ward +
+                            ", " +
+                            event.district +
+                            ", " +
+                            event.city}
                         </div>
                         <div className="flex flex-wrap gap-4">
                           <Button
@@ -368,7 +380,7 @@ export default function Consumer() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div className="space-y-4">
                       <div className="flex items-start">
-                        <Calendar className="w-5 h-5 text-[#00B14F] mr-3 mt-0.5" />
+                        <Calendar className="w-5 h-5 text-pse-green mr-3 mt-0.5" />
                         <div>
                           <p className="text-white font-medium">Ngày</p>
                           <p className="text-gray-400">
@@ -401,6 +413,10 @@ export default function Consumer() {
                           <p className="text-white font-medium">Địa điểm</p>
                           <p className="text-gray-400">
                             {selectedEvent.locationName}
+                            {selectedEvent.address}
+                            {selectedEvent.ward}
+                            {selectedEvent.district}
+                            {selectedEvent.city}
                           </p>
                         </div>
                       </div>

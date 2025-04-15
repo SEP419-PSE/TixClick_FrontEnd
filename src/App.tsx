@@ -42,11 +42,11 @@ import SearchPage from "./pages/consumer/SearchPage";
 import OrganizerCenter from "./pages/organizer";
 import Member from "./pages/consumer/components/Member/Member";
 import Tasks from "./pages/consumer/components/Tasks/Tasks";
-import Revenue from "./pages/consumer/components/Revenue/Revenue";
+import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
 import Information from "./pages/consumer/components/Information/Information";
 import EventManagement from "./pages/consumer/components/Event/EventManagement";
 import SummaryRevenue from "./pages/consumer/components/Event/SummaryRevenue";
-import Order from "./pages/consumer/components/Event/Order";
+import Order from "./pages/consumer/components/Event/Order/Order";
 import CheckIn from "./pages/consumer/components/Event/CheckIn";
 
 export default function App() {

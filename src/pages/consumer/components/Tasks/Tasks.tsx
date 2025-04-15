@@ -245,9 +245,9 @@ const Tasks = () => {
             <p className="text-white/60">
               Không có hoạt động nào của sự kiện này
             </p>
-            <NavLink to="/company">
+            <NavLink to={`/create-event?id=${eventId}&step=2`}>
               <Button className="my-2 bg-black hover:bg-pse-green transition-all duration-300">
-                Đi đến sự kiện để phân công
+                Thêm hoạt động
               </Button>
             </NavLink>
           </div>

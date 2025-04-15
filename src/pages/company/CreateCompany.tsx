@@ -119,7 +119,7 @@ const CreateCompany = () => {
   return (
     <div className="min-h-screen mt-16 flex items-center justify-center">
       {loading && <LoadingFullScreen />}
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
+      <Card className="bg-transparent flex flex-col items-center justify-center my-10 p-4 w-[350px] md:w-[500px] lg:w-[700px] rounded-xl shadow-neon-green">
         <p className="font-semibold text-[18px] mb-4 text-white">
           Đăng ký công ty
         </p>
@@ -190,8 +190,8 @@ const CreateCompany = () => {
           text={cccd}
           setText={setCccd}
         />
-        <div className="w-full mx-auto my-4 p-5 bg-white rounded-lg shadow-lg border">
-          <h2 className="text-lg font-bold mb-4 text-gray-800">
+        <div className="w-full mx-auto my-4 p-5 bg-transparent rounded-lg shadow-lg border">
+          <h2 className="text-lg font-bold mb-4 text-white">
             📂 Tài liệu xác thực (PDF)
           </h2>
 
@@ -201,7 +201,7 @@ const CreateCompany = () => {
             multiple
             accept=".pdf"
             onChange={handleFileChange}
-            className="mb-4 w-full text-sm text-gray-700 file:bg-blue-500 file:text-white file:px-3 file:py-2 file:rounded-lg file:border-none file:cursor-pointer hover:file:bg-blue-600"
+            className="mb-4 w-full text-sm text-white file:bg-white file:text-black file:px-3 file:py-2 file:rounded-lg file:border-none file:cursor-pointer hover:file:bg-blue-600"
           />
 
           {/* File List */}

@@ -96,7 +96,7 @@ const Information = () => {
           <BankCard
             accountNumber={company.bankingCode}
             bankName={company.bankingName}
-            ownerCard="Võ Mộng Luân"
+            ownerCard={company.ownerCard}
           />
         </motion.div>
       )}

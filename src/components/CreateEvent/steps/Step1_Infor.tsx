@@ -193,7 +193,7 @@ export default function StepOne({
   return (
     <div className="text-black text-[16px]">
       {isLoading && <LoadingFullScreen />}
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent p-4 rounded-lg mb-8">
         <p className="text-white">Upload hình ảnh</p>
         <div className="flex flex-wrap py-5 justify-center gap-10">
           <ImageUpload
@@ -221,7 +221,7 @@ export default function StepOne({
         />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent p-4 rounded-lg mb-8">
         <p className="text-white">Địa chỉ sự kiện</p>
         <div className="flex flex-col space-y-2 text-white">
           <div className="flex items-center space-x-6 my-2">
@@ -274,7 +274,7 @@ export default function StepOne({
         )}
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent p-4 rounded-lg mb-8">
         <SelectTypeEvent
           selectedId={typeEventid}
           choice={typeEvent}
@@ -284,12 +284,12 @@ export default function StepOne({
         />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent p-4 rounded-lg mb-8">
         <p className="text-left mx-2 text-white">Thông tin sự kiện</p>
         <TextEditor onChange={setEditorContent} />
       </Card>
 
-      <Card className="bg-transparent bg-gradient-to-b from-black/20 to-pse-green/30 md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8">
+      <Card className="bg-transparent md:flex md:flex-row-reverse md:items-center md:gap-2 p-4 rounded-lg mb-8">
         {" "}
         <div className="md:w-[70%]">
           <p className="text-white font-semibold">{companies?.companyName}</p>

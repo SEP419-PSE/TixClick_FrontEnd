@@ -29,7 +29,7 @@ const BankDropdown: React.FC<Props> = ({
         Chọn ngân hàng
       </label>
       <Select value={selectedBankName} onValueChange={onChange}>
-        <SelectTrigger className="w-full bg-white text-black">
+        <SelectTrigger className="w-full bg-transparent text-white">
           <SelectValue placeholder="-- Chọn ngân hàng --" />
         </SelectTrigger>
         <SelectContent>

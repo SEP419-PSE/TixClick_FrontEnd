@@ -24,11 +24,11 @@ const SelectTypeEvent = ({
 }: Props) => {
   return (
     <div className="flex flex-col items-start gap-1 p-2 w-full">
-      <label htmlFor="selects" className="text-white text-sm font-medium">
+      <label htmlFor="selects" className="text-white text-sm font-bold">
         {label}
       </label>
       <Select value={choice} onValueChange={setChoice}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full bg-transparent text-white">
           <SelectValue placeholder="Vui lòng chọn" />
         </SelectTrigger>
         <SelectContent>

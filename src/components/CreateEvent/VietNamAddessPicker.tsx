@@ -98,11 +98,11 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
     <div className="grid grid-cols-2 gap-4 mx-1">
       {/* Province */}
       <div>
-        <label className="block text-sm font-medium mb-1 text-white">
+        <label className="block text-sm font-bold mb-1 text-white">
           Tỉnh / Thành phố
         </label>
         <Select value={value.province} onValueChange={handleSelectProvince}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full bg-transparent text-white">
             <SelectValue placeholder="-- Chọn tỉnh / thành phố --" />
           </SelectTrigger>
           <SelectContent>
@@ -117,7 +117,7 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
 
       {/* District */}
       <div>
-        <label className="block text-sm font-medium mb-1 text-white">
+        <label className="block text-sm font-bold mb-1 text-white">
           Quận / Huyện
         </label>
         <Select
@@ -125,7 +125,7 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
           onValueChange={handleSelectDistrict}
           disabled={!selectedProvinceId}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full bg-transparent text-white">
             <SelectValue placeholder="-- Chọn quận / huyện --" />
           </SelectTrigger>
           <SelectContent>
@@ -140,7 +140,7 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
 
       {/* Ward */}
       <div>
-        <label className="block text-sm font-medium mb-1 text-white">
+        <label className="block text-sm font-bold mb-1 text-white">
           Phường / Xã
         </label>
         <Select
@@ -148,7 +148,7 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
           onValueChange={handleSelectWard}
           disabled={!selectedDistrictId}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full bg-transparent text-white">
             <SelectValue placeholder="-- Chọn phường / xã --" />
           </SelectTrigger>
           <SelectContent>
@@ -163,10 +163,11 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
 
       {/* Address input */}
       <div>
-        <label className="block text-sm font-medium mb-1 text-white">
+        <label className="block text-sm font-bold mb-1 text-white">
           Số nhà, tên đường
         </label>
         <Input
+          className="bg-transparent text-white"
           type="text"
           value={value.address}
           onChange={handleAddressChange}

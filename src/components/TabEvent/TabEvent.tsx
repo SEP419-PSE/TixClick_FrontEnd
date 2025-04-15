@@ -112,7 +112,7 @@ const TabEvent = () => {
           <button
             key={index}
             onClick={() => setActiveTab(index)}
-            className={`py-2 text-[16px]  lg:text-[19px] font-medium focus:outline-none ${
+            className={`py-2 sm:text-sm md:text-md lg:text-lg font-medium focus:outline-none ${
               activeTab === index
                 ? "text-pse-green border-b-2 border-pse-green  transition-all duration-300"
                 : "text-white border-b-2 border-transparent hover:"

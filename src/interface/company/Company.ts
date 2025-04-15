@@ -4,6 +4,7 @@ export interface Company {
   codeTax: string;
   bankingName: string;
   bankingCode: string;
+  ownerCard: string;
   nationalId: string;
   logoURL: string;
   address: string;
