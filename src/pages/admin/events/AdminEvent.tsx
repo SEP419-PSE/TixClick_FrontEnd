@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Badge, BarChart3, Calendar, DollarSign, Download, Map, PieChart, Ticket, TrendingUp, Users } from "lucide-react"
+import { Badge, BarChart3, Calendar, DollarSign, Map, PieChart, Ticket, TrendingUp, Users } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import {
@@ -20,7 +20,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Progress } from "../../../components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
@@ -159,9 +158,9 @@ export default function AdminEvent() {
               <SelectItem value="theater">Theater</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="bg-[#00B14F] hover:bg-[#00963F]">
+          {/* <Button className="bg-[#00B14F] hover:bg-[#00963F]">
             <Download className="mr-2 h-4 w-4" /> Export Report
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -630,28 +629,6 @@ export default function AdminEvent() {
             </Card>
           </div>
 
-          <Card className="bg-[#2A2A2A] border-[#3A3A3A]">
-            <CardHeader>
-              <CardTitle className="text-white">Location Map</CardTitle>
-              <CardDescription>Geographic distribution of events</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative h-[400px] bg-[#333] rounded-md overflow-hidden">
-                {/* This would be replaced with an actual map component in a real application */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Map className="h-16 w-16 text-gray-600" />
-                  <span className="absolute text-gray-400">Interactive map would be displayed here</span>
-                </div>
-
-                {/* Sample location markers */}
-                <div className="absolute top-1/4 left-1/3 h-4 w-4 bg-[#00B14F] rounded-full animate-pulse"></div>
-                <div className="absolute top-1/2 left-1/4 h-4 w-4 bg-[#00B14F] rounded-full animate-pulse"></div>
-                <div className="absolute top-1/3 left-2/3 h-4 w-4 bg-[#00B14F] rounded-full animate-pulse"></div>
-                <div className="absolute top-2/3 left-1/2 h-4 w-4 bg-[#00B14F] rounded-full animate-pulse"></div>
-                <div className="absolute top-1/5 left-1/2 h-4 w-4 bg-[#00B14F] rounded-full animate-pulse"></div>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

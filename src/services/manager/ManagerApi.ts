@@ -25,8 +25,14 @@ const managerApi = {
   },
 
   getAllPayment() {
-    const url = "/payment/all";
-    return axiosClient.get(url);
+    const url = "/contract-payment/get";
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   },
 
   getAllEvent() {

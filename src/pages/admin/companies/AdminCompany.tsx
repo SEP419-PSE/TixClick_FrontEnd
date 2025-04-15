@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge, BarChart3, Briefcase, Building, DollarSign, Download, Globe, PieChart, TrendingUp, Users } from "lucide-react"
+import { Badge, BarChart3, Briefcase, Building, DollarSign, Globe, PieChart, TrendingUp, Users } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import {
@@ -26,7 +26,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
@@ -212,9 +211,9 @@ export default function AdminCompany() {
               <SelectItem value="retail">Retail</SelectItem>
             </SelectContent>
           </Select>
-          <Button className="bg-[#00B14F] hover:bg-[#00963F]">
+          {/* <Button className="bg-[#00B14F] hover:bg-[#00963F]">
             <Download className="mr-2 h-4 w-4" /> Export Report
-          </Button>
+          </Button> */}
         </div>
       </div>
 

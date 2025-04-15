@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import {
   Bell,
   ChevronLeft,
@@ -5,10 +6,9 @@ import {
   Download,
   Eye,
   FileText,
-  Loader2,
   MoreHorizontal,
   Search,
-  Upload,
+  Upload
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -59,12 +59,11 @@ import type {
   ContractDTO,
   VietQR,
 } from "../../../../interface/manager/Contracts";
+import { formatMoney } from "../../../../lib/utils";
 import managerApi from "../../../../services/manager/ManagerApi";
+import { banks } from "../../../company/CreateCompany";
 import { ManagerHeader } from "../ManagerHeader";
 import { UploadDocumentDialog } from "./UploadDocument";
-import { formatMoney } from "../../../../lib/utils";
-import clsx from "clsx";
-import { banks } from "../../../company/CreateCompany";
 
 export default function ContractsPage() {
   const [contracts, setContracts] = useState<any[]>([]);
@@ -364,63 +363,6 @@ export default function ContractsPage() {
 
     setIsContractModalOpen(true);
   };
-
-  // New function to handle opening the edit form
-  // const openEditModal = (contract: Contract) => {
-  //   setSelectedContract(contract);
-
-  //   // Prepare the data for editing
-  //   setEditFormData({
-  //     contractId: contract.contractId,
-  //     contractName: contract.contractName || "",
-  //     totalAmount: contract.totalAmount || 0,
-  //     commission: contract.commission || "",
-  //     contractType: contract.contractType || "",
-  //     startDate: contract.startDate || "",
-  //     endDate: contract.endDate || "",
-  //     status: contract.status || "",
-  //     accountId: contract.accountId || 0,
-  //     eventId: contract.eventId || 0,
-  //     companyId: contract.companyId || 0,
-  //     contractDetailDTOS: contract.contractDetailDTOS || [],
-  //   });
-
-  //   setIsEditModalOpen(true);
-  // };
-
-  // Function to add a new contract detail to the form
-  // const addContractDetail = () => {
-  //   setEditFormData({
-  //   ...editFormData,
-  //   contractDetailDTOS: [
-  //   ...editFormData.contractDetailDTOS,
-  //   {
-  //   contractDetailId: 0,
-  //   contractDetailName: "",
-  //   contractDetailCode: "",
-  //   description: "",
-  //   contractAmount: 0,
-  //   contractPayDate: "",
-  //   status: "",
-  //   contractId: selectedContract?.contractId || 0,
-  //   },
-  //   ],
-  //   });
-  //   };
-
-  // Function to update a contract detail in the form
-  // const updateContractDetail = (index: number, field: string, value: any) => {
-  //   const updatedDetails = [...editFormData.contractDetailDTOS];
-  //   updatedDetails[index] = {
-  //   ...updatedDetails[index],
-  //   [field]: value,
-  //   };
-
-  //   setEditFormData({
-  //   ...editFormData,
-  //   contractDetailDTOS: updatedDetails,
-  //   });
-  //   };
 
   useEffect(() => {
     if (selectedContract && selectedContract.contractId) {
@@ -1039,10 +981,7 @@ export default function ContractsPage() {
                       <p className="mb-4 text-gray-400">
                         No documents uploaded yet.
                       </p>
-                      {/* <Button onClick={() => handleUploadDocument(selectedContract.contractId)}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload New Document
-                      </Button> */}
+                      
                     </div>
                   )}
                 </div>
@@ -1240,325 +1179,6 @@ export default function ContractsPage() {
               </TabsContent>
             </Tabs>
           )}
-          {/* <DialogFooter className="flex justify-between">
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => {
-                  if (selectedContract) {
-                    handleContractVerification(selectedContract.contractId, "APPROVED")
-                    setIsContractModalOpen(false)
-                  }
-                }}
-              >
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Approve Contract
-              </Button>
-              <Button
-                variant="outline"
-                className="bg-red-600 hover:bg-red-700 text-white"
-                onClick={() => {
-                  if (selectedContract) {
-                    handleContractVerification(selectedContract.contractId, "REJECTED")
-                    setIsContractModalOpen(false)
-                  }
-                }}
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Reject Contract
-              </Button>
-            </div>
-          </DialogFooter> */}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="bg-[#2A2A2A] text-white max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Contract</DialogTitle>
-            <DialogDescription>
-              Make changes to the contract information.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="eventName" className="text-right">
-                Contract Name
-              </Label>
-              <Input
-                id="contractName"
-                className="col-span-3 bg-[#1E1E1E] text-white"
-                value={editFormData?.contractName || ""}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    contractName: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Contract type
-              </Label>
-              <Input
-                id="contractType"
-                className="col-span-3 bg-[#1E1E1E] text-white"
-                value={editFormData?.contractType || ""}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    contractType: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="totalAmount" className="text-right">
-                Total Amount
-              </Label>
-              <Input
-                id="totalAmount"
-                className="col-span-3 bg-[#1E1E1E] text-white"
-                value={editFormData.totalAmount || ""}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    totalAmount: Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="startDate" className="text-right">
-                Start Date
-              </Label>
-              <Input
-                id="startDate"
-                type="date"
-                className="col-span-3 bg-[#1E1E1E] text-white"
-                value={editFormData.startDate || ""}
-                onChange={(e) =>
-                  setEditFormData({
-                    ...editFormData,
-                    startDate: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="endDate" className="text-right">
-                End Date
-              </Label>
-              <Input
-                id="endDate"
-                type="date"
-                className="col-span-3 bg-[#1E1E1E] text-white"
-                value={editFormData.endDate || ""}
-                onChange={(e) =>
-                  setEditFormData({ ...editFormData, endDate: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="status" className="text-right">
-                Status
-              </Label>
-              <Select
-                value={editFormData.status || ""}
-                onValueChange={(value) =>
-                  setEditFormData({ ...editFormData, status: value })
-                }
-              >
-                <SelectTrigger className="col-span-3 bg-[#1E1E1E] text-white">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DRAFT">Draft</SelectItem>
-                  <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                  <SelectItem value="PENDING_APPROVAL">
-                    Pending Approval
-                  </SelectItem>
-                  <SelectItem value="COMPLETED">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid items-center gap-4 bg-[#1E1E1E] p-4 rounded-lg">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contractDetailName" className="text-right">
-                  Contract Detail Name
-                </Label>
-                <Input
-                  id="contractDetailName"
-                  className="col-span-3 bg-[#1E1E1E] text-white"
-                  value={
-                    editFormData.contractDetailDTOS[0]?.contractDetailName || ""
-                  }
-                  onChange={(e) => {
-                    const updatedDetails = [...editFormData.contractDetailDTOS];
-                    updatedDetails[0] = {
-                      ...updatedDetails[0],
-                      contractDetailName: e.target.value,
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updatedDetails,
-                    });
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contractDetailCode" className="text-right">
-                  Contract Detail Code
-                </Label>
-                <Input
-                  id="contractDetailCode"
-                  className="col-span-3 bg-[#1E1E1E] text-white"
-                  value={
-                    editFormData.contractDetailDTOS[0]?.contractDetailCode || ""
-                  }
-                  onChange={(e) => {
-                    const updatedDetails = [...editFormData.contractDetailDTOS];
-                    updatedDetails[0] = {
-                      ...updatedDetails[0],
-                      contractDetailCode: e.target.value,
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updatedDetails,
-                    });
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="description" className="text-right pt-2">
-                  Description
-                </Label>
-                <textarea
-                  id="description"
-                  className="col-span-3 bg-[#1E1E1E] text-white rounded-md p-2 min-h-[100px]"
-                  value={editFormData.contractDetailDTOS[0]?.description || ""}
-                  onChange={(e) => {
-                    const updatedDetails = [...editFormData.contractDetailDTOS];
-                    updatedDetails[0] = {
-                      ...updatedDetails[0],
-                      description: e.target.value,
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updatedDetails,
-                    });
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contractAmount" className="text-right">
-                  Contract Amount
-                </Label>
-                <Input
-                  id="contractAmount"
-                  type="number"
-                  className="col-span-3 bg-[#1E1E1E] text-white"
-                  value={
-                    editFormData.contractDetailDTOS[0]?.contractAmount || ""
-                  }
-                  onChange={(e) => {
-                    const updated = [...editFormData.contractDetailDTOS];
-                    updated[0] = {
-                      ...updated[0],
-                      contractAmount: Number(e.target.value),
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updated,
-                    });
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="contractPayDate" className="text-right">
-                  Contract Pay Date
-                </Label>
-                <Input
-                  id="contractPayDate"
-                  type="date"
-                  className="col-span-3 bg-[#1E1E1E] text-white"
-                  value={
-                    editFormData.contractDetailDTOS[0]?.contractPayDate || ""
-                  }
-                  onChange={(e) => {
-                    const updated = [...editFormData.contractDetailDTOS];
-                    updated[0] = {
-                      ...updated[0],
-                      contractPayDate: e.target.value,
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updated,
-                    });
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="status" className="text-right">
-                  Status
-                </Label>
-                <Input
-                  id="status"
-                  className="col-span-3 bg-[#1E1E1E] text-white"
-                  value={editFormData.contractDetailDTOS[0]?.status || ""}
-                  onChange={(e) => {
-                    const updated = [...editFormData.contractDetailDTOS];
-                    updated[0] = {
-                      ...updated[0],
-                      status: e.target.value,
-                    };
-                    setEditFormData({
-                      ...editFormData,
-                      contractDetailDTOS: updated,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              className="text-black"
-              onClick={() => setIsEditModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleUpdateContract}
-              disabled={isProcessing}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -1649,9 +1269,7 @@ export default function ContractsPage() {
             <div className="flex gap-2 text-black">
               <Button
                 variant="outline"
-                // onClick={() =>
-                //   handleDownloadDocument(selectedContractDocument?.contractDocumentId, selectedDocument)
-                // }
+          
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download

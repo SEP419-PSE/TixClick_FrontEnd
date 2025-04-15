@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 
 import { Select } from "@radix-ui/react-select"
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
@@ -101,7 +100,6 @@ export default function AdminDashboard() {
                 <SelectItem value="year">Yearly</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-[#00B14F] hover:bg-[#00963F] text-white">Generate Report</Button>
           </div>
         </header>
 

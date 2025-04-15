@@ -936,7 +936,7 @@ export default function EventsPage() {
                 {selectedEvent?.status === "APPROVED" && (
                   <>
                     <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <FileText className="mr-2 h-4 w-4" /> Create Contract
+                      <FileText className="mr-2 h-4 w-4" /> Upload Contract
                     </Button>
                     <Button
                       onClick={handleViewRelatedContracts}
