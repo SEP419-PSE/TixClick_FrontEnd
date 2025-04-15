@@ -19,19 +19,58 @@ export interface Installment {
     status: string;
 }
 
-export interface Payments {
-  paymentId: number;
-  paymentMethod: string;
-  amount: number;
-  paymentDate: string;
-  status: string;
-  orderCode: string;
-  orderId: number;
-  accountId: number;
+// export interface Payments {
+//   paymentId: number;
+//   paymentMethod: string;
+//   amount: number;
+//   paymentDate: string;
+//   status: string;
+//   orderCode: string;
+//   orderId: number;
+//   accountId: number;
+// }
+
+// export interface AccountGroup {
+//   accountId: number
+//   payments: Payments[]
+//   isExpanded: boolean
+// }
+
+export interface ContractDTO {
+  contractId: number
+  contractCode: string
+  contractName: string
+  totalAmount: number
+  commission: string
+  contractType: string
+  startDate: string
+  endDate: string
+  status: string
+  accountId: number
+  eventId: number
+  companyId: number
+}
+
+export interface ContractPaymentDTO {
+  contractPaymentId: number
+  paymentAmount: number
+  paymentDate: string | null
+  paymentMethod: string
+  status: string
+  note: string
+  contractDetailId: number
+  bankName: string
+  accountNumber: string
+}
+
+export interface ContractPaymentGroup {
+  contractDTO: ContractDTO
+  contractPaymentDTOList: ContractPaymentDTO[]
 }
 
 export interface AccountGroup {
   accountId: number
-  payments: Payments[]
+  payments: ContractPaymentDTO[]
+  contractInfo: ContractDTO
   isExpanded: boolean
 }
