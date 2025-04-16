@@ -1,4 +1,3 @@
-// import { ContractUpload } from "../../interface/manager/Contracts";
 import { Contract } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
@@ -15,6 +14,17 @@ const managerApi = {
 
   getAllContract() {
     const url = "/contract/all";
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  getContractPaymentPay(transactionCode: string, paymentId: number) {
+    const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
     const token = localStorage.getItem("accessToken2");
 
     return axiosClient.get(url, {

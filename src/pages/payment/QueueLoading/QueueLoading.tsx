@@ -272,9 +272,9 @@ export default function PaymentQueuePage() {
         localStorage.setItem("paymentOrderCode", paymentResponse.data.data.orderCode)
       }
 
-      if (paymentResponse?.data?.data?.checkoutUrl) {
+      if (paymentResponse?.result?.data?.checkoutUrl) {
         // Redirect to the checkout URL
-        window.location.href = paymentResponse.data.data.checkoutUrl
+        window.location.href = paymentResponse.result.data.checkoutUrl
       } else {
         setInitialLoading(false)
         setIsProcessingPayment(false)
