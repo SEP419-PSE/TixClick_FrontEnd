@@ -120,7 +120,7 @@ const payOsApi = {
 
 export default function PaymentQueuePage() {
   // const [progress, setProgress] = useState(0)
-  const [queuePosition, setQueuePosition] = useState(15)
+  // const [queuePosition, setQueuePosition] = useState(15)
   // const [estimatedTime, setEstimatedTime] = useState(18000)
   const [isComplete, setIsComplete] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -315,12 +315,12 @@ export default function PaymentQueuePage() {
       //   return newProgress
       // })
 
-      setQueuePosition((prev) => {
-        if (prev <= 1) return 1
-        // Decrease queue position more rapidly as progress increases
-        const decrease = Math.random() > 0.7 ? 1 : 0
-        return prev - decrease
-      })
+      // setQueuePosition((prev) => {
+      //   if (prev <= 1) return 1
+      //   // Decrease queue position more rapidly as progress increases
+      //   const decrease = Math.random() > 0.7 ? 1 : 0
+      //   return prev - decrease
+      // })
 
       // setEstimatedTime((prev) => {
       //   if (prev <= 0) return 0
