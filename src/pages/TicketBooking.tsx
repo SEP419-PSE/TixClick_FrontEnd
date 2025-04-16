@@ -500,7 +500,7 @@ const TicketBooking = () => {
             <div className="mb-2 flex items-center text-xs gap-1">
               <Ticket fill="white" className="text-pse-black-light" />
               {selectedSeats.length > 0
-                ? selectedSeats.map((seat) => `${seat.sectionName} ${seat.seatLabel}`).join(", ")
+                ? selectedSeats.map((seat) => `(${seat.sectionName} ${seat.rcCode})`).join(", ")
                 : "Chưa chọn ghế"}
             </div>
 

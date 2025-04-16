@@ -1,111 +1,98 @@
-import { Calendar, MapPin, Ticket } from "lucide-react";
-import { Button } from "../components/ui/button";
-import CustomDivider from "../components/Divider/CustomDivider";
-import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
-import { Input } from "../components/ui/input";
-import { useEffect, useState } from "react";
-import { Card } from "../components/ui/card";
-import { useSearchParams } from "react-router";
-import ticketMappingApi from "../services/ticketMappingApi";
-import eventApi from "../services/eventApi";
-import { EventDetailResponse } from "../interface/EventInterface";
-import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
-import { toast, Toaster } from "sonner";
-import axios from "axios";
+import axios from "axios"
+import { Calendar, MapPin, Ticket } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useNavigate, useSearchParams } from "react-router" // Added useNavigate
+import { toast, Toaster } from "sonner"
+import CustomDivider from "../components/Divider/CustomDivider"
+import { Button } from "../components/ui/button"
+import { Card } from "../components/ui/card"
+import { Input } from "../components/ui/input"
+import type { EventDetailResponse } from "../interface/EventInterface"
+import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils"
+import eventApi from "../services/eventApi"
+import ticketMappingApi from "../services/ticketMappingApi"
 
 interface TicketResponse {
-  id: number;
-  ticket: TicketClass;
-  quantity: number;
-  status: boolean;
-  purchaseQuantity?: number;
+  id: number
+  ticket: TicketClass
+  quantity: number
+  status: boolean
+  purchaseQuantity?: number
 }
 
 interface TicketClass {
-  ticketId: number;
-  ticketName: string;
-  ticketCode: string;
-  createdDate: Date;
-  price: number;
-  minQuantity: number;
-  maxQuantity: number;
-  status: boolean;
-  textColor: null;
-  seatBackgroundColor: null;
-  accountId: number;
-  eventId: number;
+  ticketId: number
+  ticketName: string
+  ticketCode: string
+  createdDate: Date
+  price: number
+  minQuantity: number
+  maxQuantity: number
+  status: boolean
+  textColor: null
+  seatBackgroundColor: null
+  accountId: number
+  eventId: number
 }
 
 export interface TicketPurchaseRequest {
-  ticketPurchaseRequests: TicketPurchaseRequestElement[];
+  ticketPurchaseRequests: TicketPurchaseRequestElement[]
 }
 
 export interface TicketPurchaseRequestElement {
-  zoneId: number;
-  seatId: number;
-  eventActivityId: number;
-  ticketId: number;
-  eventId: number;
-  quantity: number;
+  zoneId: number
+  seatId: number
+  eventActivityId: number
+  ticketId: number
+  eventId: number
+  quantity: number
 }
 
 const TicketBookingNoneSeatmap = () => {
-  const [searchParams] = useSearchParams();
-  const eventId = searchParams.get("eventId");
-  const activityEventId = searchParams.get("eventActivityId");
-  const [tickets, setTickets] = useState<TicketResponse[]>([]);
-  const [totalQuantity, setTotalQuantity] = useState<number>(0);
-  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const navigate = useNavigate() // Added for navigation
+  const [searchParams] = useSearchParams()
+  const eventId = searchParams.get("eventId")
+  const activityEventId = searchParams.get("eventActivityId")
+  const [tickets, setTickets] = useState<TicketResponse[]>([])
+  const [totalQuantity, setTotalQuantity] = useState<number>(0)
+  const [totalPrice, setTotalPrice] = useState<number>(0)
   const [eventInfor, setEventInfor] =
-    useState<
-      Pick<
-        EventDetailResponse,
-        "eventName" | "eventActivityDTOList" | "locationName"
-      >
-    >();
+    useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
 
   const fetchTickets = async () => {
     try {
-      const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(
-        Number(activityEventId)
-      );
+      const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(Number(activityEventId))
       // console.log(ticketResponse);
       if (ticketResponse.data.result.length !== 0) {
-        const updatedTickets = ticketResponse.data.result.map(
-          (ticket: TicketResponse) => ({
-            ...ticket,
-            purchaseQuantity: 0,
-          })
-        );
-        setTickets(updatedTickets);
+        const updatedTickets = ticketResponse.data.result.map((ticket: TicketResponse) => ({
+          ...ticket,
+          purchaseQuantity: 0,
+        }))
+        setTickets(updatedTickets)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
   useEffect(() => {
-    fetchTickets();
-    setTotalQuantity(0);
-  }, [activityEventId]);
+    fetchTickets()
+    setTotalQuantity(0)
+  }, [activityEventId])
 
   useEffect(() => {
-    const newTotal = tickets.reduce(
-      (acc, ticket) =>
-        acc + (ticket.purchaseQuantity || 0) * ticket.ticket.price,
-      0
-    );
-    setTotalPrice(newTotal);
-  }, [tickets]);
+    const newTotal = tickets.reduce((acc, ticket) => acc + (ticket.purchaseQuantity || 0) * ticket.ticket.price, 0)
+    setTotalPrice(newTotal)
+  }, [tickets])
 
   useEffect(() => {
     const fetchEventInfor = async () => {
-      const response = await eventApi.getEventDetail(Number(eventId));
+      const response = await eventApi.getEventDetail(Number(eventId))
       if (response.data.result.length != 0) {
-        setEventInfor(response.data.result);
+        setEventInfor(response.data.result)
       }
-    };
-    fetchEventInfor();
-  }, [eventId]);
+    }
+    fetchEventInfor()
+  }, [eventId])
 
   const handleIncreaseQuantity = (ticketId: number) => {
     setTickets((prevTickets) =>
@@ -115,11 +102,11 @@ const TicketBookingNoneSeatmap = () => {
               ...ticket,
               purchaseQuantity: (ticket.purchaseQuantity || 0) + 1,
             }
-          : ticket
-      )
-    );
-    setTotalQuantity((prevTotalQuantity) => prevTotalQuantity + 1);
-  };
+          : ticket,
+      ),
+    )
+    setTotalQuantity((prevTotalQuantity) => prevTotalQuantity + 1)
+  }
 
   const handleDecreaseQuantity = (ticketId: number) => {
     setTickets((prevTickets) =>
@@ -129,18 +116,16 @@ const TicketBookingNoneSeatmap = () => {
               ...ticket,
               purchaseQuantity: Math.max((ticket.purchaseQuantity || 0) - 1, 0),
             }
-          : ticket
-      )
-    );
-    setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1);
-  };
+          : ticket,
+      ),
+    )
+    setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1)
+  }
 
   const createTicketPurchase = async () => {
     const ticketPurchaseRequest: TicketPurchaseRequest = {
       ticketPurchaseRequests: tickets
-        .filter(
-          (ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0
-        )
+        .filter((ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0)
         .map((ticket) => ({
           ticketId: ticket.ticket.ticketId,
           quantity: ticket.purchaseQuantity as number,
@@ -149,35 +134,82 @@ const TicketBookingNoneSeatmap = () => {
           seatId: 0,
           zoneId: 0,
         })),
-    };
+    }
 
     try {
-      console.log("Đang gửi yêu cầu mua vé:", ticketPurchaseRequest);
+      console.log("Đang gửi yêu cầu mua vé:", ticketPurchaseRequest)
 
-      const response = await ticketPurchase.createPurchase(
-        ticketPurchaseRequest
-      );
+      // Store the ticket purchase request in localStorage
+      localStorage.setItem("ticketPurchaseRequest", JSON.stringify(ticketPurchaseRequest))
 
-      toast.success("Mua vé thành công");
-      console.log("🎉 Purchase thành công:", response.data);
-      await fetchTickets();
+      // Prepare selected seats data for the payment page
+      const selectedSeats = tickets
+        .filter((ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0)
+        .map((ticket) => ({
+          ticketId: ticket.ticket.ticketId,
+          typeName: ticket.ticket.ticketName,
+          sectionName: "General",
+          seatLabel: "Non-reserved",
+          formattedPrice: formatMoney(ticket.ticket.price),
+          price: ticket.ticket.price,
+          quantity: ticket.purchaseQuantity,
+        }))
 
-      // Redirect hoặc làm gì tiếp theo ở đây
+      // Store event information for the payment page
+      const eventInfo = {
+        id: eventId,
+        activityId: activityEventId,
+        name: eventInfor?.eventName,
+        location: eventInfor?.locationName,
+        date:
+          formatDateVietnamese(
+            eventInfor?.eventActivityDTOList
+              ?.find((x) => x.eventActivityId == Number(activityEventId))
+              ?.dateEvent.toString(),
+          ) +
+          " - " +
+          formatTimeFe(
+            eventInfor?.eventActivityDTOList?.find((x) => x.eventActivityId == Number(activityEventId))?.startTimeEvent,
+          ),
+      }
+
+      // Store all the necessary data in localStorage
+      localStorage.setItem(
+        "selectedSeats",
+        JSON.stringify({
+          eventInfo,
+          seats: selectedSeats,
+          totalAmount: totalPrice,
+          apiResponses: {
+            purchase: ticketPurchaseRequest,
+          },
+        }),
+      )
+
+      localStorage.setItem("eventInfo", JSON.stringify(eventInfo))
+      localStorage.setItem("totalPrice", totalPrice.toString())
+      localStorage.setItem("totalQuantity", totalQuantity.toString())
+
+      navigate("/payment", {
+        state: {
+          ticketPurchaseRequest,
+          eventInfo,
+          totalPrice,
+          totalQuantity,
+        },
+      })
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message || "Lỗi từ server không xác định";
-        console.error("Lỗi Axios:", errorMessage, error.response?.data);
+        const errorMessage = error.response?.data?.message || "Lỗi từ server không xác định"
+        console.error("Lỗi Axios:", errorMessage, error.response?.data)
 
-        toast.error(`Lỗi khi mua vé: ${errorMessage}`);
+        toast.error(`Lỗi khi mua vé: ${errorMessage}`)
       } else {
-        console.error("Lỗi không phải Axios:", error);
-        toast.error("Có lỗi xảy ra khi mua vé");
+        console.error("Lỗi không phải Axios:", error)
+        toast.error("Có lỗi xảy ra khi mua vé")
       }
     }
-  };
-
-  // console.log(tickets);
+  }
 
   return (
     <div className="flex flex-col h-auto lg:min-h-screen lg:flex-row">
@@ -196,44 +228,27 @@ const TicketBookingNoneSeatmap = () => {
               <div>
                 <div className="flex items-center gap-1 font-semibold text-base text-pse-green-second">
                   {ticket.ticket.ticketName}
-                  <p className="text-xs text-pse-gray font-medium">
-                    (Còn {ticket.quantity} vé )
-                  </p>
+                  <p className="text-xs text-pse-gray font-medium">(Còn {ticket.quantity} vé )</p>
                 </div>
-                <div className="text-white">
-                  {formatMoney(ticket.ticket.price)}
-                </div>
+                <div className="text-white">{formatMoney(ticket.ticket.price)}</div>
               </div>
               {ticket.quantity == 0 || ticket.status == false ? (
-                <p className="bg-red-200 text-pse-error/80 flex w-fit h-fit px-2 py-1 rounded-md">
-                  Hết vé
-                </p>
+                <p className="bg-red-200 text-pse-error/80 flex w-fit h-fit px-2 py-1 rounded-md">Hết vé</p>
               ) : (
                 <div className="flex gap-2">
                   <Button
-                    onClick={() =>
-                      handleDecreaseQuantity(ticket.ticket.ticketId)
-                    }
+                    onClick={() => handleDecreaseQuantity(ticket.ticket.ticketId)}
                     disabled={ticket.purchaseQuantity == 0 ? true : false}
                     className="bg-transparent border border-white"
                   >
                     -
                   </Button>
-                  <Input
-                    value={ticket.purchaseQuantity}
-                    className="text-black w-[50px] text-center"
-                    readOnly
-                  />
+                  <Input value={ticket.purchaseQuantity} className="text-black w-[50px] text-center" readOnly />
                   <Button
-                    onClick={() =>
-                      handleIncreaseQuantity(ticket.ticket.ticketId)
-                    }
-                    disabled={
-                      ticket.purchaseQuantity == ticket.ticket.maxQuantity
-                    }
+                    onClick={() => handleIncreaseQuantity(ticket.ticket.ticketId)}
+                    disabled={ticket.purchaseQuantity == ticket.ticket.maxQuantity}
                     className={`${
-                      ticket.purchaseQuantity == ticket.ticket.maxQuantity &&
-                      "cursor-not-allowed"
+                      ticket.purchaseQuantity == ticket.ticket.maxQuantity && "cursor-not-allowed"
                     } bg-transparent border border-white`}
                   >
                     +
@@ -247,43 +262,31 @@ const TicketBookingNoneSeatmap = () => {
 
       <div className="flex flex-col lg:ml-auto lg:h-screen lg:w-[20%] text-black bg-white p-6 shadow-md border border-gray-200">
         <div className="mb-4 space-y-4">
-          <div className="text-[18px] font-semibold">
-            {eventInfor?.eventName}
-          </div>
+          <div className="text-[18px] font-semibold">{eventInfor?.eventName}</div>
           <div className="flex items-center gap-1 font-medium">
             <span>
-              <Calendar
-                size={20}
-                fill="white"
-                className="text-pse-green-second"
-              />
+              <Calendar size={20} fill="white" className="text-pse-green-second" />
             </span>
             {eventInfor?.eventActivityDTOList != undefined &&
               formatTimeFe(
-                eventInfor.eventActivityDTOList.find(
-                  (x) => x.eventActivityId == Number(activityEventId)
-                )?.startTimeEvent
+                eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(activityEventId))
+                  ?.startTimeEvent,
               ) +
                 ` - ` +
                 formatTimeFe(
-                  eventInfor.eventActivityDTOList.find(
-                    (x) => x.eventActivityId == Number(activityEventId)
-                  )?.endTimeEvent
+                  eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(activityEventId))
+                    ?.endTimeEvent,
                 ) +
                 `, ` +
                 formatDateVietnamese(
                   eventInfor.eventActivityDTOList
                     .find((x) => x.eventActivityId == Number(activityEventId))
-                    ?.dateEvent.toString()
+                    ?.dateEvent.toString(),
                 )}
           </div>
           <div className="flex items-center gap-1">
             <span>
-              <MapPin
-                size={20}
-                fill="white"
-                className="text-pse-green-second"
-              />
+              <MapPin size={20} fill="white" className="text-pse-green-second" />
             </span>
             {eventInfor?.locationName}
           </div>
@@ -299,9 +302,7 @@ const TicketBookingNoneSeatmap = () => {
               className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
             >
               <div>
-                <div className="font-medium text-gray-900">
-                  {ticket.ticket.ticketName}
-                </div>
+                <div className="font-medium text-gray-900">{ticket.ticket.ticketName}</div>
                 <div className="text-sm text-gray-600">
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -321,21 +322,17 @@ const TicketBookingNoneSeatmap = () => {
           <Button
             onClick={createTicketPurchase}
             className={`w-full ${
-              totalPrice != 0
-                ? "bg-pse-green text-white"
-                : "bg-white text-pse-gray"
+              totalPrice != 0 ? "bg-pse-green text-white" : "bg-white text-pse-gray"
             }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
             disabled={totalPrice != 0 ? false : true}
           >
-            {totalPrice != 0
-              ? `Tiếp tục - ${formatMoney(totalPrice)}`
-              : "Vui lòng chọn vé"}
+            {totalPrice != 0 ? `Tiếp tục - ${formatMoney(totalPrice)}` : "Vui lòng chọn vé"}
           </Button>
         </div>
       </div>
       <Toaster position="top-center" />
     </div>
-  );
-};
+  )
+}
 
-export default TicketBookingNoneSeatmap;
+export default TicketBookingNoneSeatmap

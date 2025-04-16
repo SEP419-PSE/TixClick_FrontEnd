@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
+import CreateEvent from "./components/CreateEvent/CreateEvent";
 import EnterCode from "./components/OTP/EnterCode";
 import OTPVerify from "./components/OTP/OTPVerify";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -12,30 +13,39 @@ import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
 import SignInPage from "./pages/auth/SignInPage";
+import ChatApp from "./pages/chat/ChatApp";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
+import CheckIn from "./pages/consumer/components/Event/CheckIn";
+import EventManagement from "./pages/consumer/components/Event/EventManagement";
+import Order from "./pages/consumer/components/Event/Order";
+import SummaryRevenue from "./pages/consumer/components/Event/SummaryRevenue";
+import Information from "./pages/consumer/components/Information/Information";
+import Member from "./pages/consumer/components/Member/Member";
 import Policy from "./pages/consumer/components/Policy/Policy";
 import ReportsPage from "./pages/consumer/components/Report/Report";
+import Revenue from "./pages/consumer/components/Revenue/Revenue";
+import Tasks from "./pages/consumer/components/Tasks/Tasks";
 import RootLayouts from "./pages/consumer/Layout";
+import SearchPage from "./pages/consumer/SearchPage";
 import ErrorPage from "./pages/errors/ErrorPage";
 import EventDetail from "./pages/EventDetail";
 import HomePage from "./pages/HomePage";
 import CompanyApprovalsPage from "./pages/manager/components/Companies/Companies";
 import ContractsPage from "./pages/manager/components/Contracts/ContractsPage";
+import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
 import EventsPage from "./pages/manager/components/Events/EventsPage";
 import DashboardLayout from "./pages/manager/components/ManagerLayout";
 import ManagerOverview from "./pages/manager/components/ManagerOverview";
 import NotificationPage from "./pages/manager/components/Notifications/NotificationPage";
 import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
+import OrganizerCenter from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
+import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
-import CreateEvent from "./components/CreateEvent/CreateEvent";
-import ChatApp from "./pages/chat/ChatApp";
-import ContractTemplate from "./pages/manager/components/Contracts/ContractTemplate";
-import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import SearchPage from "./pages/consumer/SearchPage";
@@ -140,6 +150,8 @@ export default function App() {
               <Route path="companies" element={<AdminCompany />} />
               <Route path="managerManagement" element={<AccountsPage />} />
               <Route path="revenues" element={<RevenuePage />} />
+
+              {/* <Route path="profile" element={<ProfileAdmin />} /> */}
             </Route>
           </Route>
 

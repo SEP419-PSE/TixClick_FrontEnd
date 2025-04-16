@@ -1,10 +1,9 @@
 import confetti from "canvas-confetti"
 import { motion } from "framer-motion"
-import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapPin, Ticket, Users } from "lucide-react"
+import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapPin, Ticket } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button } from "../../../components/ui/button"
-import { Progress } from "../../../components/ui/progress"
 import { Separator } from "../../../components/ui/separator"
 
 const payOsApi = {
@@ -44,29 +43,6 @@ const payOsApi = {
   },
 
   checkPaymentStatus: async (queryParams: Record<string, string> | null = null) => {
-    // try {
-    //   // Kiểm tra nếu có orderCode và status trong queryParams
-    //   // Nếu có, chúng ta có thể tin tưởng thông tin này thay vì gọi API
-    //   if (queryParams && queryParams.orderCode && queryParams.status) {
-    //     console.log("Using URL parameters for payment status instead of API call to avoid CORS issues")
-
-    //     // Trả về kết quả dựa trên tham số URL
-    //     return {
-    //       data: {
-    //         status:
-    //           queryParams.status === "success" || queryParams.status === "PAID"
-    //             ? "PAID"
-    //             : queryParams.status === "cancel" || queryParams.status === "CANCELED"
-    //               ? "CANCELED"
-    //               : "PENDING",
-    //         message: "Payment status determined from URL parameters",
-    //         orderCode: queryParams.orderCode,
-    //       },
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Error parsing URL parameters:", error)
-    // }
 
     try {
       // Determine if we should use query parameters or not
@@ -120,9 +96,6 @@ const payOsApi = {
 }
 
 export default function PaymentQueuePage() {
-  const [progress, setProgress] = useState(0)
-  const [queuePosition, setQueuePosition] = useState(15)
-  const [estimatedTime, setEstimatedTime] = useState(18000)
   const [isComplete, setIsComplete] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -134,18 +107,12 @@ export default function PaymentQueuePage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
-
-  // Extract query parameters from URL
   const getQueryParams = (): Record<string, string> => {
     return Object.fromEntries(new URLSearchParams(location.search))
   }
 
-  // Process payment return from gateway
+  const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || "";
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const orderCode = queryParams.get("orderCode")
@@ -160,7 +127,7 @@ export default function PaymentQueuePage() {
         setPaymentStatus("PAID")
         setIsComplete(true)
         setShowConfetti(true)
-        setProgress(100)
+        // setProgress(100)
       } else if (status === "cancel" || status === "CANCELED") {
         setPaymentStatus("CANCELED")
         setPaymentError("")
@@ -179,7 +146,7 @@ export default function PaymentQueuePage() {
             setPaymentStatus("PAID")
             setIsComplete(true)
             setShowConfetti(true)
-            setProgress(100)
+            // setProgress(100)
           } else if (response.data?.status === "CANCELED") {
             setPaymentStatus("CANCELED")
             setPaymentError("")
@@ -206,7 +173,7 @@ export default function PaymentQueuePage() {
             setPaymentStatus("PAID")
             setIsComplete(true)
             setShowConfetti(true)
-            setProgress(100)
+            // setProgress(100)
           } else {
             setPaymentError("")
           }
@@ -272,9 +239,9 @@ export default function PaymentQueuePage() {
         localStorage.setItem("paymentOrderCode", paymentResponse.data.data.orderCode)
       }
 
-      if (paymentResponse?.data?.data?.checkoutUrl) {
+      if (paymentResponse?.result?.data?.checkoutUrl) {
         // Redirect to the checkout URL
-        window.location.href = paymentResponse.data.data.checkoutUrl
+        window.location.href = paymentResponse.result.data.checkoutUrl
       } else {
         setInitialLoading(false)
         setIsProcessingPayment(false)
@@ -305,34 +272,11 @@ export default function PaymentQueuePage() {
     if (initialLoading || isProcessingPayment || isComplete || paymentStatus === "PAID" || isVerifyingPayment) return
 
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        const newProgress = prev + 1
-        if (newProgress >= 100) {
-          clearInterval(interval)
-          setIsComplete(true)
-          setShowConfetti(true)
-          return 100
-        }
-        return newProgress
-      })
-
-      setQueuePosition((prev) => {
-        if (prev <= 1) return 1
-        // Decrease queue position more rapidly as progress increases
-        const decrease = Math.random() > 0.7 ? 1 : 0
-        return prev - decrease
-      })
-
-      setEstimatedTime((prev) => {
-        if (prev <= 0) return 0
-        return prev - 1
-      })
     }, 1000)
 
     return () => clearInterval(interval)
   }, [initialLoading, isProcessingPayment, isComplete, paymentStatus, isVerifyingPayment])
 
-  // Trigger confetti effect when complete
   useEffect(() => {
     if (showConfetti) {
       const duration = 3 * 1000
@@ -364,12 +308,10 @@ export default function PaymentQueuePage() {
     }
   }, [showConfetti])
 
-  // Handle view tickets button click
   const handleViewTickets = () => {
     navigate("/ticketManagement")
   }
 
-  // Handle retry payment
   const handleRetryPayment = () => {
     if (paymentData) {
       setInitialLoading(true)
@@ -378,7 +320,6 @@ export default function PaymentQueuePage() {
     }
   }
 
-  // Rendering loading state
   if (initialLoading || isProcessingPayment || isVerifyingPayment) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
@@ -402,7 +343,6 @@ export default function PaymentQueuePage() {
     )
   }
 
-  // Rendering error state
   if (paymentError) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
@@ -470,37 +410,10 @@ export default function PaymentQueuePage() {
                 </h1>
               </div>
 
-              {!isComplete && paymentStatus !== "PAID" && (
-                <div className="flex items-center bg-[#232323] px-3 py-2 rounded-full text-sm">
-                  <Users className="h-4 w-4 text-[#FF8A00] mr-2" />
-                  <span>
-                    Vị trí trong hàng chờ: <strong className="text-white">{queuePosition}</strong>
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Progress bar */}
-          {!isComplete && paymentStatus !== "PAID" && (
-            <div className="px-5 py-4 border-b border-[#2A2A2A]">
-              <div className="flex justify-between text-sm mb-2">
-                <span>Tiến trình xử lý</span>
-                <span className="text-[#FF8A00]">{progress}%</span>
-              </div>
-              <Progress value={progress} className="h-2 bg-[#2A2A2A]" />
-              <div className="mt-3 text-sm text-gray-400 flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-[#FF8A00]" />
-                <span>
-                  Thời gian chờ ước tính: <strong className="text-white">{formatTime(estimatedTime)}</strong>
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Content */}
           <div className="p-5">
-            {/* Event info */}
             <div className="flex flex-col md:flex-row gap-5 mb-6">
               <div className="w-full md:w-[180px] h-[200px] bg-[#2A2A2A] rounded-md overflow-hidden flex-shrink-0">
                 <div className="w-full h-full bg-gradient-to-br from-[#FF8A00]/30 to-[#FF8A00]/10 flex items-center justify-center">
@@ -564,7 +477,7 @@ export default function PaymentQueuePage() {
                   paymentData.seats.map((seat: any, index: number) => (
                     <div key={seat.seatId || index} className="flex justify-between">
                       <span className="text-gray-400">
-                        1x {seat.sectionName || ""} - {seat.seatLabel || ""} ({seat.typeName || "Vé Thường"})
+                        1x {seat.sectionName || ""} - {rcCode || ""} ({seat.typeName || "Vé Thường"})
                       </span>
                       <span>{seat.formattedPrice || "200.000 đ"}</span>
                     </div>
@@ -599,22 +512,6 @@ export default function PaymentQueuePage() {
               </div>
             </div>
 
-            {/* Notes */}
-            {!isComplete && paymentStatus !== "PAID" && (
-              <div className="bg-[#2A2A2A] rounded-md p-4 mb-6">
-                <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 text-[#FF8A00] mr-3 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-white mb-1">Vui lòng không đóng trang này</p>
-                    <p className="text-gray-400">
-                      Hệ thống đang xử lý giao dịch của bạn. Việc đóng trang có thể làm gián đoạn quá trình thanh toán.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Actions */}
             <div className="flex justify-end">
               {isComplete || paymentStatus === "PAID" ? (
                 <Button className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white" onClick={handleViewTickets}>
@@ -625,7 +522,7 @@ export default function PaymentQueuePage() {
                 <Button
                   variant="outline"
                   className="border-[#2A2A2A] text-gray-400 hover:bg-[#2A2A2A] hover:text-white"
-                  onClick={() => navigate("/payment")}
+                  onClick={() => navigate("/")}
                 >
                   Hủy và quay lại
                 </Button>
@@ -634,36 +531,6 @@ export default function PaymentQueuePage() {
           </div>
         </motion.div>
 
-        {/* FAQ */}
-        <div className="mt-8 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] p-5">
-          <h3 className="text-lg font-medium mb-4">Câu hỏi thường gặp</h3>
-
-          <div className="space-y-4 text-sm">
-            <div>
-              <h4 className="font-medium text-white mb-1">Tại sao tôi phải chờ trong hàng đợi?</h4>
-              <p className="text-gray-400">
-                Hệ thống đang xử lý nhiều giao dịch cùng lúc. Việc xếp hàng giúp đảm bảo tất cả giao dịch được xử lý
-                công bằng và hiệu quả.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-white mb-1">Tôi có thể đóng trang này không?</h4>
-              <p className="text-gray-400">
-                Chúng tôi khuyến nghị bạn không đóng trang cho đến khi quá trình thanh toán hoàn tất để tránh mất vé
-                hoặc phải thanh toán lại.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-white mb-1">Tôi sẽ nhận vé ở đâu?</h4>
-              <p className="text-gray-400">
-                Sau khi thanh toán thành công, vé điện tử sẽ được gửi đến email bạn đã đăng ký. Bạn cũng có thể xem vé
-                trong tài khoản TixClick của mình.
-              </p>
-            </div>
-          </div>
-        </div>
       </main>
 
       <footer className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-4 px-4 text-center text-sm text-gray-400">

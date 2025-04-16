@@ -1,4 +1,3 @@
-// import { ContractUpload } from "../../interface/manager/Contracts";
 import { Contract } from "../../interface/manager/Contracts";
 import axiosClient from "../axiosClient";
 
@@ -24,9 +23,38 @@ const managerApi = {
     });
   },
 
+  getContractDetails(contractId: number) {
+    const url = `/contract-detail/get/${contractId}`;
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+
+  getContractPaymentPay(transactionCode: string, paymentId: number) {
+    const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
   getAllPayment() {
-    const url = "/payment/all";
-    return axiosClient.get(url);
+    const url = "/contract-payment/get";
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   },
 
   getAllEvent() {
@@ -39,8 +67,15 @@ const managerApi = {
   // }
 
   getContractsByEventId(eventId: number) {
-    const url = `/contract-document/all_by_event/{eventId}?eventId=${eventId}`;
-    return axiosClient.get(url);
+    const url = `/contract-document/all_by_event/${eventId}`;
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 10000,
+    });
   },
 
   approveCompany(status: string, companyVerificationId: number) {
@@ -93,18 +128,40 @@ const managerApi = {
     });
   },
 
-  uploadContractManager(file: File) {
-    const url = "/contract/createContractAndContractDetail";
-    const token = localStorage.getItem("accessToken2");
+    // uploadContractManager(file: File){
+    //     const url = "/contract/createContractAndContractDetail";
+    //     const token = localStorage.getItem("accessToken2")
 
-    return axiosClient.post(url, file, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "*/*",
-      },
-      timeout: 10000,
-    });
-  },
+    //     return axiosClient.post(url, file, {
+    //         headers: {
+    //           Authorization: `Bearer ${token}`,
+    //           "Accept": "m"
+    //         },
+    //         timeout: 10000, 
+    //     });
+    // },
+
+    uploadContractManager(file: File) {
+      const url = "/contract/createContractAndContractDetail"
+      const token = localStorage.getItem("accessToken2")
+  
+      // Create FormData and append the file with the exact key name "file"
+      const formData = new FormData()
+      formData.append("file", file)
+  
+      console.log("Uploading file:", file.name, file.size, file.type)
+  
+      return axiosClient.post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/pdf", 
+          Accept: "*/*",
+        },
+        timeout: 30000,
+        
+      })
+    },
+    
 
   updateContract(request: Contract) {
     const url = "/contract/createContractAndContractDetail";

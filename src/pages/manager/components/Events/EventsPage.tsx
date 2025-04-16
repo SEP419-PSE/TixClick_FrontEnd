@@ -1,5 +1,3 @@
-"use client"
-
 import {
   CheckCircle,
   ChevronLeft,
@@ -13,13 +11,13 @@ import {
   Search,
   Upload,
   XCircle,
-} from "lucide-react"
-import * as pdfjs from "pdfjs-dist"
-import { useCallback, useEffect, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { useNavigate } from "react-router"
-import { toast } from "sonner"
-import { Button } from "../../../../components/ui/button"
+} from "lucide-react";
+import * as pdfjs from "pdfjs-dist";
+import { useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
+import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -27,7 +25,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../../components/ui/dialog"
+} from "../../../../components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,14 +33,27 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../../../components/ui/dropdown-menu"
-import { Input } from "../../../../components/ui/input"
-import { Progress } from "../../../../components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
-import type { EventResponse } from "../../../../interface/manager/EventType"
-import managerApi from "../../../../services/manager/ManagerApi"
-import { ManagerHeader } from "../ManagerHeader"
+} from "../../../../components/ui/dropdown-menu";
+import { Input } from "../../../../components/ui/input";
+import { Progress } from "../../../../components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
+import type { EventResponse } from "../../../../interface/manager/EventType";
+import managerApi from "../../../../services/manager/ManagerApi";
+import { ManagerHeader } from "../ManagerHeader";
 
 const customStyles = `
   .description-scrollbar::-webkit-scrollbar {
@@ -62,7 +73,7 @@ const customStyles = `
   .description-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #444444;
   }
-`
+`;
 
 const eventTypes = [
   "Conference",
@@ -73,281 +84,343 @@ const eventTypes = [
   "Trade Show",
   "Webinar",
   "Hackathon",
-]
+];
 
 // Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<EventResponse[]>([])
+  const [events, setEvents] = useState<EventResponse[]>([]);
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filteredEvents, setFilteredEvents] = useState(events)
-  const [selectedEvent, setSelectedEvent] = useState<EventResponse>()
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false)
-  const [isContractModalOpen, setIsContractModalOpen] = useState(false)
-  const [relatedContracts, setRelatedContracts] = useState<any[]>([])
-  const [isRelatedContractsModalOpen, setIsRelatedContractsModalOpen] = useState(false)
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [filterType, setFilterType] = useState("all")
-  const [sortBy, setSortBy] = useState("date")
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredEvents, setFilteredEvents] = useState(events);
+  const [selectedEvent, setSelectedEvent] = useState<EventResponse>();
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [relatedContracts, setRelatedContracts] = useState<any[]>([]);
+  const [isRelatedContractsModalOpen, setIsRelatedContractsModalOpen] =
+    useState(false);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("asc");
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // Contract Upload State
-  const [file, setFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const navigate = useNavigate()
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const navigate = useNavigate();
 
-  // Add these state variables after the other state declarations (around line 75)
-  const [isApproving, setIsApproving] = useState(false)
-  const [isRejecting, setIsRejecting] = useState(false)
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
 
   const fetchEventList = async () => {
     try {
-      const res: any = await managerApi.getAllEvent()
-      console.log("Event List:", res.data.result)
+      const res: any = await managerApi.getAllEvent();
+      console.log("Event List:", res.data.result);
       if (res.data.result && res.data.result.length > 0) {
-        setEvents(res.data.result)
+        setEvents(res.data.result);
       }
     } catch (error) {
-      console.error("Error fetching contract:", error)
-      toast.error("Failed to fetch contract")
+      console.error("Error fetching contract:", error);
+      toast.error("Failed to fetch contract");
     }
-  }
+  };
 
   const fetchRelatedContracts = async (eventId: number) => {
-    console.log("eventId:", eventId)
+    console.log("eventId:", eventId);
     try {
-      const res: any = await managerApi.getContractsByEventId(eventId)
-      console.log("Related Contract Documents:", res.data.result)
+      const res: any = await managerApi.getContractsByEventId(eventId);
+      console.log("Related Contract Documents:", res.data.result);
       if (res.data.result && res.data.result.length > 0) {
-        setRelatedContracts(res.data.result)
+        setRelatedContracts(res.data.result);
       } else {
-        setRelatedContracts([])
+        setRelatedContracts([]);
       }
     } catch (error) {
-      console.error("Error fetching related contract documents:", error)
-      toast.error("Failed to fetch related contract documents")
-      setRelatedContracts([])
+      console.error("Error fetching related contract documents:", error);
+      toast.error("Failed to fetch related contract documents");
+      setRelatedContracts([]);
     }
-  }
+  };
 
-  // Update the handleApprove function to use the loading state
   const handleApprove = async (status: string, eventId: number) => {
     try {
-      console.log("Approving event:", status, "| eventId:", eventId)
+      console.log("Approving event:", status, "| eventId:", eventId);
 
-      // Set loading state
-      setIsApproving(true)
+      setIsApproving(true);
 
-      // Call the API with the correct method and parameters
-      const res: any = await managerApi.approveEvent(status, eventId)
-      console.log("Approval response:", res)
+      const res: any = await managerApi.approveEvent(status, eventId);
+      console.log("Approval response:", res);
 
       if (res.data && res.data.result === true) {
-        toast.success("Event approved successfully")
-        await fetchEventList()
-        setIsEventModalOpen(false)
+        toast.success("Event approved successfully");
+        await fetchEventList();
+        setIsEventModalOpen(false);
       } else {
-        toast.error("Failed to approve event")
+        toast.error("Failed to approve event");
       }
     } catch (error) {
-      console.error("Error approving event:", error)
-      toast.error("Failed to approve event. Please try again.")
+      console.error("Error approving event:", error);
+      toast.error("Failed to approve event. Please try again.");
     } finally {
-      // Reset loading state
-      setIsApproving(false)
+      setIsApproving(false);
     }
-  }
+  };
 
-  // Update the handleReject function to use the loading state
   const handleReject = async () => {
-    if (!selectedEvent) return
+    if (!selectedEvent) return;
     try {
-      console.log("Rejecting event:", "REJECTED", "| eventId:", selectedEvent.eventId)
+      console.log(
+        "Rejecting event:",
+        "REJECTED",
+        "| eventId:",
+        selectedEvent.eventId
+      );
 
-      // Set loading state
-      setIsRejecting(true)
+      setIsRejecting(true);
 
-      const res: any = await managerApi.approveEvent("REJECTED", selectedEvent.eventId)
-      console.log("Rejection response:", res)
+      const res: any = await managerApi.approveEvent(
+        "REJECTED",
+        selectedEvent.eventId
+      );
+      console.log("Rejection response:", res);
 
       if (res.data && res.data.result === true) {
-        toast.success("Event rejected successfully")
-        await fetchEventList()
-        setIsEventModalOpen(false)
+        toast.success("Event rejected successfully");
+        await fetchEventList();
+        setIsEventModalOpen(false);
       } else {
-        toast.error("Failed to reject event")
+        toast.error("Failed to reject event");
       }
     } catch (error) {
-      console.error("Error rejecting event:", error)
-      toast.error("Failed to reject event. Please try again.")
+      console.error("Error rejecting event:", error);
+      toast.error("Failed to reject event. Please try again.");
     } finally {
-      // Reset loading state
-      setIsRejecting(false)
+      setIsRejecting(false);
     }
-  }
+  };
 
   const handleUploadContract = async (file: File) => {
-    if (!file || !selectedEvent) return
+    // if (!file || !selectedEvent) return
+
+    // let progressInterval: NodeJS.Timeout | undefined
 
     try {
-      setIsUploading(true)
-      setUploadProgress(0)
+      setIsUploading(true);
+      setUploadProgress(0);
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 95) {
-            clearInterval(progressInterval)
-            return 95
-          }
-          return prev + 5
-        })
-      }, 200)
+      // progressInterval = setInterval(() => {
+      //   setUploadProgress((prev) => {
+      //     if (prev >= 95) {
+      //       if (progressInterval) clearInterval(progressInterval)
+      //       return 95
+      //     }
+      //     return prev + 5
+      //   })
+      // }, 200)
 
-      // Call the API endpoint with the file directly as specified in your API
-      const res = await managerApi.uploadContractManager(file)
-      console.log("Upload contract response:", res)
+      // Log the file details before upload
+      console.log("Uploading file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: new Date(file.lastModified).toISOString(),
+      });
 
-      clearInterval(progressInterval)
-      setUploadProgress(100)
+      // Make the API call
+      const res = await managerApi.uploadContractManager(file);
+      console.log("Upload contract response:", res);
+
+      // if (progressInterval) clearInterval(progressInterval)
+      // setUploadProgress(100)
 
       if (res.data && res.data.result) {
-        toast.success("Contract uploaded successfully")
+        toast.success("Contract uploaded successfully");
         // Refresh related contracts if needed
         if (selectedEvent) {
-          await fetchRelatedContracts(selectedEvent.eventId)
+          await fetchRelatedContracts(selectedEvent.eventId);
         }
       } else {
-        toast.error("Failed to upload contract")
+        toast.error("Failed to upload contract");
+        console.error("Upload failed with response:", res);
       }
 
       setTimeout(() => {
-        setIsContractModalOpen(false)
-        setFile(null)
-        setUploadProgress(0)
-        setIsUploading(false)
-      }, 1000)
-    } catch (error) {
-      console.error("Error uploading contract:", error)
-      toast.error("Upload Error", {
-        description: "There was an error uploading the contract. Please try again.",
-      })
-      setIsUploading(false)
+        setIsContractModalOpen(false);
+        setFile(null);
+        setUploadProgress(0);
+        setIsUploading(false);
+      }, 1000);
+    } catch (error: any) {
+      // Type assertion to any to handle error properties
+      console.error("Error uploading contract:", error);
+
+      // More detailed error logging
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+
+        toast.error(`Upload Error: ${error.response.status}`, {
+          description:
+            (error.response.data?.message as string) ||
+            "Server rejected the request. Please check file format and size.",
+        });
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Error request:", error.request);
+        toast.error("Upload Error", {
+          description:
+            "No response received from server. Please check your connection.",
+        });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        toast.error("Upload Error", {
+          description:
+            (error.message as string) ||
+            "There was an error uploading the contract. Please try again.",
+        });
+      }
+
+      setIsUploading(false);
+      // if (progressInterval) clearInterval(progressInterval)
     }
-  }
+  };
 
   const navigateToEventPage = (eventId: number) => {
     // window.location.href = `/manager/event-details/${eventId}`
-    navigate(`/manager/event-details/${eventId}`)
-  }
+    navigate(`/manager/event-details/${eventId}`);
+  };
 
   useEffect(() => {
     const initUseEffect = async () => {
-      await fetchEventList()
-    }
-    initUseEffect()
-  }, [])
+      await fetchEventList();
+    };
+    initUseEffect();
+  }, []);
 
   // Handle file drop for contract upload
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0]
-      setFile(file)
+      const file = acceptedFiles[0];
+      setFile(file);
     }
-  }, [])
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "application/pdf": [".pdf"],
       "application/msword": [".doc"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        [".docx"],
     },
     maxFiles: 1,
     maxSize: 10485760, // 10MB
-  })
+  });
 
   // Upload contract file
   const uploadContract = async () => {
-    if (!file || !selectedEvent) return
-    await handleUploadContract(file)
-  }
+    if (!file || !selectedEvent) return;
+    await handleUploadContract(file);
+  };
 
   useEffect(() => {
     let result = events.filter((event) =>
-      Object.values(event).some((value) => value.toString().toLowerCase().includes(searchQuery.toLowerCase())),
-    )
+      Object.values(event).some((value) =>
+        value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
 
     if (filterStatus !== "all") {
-      result = result.filter((event) => event.status === filterStatus)
+      result = result.filter((event) => event.status === filterStatus);
     }
 
     if (filterType !== "all") {
-      result = result.filter((event) => event.typeEvent === filterType)
+      result = result.filter((event) => event.typeEvent === filterType);
     }
 
     result.sort((a: any, b: any) => {
-      if (a[sortBy] < b[sortBy]) return sortOrder === "asc" ? -1 : 1
-      if (a[sortBy] > b[sortBy]) return sortOrder === "asc" ? 1 : -1
-      return 0
-    })
+      if (a[sortBy] < b[sortBy]) return sortOrder === "asc" ? -1 : 1;
+      if (a[sortBy] > b[sortBy]) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
 
-    setFilteredEvents(result)
-  }, [searchQuery, events, filterStatus, filterType, sortBy, sortOrder])
+    setFilteredEvents(result);
+  }, [searchQuery, events, filterStatus, filterType, sortBy, sortOrder]);
 
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "APPROVED":
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Approved</span>
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
+            Approved
+          </span>
+        );
       case "PENDING":
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Pending</span>
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">
+            Pending
+          </span>
+        );
       case "REJECTED":
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">Rejected</span>
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">
+            Rejected
+          </span>
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const handleCreateContract = () => {
-    setIsContractModalOpen(true)
-    setFile(null)
-    setUploadProgress(0)
+    setIsContractModalOpen(true);
+    setFile(null);
+    setUploadProgress(0);
+  };
+
+  const handleDownloadContractTemplate = () => {
+    const fileId = "1Lz0B_1FAtS7lwD-CgrJlPZY4wAHNK2uo";
+    const url = `https://docs.google.com/document/d/${fileId}/export?format=docx`;
+    window.open(url, '_blank');
   }
+  
+  
+  
 
   const handleViewRelatedContracts = async () => {
-    if (!selectedEvent) return
+    if (!selectedEvent) return;
 
-    await fetchRelatedContracts(selectedEvent.eventId)
-    setIsRelatedContractsModalOpen(true)
-  }
+    await fetchRelatedContracts(selectedEvent.eventId);
+    setIsRelatedContractsModalOpen(true);
+  };
 
   // Pagination functions
   const paginate = (items: any[], page: number, itemsPerPage: number) => {
-    const startIndex = (page - 1) * itemsPerPage
-    return items.slice(startIndex, startIndex + itemsPerPage)
-  }
+    const startIndex = (page - 1) * itemsPerPage;
+    return items.slice(startIndex, startIndex + itemsPerPage);
+  };
 
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage)
-  const paginatedEvents = paginate(filteredEvents, currentPage, itemsPerPage)
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+  const paginatedEvents = paginate(filteredEvents, currentPage, itemsPerPage);
 
   // Add this before the return statement
   useEffect(() => {
     // Add custom scrollbar styles
-    const styleElement = document.createElement("style")
-    styleElement.textContent = customStyles
-    document.head.appendChild(styleElement)
+    const styleElement = document.createElement("style");
+    styleElement.textContent = customStyles;
+    document.head.appendChild(styleElement);
 
     return () => {
-      document.head.removeChild(styleElement)
-    }
-  }, [])
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   return (
     <>
@@ -395,11 +468,22 @@ export default function EventsPage() {
                   Sort by
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
-                <DropdownMenuItem onClick={() => setSortBy("date")}>Date</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("name")}>Name</DropdownMenuItem>
+              <DropdownMenuContent
+                align="end"
+                className="bg-[#2A2A2A] text-white"
+              >
+                <DropdownMenuItem onClick={() => setSortBy("date")}>
+                  Date
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("name")}>
+                  Name
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                >
                   {sortOrder === "asc" ? "Ascending" : "Descending"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -421,13 +505,28 @@ export default function EventsPage() {
             </TableHeader>
             <TableBody>
               {paginatedEvents.map((event) => (
-                <TableRow key={event.eventId} className="border-[#333333] hover:bg-[#2A2A2A]">
-                  <TableCell className="font-medium text-white">{event.eventName}</TableCell>
-                  <TableCell className="text-white">{event.eventName}</TableCell>
-                  <TableCell className="text-white">{event.location}</TableCell>
-                  <TableCell className="text-white">{event.companyName}</TableCell>
-                  <TableCell className="text-white">{event.typeEvent}</TableCell>
-                  <TableCell className="text-white">{getStatusBadge(event.status)}</TableCell>
+                <TableRow
+                  key={event.eventId}
+                  className="border-[#333333] hover:bg-[#2A2A2A]"
+                >
+                  <TableCell className="font-medium text-white">
+                    {event.eventName}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {event.eventName}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {event.locationName}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {event.companyName}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {event.typeEvent}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {getStatusBadge(event.status)}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -436,26 +535,35 @@ export default function EventsPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-[#2A2A2A] text-white"
+                      >
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
                           onClick={() => {
-                            setSelectedEvent(event)
-                            setIsEventModalOpen(true)
+                            setSelectedEvent(event);
+                            setIsEventModalOpen(true);
                           }}
                         >
                           View details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigateToEventPage(event.eventId)}>
+                        <DropdownMenuItem
+                          onClick={() => navigateToEventPage(event.eventId)}
+                        >
                           Go to event page
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Edit event information</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          Edit event information
+                        </DropdownMenuItem>
                         {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
                         <DropdownMenuItem onClick={handleViewRelatedContracts}>
                           View associated contracts
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-500">Cancel event</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-500">
+                          Cancel event
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -471,13 +579,23 @@ export default function EventsPage() {
                 <p className="text-sm text-gray-400">
                   Showing{" "}
                   <span className="font-medium text-white">
-                    {Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length)}
+                    {Math.min(
+                      (currentPage - 1) * itemsPerPage + 1,
+                      filteredEvents.length
+                    )}
                   </span>{" "}
                   to{" "}
                   <span className="font-medium text-white">
-                    {Math.min(currentPage * itemsPerPage, filteredEvents.length)}
+                    {Math.min(
+                      currentPage * itemsPerPage,
+                      filteredEvents.length
+                    )}
                   </span>{" "}
-                  of <span className="font-medium text-white">{filteredEvents.length}</span> events
+                  of{" "}
+                  <span className="font-medium text-white">
+                    {filteredEvents.length}
+                  </span>{" "}
+                  events
                 </p>
               </div>
 
@@ -485,8 +603,8 @@ export default function EventsPage() {
                 <Select
                   value={itemsPerPage.toString()}
                   onValueChange={(value) => {
-                    setItemsPerPage(Number(value))
-                    setCurrentPage(1) // Reset to first page when changing items per page
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1); // Reset to first page when changing items per page
                   }}
                 >
                   <SelectTrigger className="w-[110px] h-9 bg-[#2A2A2A] text-white border-[#333333]">
@@ -500,7 +618,10 @@ export default function EventsPage() {
                   </SelectContent>
                 </Select>
 
-                <nav className="flex items-center space-x-1" aria-label="Pagination">
+                <nav
+                  className="flex items-center space-x-1"
+                  aria-label="Pagination"
+                >
                   <Button
                     variant="outline"
                     size="icon"
@@ -530,7 +651,9 @@ export default function EventsPage() {
                     variant="outline"
                     size="icon"
                     className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <span className="sr-only">Previous page</span>
@@ -651,7 +774,9 @@ export default function EventsPage() {
                       )}
 
                       <Button
-                        variant={currentPage === totalPages ? "default" : "outline"}
+                        variant={
+                          currentPage === totalPages ? "default" : "outline"
+                        }
                         size="icon"
                         className={`h-9 w-9 ${
                           currentPage === totalPages
@@ -669,7 +794,9 @@ export default function EventsPage() {
                     variant="outline"
                     size="icon"
                     className="h-9 w-9 bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333] rounded-md"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     <span className="sr-only">Next page</span>
@@ -710,10 +837,14 @@ export default function EventsPage() {
       <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader className="border-b border-[#333333] pb-4">
-            <DialogTitle className="text-xl font-bold">{selectedEvent?.eventName}</DialogTitle>
+            <DialogTitle className="text-xl font-bold">
+              {selectedEvent?.eventName}
+            </DialogTitle>
             <DialogDescription className="flex items-center gap-2">
               {selectedEvent && getStatusBadge(selectedEvent.status)}
-              <span className="text-gray-400">ID: {selectedEvent?.eventId}</span>
+              <span className="text-gray-400">
+                ID: {selectedEvent?.eventId}
+              </span>
             </DialogDescription>
           </DialogHeader>
 
@@ -746,11 +877,15 @@ export default function EventsPage() {
                       </div>
                       <div>
                         <p className="text-sm text-gray-400">Company</p>
-                        <p className="font-medium">{selectedEvent.companyName}</p>
+                        <p className="font-medium">
+                          {selectedEvent.companyName}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-400">Organizer</p>
-                        <p className="font-medium">{selectedEvent.organizerName}</p>
+                        <p className="font-medium">
+                          {selectedEvent.organizerName}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -782,7 +917,9 @@ export default function EventsPage() {
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-gray-400">Location Name</p>
-                        <p className="font-medium">{selectedEvent.locationName}</p>
+                        <p className="font-medium">
+                          {selectedEvent.locationName}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-400">Address</p>
@@ -813,9 +950,13 @@ export default function EventsPage() {
                     </h3>
                     <div className="overflow-y-auto max-h-[400px] pr-2 description-scrollbar">
                       {selectedEvent.description ? (
-                        <div className="whitespace-pre-wrap">{selectedEvent.description}</div>
+                        <div className="whitespace-pre-wrap">
+                          {selectedEvent.description}
+                        </div>
                       ) : (
-                        <div className="text-gray-400 italic">No description available</div>
+                        <div className="text-gray-400 italic">
+                          No description available
+                        </div>
                       )}
                     </div>
                   </div>
@@ -838,7 +979,9 @@ export default function EventsPage() {
                   <>
                     <Button
                       className="bg-green-600 hover:bg-green-700 text-white"
-                      onClick={() => handleApprove("APPROVED", selectedEvent?.eventId ?? 0)}
+                      onClick={() =>
+                        handleApprove("APPROVED", selectedEvent?.eventId ?? 0)
+                      }
                       disabled={isApproving || isRejecting}
                     >
                       {isApproving ? (
@@ -911,8 +1054,11 @@ export default function EventsPage() {
                 )}
                 {selectedEvent?.status === "APPROVED" && (
                   <>
-                    <Button onClick={handleCreateContract} className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <FileText className="mr-2 h-4 w-4" /> Create Contract
+                    <Button
+                      onClick={handleCreateContract}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <FileText className="mr-2 h-4 w-4" /> Upload Contract
                     </Button>
                     <Button
                       onClick={handleViewRelatedContracts}
@@ -931,8 +1077,15 @@ export default function EventsPage() {
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Upload Contract</DialogTitle>
-            <DialogDescription>Upload a contract document for: {selectedEvent?.eventName}</DialogDescription>
+            <div className="flex justify-between items-center w-full">
+              <div className="text-left">
+                <DialogTitle>Upload Contract</DialogTitle>
+                <DialogDescription>
+                  Upload a contract document for: {selectedEvent?.eventName}
+                </DialogDescription>
+              </div>
+              <Button onClick={handleDownloadContractTemplate}>Contract template</Button>
+            </div>
           </DialogHeader>
 
           <div className="py-6">
@@ -940,29 +1093,35 @@ export default function EventsPage() {
               <div
                 {...getRootProps()}
                 className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors ${
-                  isDragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"
+                  isDragActive
+                    ? "border-primary bg-primary/5"
+                    : "border-muted-foreground/25 hover:border-primary/50"
                 }`}
               >
                 <input {...getInputProps()} />
                 <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium mb-1">Drag & drop your contract</h3>
-                <p className="text-sm text-muted-foreground mb-4">Support for PDF files only (max 10MB)</p>
+                <h3 className="text-lg font-medium mb-1">
+                  Drag & drop your contract
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Support for PDF files only (max 10MB)
+                </p>
                 <Button
                   type="button"
                   variant="secondary"
                   className="mx-auto"
                   onClick={(e) => {
-                    e.stopPropagation()
-                    const input = document.createElement("input")
-                    input.type = "file"
-                    input.accept = ".pdf,.doc,.docx"
+                    e.stopPropagation();
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = ".pdf,.doc,.docx";
                     input.onchange = (event) => {
-                      const target = event.target as HTMLInputElement
+                      const target = event.target as HTMLInputElement;
                       if (target && target.files && target.files[0]) {
-                        setFile(target.files[0])
+                        setFile(target.files[0]);
                       }
-                    }
-                    input.click()
+                    };
+                    input.click();
                   }}
                 >
                   <Upload className="w-4 h-4 mr-2" />
@@ -975,7 +1134,9 @@ export default function EventsPage() {
                   <FileText className="w-8 h-8 text-blue-400" />
                   <div className="flex-1">
                     <p className="font-medium">{file.name}</p>
-                    <p className="text-xs text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p className="text-xs text-gray-400">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
                   </div>
                   <Button
                     variant="ghost"
@@ -1002,14 +1163,18 @@ export default function EventsPage() {
                     variant="outline"
                     className="text-black"
                     onClick={() => {
-                      setFile(null)
-                      setUploadProgress(0)
+                      setFile(null);
+                      setUploadProgress(0);
                     }}
                     disabled={isUploading}
                   >
                     Cancel
                   </Button>
-                  <Button onClick={uploadContract} disabled={isUploading} className="bg-blue-600 hover:bg-blue-700">
+                  <Button
+                    onClick={uploadContract}
+                    disabled={isUploading}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
                     {isUploading ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -1027,85 +1192,140 @@ export default function EventsPage() {
       </Dialog>
 
       {/* Related Contracts Dialog */}
-      <Dialog open={isRelatedContractsModalOpen} onOpenChange={setIsRelatedContractsModalOpen}>
-        <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl">
-          <DialogHeader>
+      <Dialog
+        open={isRelatedContractsModalOpen}
+        onOpenChange={setIsRelatedContractsModalOpen}
+      >
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader className="border-b border-[#333333] pb-4">
             <DialogTitle>Related Contracts</DialogTitle>
-            <DialogDescription>Contracts associated with: {selectedEvent?.eventName}</DialogDescription>
+            <DialogDescription>
+              Contracts associated with: {selectedEvent?.eventName}
+            </DialogDescription>
           </DialogHeader>
 
-          {relatedContracts.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-                  <TableHead className="text-white">File Name</TableHead>
-                  <TableHead className="text-white">File Type</TableHead>
-                  <TableHead className="text-white">Status</TableHead>
-                  <TableHead className="text-white">Upload Date</TableHead>
-                  <TableHead className="text-white text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {relatedContracts.map((document) => (
-                  <TableRow key={document.contractDocumentId} className="border-[#333333] hover:bg-[#2A2A2A]">
-                    <TableCell className="font-medium text-white">{document.fileName}</TableCell>
-                    <TableCell className="text-white">{document.fileType}</TableCell>
-                    <TableCell className="text-white">{document.status}</TableCell>
-                    <TableCell className="text-white">
-                      {document.uploadDate ? new Date(document.uploadDate).toLocaleDateString() : "N/A"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          {document.fileURL && (
-                            <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Document
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => window.open(document.fileURL, "_blank")}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="py-8 text-center">
-              <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">No Contract Documents Found</h3>
-              <p className="text-sm text-gray-400 mb-4">
-                There are no contract documents associated with this event yet.
-              </p>
-              {selectedEvent?.status === "APPROVED" && (
-                <Button
-                  onClick={() => {
-                    setIsRelatedContractsModalOpen(false)
-                    handleCreateContract()
-                  }}
-                >
-                  <FileText className="mr-2 h-4 w-4" /> Create Contract
-                </Button>
-              )}
-            </div>
-          )}
+          <div className="flex-1 overflow-hidden py-4">
+            {relatedContracts.length > 0 ? (
+              <div className="overflow-auto max-h-[50vh] pr-2 description-scrollbar">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
+                        File Name
+                      </TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
+                        File Type
+                      </TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
+                        Upload Date
+                      </TableHead>
+                      <TableHead className="text-white text-right sticky top-0 bg-[#2A2A2A] z-10">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {relatedContracts.map((document) => (
+                      <TableRow
+                        key={document.contractDocumentId}
+                        className="border-[#333333] hover:bg-[#2A2A2A]"
+                      >
+                        <TableCell className="font-medium text-white">
+                          {document.fileName}
+                        </TableCell>
+                        <TableCell className="text-white">
+                          {document.fileType}
+                        </TableCell>
+                        <TableCell className="text-white">
+                          {document.status}
+                        </TableCell>
+                        <TableCell className="text-white">
+                          {document.uploadDate
+                            ? new Date(document.uploadDate).toLocaleDateString()
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="bg-[#2A2A2A] text-white"
+                            >
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              {document.fileURL && (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    window.open(document.fileURL, "_blank")
+                                  }
+                                >
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View Document
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  window.open(document.fileURL, "_blank")
+                                }
+                              >
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="py-8 text-center">
+                <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+                <h3 className="text-lg font-medium mb-2">
+                  No Contract Documents Found
+                </h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  There are no contract documents associated with this event
+                  yet.
+                </p>
+                {selectedEvent?.status === "APPROVED" && (
+                  <Button
+                    onClick={() => {
+                      setIsRelatedContractsModalOpen(false);
+                      handleCreateContract();
+                    }}
+                  >
+                    <FileText className="mr-2 h-4 w-4" /> Create Contract
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
 
-          <DialogFooter>
-            <Button onClick={() => setIsRelatedContractsModalOpen(false)}>Close</Button>
+          <DialogFooter className="border-t border-[#333333] pt-4 mt-auto">
+            <div className="flex justify-between w-full">
+              <Button
+                onClick={handleCreateContract}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={selectedEvent?.status !== "APPROVED"}
+              >
+                <FileText className="mr-2 h-4 w-4" /> Add New Contract
+              </Button>
+              <Button onClick={() => setIsRelatedContractsModalOpen(false)}>
+                Close
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

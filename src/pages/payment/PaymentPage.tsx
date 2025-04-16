@@ -17,6 +17,7 @@ import { Separator } from "../../components/ui/separator"
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
     try {
+      console.log("Data purchase:", data)
       const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
         method: "POST",
         headers: {
@@ -102,14 +103,14 @@ export default function PaymentPage() {
       return selectedSeatsData.apiResponses.purchase
     }
 
-    // Create a ticket purchase request for each selected seat
-    const ticketPurchaseRequests = selectedSeatsData.seats.map((seat: any) => ({
+    // If no existing purchase data, create ticket purchase requests based on selected seats
+    const ticketPurchaseRequests = selectedSeatsData.seats.map((seat:any) => ({
       zoneId: seat.zoneId || 0,
-      seatId: seat.seatId, // Use the correct seatId from each seat
+      seatId: seat.seatId || 0,
       eventActivityId: Number(selectedSeatsData.eventInfo.activityId),
-      ticketId: seat.ticketId, // Use the ticketId from each seat
+      ticketId: seat.ticketId,
       eventId: Number(selectedSeatsData.eventInfo.id),
-      quantity: 1, // For seated tickets, quantity is always 1
+      quantity: seat.quantity || 1,
     }))
 
     console.log("Generated ticket purchase requests:", ticketPurchaseRequests)
@@ -172,6 +173,8 @@ export default function PaymentPage() {
       setIsProcessing(false)
     }
   }
+
+  
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
