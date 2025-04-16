@@ -599,7 +599,7 @@ export default function PaymentQueuePage() {
             </div>
 
             {/* Notes */}
-            {!isComplete && paymentStatus !== "PAID" && (
+            {/* {!isComplete && paymentStatus !== "PAID" && (
               <div className="bg-[#2A2A2A] rounded-md p-4 mb-6">
                 <div className="flex items-start">
                   <AlertCircle className="h-5 w-5 text-[#FF8A00] mr-3 flex-shrink-0 mt-0.5" />
@@ -611,7 +611,7 @@ export default function PaymentQueuePage() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Actions */}
             <div className="flex justify-end">
@@ -634,7 +634,7 @@ export default function PaymentQueuePage() {
         </motion.div>
 
         {/* FAQ */}
-        <div className="mt-8 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] p-5">
+        {/* <div className="mt-8 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] p-5">
           <h3 className="text-lg font-medium mb-4">Câu hỏi thường gặp</h3>
 
           <div className="space-y-4 text-sm">
@@ -662,7 +662,7 @@ export default function PaymentQueuePage() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </main>
 
       <footer className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-4 px-4 text-center text-sm text-gray-400">
