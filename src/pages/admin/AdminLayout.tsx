@@ -11,6 +11,8 @@ import NavItem from "./NavItem"
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [profileOpen, setProfileOpen] = useState(false)
+
     const navigate = useNavigate()
 
     const handleLogOut = () => {
@@ -26,6 +28,11 @@ export default function AdminLayout() {
         navigate("/superLogin")
       }, 1000)
     }
+
+    const handleOpenProfile = () => {
+      setProfileOpen(true)
+    }
+
     return (
       <div className="flex h-screen bg-[#1E1E1E] text-white">
         
@@ -67,7 +74,7 @@ export default function AdminLayout() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleOpenProfile}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </DropdownMenuItem>

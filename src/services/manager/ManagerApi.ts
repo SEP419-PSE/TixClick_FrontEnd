@@ -23,6 +23,18 @@ const managerApi = {
     });
   },
 
+  getContractDetails(contractId: number) {
+    const url = `/contract-detail/get/${contractId}`;
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+
   getContractPaymentPay(transactionCode: string, paymentId: number) {
     const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
     const token = localStorage.getItem("accessToken2");

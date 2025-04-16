@@ -174,6 +174,8 @@ export default function PaymentPage() {
     }
   }
 
+  
+
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
       <Toaster />
