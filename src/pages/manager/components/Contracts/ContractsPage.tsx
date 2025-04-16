@@ -54,7 +54,6 @@ import {
   TabsTrigger,
 } from "../../../../components/ui/tabs";
 import type {
-  Contract,
   ContractDocumentDTO,
   ContractDTO,
   VietQR,

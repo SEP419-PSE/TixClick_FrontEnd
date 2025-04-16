@@ -107,7 +107,7 @@ export default function ManagerOverview() {
           </Card>
           <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Upcoming Events</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Scheduled Events</CardTitle>
               <CalendarDays className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -117,7 +117,7 @@ export default function ManagerOverview() {
           </Card>
           <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Active Contracts</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Approved Contracts</CardTitle>
               <ClipboardSignature className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
