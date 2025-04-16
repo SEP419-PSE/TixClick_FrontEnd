@@ -280,7 +280,7 @@ const StepTwo: React.FC<StepProps> = ({
           </button>
 
           {activities.map((activity, index) => (
-            <Card className="px-4 py-2 bg-gradient-to-b from-black/20 to-pse-green/50 text-white">
+            <Card className="px-4 py-2 bg-transparent text-white">
               <CardTitle className="flex justify-between items-center mb-4 mt-2 ml-4 text-[20px] font-bold">
                 <p>Hoạt động {index + 1}</p>
                 <X
@@ -293,7 +293,8 @@ const StepTwo: React.FC<StepProps> = ({
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="activityName">Tên hoạt động</Label>
                   <Input
-                    className="bg-transparent"
+                    placeholder="Tên hoạt động"
+                    className="text-white bg-transparent"
                     id="activityName"
                     type="text"
                     value={activity.activityName || ""}
@@ -312,7 +313,7 @@ const StepTwo: React.FC<StepProps> = ({
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal bg-transparent",
+                          "w-full justify-start text-left font-normal text-white bg-transparent",
                           !activity.dateEvent && "text-muted-foreground"
                         )}
                       >
@@ -371,7 +372,7 @@ const StepTwo: React.FC<StepProps> = ({
                 </div>
                 {/* Giờ bắt đầu */}
                 <TimeInput
-                  className="bg-transparent"
+                  className="text-white bg-transparent"
                   label="Giờ bắt đầu"
                   id={`startTimeEvent-${index}`}
                   value={activity.startTimeEvent || ""}
@@ -405,7 +406,7 @@ const StepTwo: React.FC<StepProps> = ({
 
                 {/* Giờ kết thúc */}
                 <TimeInput
-                  className="bg-transparent"
+                  className="text-white bg-transparent"
                   label="Giờ kết thúc"
                   id={`endTimeEvent-${index}`}
                   value={activity.endTimeEvent || ""}
@@ -446,7 +447,7 @@ const StepTwo: React.FC<StepProps> = ({
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-white text-left font-normal bg-transparent",
+                          "w-full justify-start text-white bg-transparent text-left font-normal",
                           !activity.startTicketSale && "text-muted-foreground"
                         )}
                       >
@@ -547,11 +548,14 @@ const StepTwo: React.FC<StepProps> = ({
                 <div className="flex flex-col gap-2">
                   <Label>Kết thúc bán vé</Label>
                   <Popover>
-                    <PopoverTrigger className="text-white" asChild>
+                    <PopoverTrigger
+                      className="text-white bg-transparent"
+                      asChild
+                    >
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal bg-transparent",
+                          "w-full justify-start text-left font-normal",
                           !activity.endTicketSale && "text-muted-foreground"
                         )}
                       >

@@ -62,6 +62,10 @@ const eventApi = {
     const url = `${baseURL}/dashboard/${companyId}`;
     return axiosClient.get(url);
   },
+  getRevenue: (eventId: number) => {
+    const url = `${baseURL}/dashboard/event-activity/${eventId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;

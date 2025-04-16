@@ -48,6 +48,16 @@ import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
+import SearchPage from "./pages/consumer/SearchPage";
+import OrganizerCenter from "./pages/organizer";
+import Member from "./pages/consumer/components/Member/Member";
+import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
+import Information from "./pages/consumer/components/Information/Information";
+import EventManagement from "./pages/consumer/components/Event/EventManagement";
+import SummaryRevenue from "./pages/consumer/components/Event/Summary/SummaryRevenue";
+import Order from "./pages/consumer/components/Event/Order/Order";
+import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
+import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
 
 export default function App() {
   return (
@@ -142,10 +152,7 @@ export default function App() {
               <Route path="revenues" element={<RevenuePage />} />
 
               {/* <Route path="profile" element={<ProfileAdmin />} /> */}
-
             </Route>
-
-            
           </Route>
 
           <Route path="404" element={<ErrorPage />} />

@@ -7,7 +7,7 @@ import {
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
-import { NavLink, } from "react-router";
+import { NavLink } from "react-router";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
@@ -50,7 +50,13 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
             {eventDetail?.locationName}
           </div>
           <div className="absolute top-5 left-5 truncate">
-            {eventDetail?.location}
+            {eventDetail?.address +
+              "," +
+              eventDetail?.ward +
+              "," +
+              eventDetail?.district +
+              "," +
+              eventDetail?.city}
           </div>
         </p>
         <div className="max-[1150px]:hidden absolute bottom-28 w-[95%] h-[1px] bg-white rounded-full">

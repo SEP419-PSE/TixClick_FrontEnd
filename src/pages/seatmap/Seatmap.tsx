@@ -8,6 +8,7 @@ import ticketApi from "../../services/ticketApi";
 import seatmapApi from "../../services/seatmapApi";
 import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 import { StepProps } from "../../components/CreateEvent/steps/Step1_Infor";
+import { formatMoney } from "../../lib/utils";
 
 // Type definitions
 // type SeatStatus = "available" | "disabled";
@@ -276,7 +277,12 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                             )?.name || "Chưa xác định"}
                           </div>
                           <div className="mb-1">
-                            Giá: {formatCurrency(seat.price)}
+                            Giá:{" "}
+                            {formatMoney(
+                              seatTypes.find(
+                                (type) => type.id == seat.seatTypeId
+                              )?.price
+                            )}
                           </div>
                           {/* <div>
                             Trạng thái:{" "}
@@ -387,6 +393,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     };
     getTickets();
   }, []);
+
+  console.log(sections);
 
   useEffect(() => {
     const getSections = async () => {

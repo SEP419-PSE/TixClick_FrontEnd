@@ -1,4 +1,11 @@
 import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 type Bank = {
   id: string;
@@ -21,18 +28,18 @@ const BankDropdown: React.FC<Props> = ({
       <label className="block mb-1 font-medium text-white">
         Chọn ngân hàng
       </label>
-      <select
-        className="w-full p-1 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-pse-gray"
-        value={selectedBankName}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">-- Chọn ngân hàng --</option>
-        {banks.map((bank) => (
-          <option key={bank.id} value={bank.bankName}>
-            {bank.bankName}
-          </option>
-        ))}
-      </select>
+      <Select value={selectedBankName} onValueChange={onChange}>
+        <SelectTrigger className="w-full bg-transparent text-white">
+          <SelectValue placeholder="-- Chọn ngân hàng --" />
+        </SelectTrigger>
+        <SelectContent>
+          {banks.map((bank) => (
+            <SelectItem key={bank.id} value={bank.bankName}>
+              {bank.bankName}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

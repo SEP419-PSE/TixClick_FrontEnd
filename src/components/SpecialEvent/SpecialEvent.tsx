@@ -34,7 +34,7 @@ const SpecialEvent: React.FC<Props> = ({ specialEvents }) => {
   };
   return (
     <div className="my-8 mx-4 lg:mx-14">
-      <div className="text-[16px] lg:text-[19px] uppercase font-bold text-pse-green my-2">
+      <div className="text-sm md:text-md lg:text-lg uppercase font-bold text-pse-green my-2">
         Sự kiện đặc biệt
       </div>
       <div className="relative">
