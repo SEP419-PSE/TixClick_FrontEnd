@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti"
 import { motion } from "framer-motion"
-import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapPin, Ticket, Users } from "lucide-react"
+import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapPin, Ticket } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button } from "../../../components/ui/button"
@@ -469,14 +469,14 @@ export default function PaymentQueuePage() {
                 </h1>
               </div>
 
-              {!isComplete && paymentStatus !== "PAID" && (
+              {/* {!isComplete && paymentStatus !== "PAID" && (
                 <div className="flex items-center bg-[#232323] px-3 py-2 rounded-full text-sm">
                   <Users className="h-4 w-4 text-[#FF8A00] mr-2" />
                   <span>
                     Vị trí trong hàng chờ: <strong className="text-white">{queuePosition}</strong>
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
 
