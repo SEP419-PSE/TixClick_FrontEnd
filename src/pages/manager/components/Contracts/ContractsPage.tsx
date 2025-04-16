@@ -928,7 +928,6 @@ export default function ContractsPage() {
                       </div>
                     </div>
 
-                    {/* Document Uploads */}
                     {contractDocument && contractDocument.length > 0 ? (
                       contractDocument.map((doc, index) => (
                         <div className="relative" key={index}>
