@@ -1,23 +1,15 @@
-import clsx from "clsx"
 import {
   Bell,
-  Calendar,
   ChevronLeft,
   ChevronRight,
-  Clock,
   DollarSign,
-  Download,
-  Eye,
   FileText,
-  Info,
   MoreHorizontal,
-  Search,
-  Upload,
+  Search
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../../../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -36,16 +28,13 @@ import {
   DropdownMenuTrigger,
 } from "../../../../components/ui/dropdown-menu"
 import { Input } from "../../../../components/ui/input"
-import { Label } from "../../../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs"
 import type { ContractDocumentDTO, ContractDTO, VietQR } from "../../../../interface/manager/Contracts"
-import { formatMoney } from "../../../../lib/utils"
 import managerApi from "../../../../services/manager/ManagerApi"
 import { banks } from "../../../company/CreateCompany"
 import { ManagerHeader } from "../ManagerHeader"
-import { UploadDocumentDialog } from "./UploadDocument"
 
 // Define the ContractDetail interface
 interface ContractDetail {
@@ -68,48 +57,15 @@ export default function ContractsPage() {
   console.log(selectedContractDocument, setSelectedContractDocument)
   const [isContractModalOpen, setIsContractModalOpen] = useState(false)
 
-  const [selectedDocument, setSelectedDocument] = useState("")
-  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false)
-  const [documentDetails, setDocumentDetails] = useState({
-    name: "",
-    type: "",
-    size: "",
-    uploadedBy: "",
-    uploadedDate: "",
-    lastModified: "",
-    version: "",
-    description: "",
-  })
-
   const [paymentCode, setPaymentCode] = useState("")
-  const [vietQRParams, setVietQRParams] = useState<VietQR>({
-    bankID: "",
-    accountID: "",
-    amount: 0,
-    description: "",
-  })
-
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
-  const [selectedContractForUpload, setSelectedContractForUpload] = useState<number | null>(null)
 
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [paymentInfor, setPaymentInfor] = useState<VietQR>()
 
-  // Add a new state for contract details
   const [contractDetails, setContractDetails] = useState<ContractDetail[]>([])
 
-  // Add states for contract detail modal
-  const [selectedContractDetail, setSelectedContractDetail] = useState<ContractDetail | null>(null)
-  const [isContractDetailModalOpen, setIsContractDetailModalOpen] = useState(false)
 
-  // Function to open contract detail modal
-  const openContractDetailModal = (contractDetail: ContractDetail) => {
-    setSelectedContractDetail(contractDetail)
-    setIsContractDetailModalOpen(true)
-  }
-
-  // Add a function to fetch contract details
   const fetchContractDetails = async (contractId: number) => {
     try {
       const response = await managerApi.getContractDetails(contractId)
@@ -165,45 +121,6 @@ export default function ContractsPage() {
     setPaymentCode("")
   }
 
-  const handleViewDocumentDetails = (doc: string) => {
-    setSelectedDocument(doc)
-
-    const fileExtension = doc.split(".").pop() || ""
-    const fileType =
-      fileExtension === "pdf"
-        ? "PDF Document"
-        : fileExtension === "docx"
-          ? "Word Document"
-          : fileExtension === "xlsx"
-            ? "Excel Spreadsheet"
-            : "Document"
-
-    setDocumentDetails({
-      name: doc,
-      type: fileType,
-      size: `${Math.floor(Math.random() * 10) + 1} MB`,
-      uploadedBy: "John Doe",
-      uploadedDate: "2023-12-15",
-      lastModified: "2024-01-10",
-      version: "1.2",
-      description: `This is the ${doc} file for contract.`,
-    })
-
-    setIsAttachmentModalOpen(true)
-  }
-
-  const handleUploadSuccess = async () => {
-    await fetchContractList()
-
-    if (selectedContract && selectedContractForUpload === selectedContract.contractId) {
-      const contractData = contracts.find((item: any) => item.contractDTO.contractId === selectedContract.contractId)
-
-      if (contractData && contractData.contractDocumentDTOS) {
-        setContractDocument(contractData.contractDocumentDTOS)
-      }
-    }
-  }
-
   const fetchContractList = async () => {
     try {
       const res: any = await managerApi.getAllContract()
@@ -234,10 +151,8 @@ export default function ContractsPage() {
     initUseEffect()
   }, [])
 
-  // Modify the openContractModal function to also fetch contract details
   const openContractModal = async (contract: ContractDTO) => {
     setSelectedContract(contract)
-    // Find the contract documents for this contract
     const contractData = contracts.find((item: any) => item.contractDTO.contractId === contract.contractId)
 
     if (contractData && contractData.contractDocumentDTOS) {
@@ -250,7 +165,6 @@ export default function ContractsPage() {
       setSelectedContractDocument(undefined)
     }
 
-    // Fetch contract details
     if (contract.contractId) {
       await fetchContractDetails(contract.contractId)
     }
@@ -260,12 +174,12 @@ export default function ContractsPage() {
 
   useEffect(() => {
     if (selectedContract && selectedContract.contractId) {
-      setVietQRParams({
-        bankID: "BIDV",
-        accountID: "31410001689304",
-        amount: selectedContract.totalAmount,
-        description: `Payment for contract #${selectedContract.contractId}`,
-      })
+      // setVietQRParams({
+      //   bankID: "BIDV",
+      //   accountID: "31410001689304",
+      //   amount: selectedContract.totalAmount,
+      //   description: `Payment for contract #${selectedContract.contractId}`,
+      // })
     }
   }, [selectedContract])
 
@@ -282,7 +196,6 @@ export default function ContractsPage() {
     }
   }
 
-  // Add a function to get status badge for contract details
   const getContractDetailStatusBadge = (status: string) => {
     let style = ""
     let label = status
@@ -513,9 +426,7 @@ export default function ContractsPage() {
                       </Button>
                     ))
                   ) : (
-                    // If more than 5 pages, show a smart subset
                     <>
-                      {/* Always show first page */}
                       <Button
                         variant={currentPage === 1 ? "default" : "outline"}
                         size="icon"
@@ -529,7 +440,6 @@ export default function ContractsPage() {
                         <span>1</span>
                       </Button>
 
-                      {/* Show ellipsis if current page is > 3 */}
                       {currentPage > 3 && (
                         <span className="mx-1 text-gray-400 flex items-center justify-center">
                           <svg
@@ -583,7 +493,6 @@ export default function ContractsPage() {
                         </Button>
                       )}
 
-                      {/* Show ellipsis if current page is < totalPages - 2 */}
                       {currentPage < totalPages - 2 && (
                         <span className="mx-1 text-gray-400 flex items-center justify-center">
                           <svg
@@ -672,48 +581,10 @@ export default function ContractsPage() {
           {selectedContract && (
             <Tabs defaultValue="details" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                {/* <TabsTrigger value="details">Details</TabsTrigger> */}
                 <TabsTrigger value="contractDetails">Payment Schedule</TabsTrigger>
-                {/* <TabsTrigger value="documents">Documents</TabsTrigger> */}
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                {/* <TabsTrigger value="payment">Payment</TabsTrigger> */}
               </TabsList>
-              <TabsContent value="details">
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Contract Name</Label>
-                    <div>{selectedContract.contractName}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Company</Label>
-                    <div>Company {selectedContract.companyId}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Type</Label>
-                    <div>{selectedContract.contractType}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Start Date</Label>
-                    <div>{selectedContract.startDate || "Not specified"}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">End Date</Label>
-                    <div>{selectedContract.endDate || "Not specified"}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Value</Label>
-                    <div>${selectedContract.totalAmount?.toLocaleString() || "0"}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Status</Label>
-                    <div>{getStatusBadge(selectedContract.status || "Unknown")}</div>
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label className="text-right">Commission</Label>
-                    <div>{selectedContract.commission || "Not specified"}</div>
-                  </div>
-                </div>
-              </TabsContent>
+            
               <TabsContent value="contractDetails">
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-4">Payment Schedule</h3>
@@ -846,246 +717,7 @@ export default function ContractsPage() {
                   )}
                 </div>
               </TabsContent>
-              <TabsContent value="documents">
-                <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-4">Contract Documents</h3>
-
-                  {contractDocument && contractDocument.length > 0 ? (
-                    <div>
-                      <Tabs defaultValue="all" className="w-full mb-4">
-                        <TabsList className="grid w-full grid-cols-3">
-                          <TabsTrigger value="all">All Documents</TabsTrigger>
-                          <TabsTrigger value="contracts">Contracts</TabsTrigger>
-                          <TabsTrigger value="attachments">Attachments</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="all">
-                          <ul className="space-y-2 mt-4">
-                            {contractDocument.map((doc, index) => (
-                              <li
-                                key={index}
-                                className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                              >
-                                <div className="flex items-center">
-                                  {getDocumentIcon(doc.fileName)}
-                                  <span className="ml-2">{doc.fileName}</span>
-                                </div>
-                                <div className="flex gap-2 text-black">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewDocumentDetails(doc.fileName)}
-                                  >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    View Details
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    <Download className="mr-2 h-4 w-4" />
-                                    Download
-                                  </Button>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </TabsContent>
-
-                        <TabsContent value="contracts">
-                          <div className="bg-[#1E1E1E] p-4 rounded-lg mt-4">
-                            <h4 className="text-md font-medium mb-3">Main Contract Documents</h4>
-                            {contractDocument.filter(
-                              (doc) => doc.fileName.includes("Contract") || doc.fileName.includes("Agreement"),
-                            ).length > 0 ? (
-                              <ul className="space-y-2">
-                                {contractDocument
-                                  .filter(
-                                    (doc) => doc.fileName.includes("Contract") || doc.fileName.includes("Agreement"),
-                                  )
-                                  .map((doc, index) => (
-                                    <li
-                                      key={index}
-                                      className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                                    >
-                                      <div className="flex items-center">
-                                        {getDocumentIcon(doc.fileName)}
-                                        <span className="ml-2">{doc.fileName}</span>
-                                      </div>
-                                      <div className="flex gap-2 text-black">
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={() => handleViewDocumentDetails(doc.fileName)}
-                                        >
-                                          <Eye className="mr-2 h-4 w-4" />
-                                          View Details
-                                        </Button>
-                                        <Button variant="outline" size="sm">
-                                          <Download className="mr-2 h-4 w-4" />
-                                          Download
-                                        </Button>
-                                      </div>
-                                    </li>
-                                  ))}
-                              </ul>
-                            ) : (
-                              <p className="text-gray-400">No contract documents available</p>
-                            )}
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="attachments">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                            <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                              <h4 className="text-md font-medium mb-3">Legal Attachments</h4>
-                              {contractDocument.filter(
-                                (doc) => doc.fileName.includes("Legal") || doc.fileName.includes("Terms"),
-                              ).length > 0 ? (
-                                <ul className="space-y-2">
-                                  {contractDocument
-                                    .filter((doc) => doc.fileName.includes("Legal") || doc.fileName.includes("Terms"))
-                                    .map((doc, index) => (
-                                      <li
-                                        key={index}
-                                        className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                                      >
-                                        <div className="flex items-center">
-                                          {getDocumentIcon(doc.fileName)}
-                                          <span className="ml-2">{doc.fileName}</span>
-                                        </div>
-                                        <div className="flex gap-2 text-black">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleViewDocumentDetails(doc.fileName)}
-                                          >
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            View
-                                          </Button>
-                                        </div>
-                                      </li>
-                                    ))}
-                                </ul>
-                              ) : (
-                                <p className="text-gray-400">No legal attachments</p>
-                              )}
-                            </div>
-
-                            <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                              <h4 className="text-md font-medium mb-3">Financial Attachments</h4>
-                              {contractDocument.filter(
-                                (doc) =>
-                                  doc.fileName.includes("Invoice") ||
-                                  doc.fileName.includes("Payment") ||
-                                  doc.fileName.includes("Financial"),
-                              ).length > 0 ? (
-                                <ul className="space-y-2">
-                                  {contractDocument
-                                    .filter(
-                                      (doc) =>
-                                        doc.fileName.includes("Invoice") ||
-                                        doc.fileName.includes("Payment") ||
-                                        doc.fileName.includes("Financial"),
-                                    )
-                                    .map((doc, index) => (
-                                      <li
-                                        key={index}
-                                        className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                                      >
-                                        <div className="flex items-center">
-                                          {getDocumentIcon(doc.fileName)}
-                                          <span className="ml-2">{doc.fileName}</span>
-                                        </div>
-                                        <div className="flex gap-2 text-black">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleViewDocumentDetails(doc.fileName)}
-                                          >
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            View
-                                          </Button>
-                                        </div>
-                                      </li>
-                                    ))}
-                                </ul>
-                              ) : (
-                                <p className="text-gray-400">No financial attachments</p>
-                              )}
-                            </div>
-
-                            <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                              <h4 className="text-md font-medium mb-3">Technical Attachments</h4>
-                              {contractDocument.filter(
-                                (doc) =>
-                                  doc.fileName.includes("Technical") ||
-                                  doc.fileName.includes("Specification") ||
-                                  doc.fileName.includes("Requirements"),
-                              ).length > 0 ? (
-                                <ul className="space-y-2">
-                                  {contractDocument
-                                    .filter(
-                                      (doc) =>
-                                        doc.fileName.includes("Technical") ||
-                                        doc.fileName.includes("Specification") ||
-                                        doc.fileName.includes("Requirements"),
-                                    )
-                                    .map((doc, index) => (
-                                      <li
-                                        key={index}
-                                        className="flex items-center justify-between p-2 rounded hover:bg-[#333333]"
-                                      >
-                                        <div className="flex items-center">
-                                          {getDocumentIcon(doc.fileName)}
-                                          <span className="ml-2">{doc.fileName}</span>
-                                        </div>
-                                        <div className="flex gap-2 text-black">
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleViewDocumentDetails(doc.fileName)}
-                                          >
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            View
-                                          </Button>
-                                        </div>
-                                      </li>
-                                    ))}
-                                </ul>
-                              ) : (
-                                <p className="text-gray-400">No technical attachments</p>
-                              )}
-                            </div>
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-
-                      <div className="flex justify-end mt-4">
-                        <Button
-                          onClick={() => {
-                            setSelectedContractForUpload(selectedContract?.contractId || null)
-                            setIsUploadDialogOpen(true)
-                          }}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          Upload Document
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
-                      <p className="mb-4 text-gray-400">No documents uploaded yet.</p>
-                      <Button
-                        onClick={() => {
-                          setSelectedContractForUpload(selectedContract?.contractId || null)
-                          setIsUploadDialogOpen(true)
-                        }}
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload Document
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
+             
               <TabsContent value="timeline">
                 <div className="py-4">
                   <h3 className="text-lg font-semibold mb-4">Contract Timeline</h3>
@@ -1133,384 +765,12 @@ export default function ContractsPage() {
                   </div>
                 </div>
               </TabsContent>
-              <TabsContent value="payment">
-                <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-4">Contract Payment</h3>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
-                        <h4 className="flex text-md font-medium mb-2">
-                          Payment Details{" "}
-                          <span className="ml-2 flex items-center gap-1">
-                            <div
-                              className={`h-3 w-3 rounded-full ${clsx({
-                                "bg-pse-green": paymentInfor?.status === "PENDING",
-                                "bg-green-600": paymentInfor?.status === "PAID",
-                                "bg-red-600": paymentInfor?.status === "OVERDUE",
-                              })}`}
-                            ></div>
-                            {paymentInfor?.status}
-                          </span>
-                        </h4>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-400">Contract Value:</div>
-                          <div>{formatMoney(paymentInfor?.amount)}</div>
-                          <div className="text-gray-400">Payment Status:</div>
-                          <div>Pending</div>
-                          <div className="text-gray-400">Due Date:</div>
-                          <div>{paymentInfor?.dueDate}</div>
-                          <div className="text-gray-400">Bank:</div>
-                          <div>{paymentInfor?.bankID}</div>
-                          <div className="text-gray-400">Account Number:</div>
-                          <div>{paymentInfor?.accountID}</div>
-                          <div className="text-gray-400">Description:</div>
-                          <div className="truncate">{paymentInfor?.description}</div>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
-                        <h4 className="text-md font-medium mb-2">Confirm Payment</h4>
-                        <div className="space-y-3">
-                          <p className="text-sm text-gray-400">
-                            After completing payment, enter the confirmation code below:
-                          </p>
-                          <div className="flex space-x-2">
-                            <Input
-                              placeholder="Enter payment code"
-                              value={paymentCode}
-                              onChange={(e) => setPaymentCode(e.target.value)}
-                              className="bg-[#2A2A2A]"
-                            />
-                            <Button onClick={handlePaymentConfirmation}>Confirm</Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
-                      <div className="mb-4 text-center">
-                        <h4 className="text-md font-medium mb-1">Scan to Pay</h4>
-                        <p className="text-sm text-gray-400">Scan this VietQR code to make payment for this contract</p>
-                      </div>
-
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <div className="bg-white p-4 rounded-lg mb-4 flex items-center justify-center cursor-pointer hover:scale-105 transition">
-                            {generateVietQRUrl() ? (
-                              <img
-                                src={generateVietQRUrl() || ""}
-                                alt="VietQR Payment Code"
-                                width={200}
-                                height={200}
-                                className="w-48 h-48"
-                              />
-                            ) : (
-                              <div className="w-48 h-48 flex flex-col items-center justify-center text-black">
-                                <p className="text-center text-sm">Loading payment QR code...</p>
-                              </div>
-                            )}
-                          </div>
-                        </DialogTrigger>
-
-                        <DialogContent className="flex flex-col items-center p-6">
-                          {generateVietQRUrl() && (
-                            <img src={generateVietQRUrl() || ""} alt="VietQR Payment Code" className="w-80 h-80" />
-                          )}
-                        </DialogContent>
-                      </Dialog>
-
-                      <p className="text-xs text-gray-400 text-center">
-                        Payment reference: {selectedContract.contractId}-
-                        {
-                          selectedContract.companyId
-                          // .replace(/\s+/g, "")
-                          // .toLowerCase()
-                        }
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
+             
             </Tabs>
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Contract Detail Modal */}
-      <Dialog open={isContractDetailModalOpen} onOpenChange={setIsContractDetailModalOpen}>
-        <DialogContent className="bg-[#2A2A2A] text-white max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Payment Detail</DialogTitle>
-            <DialogDescription>
-              View detailed information for payment {selectedContractDetail?.contractDetailName}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedContractDetail && (
-            <div className="grid gap-6 py-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-2xl font-bold">{selectedContractDetail.contractDetailName}</h2>
-                  <p className="text-gray-400">Code: {selectedContractDetail.contractDetailCode}</p>
-                </div>
-                <div>{getContractDetailStatusBadge(selectedContractDetail.status)}</div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="bg-[#1E1E1E] border-[#333333]">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-md flex items-center">
-                      <DollarSign className="h-5 w-5 mr-2 text-green-500" />
-                      Payment Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Amount:</span>
-                        <span className="font-semibold">
-                          ${selectedContractDetail.contractAmount?.toLocaleString() || "0"}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Payment Status:</span>
-                        <span>{selectedContractDetail.status}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Contract ID:</span>
-                        <span>{selectedContractDetail.contractId}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-[#1E1E1E] border-[#333333]">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-md flex items-center">
-                      <Calendar className="h-5 w-5 mr-2 text-blue-500" />
-                      Schedule Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Due Date:</span>
-                        <span className="font-semibold">{selectedContractDetail.contractPayDate}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Days Remaining:</span>
-                        <span>
-                          {(() => {
-                            const dueDate = new Date(selectedContractDetail.contractPayDate)
-                            const today = new Date()
-                            const diffTime = dueDate.getTime() - today.getTime()
-                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-                            if (diffDays < 0) {
-                              return <span className="text-red-500">Overdue by {Math.abs(diffDays)} days</span>
-                            } else if (diffDays === 0) {
-                              return <span className="text-yellow-500">Due today</span>
-                            } else {
-                              return <span className={diffDays <= 7 ? "text-yellow-500" : ""}>{diffDays} days</span>
-                            }
-                          })()}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-[#1E1E1E] border-[#333333]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-md flex items-center">
-                    <Info className="h-5 w-5 mr-2 text-purple-500" />
-                    Description
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{selectedContractDetail.description || "No description provided."}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-[#1E1E1E] border-[#333333]">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-md flex items-center">
-                    <Clock className="h-5 w-5 mr-2 text-orange-500" />
-                    Payment History
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {selectedContractDetail.status === "PAID" ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <span>Payment received</span>
-                            <span className="text-gray-400">2024-03-15</span>
-                          </div>
-                          <p className="text-sm text-gray-400">Payment confirmed via bank transfer</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <span>Invoice sent</span>
-                            <span className="text-gray-400">2024-03-10</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            Invoice #INV-{selectedContractDetail.contractDetailId}-{selectedContractDetail.contractId}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <span>Invoice sent</span>
-                            <span className="text-gray-400">2024-03-10</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            Invoice #INV-{selectedContractDetail.contractDetailId}-{selectedContractDetail.contractId}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div>
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <span>Payment pending</span>
-                            <span className="text-gray-400">Awaiting payment</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            Payment due by {selectedContractDetail.contractPayDate}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <DialogFooter className="flex justify-between">
-                <div className="flex gap-2">
-                  {selectedContractDetail.status === "PENDING" && (
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Mark as Paid
-                    </Button>
-                  )}
-                  <Button variant="outline" className="bg-[#1E1E1E] hover:bg-[#333333] text-white">
-                    <Bell className="mr-2 h-4 w-4" />
-                    Set Reminder
-                  </Button>
-                </div>
-                <Button variant="outline" onClick={() => setIsContractDetailModalOpen(false)}>
-                  Close
-                </Button>
-              </DialogFooter>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isAttachmentModalOpen} onOpenChange={setIsAttachmentModalOpen}>
-        <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Document Details</DialogTitle>
-            <DialogDescription>View details for {selectedDocument}</DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-4">
-            <div className="flex items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
-              {getDocumentIcon(selectedDocument)}
-              <span className="ml-2 text-xl font-medium">{selectedDocument}</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">File Type</h4>
-                <p>{documentDetails.type}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">File Size</h4>
-                <p>{documentDetails.size}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">Uploaded By</h4>
-                <p>{documentDetails.uploadedBy}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">Upload Date</h4>
-                <p>{documentDetails.uploadedDate}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">Last Modified</h4>
-                <p>{documentDetails.lastModified}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-400">Version</h4>
-                <p>{documentDetails.version}</p>
-              </div>
-            </div>
-
-            <div className="mt-2">
-              <h4 className="text-sm font-medium text-gray-400">Description</h4>
-              <p className="mt-1">{documentDetails.description}</p>
-            </div>
-
-            <div className="mt-4 p-3 bg-[#1E1E1E] rounded-lg">
-              <h4 className="text-sm font-medium text-gray-400 mb-2">Document History</h4>
-              <ul className="space-y-2 text-sm">
-                <li className="flex justify-between">
-                  <span>Created document</span>
-                  <span className="text-gray-400">2023-12-10</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Updated content</span>
-                  <span className="text-gray-400">2023-12-15</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Reviewed by legal</span>
-                  <span className="text-gray-400">2024-01-05</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Final version approved</span>
-                  <span className="text-gray-400">2024-01-10</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <DialogFooter className="flex justify-between">
-            <div className="flex gap-2 text-black">
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </Button>
-              <Button variant="outline">
-                <Upload className="mr-2 h-4 w-4" />
-                Upload New Version
-              </Button>
-            </div>
-            <Button className="text-black" onClick={() => setIsAttachmentModalOpen(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <UploadDocumentDialog
-        contractId={selectedContractForUpload || 0}
-        isOpen={isUploadDialogOpen}
-        onClose={() => setIsUploadDialogOpen(false)}
-        onSuccess={handleUploadSuccess}
-      />
+      
     </>
   )
 }
