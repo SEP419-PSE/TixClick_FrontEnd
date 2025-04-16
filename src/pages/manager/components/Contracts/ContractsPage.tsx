@@ -71,39 +71,12 @@ export default function ContractsPage() {
     ContractDocumentDTO[]
   >([]);
 
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [editFormData, setEditFormData] = useState<Contract>({
-    contractId: 0,
-    contractName: "",
-    totalAmount: 0,
-    commission: "",
-    contractType: "",
-    startDate: "",
-    endDate: "",
-    status: "",
-    accountId: 0,
-    eventId: 0,
-    companyId: 0,
-    contractDetailDTOS: [
-      {
-        contractDetailId: 0,
-        contractDetailName: "",
-        contractDetailCode: "",
-        description: "",
-        contractAmount: 0,
-        contractPayDate: "",
-        status: "",
-        contractId: 0,
-      },
-    ],
-  });
 
   const [selectedContract, setSelectedContract] = useState<ContractDTO>();
   const [selectedContractDocument, setSelectedContractDocument] =
     useState<ContractDocumentDTO>();
   console.log(selectedContractDocument, setSelectedContractDocument);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [selectedDocument, setSelectedDocument] = useState("");
   const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
@@ -210,16 +183,11 @@ export default function ContractsPage() {
     setIsAttachmentModalOpen(true);
   };
 
-  // const handleUploadDocument = (id: number) => {
-  //   setSelectedContractForUpload(id);
-  //   setIsUploadDialogOpen(true);
-  // };
+ 
 
   const handleUploadSuccess = async () => {
-    // Refresh the contract list to show the new document
     await fetchContractList();
 
-    // If we have a selected contract, update its documents
     if (
       selectedContract &&
       selectedContractForUpload === selectedContract.contractId
@@ -258,84 +226,6 @@ export default function ContractsPage() {
       toast.error("Failed to fetch contract");
     }
   };
-
-  // const handleContractVerification = async (
-  //   contractId: number,
-  //   status: "APPROVED" | "REJECTED"
-  // ) => {
-  //   try {
-  //     toast.loading(
-  //       `${status === "APPROVED" ? "Approving" : "Rejecting"} contract...`
-  //     );
-
-  //     const accessToken = localStorage.getItem("accessToken2");
-  //     if (!accessToken) {
-  //       toast.dismiss();
-  //       toast.error("No access token found. Please login again.");
-  //       return;
-  //     }
-  //     const url = `https://tixclick.site/api/contract/approve?contractId=${contractId}&status=${status}`;
-
-  //     console.log("Request URL:", url);
-  //     console.log("contractId:", contractId);
-  //     console.log("contractStatus:", status);
-
-  //     const response = await fetch(url, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //       body: JSON.stringify({
-  //         contractVerificationId: contractId,
-  //         status: status,
-  //       }),
-  //       mode: "cors",
-  //     });
-
-  //     fetchContractList();
-
-  //     console.log("Response status:", response.status);
-
-  //     // Kiểm tra xem response có ok không trước khi parse JSON
-  //     if (!response.ok) {
-  //       const errorText = await response.text();
-  //       console.error("API error response:", errorText);
-  //       throw new Error(`HTTP error ${response.status}: ${errorText}`);
-  //     }
-
-  //     const data = await response.json();
-  //     console.log("Response data:", data);
-
-  //     toast.dismiss();
-  //     if (data.code === 200) {
-  //       toast.success(
-  //         `Contract ${
-  //           status === "APPROVED" ? "approved" : "rejected"
-  //         } successfully`
-  //       );
-  //       // Refresh the contract list
-  //       await fetchContractList();
-  //     } else {
-  //       toast.error(
-  //         `Failed to ${
-  //           status === "APPROVED" ? "approve" : "reject"
-  //         } contract: ${data.message}`
-  //       );
-  //     }
-  //   } catch (error) {
-  //     toast.dismiss();
-  //     console.error(
-  //       `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract:`,
-  //       error
-  //     );
-  //     toast.error(
-  //       `Error ${status === "APPROVED" ? "approving" : "rejecting"} contract: ${
-  //         error instanceof Error ? error.message : "Unknown error"
-  //       }`
-  //     );
-  //   }
-  // };
 
   useEffect(() => {
     const initUseEffect = async () => {
@@ -418,67 +308,6 @@ export default function ContractsPage() {
         return <FileText className="h-5 w-5 text-green-400" />;
       default:
         return <FileText className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const handleUpdateContract = async () => {
-    if (!selectedContract) return;
-
-    try {
-      setIsProcessing(true);
-
-      // Prepare the contract object for API
-      const contract = {
-        contractId: selectedContract.contractId,
-        contractName: editFormData.contractName,
-        totalAmount: Number(editFormData.totalAmount),
-        commission: editFormData.commission,
-        contractType: editFormData.contractType,
-        startDate: editFormData.startDate,
-        endDate: editFormData.endDate,
-        status: editFormData.status,
-        accountId: Number(editFormData.accountId),
-        eventId: Number(editFormData.eventId),
-        companyId: Number(editFormData.companyId),
-        contractDetailDTOS: editFormData.contractDetailDTOS.map(
-          (detail: any) => ({
-            ...detail,
-            contractAmount: Number(detail.contractAmount),
-            contractDetailId: Number(detail.contractDetailId),
-            contractId: selectedContract.contractId,
-          })
-        ),
-      };
-
-      console.log("Updating contract with data:", contract);
-
-      // Call the API to update the contract
-      const response = await managerApi.updateContract(contract);
-      console.log("✅ Contract updated successfully:", response);
-
-      if (response.data && response.data.code === 0) {
-        // Update the contracts list with the edited contract
-        await fetchContractList();
-
-        setIsEditModalOpen(false);
-
-        toast.success("Contract Updated", {
-          description: "The contract has been successfully updated.",
-        });
-      } else {
-        throw new Error(response.data?.message || "Update failed");
-      }
-    } catch (error: any) {
-      console.error("❌ Error updating contract:", error);
-
-      toast.error("Update Failed", {
-        description:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Something went wrong.",
-      });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -598,14 +427,6 @@ export default function ContractsPage() {
                           >
                             View details
                           </DropdownMenuItem>
-                          {/* <DropdownMenuItem onClick={() => openEditModal(contract)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit contract
-                          </DropdownMenuItem> */}
-                          {/* <DropdownMenuItem onClick={() => handleUploadDocument(contract.contractId)}>
-                            <Upload className="mr-2 h-4 w-4" />
-                            Upload document
-                          </DropdownMenuItem> */}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-yellow-500">
                             <Bell className="mr-2 h-4 w-4" />
@@ -623,7 +444,6 @@ export default function ContractsPage() {
             </TableBody>
           </Table>
 
-          {/* Pagination Controls */}
           <div className="mt-6 border-t border-[#333333] pt-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
@@ -652,7 +472,7 @@ export default function ContractsPage() {
                   value={itemsPerPage.toString()}
                   onValueChange={(value) => {
                     setItemsPerPage(Number(value));
-                    setCurrentPage(1); // Reset to first page when changing items per page
+                    setCurrentPage(1); 
                   }}
                 >
                   <SelectTrigger className="w-[110px] h-9 bg-[#2A2A2A] text-white border-[#333333]">
@@ -764,7 +584,6 @@ export default function ContractsPage() {
                         </span>
                       )}
 
-                      {/* Show page before current if not first or second page */}
                       {currentPage > 2 && (
                         <Button
                           variant="outline"
@@ -776,7 +595,6 @@ export default function ContractsPage() {
                         </Button>
                       )}
 
-                      {/* Show current page if not first or last */}
                       {currentPage !== 1 && currentPage !== totalPages && (
                         <Button
                           variant="default"
@@ -787,7 +605,6 @@ export default function ContractsPage() {
                         </Button>
                       )}
 
-                      {/* Show page after current if not last or second-to-last */}
                       {currentPage < totalPages - 1 && (
                         <Button
                           variant="outline"
