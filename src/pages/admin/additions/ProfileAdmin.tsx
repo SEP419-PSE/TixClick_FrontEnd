@@ -12,6 +12,7 @@ export function ProfileAdmin() {
     
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
