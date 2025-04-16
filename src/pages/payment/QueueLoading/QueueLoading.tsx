@@ -4,7 +4,6 @@ import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapP
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Button } from "../../../components/ui/button"
-import { Progress } from "../../../components/ui/progress"
 import { Separator } from "../../../components/ui/separator"
 
 const payOsApi = {
@@ -120,9 +119,9 @@ const payOsApi = {
 }
 
 export default function PaymentQueuePage() {
-  const [progress, setProgress] = useState(0)
+  // const [progress, setProgress] = useState(0)
   const [queuePosition, setQueuePosition] = useState(15)
-  const [estimatedTime, setEstimatedTime] = useState(18000)
+  // const [estimatedTime, setEstimatedTime] = useState(18000)
   const [isComplete, setIsComplete] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -134,11 +133,11 @@ export default function PaymentQueuePage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+  // const formatTime = (seconds: number) => {
+  //   const mins = Math.floor(seconds / 60)
+  //   const secs = seconds % 60
+  //   return `${mins}:${secs.toString().padStart(2, "0")}`
+  // }
 
   // Extract query parameters from URL
   const getQueryParams = (): Record<string, string> => {
@@ -160,7 +159,7 @@ export default function PaymentQueuePage() {
         setPaymentStatus("PAID")
         setIsComplete(true)
         setShowConfetti(true)
-        setProgress(100)
+        // setProgress(100)
       } else if (status === "cancel" || status === "CANCELED") {
         setPaymentStatus("CANCELED")
         setPaymentError("")
@@ -179,7 +178,7 @@ export default function PaymentQueuePage() {
             setPaymentStatus("PAID")
             setIsComplete(true)
             setShowConfetti(true)
-            setProgress(100)
+            // setProgress(100)
           } else if (response.data?.status === "CANCELED") {
             setPaymentStatus("CANCELED")
             setPaymentError("")
@@ -206,7 +205,7 @@ export default function PaymentQueuePage() {
             setPaymentStatus("PAID")
             setIsComplete(true)
             setShowConfetti(true)
-            setProgress(100)
+            // setProgress(100)
           } else {
             setPaymentError("")
           }
@@ -305,16 +304,16 @@ export default function PaymentQueuePage() {
     if (initialLoading || isProcessingPayment || isComplete || paymentStatus === "PAID" || isVerifyingPayment) return
 
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        const newProgress = prev + 1
-        if (newProgress >= 100) {
-          clearInterval(interval)
-          setIsComplete(true)
-          setShowConfetti(true)
-          return 100
-        }
-        return newProgress
-      })
+      // setProgress((prev) => {
+      //   const newProgress = prev + 1
+      //   if (newProgress >= 100) {
+      //     clearInterval(interval)
+      //     setIsComplete(true)
+      //     setShowConfetti(true)
+      //     return 100
+      //   }
+      //   return newProgress
+      // })
 
       setQueuePosition((prev) => {
         if (prev <= 1) return 1
@@ -323,10 +322,10 @@ export default function PaymentQueuePage() {
         return prev - decrease
       })
 
-      setEstimatedTime((prev) => {
-        if (prev <= 0) return 0
-        return prev - 1
-      })
+      // setEstimatedTime((prev) => {
+      //   if (prev <= 0) return 0
+      //   return prev - 1
+      // })
     }, 1000)
 
     return () => clearInterval(interval)
@@ -482,7 +481,7 @@ export default function PaymentQueuePage() {
           </div>
 
           {/* Progress bar */}
-          {!isComplete && paymentStatus !== "PAID" && (
+          {/* {!isComplete && paymentStatus !== "PAID" && (
             <div className="px-5 py-4 border-b border-[#2A2A2A]">
               <div className="flex justify-between text-sm mb-2">
                 <span>Tiến trình xử lý</span>
@@ -496,7 +495,7 @@ export default function PaymentQueuePage() {
                 </span>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Content */}
           <div className="p-5">
@@ -625,7 +624,7 @@ export default function PaymentQueuePage() {
                 <Button
                   variant="outline"
                   className="border-[#2A2A2A] text-gray-400 hover:bg-[#2A2A2A] hover:text-white"
-                  onClick={() => navigate("/payment")}
+                  onClick={() => navigate("/")}
                 >
                   Hủy và quay lại
                 </Button>
