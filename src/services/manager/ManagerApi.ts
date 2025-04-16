@@ -79,7 +79,7 @@ const managerApi = {
   },
 
   approveCompany(status: string, companyVerificationId: number) {
-    const url = `/company-verification/${companyVerificationId}/approve`;
+    const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
 
     const token = localStorage.getItem("accessToken2");
 
