@@ -89,7 +89,7 @@ export default function Consumer() {
   };
 
   const goTask = (eventId: number) => {
-    navigate(`/company/tasks?eventId=${eventId}`);
+    navigate(`/company/events/${eventId}/tasks`);
   };
 
   const filteredEvents = events.filter((event) => {
