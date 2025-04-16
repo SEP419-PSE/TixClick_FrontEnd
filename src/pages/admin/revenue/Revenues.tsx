@@ -81,10 +81,6 @@ export default function RevenuePage() {
   const totalRevenue = revenueData.reduce((sum, day) => sum + day.totalRevenue, 0)
   const averageDailyRevenue = totalRevenue / revenueData.length
 
-  const handleExportData = () => {
-    console.log("Exporting data...")
-  }
-
   return (
     <div className="p-6 bg-[#1E1E1E] text-white min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -102,7 +98,6 @@ export default function RevenuePage() {
             <SelectItem value="90">Last 90 days</SelectItem>
           </SelectContent>
         </Select>
-        {/* <DatePickerWithRange date={dateRange} setDate={setDateRange} /> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

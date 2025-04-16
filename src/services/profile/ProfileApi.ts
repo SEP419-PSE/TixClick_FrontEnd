@@ -14,6 +14,17 @@ const profileApi = {
         });
       },
 
+      getAdminProfile() {
+        const url = "/account/my-profile";
+        const token = localStorage.getItem("accessToken2");
+
+        return axiosClient.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+      },
+
     updateProfile(data: Profile) {
         const url = "/account/update-profile";
         const token = localStorage.getItem("accessToken");
