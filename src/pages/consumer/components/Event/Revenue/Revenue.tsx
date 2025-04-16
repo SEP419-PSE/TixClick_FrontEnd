@@ -28,7 +28,7 @@ const Revenue = () => {
   );
 
   return (
-    <div className="p-6 bg-white text-black">
+    <div className="p-6 bg-white min-h-screen text-black">
       <div className="font-bold text-3xl mb-8">Doanh thu</div>
       <div className="grid lg:grid-cols-2 gap-8">
         <TicketsBarChart data={revenue?.eventActivityDashbroadResponseList} />

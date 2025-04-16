@@ -1,22 +1,21 @@
+import NoEvent from "../../../../../assets/NoEvent.png";
 import { useEffect, useState } from "react";
-import { NavLink, useParams, useSearchParams } from "react-router";
-import eventActivityApi from "../../../../services/eventActivityApi";
-import { EventActivityResponse } from "../../../../interface/event/EventActivity";
-import NoEvent from "../../../../assets/NoEvent.png";
-import { CalendarDays, Clock, Ticket, Trash2, User } from "lucide-react";
-import { formatDateVietnamese } from "../../../../lib/utils";
-import { Button } from "../../../../components/ui/button";
-import { Checkbox } from "../../../../components/ui/checkbox";
-import companyApi from "../../../../services/companyApi";
-import memberApi from "../../../../services/memberApi";
+import { NavLink, useParams } from "react-router";
+import eventActivityApi from "../../../../../services/eventActivityApi";
+import { EventActivityResponse } from "../../../../../interface/event/EventActivity";
 import {
   MemberOfTaskResponse,
   MemberResponse,
-} from "../../../../interface/consumer/Member";
+} from "../../../../../interface/consumer/Member";
+import companyApi from "../../../../../services/companyApi";
+import memberApi from "../../../../../services/memberApi";
 import { toast } from "sonner";
-import Popup from "../../../../components/Popup/Popup";
-
-// type AssignmentMap = Record<number, number[]>;
+import { Card } from "../../../../../components/ui/card";
+import { CalendarDays, Clock, Ticket, Trash2, User } from "lucide-react";
+import { formatDateVietnamese } from "../../../../../lib/utils";
+import { Button } from "../../../../../components/ui/button";
+import { Checkbox } from "../../../../../components/ui/checkbox";
+import Popup from "../../../../../components/Popup/Popup";
 
 const Tasks = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -123,15 +122,15 @@ const Tasks = () => {
   };
   console.log(memberOfTask);
   return (
-    <div className="p-6">
+    <div className="p-6 bg-background text-foreground shadow-md rounded-2xl border min-h-screen">
       <p className="text-2xl font-bold mb-8">Phân chia công việc</p>
       <div>
         {tasks.length !== 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tasks.map((activity) => (
-              <div
+              <Card
                 key={activity.eventActivityId}
-                className="bg-white shadow-md rounded-2xl p-4 space-y-2 border border-gray-200"
+                className="bg-background h-auto text-foreground shadow-md rounded-2xl borderbg-white p-6 space-y-2 border border-gray-200"
               >
                 <h2 className="text-lg font-semibold text-gray-800">
                   {activity.activityName}
@@ -176,7 +175,7 @@ const Tasks = () => {
                   </Button>
 
                   {isOpenMenu[activity.eventActivityId] && (
-                    <div className="absolute top-12 p-2 border max-h-[200px] overflow-y-auto text-sm bg-white text-black rounded-md">
+                    <div className="absolute top-12 p-2 max-h-[200px] overflow-y-auto text-sm bg-background text-foreground shadow-md rounded-2xl border z-10">
                       <div className="flex ">
                         <p className="ml-2 my-2 text-[18px] italic font-semibold">
                           Danh sách thành viên
@@ -230,7 +229,7 @@ const Tasks = () => {
                   Event ID: {activity.eventId} · Seatmap ID:{" "}
                   {activity.seatMapId}
                 </div> */}
-              </div>
+              </Card>
             ))}
           </div>
         ) : (
@@ -242,7 +241,7 @@ const Tasks = () => {
                 className="w-16 h-16 opacity-50"
               />
             </div>
-            <p className="text-white/60">
+            <p className="text-black/60">
               Không có hoạt động nào của sự kiện này
             </p>
             <NavLink to={`/create-event?id=${eventId}&step=2`}>
