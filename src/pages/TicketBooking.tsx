@@ -1,9 +1,12 @@
+"use client"
+
 import type React from "react"
 
-import { Calendar, MapPin, Ticket } from "lucide-react"
+import { Calendar, Loader2, MapPin, Ticket } from "lucide-react"
 import { useEffect, useState } from "react"
 import Draggable from "react-draggable"
 import { useNavigate, useSearchParams } from "react-router"
+import { toast, Toaster } from "sonner"
 import CustomDivider from "../components/Divider/CustomDivider"
 import Header from "../components/Header/Header"
 import { Button } from "../components/ui/button"
@@ -15,6 +18,30 @@ import ticketApi from "../services/ticketApi"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
 // type ViewMode = "edit" | "preview"
 export type SectionType = "SEATED" | "STANDING"
+
+const ticketPurchaseApi = {
+  createTicketPurchase: async (data: any, accessToken: string) => {
+    try {
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create ticket purchase")
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error creating ticket purchase:", error)
+      throw error
+    }
+  },
+}
 
 // Utility functions
 const formatCurrency = (amount: number): string => {
@@ -251,6 +278,7 @@ const TicketBooking = () => {
   const [seatTypes, setSeatTypes] = useState<SeatTypeEdit[]>([])
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeatInfo[]>([])
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false)
 
   console.log("Sections:", sections)
 
@@ -367,50 +395,69 @@ const TicketBooking = () => {
   }
 
   // Hàm xử lý việc chuyển đến trang thanh toán
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     if (selectedSeats.length === 0) return
 
-    // Prepare ticket purchase requests
-    const ticketPurchaseRequests = selectedSeats.map((seat) => ({
-      zoneId: seat.zoneId || 0,
-      seatId: seat.seatId, // Use the individual seat's seatId
-      eventActivityId: Number(eventActivityId),
-      ticketId: seat.ticketId, // Use the ticketId we added to the seat info
-      eventId: Number(eventId),
-      quantity: 1,
-    }))
+    setIsLoading(true)
 
-    console.log("Ticket purchase requests:", ticketPurchaseRequests)
+    try {
+      // Prepare ticket purchase requests
+      const ticketPurchaseRequests = selectedSeats.map((seat) => ({
+        zoneId: seat.zoneId || 0,
+        seatId: seat.seatId,
+        eventActivityId: Number(eventActivityId),
+        ticketId: seat.ticketId,
+        eventId: Number(eventId),
+        quantity: 1,
+      }))
 
-    // Store data for payment page
-    localStorage.setItem(
-      "selectedSeats",
-      JSON.stringify({
-        seats: selectedSeats,
-        totalAmount: calculateTotal(),
-        eventInfo: {
-          id: eventId,
-          activityId: eventActivityId,
-          name: "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
-          location: "Nhà Hát Kịch IDECAF",
-          date: "19:30, 12 tháng 4, 2025",
-        },
-        apiResponses: {
-          ticket: seatTypes, // Store the ticket types for reference
-          seats: selectedSeats, // Store the selected seats with all details
-          purchase: {
-            ticketPurchaseRequests, // Store the prepared purchase requests
+      console.log("Ticket purchase requests:", ticketPurchaseRequests)
+
+      // Call the API to create the ticket purchase
+      const response = await ticketPurchaseApi.createTicketPurchase(
+        { ticketPurchaseRequests },
+        localStorage.getItem("accessToken") || "",
+      )
+
+      console.log("Ticket purchase response:", response)
+
+      // Store data for payment page
+      localStorage.setItem(
+        "selectedSeats",
+        JSON.stringify({
+          seats: selectedSeats,
+          totalAmount: calculateTotal(),
+          eventInfo: {
+            id: eventId,
+            activityId: eventActivityId,
+            name: "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+            location: "Nhà Hát Kịch IDECAF",
+            date: "19:30, 12 tháng 4, 2025",
           },
-        },
-      }),
-    )
+          apiResponses: {
+            ticket: seatTypes,
+            seats: selectedSeats,
+            purchase: response,
+          },
+        }),
+      )
 
-    // Chuyển đến trang thanh toán
-    navigate("/payment")
+      // Show success message
+      toast.success("Đã tạo đơn hàng thành công!")
+
+      // Chuyển đến trang thanh toán
+      navigate("/payment")
+    } catch (error) {
+      console.error("Error creating ticket purchase:", error)
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi tạo đơn hàng")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="h-screen w-full text-black">
+      <Toaster />
       <Header />
       <div className="flex gap-6">
         <div className="relative mt-[70px] flex justify-left">
@@ -479,9 +526,7 @@ const TicketBooking = () => {
                         </div>
                         <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        {seat.typeName} 
-                      </div>
+                      <div className="text-sm text-gray-600">{seat.typeName}</div>
                     </div>
                   ))}
                   <div className="flex justify-between font-medium mt-2 pt-2 border-t border-gray-200">
@@ -506,10 +551,19 @@ const TicketBooking = () => {
 
             <Button
               className="w-full bg-white text-black"
-              disabled={selectedSeats.length === 0}
+              disabled={selectedSeats.length === 0 || isLoading}
               onClick={handleProceedToPayment}
             >
-              {selectedSeats.length > 0 ? "Tiếp tục" : "Vui lòng chọn vé"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : selectedSeats.length > 0 ? (
+                "Tiếp tục"
+              ) : (
+                "Vui lòng chọn vé"
+              )}
             </Button>
           </div>
         </div>
