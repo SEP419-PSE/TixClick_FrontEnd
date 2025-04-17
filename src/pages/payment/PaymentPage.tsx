@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
+import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from 'lucide-react'
 import { useEffect, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
@@ -14,32 +14,6 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
 
-const ticketPurchaseApi = {
-  createTicketPurchase: async (data: any, accessToken: string) => {
-    try {
-      console.log("Data purchase:", data)
-      const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-      })
-      console.log("response", response)
-
-      if (!response.ok) {
-        throw new Error("Failed to create ticket purchase")
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error creating ticket purchase:", error)
-      throw error
-    }
-  },
-}
-
 export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [minutes, setMinutes] = useState(10)
@@ -49,6 +23,7 @@ export default function PaymentPage() {
   const navigate = useNavigate()
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
+  const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
@@ -72,6 +47,7 @@ export default function PaymentPage() {
   }, [minutes, seconds, navigate])
 
   useEffect(() => {
+    // Load selected seats data
     const storedSeatsData = localStorage.getItem("selectedSeats")
     if (storedSeatsData) {
       const parsedData = JSON.parse(storedSeatsData)
@@ -82,6 +58,12 @@ export default function PaymentPage() {
         console.log("Ticket API response:", parsedData.apiResponses.ticket)
         console.log("Seat API responses:", parsedData.apiResponses.seats)
         console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
+        console.log("Purchase Response:", parsedData.apiResponses.purchaseResponse)
+      }
+
+      // Log the ticketPurchaseId
+      if (parsedData.ticketPurchaseId) {
+        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId)
       }
     } else {
       // If no data is found, redirect back to the booking page
@@ -90,35 +72,19 @@ export default function PaymentPage() {
         navigate("/")
       }, 1500)
     }
+
+    // Load purchase response
+    const storedPurchaseResponse = localStorage.getItem("purchaseResponse")
+    if (storedPurchaseResponse) {
+      try {
+        const parsedResponse = JSON.parse(storedPurchaseResponse)
+        setPurchaseResponse(parsedResponse)
+        console.log("Loaded purchase response:", parsedResponse)
+      } catch (error) {
+        console.error("Error parsing purchase response:", error)
+      }
+    }
   }, [navigate])
-
-  const prepareTicketPurchaseData = () => {
-    if (!selectedSeatsData || !selectedSeatsData.seats || !selectedSeatsData.eventInfo) {
-      return null
-    }
-
-    // If we already have a purchase response from the ticket booking page, use that
-    if (selectedSeatsData.apiResponses && selectedSeatsData.apiResponses.purchase) {
-      console.log("Using existing purchase data from ticket booking page")
-      return selectedSeatsData.apiResponses.purchase
-    }
-
-    // If no existing purchase data, create ticket purchase requests based on selected seats
-    const ticketPurchaseRequests = selectedSeatsData.seats.map((seat:any) => ({
-      zoneId: seat.zoneId || 0,
-      seatId: seat.seatId || 0,
-      eventActivityId: Number(selectedSeatsData.eventInfo.activityId),
-      ticketId: seat.ticketId,
-      eventId: Number(selectedSeatsData.eventInfo.id),
-      quantity: seat.quantity || 1,
-    }))
-
-    console.log("Generated ticket purchase requests:", ticketPurchaseRequests)
-
-    return {
-      ticketPurchaseRequests,
-    }
-  }
 
   const handleConfirmPayment = async () => {
     if (!acceptTerms) return
@@ -127,21 +93,25 @@ export default function PaymentPage() {
     setApiError(null)
 
     try {
-      const purchaseData = prepareTicketPurchaseData()
+      // Get the purchase response from state or localStorage
+      const response = purchaseResponse || 
+                      (selectedSeatsData?.apiResponses?.purchaseResponse) || 
+                      JSON.parse(localStorage.getItem("purchaseResponse") || "null")
 
-      if (!purchaseData) {
-        throw new Error("Không thể chuẩn bị dữ liệu đặt vé")
+      if (!response) {
+        throw new Error("Không tìm thấy thông tin đặt vé")
       }
 
-      console.log("Sending ticket purchase data:", purchaseData)
+      console.log("Using purchase response:", response)
 
-      // Call the API to create the ticket purchase
-      const response = await ticketPurchaseApi.createTicketPurchase(
-        purchaseData,
-        localStorage.getItem("accessToken") || "",
-      )
+      // Get the ticketPurchaseIds from the response
+      const ticketPurchaseIds = response.result.map((item: any) => item.ticketPurchaseId)
 
-      console.log("Ticket purchase response:", response)
+      if (!ticketPurchaseIds || ticketPurchaseIds.length === 0) {
+        throw new Error("Không tìm thấy ID mua vé")
+      }
+
+      console.log("Using ticket purchase IDs:", ticketPurchaseIds)
 
       // Store all the necessary data for the queue page
       const queueData = {
@@ -151,6 +121,7 @@ export default function PaymentPage() {
         totalAmount: selectedSeatsData.totalAmount,
         transactionId: `TIX-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`,
         timestamp: new Date().toISOString(),
+        ticketPurchaseIds: ticketPurchaseIds
       }
 
       // Save to localStorage for the queue page to access
@@ -160,7 +131,7 @@ export default function PaymentPage() {
       setShowConfirmation(false)
 
       // Show success message
-      toast.success("Đặt vé thành công!")
+      toast.success("Thanh toán thành công!")
 
       // Navigate to the queue page after a short delay
       setTimeout(() => {
@@ -173,8 +144,6 @@ export default function PaymentPage() {
       setIsProcessing(false)
     }
   }
-
-  
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">

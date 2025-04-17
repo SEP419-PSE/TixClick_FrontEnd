@@ -1,7 +1,7 @@
 import axios from "axios"
 import { Calendar, MapPin, Ticket } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useNavigate, useSearchParams } from "react-router" // Added useNavigate
+import { useNavigate, useSearchParams } from "react-router"
 import { toast, Toaster } from "sonner"
 import CustomDivider from "../components/Divider/CustomDivider"
 import { Button } from "../components/ui/button"
@@ -12,7 +12,34 @@ import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils"
 import eventApi from "../services/eventApi"
 import ticketMappingApi from "../services/ticketMappingApi"
 
-interface TicketResponse {
+// Add the ticketPurchaseApi service
+const ticketPurchaseApi = {
+  createTicketPurchase: async (data: any, accessToken: string) => {
+    try {
+      console.log("Data purchase:", data)
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      })
+      console.log("response", response)
+
+      if (!response.ok) {
+        throw new Error("Failed to create ticket purchase")
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error creating ticket purchase:", error)
+      throw error
+    }
+  },
+}
+
+export interface TicketResponse {
   id: number
   ticket: TicketClass
   quantity: number
@@ -58,6 +85,7 @@ const TicketBookingNoneSeatmap = () => {
   const [totalPrice, setTotalPrice] = useState<number>(0)
   const [eventInfor, setEventInfor] =
     useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
+  const [isLoading, setIsLoading] = useState(false)
 
   const fetchTickets = async () => {
     try {
@@ -122,7 +150,10 @@ const TicketBookingNoneSeatmap = () => {
     setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1)
   }
 
+  // Now, let's modify the createTicketPurchase function to call the API and pass the response to the payment page
   const createTicketPurchase = async () => {
+    setIsLoading(true)
+
     const ticketPurchaseRequest: TicketPurchaseRequest = {
       ticketPurchaseRequests: tickets
         .filter((ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0)
@@ -141,6 +172,17 @@ const TicketBookingNoneSeatmap = () => {
 
       // Store the ticket purchase request in localStorage
       localStorage.setItem("ticketPurchaseRequest", JSON.stringify(ticketPurchaseRequest))
+
+      // Call the API to create the ticket purchase
+      const response = await ticketPurchaseApi.createTicketPurchase(
+        ticketPurchaseRequest,
+        localStorage.getItem("accessToken") || "",
+      )
+
+      console.log("Ticket purchase response:", response)
+
+      // Store the full purchase response in localStorage
+      localStorage.setItem("purchaseResponse", JSON.stringify(response))
 
       // Prepare selected seats data for the payment page
       const selectedSeats = tickets
@@ -182,6 +224,7 @@ const TicketBookingNoneSeatmap = () => {
           totalAmount: totalPrice,
           apiResponses: {
             purchase: ticketPurchaseRequest,
+            purchaseResponse: response,
           },
         }),
       )
@@ -190,14 +233,18 @@ const TicketBookingNoneSeatmap = () => {
       localStorage.setItem("totalPrice", totalPrice.toString())
       localStorage.setItem("totalQuantity", totalQuantity.toString())
 
+      // Navigate to payment page with the purchase response
       navigate("/payment", {
         state: {
           ticketPurchaseRequest,
           eventInfo,
           totalPrice,
           totalQuantity,
+          purchaseResponse: response,
         },
       })
+
+      toast.success("Đặt vé thành công!")
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || "Lỗi từ server không xác định"
@@ -208,6 +255,8 @@ const TicketBookingNoneSeatmap = () => {
         console.error("Lỗi không phải Axios:", error)
         toast.error("Có lỗi xảy ra khi mua vé")
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -324,9 +373,13 @@ const TicketBookingNoneSeatmap = () => {
             className={`w-full ${
               totalPrice != 0 ? "bg-pse-green text-white" : "bg-white text-pse-gray"
             }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
-            disabled={totalPrice != 0 ? false : true}
+            disabled={totalPrice != 0 ? false : true || isLoading}
           >
-            {totalPrice != 0 ? `Tiếp tục - ${formatMoney(totalPrice)}` : "Vui lòng chọn vé"}
+            {isLoading
+              ? "Đang xử lý..."
+              : totalPrice != 0
+                ? `Tiếp tục - ${formatMoney(totalPrice)}`
+                : "Vui lòng chọn vé"}
           </Button>
         </div>
       </div>
