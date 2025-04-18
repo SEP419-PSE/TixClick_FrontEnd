@@ -48,6 +48,8 @@ export default function CompanyApprovalsPage() {
     try {
       setIsApproving(true)
 
+      console.log("status:", status, "|  companyVerificationId:", companyVerificationId)
+
       const response = await managerApi.approveCompany(status, companyVerificationId)
       console.log("Approved successfully:", response)
 

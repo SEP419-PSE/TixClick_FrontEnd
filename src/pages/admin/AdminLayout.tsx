@@ -11,7 +11,6 @@ import NavItem from "./NavItem"
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [profileOpen, setProfileOpen] = useState(false)
 
     const navigate = useNavigate()
 
@@ -30,7 +29,6 @@ export default function AdminLayout() {
     }
 
     const handleOpenProfile = () => {
-      setProfileOpen(true)
     }
 
     return (

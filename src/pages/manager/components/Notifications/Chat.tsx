@@ -202,3 +202,50 @@
 // };
 
 // export default ChatApp;
+
+
+
+
+
+//Api chạy cho tạo ticketPurchase trong thẳng api đó và channel lấy theo Id
+
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
+// import { Client } from '@stomp/stompjs';
+// import WebSocket from 'ws';
+
+// const websocketChannel = '198'; // ← thay bằng ticketPurchase_id
+
+// const client = new Client({
+//   brokerURL: 'wss://localhost:8443/ws',
+//   webSocketFactory: () => {
+//     console.log("🔌 Attempting to connect to WebSocket...");
+//     return new WebSocket('wss://localhost:8443/ws');
+//   },
+//   onConnect: () => {
+//     console.log('✅ WebSocket connected');
+
+//     const destination = `/all/${websocketChannel}/ticket-purchase-expired`;
+//     console.log(`📩 Subscribing to: ${destination}`);
+
+//     client.subscribe(destination, (message) => {
+//       try {
+//         const body = JSON.parse(message.body);
+//         console.log('📥 Received message:', body);
+//       } catch (e) {
+//         console.log('⚠️ Raw message:', message.body);
+//       }
+//     });
+//   },
+//   onStompError: (frame) => {
+//     console.error('❌ STOMP error:', frame);
+//   },
+//   onWebSocketClose: () => {
+//     console.log('🔌 WebSocket connection closed');
+//   },
+//   onWebSocketError: (error) => {
+//     console.error('❌ WebSocket error:', error);
+//   }
+// });
+
+// client.activate();

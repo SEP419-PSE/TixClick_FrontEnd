@@ -57,6 +57,7 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const superLogin = (token: string) => {
+    
     localStorage.setItem("accessToken2", token);
     setIsSuperLogin(true);
     setAccessToken2(token);
