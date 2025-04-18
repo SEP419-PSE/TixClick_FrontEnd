@@ -1,6 +1,4 @@
-"use client"
-
-import { Bell, CalendarDays, ClipboardSignature, CreditCard, LayoutDashboard, LogOut, UserCheck } from "lucide-react"
+import { Bell, CalendarDays, ClipboardSignature, CreditCard, LayoutDashboard, LogOut, MailIcon, MessageSquare, UserCheck, X } from "lucide-react"
 import { Link, useLocation, useNavigate } from "react-router"
 import { toast, Toaster } from "sonner"
 import Logo from "../../../assets/Logo.png"
@@ -22,14 +20,16 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator
 } from "../../../components/ui/sidebar"
 import { cn } from "../../../lib/utils"
 // Import the AuthContext and Client from stomp/stompjs at the top
 import { Client } from "@stomp/stompjs"
 import { useContext, useEffect, useRef, useState } from "react"
+import { Badge } from "../../../components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
 import { AuthContext } from "../../../contexts/AuthProvider"
 
 export function DashboardSidebar() {
@@ -45,6 +45,7 @@ export function DashboardSidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(5) // Example count
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("all")
 
   // Add this type definition
   type Notification = {
@@ -63,7 +64,6 @@ export function DashboardSidebar() {
     setCurrentPath(path)
   }, [location.pathname])
 
-  // Add these useEffects after the existing useEffect for currentPath
   // Extract username from token
   useEffect(() => {
     if (context?.accessToken2) {
@@ -177,7 +177,7 @@ export function DashboardSidebar() {
           }))
           setNotifications(enhancedNotifications)
 
-          const unreadCount = enhancedNotifications.filter((n:any) => !n.read).length
+          const unreadCount = enhancedNotifications.filter((n: any) => !n.read).length
           setUnreadNotifications(unreadCount)
         } else {
           setNotifications([])
@@ -246,15 +246,313 @@ export function DashboardSidebar() {
     }, 1000)
   }
 
+  // Function to get notification icon based on type
+  const getNotificationIcon = (type?: string) => {
+    switch (type) {
+      case "message":
+        return (
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
+            <MessageSquare className="h-5 w-5" />
+          </div>
+        )
+      case "order":
+        return (
+          <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
+            <CreditCard className="h-5 w-5" />
+          </div>
+        )
+      case "user":
+        return (
+          <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 flex-shrink-0">
+            <UserCheck className="h-5 w-5" />
+          </div>
+        )
+      case "document":
+        return (
+          <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 flex-shrink-0">
+            <ClipboardSignature className="h-5 w-5" />
+          </div>
+        )
+      case "email":
+        return (
+          <div className="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 flex-shrink-0">
+            <MailIcon className="h-5 w-5" />
+          </div>
+        )
+      default:
+        return (
+          <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 flex-shrink-0">
+            <Bell className="h-5 w-5" />
+          </div>
+        )
+    }
+  }
+
+  // Filter notifications based on active tab
+  const filteredNotifications = notifications.filter((notification) => {
+    if (activeTab === "all") return true
+    return notification.type === activeTab
+  })
+
+  // Get notification counts by type
+  const getTypeCount = (type: string) => {
+    return notifications.filter((n) => n.type === type && !n.read).length
+  }
+
   return (
     <Sidebar>
       <Toaster position="top-right" />
       <SidebarHeader className="border-b border-[#333333] px-6 py-4">
-        <div className="flex items-center gap-2">
-          <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-12 w-13" />
-          <h1 className="text-xl font-bold text-black">Manager Dashboard</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-12 w-13" />
+            <h1 className="text-xl font-bold text-black">Manager Dashboard</h1>
+          </div>
+
+          {/* Notification Bell in Header */}
+          <Popover open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative h-10 w-10 rounded-full hover:bg-orange-100 focus:ring-2 focus:ring-orange-200 transition-all"
+              >
+                <Bell className="h-5 w-5 text-orange-600" />
+                {unreadNotifications > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-orange-500 text-[10px] font-medium text-white flex items-center justify-center ring-2 ring-white">
+                    {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[380px] p-0 shadow-lg border border-orange-100" align="end" sideOffset={5}>
+              <div className="flex items-center justify-between border-b p-4 bg-gradient-to-r from-orange-50 to-white">
+                <h3 className="font-semibold text-lg text-orange-700">Thông báo</h3>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={markAllAsRead}
+                    className="h-8 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 font-medium"
+                    disabled={unreadNotifications === 0}
+                  >
+                    Đánh dấu đã đọc
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-gray-700"
+                    onClick={() => setIsNotificationsOpen(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+                <div className="px-4 pt-2">
+                  <TabsList className="w-full bg-orange-50 p-1">
+                    <TabsTrigger
+                      value="all"
+                      className="flex-1 data-[state=active]:bg-white data-[state=active]:text-orange-700"
+                    >
+                      Tất cả
+                      {unreadNotifications > 0 && (
+                        <Badge variant="outline" className="ml-2 bg-orange-100 text-orange-700 border-orange-200">
+                          {unreadNotifications}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="message"
+                      className="flex-1 data-[state=active]:bg-white data-[state=active]:text-blue-700"
+                    >
+                      Đã đọc
+                      {getTypeCount("message") > 0 && (
+                        <Badge variant="outline" className="ml-2 bg-blue-100 text-blue-700 border-blue-200">
+                          {getTypeCount("message")}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <TabsContent value="all" className="mt-0">
+                  <ScrollArea className="h-[350px]">
+                    {loading ? (
+                      <div className="flex flex-col gap-2 p-3">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="flex items-start gap-3 p-4 border-b animate-pulse">
+                            <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                              <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : filteredNotifications.length > 0 ? (
+                      <div className="flex flex-col">
+                        {filteredNotifications.slice(0, 5).map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={cn(
+                              "flex items-start gap-3 p-4 border-b hover:bg-orange-50 cursor-pointer transition-colors",
+                              !notification.read && "bg-gradient-to-r from-orange-50 to-white",
+                            )}
+                            onClick={() => {
+                              navigate("notifications")
+                              setIsNotificationsOpen(false)
+                            }}
+                          >
+                            {getNotificationIcon(notification.type)}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <p className="text-sm font-medium text-gray-800">
+                                  {notification.title ||
+                                    notification.content ||
+                                    notification.message ||
+                                    "Thông báo mới"}
+                                </p>
+                                {!notification.read && (
+                                  <div className="h-2 w-2 rounded-full bg-orange-500 mt-1.5 ml-2 flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full p-8">
+                        <div className="h-16 w-16 rounded-full bg-orange-100 flex items-center justify-center text-orange-400 mb-4">
+                          <Bell className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-gray-500 text-center">Không có thông báo</p>
+                      </div>
+                    )}
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="message" className="mt-0">
+                  <ScrollArea className="h-[350px]">
+                    {loading ? (
+                      <div className="flex flex-col gap-2 p-3">
+                        {[1, 2].map((i) => (
+                          <div key={i} className="flex items-start gap-3 p-4 border-b animate-pulse">
+                            <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                              <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : filteredNotifications.length > 0 ? (
+                      <div className="flex flex-col">
+                        {filteredNotifications.slice(0, 5).map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={cn(
+                              "flex items-start gap-3 p-4 border-b hover:bg-blue-50 cursor-pointer transition-colors",
+                              !notification.read && "bg-gradient-to-r from-blue-50 to-white",
+                            )}
+                            onClick={() => {
+                              navigate("notifications")
+                              setIsNotificationsOpen(false)
+                            }}
+                          >
+                            {getNotificationIcon(notification.type)}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <p className="text-sm font-medium text-gray-800">
+                                  {notification.title || notification.content || notification.message || "Thông báo mới"}
+                                </p>
+                                {!notification.read && (
+                                  <div className="h-2 w-2 rounded-full bg-blue-500 mt-1.5 ml-2 flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full p-8">
+                        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-400 mb-4">
+                          <MessageSquare className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-gray-500 text-center">Không có thông báo</p>
+                      </div>
+                    )}
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="order" className="mt-0">
+                  <ScrollArea className="h-[350px]">
+                    {loading ? (
+                      <div className="flex flex-col gap-2 p-3">
+                        {[1, 2].map((i) => (
+                          <div key={i} className="flex items-start gap-3 p-4 border-b animate-pulse">
+                            <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                            <div className="flex-1">
+                              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                              <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : filteredNotifications.length > 0 ? (
+                      <div className="flex flex-col">
+                        {filteredNotifications.slice(0, 5).map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={cn(
+                              "flex items-start gap-3 p-4 border-b hover:bg-green-50 cursor-pointer transition-colors",
+                              !notification.read && "bg-gradient-to-r from-green-50 to-white",
+                            )}
+                            onClick={() => {
+                              navigate("notifications")
+                              setIsNotificationsOpen(false)
+                            }}
+                          >
+                            {getNotificationIcon(notification.type)}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <p className="text-sm font-medium text-gray-800">
+                                  {notification.title || notification.content || notification.message || "Đơn hàng mới"}
+                                </p>
+                                {!notification.read && (
+                                  <div className="h-2 w-2 rounded-full bg-green-500 mt-1.5 ml-2 flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-full p-8">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-400 mb-4">
+                          <CreditCard className="h-8 w-8" />
+                        </div>
+                        <p className="text-sm text-gray-500 text-center">Không có thông báo đơn hàng</p>
+                      </div>
+                    )}
+                  </ScrollArea>
+                </TabsContent>
+
+                <div className="p-4 border-t">
+                  <Button asChild className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+                    <Link to="notifications">Xem tất cả thông báo</Link>
+                  </Button>
+                </div>
+              </Tabs>
+            </PopoverContent>
+          </Popover>
         </div>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -314,99 +612,28 @@ export function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {/* Redesigned Notification Button with Popover */}
+          {/* Notifications page link - still keep this for navigation
           <SidebarMenuItem>
-            <Popover open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
-              <PopoverTrigger asChild>
-                <SidebarMenuButton
-                  className={cn(
-                    "relative",
-                    isActive("notifications") && "bg-orange-100 text-orange-600 font-medium",
-                    isNotificationsOpen && !isActive("notifications") && "bg-orange-50",
-                  )}
-                >
-                  <Bell className="mr-2 h-5 w-5" />
-                  <span>Notifications</span>
-                  {unreadNotifications > 0 && (
-                    <SidebarMenuBadge className="bg-orange-500 text-white">{unreadNotifications}</SidebarMenuBadge>
-                  )}
-                </SidebarMenuButton>
-              </PopoverTrigger>
-              {/* Replace the PopoverContent in the Notification Popover with this updated version */}
-              <PopoverContent className="w-80 p-0" align="start" side="right" sideOffset={20}>
-                <div className="flex items-center justify-between border-b p-3">
-                  <h3 className="font-medium">Thông báo</h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={markAllAsRead}
-                    className="h-8 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                    disabled={unreadNotifications === 0}
-                  >
-                    Đánh dấu đã đọc
-                  </Button>
-                </div>
-                <ScrollArea className="h-[300px]">
-                  {loading ? (
-                    <div className="flex flex-col gap-2 p-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-start gap-2 p-2 border-b animate-pulse">
-                          <div className="h-2 w-2 rounded-full bg-gray-200 mt-2"></div>
-                          <div className="flex-1">
-                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                            <div className="h-3 bg-gray-100 rounded w-1/2"></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : notifications.length > 0 ? (
-                    <div className="flex flex-col">
-                      {notifications.slice(0, 5).map((notification) => (
-                        <div
-                          key={notification.id}
-                          className={cn(
-                            "flex items-start gap-2 p-3 border-b hover:bg-orange-50 cursor-pointer transition-colors",
-                            !notification.read && "bg-orange-50",
-                          )}
-                          onClick={() => {
-                            // Mark as read logic would go here
-                            // For now, we'll just navigate to the notifications page
-                            navigate("notifications")
-                            setIsNotificationsOpen(false)
-                          }}
-                        >
-                          <div className="flex-shrink-0 mt-0.5">
-                            {!notification.read && <div className="h-2 w-2 rounded-full bg-orange-500" />}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {notification.title || notification.content || notification.message || "Thông báo mới"}
-                            </p>
-                            <p className="text-xs text-gray-500">{notification.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full p-4">
-                      <p className="text-sm text-gray-500">Không có thông báo</p>
-                    </div>
-                  )}
-                </ScrollArea>
-                <div className="p-3 border-t">
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full text-orange-600 border-orange-200 hover:bg-orange-50 hover:text-orange-700"
-                  >
-                    <Link to="notifications">Xem tất cả thông báo</Link>
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className={cn(isActive("notifications") && "bg-orange-100 text-orange-600 font-medium")}
+            >
+              <Link to="notifications" className="flex items-center">
+                <Bell className="mr-2 h-5 w-5" />
+                <span>Notifications</span>
+                {unreadNotifications > 0 && (
+                  <Badge variant="outline" className="ml-auto bg-orange-100 text-orange-600 border-orange-200">
+                    {unreadNotifications}
+                  </Badge>
+                )}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem> */}
         </SidebarMenu>
       </SidebarContent>
+
+      <SidebarSeparator />
+
       <SidebarFooter className="border-t border-[#333333] p-6">
         <div className="flex flex-col space-y-4">
           <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
