@@ -1,4 +1,4 @@
-import { ClipboardList, DollarSign, Eye, MapPin, Users } from "lucide-react";
+import { ClipboardList, DollarSign, Eye, MapPin, Ticket } from "lucide-react";
 import SummaryCard from "./SummaryCard";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -12,65 +12,49 @@ type SummaryType = "INFORMATION" | "REVENUE";
 export interface Summary {
   id: number;
   name: string;
-  value: number;
+  value: number | undefined;
   growth: number;
   icon: JSX.Element;
   type?: SummaryType;
 }
 
-const summaries: Summary[] = [
-  {
-    id: 1,
-    name: "Tổng doanh thu",
-    value: 400000,
-    type: "REVENUE",
-    growth: 20.1,
-    icon: <DollarSign size={20} className="text-pse-gray" />,
-  },
-  {
-    id: 2,
-    name: "Tổng đơn hàng",
-    value: 2,
-    growth: 10.7,
-    icon: <ClipboardList size={20} className="text-pse-gray" />,
-  },
-  {
-    id: 3,
-    name: "Lượt xem",
-    value: 20,
-    growth: 50.1,
-    icon: <Eye size={20} className="text-pse-gray" />,
-  },
-  {
-    id: 4,
-    name: "Vé đã bán",
-    value: 10,
-    growth: 20,
-    icon: <Users size={20} className="text-pse-gray" />,
-  },
-];
+interface SummaryValue {
+  totalRevenue: number;
+  countOrder: number;
+  countViewer: number;
+  countTicket: number;
+}
 
 const SummaryRevenue = () => {
   const { eventId } = useParams();
+  const [summary, setSummary] = useState<SummaryValue>();
   const [eventDetail, setEventDetail] = useState<
     EventDetailResponse | undefined
   >();
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log(eventDetail);
-  useEffect(() => {
-    const fetchData = async () => {
-      if (eventId) {
-        setLoading(true);
-        const response = await eventApi.getEventDetail(Number(eventId));
-        if (response.data.result) {
-          setEventDetail(response.data.result);
-        } else {
-          setEventDetail(undefined);
-        }
-        setLoading(false);
+  const fetchSummary = async () => {
+    const response = await eventApi.getSummary(Number(eventId));
+    console.log(response);
+    if (response.data.code == 200) {
+      setSummary(response.data.result);
+    }
+  };
+
+  const fetchData = async () => {
+    if (eventId) {
+      setLoading(true);
+      const response = await eventApi.getEventDetail(Number(eventId));
+      if (response.data.result) {
+        setEventDetail(response.data.result);
+      } else {
+        setEventDetail(undefined);
       }
-    };
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchSummary();
     fetchData();
   }, [eventId]);
 
@@ -79,17 +63,38 @@ const SummaryRevenue = () => {
   return (
     <div className="p-6 min-h-screen bg-background text-foreground">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {summaries.map((summary) => (
-          <SummaryCard
-            key={summary.id}
-            id={summary.id}
-            type={summary.type}
-            name={summary.name}
-            value={summary.value}
-            growth={summary.growth}
-            icon={summary.icon}
-          />
-        ))}
+        <SummaryCard
+          id={1}
+          name="Tổng doanh thu"
+          growth={20}
+          value={summary?.totalRevenue}
+          type="REVENUE"
+          icon={<DollarSign size={18} className="text-pse-gray" />}
+        />
+        <SummaryCard
+          id={2}
+          name="Tổng đơn hàng"
+          growth={20}
+          value={summary?.countOrder}
+          type="INFORMATION"
+          icon={<ClipboardList size={18} className="text-pse-gray" />}
+        />
+        <SummaryCard
+          id={3}
+          name="Lượt xem"
+          growth={20}
+          value={summary?.countViewer}
+          type="INFORMATION"
+          icon={<Eye size={18} className="text-pse-gray" />}
+        />
+        <SummaryCard
+          id={4}
+          name="Vé đã bán"
+          growth={20}
+          value={summary?.countTicket}
+          type="INFORMATION"
+          icon={<Ticket size={18} className="text-pse-gray" />}
+        />
       </div>
       <Card className="my-6 bg-background h-auto text-foreground shadow-md rounded-2xl border">
         <div className="w-full flex">

@@ -11,6 +11,9 @@ export interface EventType {
   id: number;
   name: string;
   englishName?: string;
+  vietnamName?: string;
+  color: string;
+  img: string;
 }
 
 interface ImageEvent {
@@ -21,6 +24,9 @@ export interface EventForConsumer {
   bannerURL: string;
   eventId: number;
   logoURL: string;
+  eventName: string;
+  minPrice: number;
+  date: string;
 }
 
 export interface EventDetailResponse {

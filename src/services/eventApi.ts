@@ -70,6 +70,22 @@ const eventApi = {
     const url = `${baseURL}/checkin/ticket-type/${eventActivityId}`;
     return axiosClient.get(url);
   },
+  getSummary: (eventId: number) => {
+    const url = `${baseURL}/summary/${eventId}`;
+    return axiosClient.get(url);
+  },
+  getWeekend: () => {
+    const url = `${baseURL}/consumer/weekend`;
+    return axiosClient.get(url);
+  },
+  getMonth: (month: number) => {
+    const url = `${baseURL}/consumer/month/${month}`;
+    return axiosClient.get(url);
+  },
+  getByCategory: (eventCategoryId: number, status: string) => {
+    const url = `${baseURL}/consumer/event-category/${eventCategoryId}?status=${status}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;

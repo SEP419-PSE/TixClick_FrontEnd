@@ -122,7 +122,7 @@ const Tasks = () => {
   };
   console.log(memberOfTask);
   return (
-    <div className="p-6 bg-background text-foreground shadow-md rounded-2xl border min-h-screen">
+    <div className="p-6 bg-background text-foreground border min-h-screen">
       <p className="text-2xl font-bold mb-8">Phân chia công việc</p>
       <div>
         {tasks.length !== 0 ? (
