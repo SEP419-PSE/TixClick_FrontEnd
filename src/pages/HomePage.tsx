@@ -6,6 +6,7 @@ import TabEvent from "../components/TabEvent/TabEvent";
 import { EventForConsumer } from "../interface/EventInterface";
 import eventApi from "../services/eventApi";
 import EventsByCategory from "../components/TabEvent/EventsByCategory";
+import Categories from "../components/Categories/Categories";
 
 const HomePage = () => {
   const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
@@ -25,6 +26,7 @@ const HomePage = () => {
   return (
     <div>
       <HeroSlider />
+      <Categories />
       <SpecialEvent specialEvents={specialEvents} />
       <TabEvent />
       <EventsByCategory eventCategoryId={1} status="SCHEDULED" />
