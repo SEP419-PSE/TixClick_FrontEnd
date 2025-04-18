@@ -21,6 +21,9 @@ export interface EventForConsumer {
   bannerURL: string;
   eventId: number;
   logoURL: string;
+  eventName: string;
+  minPrice: number;
+  date: string;
 }
 
 export interface EventDetailResponse {
