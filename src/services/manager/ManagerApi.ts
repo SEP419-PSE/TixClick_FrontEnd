@@ -35,7 +35,7 @@ const managerApi = {
   },
 
 
-  getContractPaymentPay(transactionCode: string, paymentId: number) {
+  confirmContractPaymentPay(transactionCode: string, paymentId: number) {
     const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
     const token = localStorage.getItem("accessToken2");
 

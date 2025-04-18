@@ -27,90 +27,131 @@ import {
 } from "../../components/ui/tabs";
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
+import { getCroppedImg } from "./imageUtils";
 
-// Define an extended profile interface to include fullName
 interface ExtendedProfile extends Profile {
-  fullName?: string;
+  fullName?: string
 }
 
+
 export default function ProfileForm() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [image, setImage] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<ExtendedProfile>(
-    {} as ExtendedProfile
-  );
-  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [image, setImage] = useState<string | null>(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [formData, setFormData] = useState<ExtendedProfile>({} as ExtendedProfile)
+  const [loading, setLoading] = useState(false)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+      const imageUrl = URL.createObjectURL(file)
+      setImage(imageUrl)
     }
-  };
+  }
 
-  const handleCropComplete = () => {
-    // Here you would usually process the cropped image
-    // For now, we'll just close the cropper
-    setImage(null);
-  };
+  const uploadProfileImage = async (croppedImageBlob: Blob) => {
+    try {
+      setLoading(true)
+
+      // Tạo URL từ blob để hiển thị ảnh
+      const imageUrl = URL.createObjectURL(croppedImageBlob)
+
+      // Cập nhật profile với URL ảnh mới
+      const updateData: Profile = {
+        ...profile!,
+        avatarURL: imageUrl,
+      }
+
+      const response = await profileApi.updateProfile(updateData)
+
+      if (response.data && response.data.success) {
+        setProfile({
+          ...profile!,
+          avatarURL: imageUrl,
+        })
+        toast.success("Cập nhật ảnh đại diện thành công!")
+      } else {
+        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại")
+      }
+    } catch (error) {
+      console.error("Error uploading profile image:", error)
+      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCropComplete = async (_: any, croppedAreaPixels: any) => {
+    try {
+      if (!image) return
+
+      // Show loading state
+      setLoading(true)
+
+      // Get the cropped image as a blob
+      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0)
+
+      if (croppedImage) {
+        // Upload the cropped image
+        await uploadProfileImage(croppedImage)
+      }
+
+      // Close the cropper
+      setImage(null)
+    } catch (error) {
+      console.error("Error cropping image:", error)
+      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const fetchProfile = async () => {
     try {
-      const res = await profileApi.getProfile();
+      const res = await profileApi.getProfile()
       if (res.data.result) {
-        setProfile(res.data.result);
+        setProfile(res.data.result)
       }
     } catch (error) {
-      console.error("Lỗi khi lấy profile:", error);
-      toast.error("Không thể tải thông tin người dùng");
+      console.error("Lỗi khi lấy profile:", error)
+      toast.error("Không thể tải thông tin người dùng")
     }
-  };
+  }
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    fetchProfile()
+  }, [])
 
   const getInitials = (firstName?: string, lastName?: string) => {
-    if (!firstName && !lastName) return "U";
-    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`;
-  };
+    if (!firstName && !lastName) return "U"
+    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
-      // Split the full name into first name and last name
-      const nameParts = formData.fullName?.trim().split(" ") || [];
-      let firstName = "";
-      let lastName = "";
-
-      if (nameParts.length > 0) {
-        firstName = nameParts.pop() || ""; // Get the last word as firstName
-        lastName = nameParts.join(" "); // Join the rest as lastName
-      }
-
       // Make sure we have the required fields with proper types
       if (!profile?.accountId) {
-        throw new Error("Missing account ID");
+        throw new Error("Missing account ID")
       }
 
       const updateData: Profile = {
-        firstName,
-        lastName,
+        firstName: formData.firstName || "",
+        lastName: formData.lastName || "",
         phone: formData.phone || "",
         email: formData.email || "",
         dob: formData.dob || "",
@@ -119,41 +160,39 @@ export default function ProfileForm() {
         userName: profile.userName || "",
         roleId: profile.roleId || 0,
         active: profile.active !== undefined ? profile.active : true,
-      };
+      }
 
       // Call the API
-      const response = await profileApi.updateProfile(updateData);
+      const response = await profileApi.updateProfile(updateData)
 
       if (response.data && response.data.success) {
         // Update the local profile state with type safety
         setProfile({
           ...updateData,
-        });
+        })
 
-        toast.success("Cập nhật thông tin thành công!");
-        setEditMode(false);
+        toast.success("Cập nhật thông tin thành công!")
+        setEditMode(false)
       } else {
         // Handle API error with message
-        toast.error(response.data?.message || "Cập nhật thất bại");
+        toast.error(response.data?.message || "Cập nhật thất bại")
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
+      console.error("Error updating profile:", error)
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (profile) {
-      // Create an extended profile object with fullName
-      const extendedProfile: ExtendedProfile = {
+      // Sử dụng trực tiếp dữ liệu từ profile
+      setFormData({
         ...profile,
-        fullName: `${profile.lastName || ""} ${profile.firstName || ""}`.trim(),
-      };
-      setFormData(extendedProfile);
+      })
     }
-  }, [profile]);
+  }, [profile])
 
   return (
     <>
@@ -178,10 +217,7 @@ export default function ProfileForm() {
                 <div className="px-6 pb-6 -mt-16 flex flex-col items-center">
                   <div className="relative">
                     <Avatar className="h-32 w-32 border-4 border-[#1A1A1A] shadow-lg">
-                      <AvatarImage
-                        src={profile?.avatarURL || ""}
-                        alt="Avatar"
-                      />
+                      <AvatarImage src={profile?.avatarURL || ""} alt="Avatar" />
                       <AvatarFallback className="text-3xl bg-gradient-to-br from-[#FF8A00] to-[#FF9A20] text-white">
                         {getInitials(profile?.firstName, profile?.lastName)}
                       </AvatarFallback>
@@ -205,15 +241,13 @@ export default function ProfileForm() {
                     </div>
                   </div>
 
-                  <h2 className="mt-4 text-xl font-bold text-white">
-                    {profile?.userName || "Người dùng"}
-                  </h2>
+                  <h2 className="mt-4 text-xl font-bold text-white">{profile?.userName || "Người dùng"}</h2>
 
                   <div className="w-full mt-6 space-y-4">
                     <div className="flex items-center text-gray-400">
                       <User className="h-5 w-5 mr-3 text-[#FF8A00]" />
                       <span>
-                        {profile?.lastName} {profile?.firstName}
+                        {profile?.lastName || ""} {profile?.firstName || ""}
                       </span>
                     </div>
 
@@ -267,13 +301,11 @@ export default function ProfileForm() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Tên
-                        </label>
+                        <label className="text-sm font-medium text-gray-300">Họ</label>
                         <div className="relative">
                           <Input
-                            name="firstName"
-                            value={`${profile?.firstName || ""} `}
+                            name="lastName"
+                            value={formData.lastName || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -284,13 +316,11 @@ export default function ProfileForm() {
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Họ
-                        </label>
+                        <label className="text-sm font-medium text-gray-300">Tên</label>
                         <div className="relative">
                           <Input
-                            name="fullName"
-                            value={formData.fullName || ""}
+                            name="firstName"
+                            value={formData.firstName || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -302,9 +332,7 @@ export default function ProfileForm() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Số điện thoại
-                        </label>
+                        <label className="text-sm font-medium text-gray-300">Số điện thoại</label>
                         <div className="relative">
                           <Input
                             name="phone"
@@ -321,9 +349,7 @@ export default function ProfileForm() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Email
-                        </label>
+                        <label className="text-sm font-medium text-gray-300">Email</label>
                         <div className="relative">
                           <Input
                             name="email"
@@ -340,18 +366,12 @@ export default function ProfileForm() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Ngày sinh
-                        </label>
+                        <label className="text-sm font-medium text-gray-300">Ngày sinh</label>
                         <div className="relative">
                           <Input
                             name="dob"
                             type="date"
-                            value={
-                              typeof formData.dob === "string"
-                                ? formData.dob
-                                : ""
-                            }
+                            value={typeof formData.dob === "string" ? formData.dob : ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -387,17 +407,13 @@ export default function ProfileForm() {
 
                 <TabsContent value="security">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">
-                      Tính năng bảo mật sẽ được cập nhật sau
-                    </p>
+                    <p className="text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="preferences">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">
-                      Tính năng tùy chọn sẽ được cập nhật sau
-                    </p>
+                    <p className="text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -413,9 +429,7 @@ export default function ProfileForm() {
               className="bg-[#1A1A1A] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-[#2A2A2A]"
             >
               <div className="p-4 bg-gradient-to-r from-[#FF8A00] to-[#FF9A20] text-white">
-                <h3 className="text-lg font-semibold text-center">
-                  Chỉnh sửa ảnh đại diện
-                </h3>
+                <h3 className="text-lg font-semibold text-center">Chỉnh sửa ảnh đại diện</h3>
               </div>
 
               <div className="p-6">
@@ -429,18 +443,18 @@ export default function ProfileForm() {
                     onZoomChange={setZoom}
                     cropShape="round"
                     showGrid={false}
+                    onCropComplete={(_, croppedAreaPixels) => {
+                      // Store the crop data for later use
+                      setCroppedAreaPixels(croppedAreaPixels)
+                    }}
                   />
                 </div>
 
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <label className="text-sm font-medium text-gray-300">
-                        Phóng to
-                      </label>
-                      <span className="text-sm text-gray-400">
-                        {zoom.toFixed(1)}x
-                      </span>
+                      <label className="text-sm font-medium text-gray-300">Phóng to</label>
+                      <span className="text-sm text-gray-400">{zoom.toFixed(1)}x</span>
                     </div>
                     <div className="flex items-center">
                       <input
@@ -449,7 +463,7 @@ export default function ProfileForm() {
                         max="3"
                         step="0.1"
                         value={zoom}
-                        onChange={(e) => setZoom(parseFloat(e.target.value))}
+                        onChange={(e) => setZoom(Number.parseFloat(e.target.value))}
                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                       />
                     </div>
@@ -465,9 +479,17 @@ export default function ProfileForm() {
                     </Button>
                     <Button
                       className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                      onClick={handleCropComplete}
+                      onClick={() => handleCropComplete(null, croppedAreaPixels)}
+                      disabled={loading}
                     >
-                      Lưu ảnh
+                      {loading ? (
+                        <div className="flex items-center">
+                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Đang xử lý
+                        </div>
+                      ) : (
+                        "Lưu ảnh"
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -477,5 +499,5 @@ export default function ProfileForm() {
         )}
       </div>
     </>
-  );
+  )
 }
