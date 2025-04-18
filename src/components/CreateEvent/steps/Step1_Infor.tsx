@@ -5,10 +5,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import useAllCompany from "../../../hooks/useAllCompany";
 import { Company } from "../../../interface/company/Company";
-import {
-  EventDetailResponse,
-  EventType,
-} from "../../../interface/EventInterface";
+import { EventDetailResponse } from "../../../interface/EventInterface";
 import eventApi from "../../../services/eventApi";
 import LoadingFullScreen from "../../Loading/LoadingFullScreen";
 import ImageUpload from "../ImageUpload";
@@ -19,13 +16,7 @@ import { Card } from "../../ui/card";
 import { equalIgnoreCase } from "../../../lib/utils";
 import VietNamAddressPicker from "../VietNamAddessPicker";
 import { Input } from "../../ui/input";
-
-const eventTypes: EventType[] = [
-  { id: 1, name: "Music" },
-  { id: 2, name: "Sport" },
-  { id: 3, name: "Theater" },
-  { id: 4, name: "Other" },
-];
+import { eventTypes } from "../../../constants/constants";
 
 export type StepProps = {
   step: number;

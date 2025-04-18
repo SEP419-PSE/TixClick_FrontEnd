@@ -11,6 +11,7 @@ export interface EventType {
   id: number;
   name: string;
   englishName?: string;
+  vietnamName?: string;
 }
 
 interface ImageEvent {

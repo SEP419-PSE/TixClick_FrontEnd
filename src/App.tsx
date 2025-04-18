@@ -51,7 +51,7 @@ import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
 
 export default function App() {
   return (
-    <div className="font-inter text-[14px] text-white min-h-screen bg-pse-black overflow-x-hidden">
+    <div className="font-inter text-[14px] text-white min-h-screen bg-[#1E1E1E] overflow-x-hidden">
       <BrowserRouter>
         <ScrollToTop />
         <Routes>

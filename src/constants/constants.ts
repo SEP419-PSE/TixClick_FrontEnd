@@ -1,3 +1,5 @@
+import { EventType } from "../interface/EventInterface";
+
 export const PATHNAME_EXCEPT = [
   "/auth/signin",
   "/auth/signup",
@@ -30,6 +32,13 @@ export const subRoles = [
     name: "Nhân viên",
     value: "EMPLOYEE",
   },
+];
+
+export const eventTypes: EventType[] = [
+  { id: 1, name: "Music", vietnamName: "Âm nhạc" },
+  { id: 2, name: "Sport", vietnamName: "Thể thao" },
+  { id: 3, name: "Theater", vietnamName: "Sân khấu & Nghệ thuật" },
+  { id: 4, name: "Other", vietnamName: "Thể loại khác" },
 ];
 
 export const TOAST_MESSAGE = {

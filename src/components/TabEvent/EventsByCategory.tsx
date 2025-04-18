@@ -1,53 +1,31 @@
 import { useEffect, useRef, useState } from "react";
+import { EventForConsumer } from "../../interface/EventInterface";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { formatDateVietnamese, formatMoney } from "../../lib/utils";
 import { CiCalendar } from "react-icons/ci";
-import { FaAngleRight } from "react-icons/fa6";
-import { FaAngleLeft } from "react-icons/fa6";
 import { NavLink } from "react-router";
 import eventApi from "../../services/eventApi";
-import { EventForConsumer } from "../../interface/EventInterface";
-import { formatDateVietnamese, formatMoney } from "../../lib/utils";
+import { eventTypes } from "../../constants/constants";
 
-const TabEvent = () => {
-  const nowMonth = new Date().getMonth() + 1;
-  const [activeTab, setActiveTab] = useState<number>(1);
+type Props = {
+  eventCategoryId: number;
+  status: string;
+};
+
+const EventsByCategory = ({ eventCategoryId, status }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [eventWeek, setEventWeek] = useState<EventForConsumer[]>([]);
-  const [eventMonth, setEventMonth] = useState<EventForConsumer[]>([]);
-  const [activeEvents, setActiveEvents] = useState<EventForConsumer[]>([]);
+  const [activeEvents, setActiveEvents] = useState<EventForConsumer[]>();
 
-  const fetchEventWeekend = async () => {
-    const response = await eventApi.getWeekend();
-    // console.log(response);
-    if (response.data.result.length != 0) {
-      setEventWeek(response.data.result);
+  const fetchEvents = async () => {
+    const response = await eventApi.getByCategory(eventCategoryId, status);
+    if (response.data.code == 200) {
       setActiveEvents(response.data.result);
     }
   };
 
-  const fetchEventMoth = async () => {
-    const response = await eventApi.getMonth(nowMonth);
-    // console.log(response);
-    if (response.data.result.length != 0) {
-      setEventMonth(response.data.result);
-    }
-  };
-
   useEffect(() => {
-    fetchEventWeekend();
-    fetchEventMoth();
-  }, [nowMonth]);
-
-  const changeActiveEvent = () => {
-    if (activeTab === 1) {
-      setActiveEvents(eventWeek);
-    } else {
-      setActiveEvents(eventMonth);
-    }
-  };
-
-  useEffect(() => {
-    changeActiveEvent();
-  }, [activeTab]);
+    fetchEvents();
+  }, [eventCategoryId, status]);
 
   const scrollLeft = () => {
     if (containerRef.current) {
@@ -61,37 +39,17 @@ const TabEvent = () => {
     }
   };
 
-  const tabs = [
-    { id: 1, label: "Tuần này" },
-    { id: 2, label: "Tháng này" },
-  ];
-
   return (
     <div className="mx-4 my-8 lg:mx-14">
-      {/* Tab Headers */}
-      <div className="flex gap-4 border-gray-300">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`py-2 sm:text-sm md:text-base font-bold focus:outline-none ${
-              activeTab === tab.id
-                ? "text-pse-green border-b-2 border-pse-green  transition-all duration-300"
-                : "text-white border-b-2 border-transparent hover:"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="sm:text-sm md:text-base font-bold">
+        {eventTypes.find((type) => type.id === eventCategoryId)?.vietnamName}
       </div>
-
-      {/* Tab Panels */}
       <div className="relative">
         <div
           ref={containerRef}
           className=" pt-4 pb-2 flex overflow-x-auto lg:overflow-x-hidden gap-4"
         >
-          {activeEvents.map((item) => (
+          {activeEvents?.map((item) => (
             <div key={item.eventId}>
               <NavLink to={`event-detail/${item.eventId}`}>
                 <div className="lg:relative group w-[340px] overflow-hidden cursor-pointer">
@@ -137,4 +95,4 @@ const TabEvent = () => {
   );
 };
 
-export default TabEvent;
+export default EventsByCategory;

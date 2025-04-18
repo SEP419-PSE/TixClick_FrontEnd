@@ -82,6 +82,10 @@ const eventApi = {
     const url = `${baseURL}/consumer/month/${month}`;
     return axiosClient.get(url);
   },
+  getByCategory: (eventCategoryId: number, status: string) => {
+    const url = `${baseURL}/consumer/event-category/${eventCategoryId}?status=${status}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;
