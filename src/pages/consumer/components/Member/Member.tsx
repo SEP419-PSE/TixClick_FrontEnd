@@ -103,6 +103,9 @@ const Member = () => {
     if (response.data.code == 201) {
       toast.success(TOAST_MESSAGE.successCreateMember);
     }
+    handleClosePopUp();
+    setMailList([]);
+    await fetchMembers();
   };
 
   const filterMembers = searchMember

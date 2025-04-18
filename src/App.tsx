@@ -108,7 +108,7 @@ export default function App() {
             <Route path="company" element={<RootLayouts />}>
               <Route index element={<Consumer />} />
               <Route path="reports" element={<ReportsPage />} />
-              <Route path="policies" element={<Policy />} />e
+              <Route path="policies" element={<Policy />} />
               <Route path="members" element={<Member />} />
               <Route path="information" element={<Information />} />
             </Route>
