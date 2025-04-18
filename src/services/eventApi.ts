@@ -70,6 +70,10 @@ const eventApi = {
     const url = `${baseURL}/checkin/ticket-type/${eventActivityId}`;
     return axiosClient.get(url);
   },
+  getSummary: (eventId: number) => {
+    const url = `${baseURL}/summary/${eventId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;

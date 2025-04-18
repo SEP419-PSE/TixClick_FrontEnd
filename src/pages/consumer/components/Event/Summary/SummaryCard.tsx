@@ -4,7 +4,7 @@ import { Summary } from "./SummaryRevenue";
 
 const SummaryCard = ({ growth, name, value, icon, type }: Summary) => {
   return (
-    <Card className="flex flex-col bg-background text-foreground shadow-md rounded-2xl border max-w-sm">
+    <Card className="flex flex-col bg-background text-foreground shadow-md rounded-2xl border w-sm">
       <div className="font-semibold px-6 pt-6 mb-4">
         <div className="flex justify-between items-center text-lg">
           {name}

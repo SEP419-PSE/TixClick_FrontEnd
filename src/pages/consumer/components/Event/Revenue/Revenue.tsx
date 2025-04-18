@@ -22,11 +22,6 @@ const Revenue = () => {
     fetchRevenue();
   }, [eventId]);
 
-  console.log(
-    "Revenue chung",
-    JSON.stringify(revenue?.eventActivityRevenueReportResponseList, null, 2)
-  );
-
   return (
     <div className="p-6 bg-white min-h-screen text-black">
       <div className="font-bold text-3xl mb-8">Doanh thu</div>
