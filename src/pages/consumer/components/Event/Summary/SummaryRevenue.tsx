@@ -115,7 +115,7 @@ const SummaryRevenue = () => {
 
       <Card className="bg-background h-auto text-foreground shadow-md rounded-2xl border">
         <div
-          className="p-6"
+          className="p-6 min-w-md"
           dangerouslySetInnerHTML={{ __html: eventDetail?.description as any }}
         />
       </Card>

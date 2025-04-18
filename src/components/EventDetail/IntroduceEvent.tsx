@@ -11,9 +11,9 @@ const IntroduceEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
     setIsExpanded(!isExpanded);
   };
   return (
-    <div className="bg-white/80 px-3 py-3 lg:py-9  text-pse-black flex justify-center">
+    <div className="bg-white/80 px-3 py-3 lg:py-9 text-pse-black flex justify-center">
       <div
-        className={`relative pt-3 pb-14 bg-white rounded-lg max-w-[700px] ${
+        className={`relative pt-3 pb-14 bg-white rounded-lg w-[700px] ${
           isExpanded ? "max-h-auto" : "max-h-[400px]"
         } overflow-hidden ease-in-out transition-all duration-700`}
       >

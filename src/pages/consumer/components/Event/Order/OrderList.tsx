@@ -1,6 +1,4 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -32,22 +30,22 @@ type Props = {
   transactions?: TransactionResponse[];
 };
 
-export function OrderList({ transactions = [] }: Props) {
+export function OrderList({ transactions }: Props) {
+  console.log(JSON.stringify(transactions, null, 2));
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredData = useMemo(() => {
-    return transactions.filter((tx) => {
-      const matchesSearch =
-        tx.accountName.toLowerCase().includes(search.toLowerCase()) ||
-        tx.transactionCode.toLowerCase().includes(search.toLowerCase());
+  const filteredData = transactions?.filter((tx) => {
+    const matchesSearch =
+      tx.accountName.toLowerCase().includes(search.toLowerCase()) ||
+      tx.transactionCode.toLowerCase().includes(search.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === "all" || tx.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" ||
+      tx.status.toLowerCase() === statusFilter.toLowerCase();
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [transactions, search, statusFilter]);
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <Card className="bg-background text-foreground shadow-md rounded-2xl border">
@@ -77,9 +75,8 @@ export function OrderList({ transactions = [] }: Props) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="SUCCESS">SUCCESS</SelectItem>
-              <SelectItem value="Đang xử lý">Đang xử lý</SelectItem>
-              <SelectItem value="Đã hoàn">Đã hoàn</SelectItem>
+              <SelectItem value="success">SUCCESS</SelectItem>
+              <SelectItem value="failed">FAILED</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -98,9 +95,9 @@ export function OrderList({ transactions = [] }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData.length > 0 ? (
-                filteredData.map((tx) => (
-                  <TableRow key={tx.transactionCode}>
+              {filteredData !== undefined ? (
+                filteredData?.map((tx, index) => (
+                  <TableRow key={index}>
                     <TableCell>{tx.transactionCode}</TableCell>
                     <TableCell className="font-medium">
                       {tx.accountName}
@@ -119,9 +116,9 @@ export function OrderList({ transactions = [] }: Props) {
                     <TableCell className="text-right">
                       <Badge
                         variant={
-                          tx.status === "Hoàn tất"
+                          tx.status === "SUCCESS"
                             ? "default"
-                            : tx.status === "Đang xử lý"
+                            : tx.status === "FAILED"
                             ? "secondary"
                             : "outline"
                         }
