@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import {
   Select,
   SelectContent,
@@ -5,20 +6,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../../components/ui/select";
-const FilterCheckIn = () => {
+import { EventActivityResponse } from "../../../../../interface/event/EventActivity";
+
+type Props = {
+  eventActivity: EventActivityResponse[];
+  selectedEventActId: string;
+  setSelectedEventActId: Dispatch<SetStateAction<string>>;
+};
+
+const FilterCheckIn = ({
+  eventActivity,
+  selectedEventActId,
+  setSelectedEventActId,
+}: Props) => {
   return (
     <div className="flex items-center">
       <div className="text-2xl font-semibold">
-        Checkin:{" "}
-        <span className="font-semibold text-pse-gray">Hoạt động 1</span>
+        Checkin:
+        <span className="font-semibold text-pse-gray">
+          {" "}
+          {eventActivity.find(
+            (x) => x.eventActivityId.toString() == selectedEventActId
+          )?.activityName || "Chưa chọn hoạt động"}
+        </span>
       </div>
-      <Select>
+      <Select
+        onValueChange={(e: string) => {
+          setSelectedEventActId(e);
+        }}
+      >
         <SelectTrigger className="w-[180px] ml-auto">
-          <SelectValue placeholder="Theme" />
+          <SelectValue placeholder="Chọn hoạt động" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="light">Hoạt động 1</SelectItem>
-          <SelectItem value="dark">Hoạt động 2</SelectItem>
+          {eventActivity.map((eventAct) => (
+            <SelectItem value={eventAct.eventActivityId.toString()}>
+              {eventAct.activityName}{" "}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

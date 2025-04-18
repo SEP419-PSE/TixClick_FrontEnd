@@ -13,16 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../../components/ui/table";
-
-interface Ticket {
-  type: string;
-  price: number;
-  total: number;
-  checkedIn: number;
-}
+import { TicketCheckin } from "../../../../../interface/ticket/Ticket";
+import { formatMoney } from "../../../../../lib/utils";
 
 interface TicketTableProps {
-  data: Ticket[];
+  data: TicketCheckin[];
 }
 
 export default function TicketTable({ data }: TicketTableProps) {
@@ -43,14 +38,10 @@ export default function TicketTable({ data }: TicketTableProps) {
           </TableHeader>
           <TableBody>
             {data.map((ticket, index) => {
-              const ratio =
-                ticket.total > 0
-                  ? ((ticket.checkedIn / ticket.total) * 100).toFixed(1)
-                  : "0.0";
               return (
                 <TableRow key={index}>
-                  <TableCell>{ticket.type}</TableCell>
-                  <TableCell>{ticket.price.toLocaleString()} đ</TableCell>
+                  <TableCell>{ticket.ticketType}</TableCell>
+                  <TableCell>{formatMoney(ticket.price)}</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       {ticket.checkedIn}/{ticket.total}
@@ -60,14 +51,14 @@ export default function TicketTable({ data }: TicketTableProps) {
                     <Badge
                       variant="default"
                       className={
-                        parseFloat(ratio) >= 80
+                        parseFloat(ticket.percentage.toString()) >= 80
                           ? "bg-green-500"
-                          : parseFloat(ratio) >= 50
+                          : parseFloat(ticket.percentage.toString()) >= 50
                           ? "bg-yellow-500"
                           : "bg-red-500"
                       }
                     >
-                      {ratio}%
+                      {ticket.percentage}%
                     </Badge>
                   </TableCell>
                 </TableRow>
