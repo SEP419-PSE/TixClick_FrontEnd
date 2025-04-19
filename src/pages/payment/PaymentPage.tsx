@@ -7,6 +7,7 @@ import payOs from "../../assets/payOs.svg"
 import { Button } from "../../components/ui/button"
 import { Checkbox } from "../../components/ui/checkbox"
 
+import { Client } from "@stomp/stompjs"
 import { Link, useNavigate } from "react-router"
 import { toast, Toaster } from "sonner"
 import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
@@ -150,6 +151,54 @@ export default function PaymentPage() {
       setIsProcessing(false)
     }
   }
+
+  const websocketService = {
+    client: null as Client | null,
+    
+    connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void) => {
+      if (typeof window === 'undefined') return; 
+      
+      const client = new Client({
+        brokerURL: 'wss://localhost:8443/ws',
+  
+        onConnect: () => {
+          console.log('✅ WebSocket connected');
+          const destination = `/all/${ticketPurchaseId}/ticket-purchase-expired`;
+          console.log(`📩 Subscribing to: ${destination}`);
+          client.subscribe(destination, (message) => {
+            try {
+              const body = JSON.parse(message.body);
+              console.log('📥 Received message:', body);
+              onMessageReceived(body);
+            } catch (e) {
+              console.log('⚠️ Raw message:', message.body);
+            }
+          });
+        },
+        onStompError: (frame) => {
+          console.error('❌ STOMP error:', frame);
+        },
+        onWebSocketClose: () => {
+          console.log('🔌 WebSocket connection closed');
+        },
+        onWebSocketError: (error) => {
+          console.error('❌ WebSocket error:', error);
+        }
+      });
+      
+      websocketService.client = client;
+      client.activate();
+      return client;
+    },
+    
+    disconnect: () => {
+      if (websocketService.client && websocketService.client.connected) {
+        websocketService.client.deactivate();
+        websocketService.client = null;
+        console.log('🔌 WebSocket connection closed');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
