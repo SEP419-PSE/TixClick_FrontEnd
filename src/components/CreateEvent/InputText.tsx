@@ -35,7 +35,7 @@ export default function TextInput({
 
   return (
     <div
-      className={`flex flex-col w-full items-start rounded-lg p-1 ${className}`}
+      className={`flex flex-col w-full items-start rounded-lg px-1 ${className}`}
     >
       <label className="text-white mb-[2px]">{label}</label>
 
