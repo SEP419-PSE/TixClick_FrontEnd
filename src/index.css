@@ -97,6 +97,23 @@
   }
 }
 
+/* globals.css */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* globals.css */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  display: inline-block;
+  animation: blink 1s infinite;
+}
+
 .text-glow-orange {
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 138, 0, 0.5);
 }
@@ -104,4 +121,6 @@
 .hover\:shadow-orange-glow:hover {
   box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 138, 0, 0.5);
 }
+
+
 

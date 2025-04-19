@@ -76,7 +76,7 @@ const HeroSlider = () => {
   };
 
   return (
-    <div className="lg:mb-8">
+    <div className="">
       <div className="relative">
         {/* <img src="https://images.tkbcdn.com/2/614/350/ts/ds/2b/cf/04/28f7e94ace8d993b981003b88b26b0b5.jpg" />
         <img src="https://images.tkbcdn.com/2/614/350/ts/ds/2a/83/ac/cb6963360dae30f95f517cefc982780e.jpg" />

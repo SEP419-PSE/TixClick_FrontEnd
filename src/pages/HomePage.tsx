@@ -27,6 +27,7 @@ const HomePage = () => {
   return (
     <div>
       <HeroSlider />
+      <HeroSection />
       <Categories />
       <SpecialEvent specialEvents={specialEvents} />
       <TabEvent />
@@ -34,7 +35,6 @@ const HomePage = () => {
       <EventsByCategory eventCategoryId={2} status="SCHEDULED" />
       <EventsByCategory eventCategoryId={3} status="SCHEDULED" />
       <EventsByCategory eventCategoryId={4} status="SCHEDULED" />
-      <HeroSection />
     </div>
   );
 };
