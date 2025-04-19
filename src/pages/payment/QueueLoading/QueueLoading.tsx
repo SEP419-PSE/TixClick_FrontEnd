@@ -11,65 +11,64 @@ import {
   Ticket,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
+import { EventDetailResponse } from "../../../interface/EventInterface";
+import eventApi from "../../../services/eventApi";
+import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
+import { Toaster } from "sonner";
 
 const payOsApi = {
   createPayment: async (ticketPurchaseId: number, accessToken: string) => {
     try {
-      console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId);
-      const returnUrl = `${window.location.origin}/payment/queue`;
+      console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
+      const returnUrl = `${window.location.origin}/payment/queue`
 
-      const response = await fetch(
-        "https://tixclick.site/api/payment/pay-os-create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            ticketOrderDTOS: [
-              {
-                ticketPurchaseId: ticketPurchaseId,
-              },
-            ],
-            expiredTime: 900,
-            voucherCode: "",
-            returnUrl: returnUrl,
-          }),
-        }
-      );
-      console.log("payment response", response);
+      const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          ticketOrderDTOS: [
+            {
+              ticketPurchaseId: ticketPurchaseId,
+            },
+          ],
+          expiredTime: 900,
+          voucherCode: "",
+          returnUrl: returnUrl,
+        }),
+      })
+      console.log("payment response", response)
 
       if (!response.ok) {
-        throw new Error("Failed to create payment");
+        throw new Error("Failed to create payment")
       }
 
-      return await response.json();
+      return await response.json()
     } catch (error) {
-      console.error("Error creating payment:", error);
-      throw error;
+      console.error("Error creating payment:", error)
+      throw error
     }
   },
 
-  checkPaymentStatus: async (
-    queryParams: Record<string, string> | null = null
-  ) => {
+  checkPaymentStatus: async (queryParams: Record<string, string> | null = null) => {
     try {
       // Determine if we should use query parameters or not
-      let url = "https://tixclick.site/api/payment/payos_call_back";
+      let url = "https://tixclick.site/api/payment/payos_call_back"
 
       // If queryParams is provided and not empty, append them to the URL
       if (queryParams) {
-        const queryString = new URLSearchParams(queryParams).toString();
+        const queryString = new URLSearchParams(queryParams).toString()
         if (queryString) {
-          url = `${url}?${queryString}`;
+          url = `${url}?${queryString}`
         }
       }
 
-      console.log("Calling payment status URL:", url);
+      console.log("Calling payment status URL:", url)
 
       const response = await fetch(url, {
         method: "GET",
@@ -78,269 +77,267 @@ const payOsApi = {
           Authorization: `Bearer ${localStorage.getItem("accessToken") || ""}`,
         },
         mode: "cors",
-      });
+      })
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
+        const errorText = await response.text()
+        console.error("Error response:", errorText)
 
         // Check for QR code truncation error
-        if (
-          errorText.includes("String or binary data would be truncated") &&
-          errorText.includes("qr_code")
-        ) {
-          console.warn(
-            "QR code truncation error detected, will handle as successful payment"
-          );
+        if (errorText.includes("String or binary data would be truncated") && errorText.includes("qr_code")) {
+          console.warn("QR code truncation error detected, will handle as successful payment")
           // Return a mock successful response
           return {
             data: {
               status: "PAID",
-              message:
-                "Payment successful (handled by client due to QR code size issue)",
+              message: "Payment successful (handled by client due to QR code size issue)",
             },
-          };
+          }
         }
 
-        throw new Error(
-          `Failed to check payment status: ${response.status} ${errorText}`
-        );
+        throw new Error(`Failed to check payment status: ${response.status} ${errorText}`)
       }
 
-      return await response.json();
+      return await response.json()
     } catch (error) {
-      console.error("Error checking payment status:", error);
-      throw error;
+      console.error("Error checking payment status:", error)
+      throw error
     }
   },
-};
+}
 
 export default function PaymentQueuePage() {
-  const [isComplete, setIsComplete] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [paymentData, setPaymentData] = useState<any>(null);
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
-  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isComplete, setIsComplete] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [paymentData, setPaymentData] = useState<any>(null)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [paymentError, setPaymentError] = useState<string | null>(null)
+  const [paymentStatus, setPaymentStatus] = useState<string>("PENDING")
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false)
+  const [eventInfor, setEventInfor] =
+    useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
+  const [isLoadingEvent, setIsLoadingEvent] = useState(false)
+  console.log(isLoadingEvent)
+  const navigate = useNavigate()
+  const location = useLocation()
+  // const [searchParams] = useSearchParams()
 
   const getQueryParams = (): Record<string, string> => {
-    return Object.fromEntries(new URLSearchParams(location.search));
-  };
+    return Object.fromEntries(new URLSearchParams(location.search))
+  }
 
-  const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || "";
+  const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || ""
+
+  // Fetch event information
+  useEffect(() => {
+    const fetchEventInfor = async () => {
+      try {
+        setIsLoadingEvent(true)
+        const storedPaymentData = localStorage.getItem("paymentQueueData")
+
+        if (storedPaymentData) {
+          const parsedData = JSON.parse(storedPaymentData)
+
+          // Get eventId from stored data
+          const eventId = parsedData.eventInfo?.id
+
+          if (eventId) {
+            const response = await eventApi.getEventDetail(Number(eventId))
+            if (response.data.result.length != 0) {
+              setEventInfor(response.data.result)
+              console.log("Event info fetched from API:", response.data.result)
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching event information:", error)
+      } finally {
+        setIsLoadingEvent(false)
+      }
+    }
+
+    fetchEventInfor()
+  }, [])
 
   useEffect(() => {
-    const storedPaymentData = localStorage.getItem("paymentQueueData");
+    const storedPaymentData = localStorage.getItem("paymentQueueData")
 
     if (storedPaymentData) {
       try {
-        const parsedData = JSON.parse(storedPaymentData);
-        setPaymentData(parsedData);
-        console.log("Payment queue data loaded:", parsedData);
+        const parsedData = JSON.parse(storedPaymentData)
+        setPaymentData(parsedData)
+        console.log("Payment queue data loaded:", parsedData)
 
-        const queryParams = new URLSearchParams(location.search);
+        const queryParams = new URLSearchParams(location.search)
         if (queryParams.has("orderCode")) {
-          setInitialLoading(false);
-          return;
+          setInitialLoading(false)
+          return
         }
 
         const timer = setTimeout(() => {
-          processPayment(parsedData);
-        }, 2000);
+          processPayment(parsedData)
+        }, 2000)
 
-        return () => clearTimeout(timer);
+        return () => clearTimeout(timer)
       } catch (error) {
-        console.error("Error parsing payment queue data:", error);
-        setInitialLoading(false);
+        console.error("Error parsing payment queue data:", error)
+        setInitialLoading(false)
       }
     } else {
-      setInitialLoading(false);
+      setInitialLoading(false)
     }
-  }, [location.search]);
+  }, [location.search])
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const orderCode = queryParams.get("orderCode");
-    const status = queryParams.get("status");
+    const queryParams = new URLSearchParams(location.search)
+    const orderCode = queryParams.get("orderCode")
+    const status = queryParams.get("status")
 
     if (orderCode) {
-      setIsVerifyingPayment(true);
-      console.log(
-        "Payment return detected with params:",
-        Object.fromEntries(queryParams.entries())
-      );
+      setIsVerifyingPayment(true)
+      console.log("Payment return detected with params:", Object.fromEntries(queryParams.entries()))
 
       // First update UI based on URL parameters for immediate feedback
       if (status === "success" || status === "PAID") {
-        setPaymentStatus("PAID");
-        setIsComplete(true);
-        setShowConfetti(true);
+        setPaymentStatus("PAID")
+        setIsComplete(true)
+        setShowConfetti(true)
         // setProgress(100)
       } else if (status === "cancel" || status === "CANCELED") {
-        setPaymentStatus("CANCELED");
-        setPaymentError("");
+        setPaymentStatus("CANCELED")
+        setPaymentError("")
       }
 
       // Then verify with backend
-      const allParams = getQueryParams();
+      const allParams = getQueryParams()
 
       payOsApi
         .checkPaymentStatus(allParams)
         .then((response) => {
-          console.log("Payment verification response:", response);
+          console.log("Payment verification response:", response)
 
           // Update UI based on backend response
           if (response.data?.status === "PAID") {
-            setPaymentStatus("PAID");
-            setIsComplete(true);
-            setShowConfetti(true);
+            setPaymentStatus("PAID")
+            setIsComplete(true)
+            setShowConfetti(true)
             // setProgress(100)
           } else if (response.data?.status === "CANCELED") {
-            setPaymentStatus("CANCELED");
-            setPaymentError("");
+            setPaymentStatus("CANCELED")
+            setPaymentError("")
           }
 
           // Check if this is a store order payment
-          const isPayStore = queryParams.get("name") === "Store_Order";
+          const isPayStore = queryParams.get("name") === "Store_Order"
           if (isPayStore && response.data?.status === "PAID") {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("userRole");
-            window.location.href = "/login";
+            localStorage.removeItem("accessToken")
+            localStorage.removeItem("userRole")
+            window.location.href = "/login"
           }
         })
         .catch((error) => {
-          console.error("Error verifying payment:", error);
+          console.error("Error verifying payment:", error)
 
           // If the error contains information about QR code truncation
           if (
             error.message &&
-            error.message.includes(
-              "String or binary data would be truncated"
-            ) &&
+            error.message.includes("String or binary data would be truncated") &&
             error.message.includes("qr_code")
           ) {
-            console.log(
-              "QR code truncation error detected, treating as successful payment"
-            );
-            setPaymentStatus("PAID");
-            setIsComplete(true);
-            setShowConfetti(true);
+            console.log("QR code truncation error detected, treating as successful payment")
+            setPaymentStatus("PAID")
+            setIsComplete(true)
+            setShowConfetti(true)
             // setProgress(100)
           } else {
-            setPaymentError("");
+            setPaymentError("")
           }
         })
         .finally(() => {
-          setIsVerifyingPayment(false);
-          setInitialLoading(false);
-          setIsProcessingPayment(false);
-        });
+          setIsVerifyingPayment(false)
+          setInitialLoading(false)
+          setIsProcessingPayment(false)
+        })
     }
-  }, [location.search]);
-
-  // Load payment data from localStorage
+  }, [location.search])
 
   // Process payment
   const processPayment = async (data: any) => {
-    if (isProcessingPayment) return;
+    if (isProcessingPayment) return
 
-    setIsProcessingPayment(true);
-    setPaymentError(null);
+    setIsProcessingPayment(true)
+    setPaymentError(null)
 
     try {
       const ticketPurchaseId =
         data.purchaseResponse?.result?.[0]?.ticketPurchaseId ||
-        data.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId;
+        data.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId
 
-      console.log("Processing payment for ticketPurchaseId:", ticketPurchaseId);
+      console.log("Processing payment for ticketPurchaseId:", ticketPurchaseId)
 
       // Call the PayOS API
-      const paymentResponse = await payOsApi.createPayment(
-        ticketPurchaseId,
-        localStorage.getItem("accessToken") || ""
-      );
-      console.log("PayOS payment response:", paymentResponse);
+      const paymentResponse = await payOsApi.createPayment(ticketPurchaseId, localStorage.getItem("accessToken") || "")
+      console.log("PayOS payment response:", paymentResponse)
 
       // Store the orderCode for later verification
       if (paymentResponse?.data?.data?.orderCode) {
-        localStorage.setItem(
-          "paymentOrderCode",
-          paymentResponse.data.data.orderCode
-        );
+        localStorage.setItem("paymentOrderCode", paymentResponse.data.data.orderCode)
       }
 
       if (paymentResponse?.result?.data?.checkoutUrl) {
         // Redirect to the checkout URL
-        window.location.href = paymentResponse.result.data.checkoutUrl;
+        window.location.href = paymentResponse.result.data.checkoutUrl
       } else {
-        setInitialLoading(false);
-        setIsProcessingPayment(false);
+        setInitialLoading(false)
+        setIsProcessingPayment(false)
       }
     } catch (error) {
-      console.error("Error processing payment:", error);
-      setPaymentError(
-        error instanceof Error ? error.message : "Đã xử lý thanh toán"
-      );
-      setInitialLoading(false);
-      setIsProcessingPayment(false);
+      console.error("Error processing payment:", error)
+      setPaymentError(error instanceof Error ? error.message : "Đã xử lý thanh toán")
+      setInitialLoading(false)
+      setIsProcessingPayment(false)
     }
-  };
+  }
 
   // Handle initial loading timeout
   useEffect(() => {
-    if (!initialLoading) return;
+    if (!initialLoading) return
 
     const timer = setTimeout(() => {
       if (!isProcessingPayment && !isVerifyingPayment) {
-        setInitialLoading(false);
+        setInitialLoading(false)
       }
-    }, 1500);
+    }, 1500)
 
-    return () => clearTimeout(timer);
-  }, [initialLoading, isProcessingPayment, isVerifyingPayment]);
+    return () => clearTimeout(timer)
+  }, [initialLoading, isProcessingPayment, isVerifyingPayment])
 
   // Progress animation
   useEffect(() => {
-    if (
-      initialLoading ||
-      isProcessingPayment ||
-      isComplete ||
-      paymentStatus === "PAID" ||
-      isVerifyingPayment
-    )
-      return;
+    if (initialLoading || isProcessingPayment || isComplete || paymentStatus === "PAID" || isVerifyingPayment) return
 
-    const interval = setInterval(() => {}, 1000);
+    const interval = setInterval(() => {}, 1000)
 
-    return () => clearInterval(interval);
-  }, [
-    initialLoading,
-    isProcessingPayment,
-    isComplete,
-    paymentStatus,
-    isVerifyingPayment,
-  ]);
+    return () => clearInterval(interval)
+  }, [initialLoading, isProcessingPayment, isComplete, paymentStatus, isVerifyingPayment])
 
   useEffect(() => {
     if (showConfetti) {
-      const duration = 3 * 1000;
-      const animationEnd = Date.now() + duration;
-      const colors = ["#FF8A00", "#FFFFFF"];
+      const duration = 3 * 1000
+      const animationEnd = Date.now() + duration
+      const colors = ["#FF8A00", "#FFFFFF"]
 
       const randomInRange = (min: number, max: number) => {
-        return Math.random() * (max - min) + min;
-      };
+        return Math.random() * (max - min) + min
+      }
 
       const confettiInterval = setInterval(() => {
-        const timeLeft = animationEnd - Date.now();
+        const timeLeft = animationEnd - Date.now()
 
         if (timeLeft <= 0) {
-          clearInterval(confettiInterval);
-          return;
+          clearInterval(confettiInterval)
+          return
         }
 
         confetti({
@@ -349,33 +346,42 @@ export default function PaymentQueuePage() {
           spread: randomInRange(50, 70),
           origin: { y: 0.6 },
           colors: colors,
-        });
-      }, 200);
+        })
+      }, 200)
 
-      return () => clearInterval(confettiInterval);
+      return () => clearInterval(confettiInterval)
     }
-  }, [showConfetti]);
+  }, [showConfetti])
 
   const handleViewTickets = () => {
-    navigate("/ticketManagement");
-  };
+    navigate("/ticketManagement")
+  }
 
   const handleRetryPayment = () => {
     if (paymentData) {
-      setInitialLoading(true);
-      setPaymentError(null);
-      processPayment(paymentData);
+      setInitialLoading(true)
+      setPaymentError(null)
+      processPayment(paymentData)
     }
-  };
+  }
+
+  // Format event date and time
+  const getFormattedEventDateTime = () => {
+    if (eventInfor?.eventActivityDTOList && paymentData?.eventInfo?.activityId) {
+      const activity = eventInfor.eventActivityDTOList.find(
+        (x) => x.eventActivityId == Number(paymentData.eventInfo.activityId),
+      )
+      if (activity) {
+        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent.toString())}`
+      }
+    }
+    return paymentData?.eventInfo?.date || "19:30, 12 tháng 4, 2025"
+  }
 
   if (initialLoading || isProcessingPayment || isVerifyingPayment) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
           <div className="relative h-20 w-20 mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-[#FF8A00] border-t-transparent animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -386,13 +392,13 @@ export default function PaymentQueuePage() {
             {isProcessingPayment
               ? "Đang kết nối với cổng thanh toán"
               : isVerifyingPayment
-              ? "Đang xác thực giao dịch"
-              : "Đang chuẩn bị giao dịch"}
+                ? "Đang xác thực giao dịch"
+                : "Đang chuẩn bị giao dịch"}
           </h3>
           <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
         </motion.div>
       </div>
-    );
+    )
   }
 
   if (paymentError) {
@@ -403,17 +409,12 @@ export default function PaymentQueuePage() {
             <div className="h-16 w-16 rounded-full bg-red-900/30 flex items-center justify-center mb-4">
               <AlertCircle className="h-8 w-8 text-red-500" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">
-              Lỗi kết nối thanh toán
-            </h2>
+            <h2 className="text-xl font-bold text-white mb-2">Lỗi kết nối thanh toán</h2>
             <p className="text-gray-400">{paymentError}</p>
           </div>
 
           <div className="space-y-3">
-            <Button
-              className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white"
-              onClick={handleRetryPayment}
-            >
+            <Button className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white" onClick={handleRetryPayment}>
               Thử lại
             </Button>
             <Button
@@ -426,11 +427,12 @@ export default function PaymentQueuePage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200 flex flex-col">
+      <Toaster />
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center">
         <div className="flex items-center ml-4">
           <div className="text-[#FF8A00] font-bold text-2xl">TixClick</div>
@@ -438,9 +440,7 @@ export default function PaymentQueuePage() {
         <div className="text-sm text-gray-400">
           ID Giao dịch:{" "}
           <span className="text-white font-medium">
-            {new URLSearchParams(location.search).get("orderCode") ||
-              paymentData?.transactionId ||
-              "TIX-24032023-8721"}
+            {new URLSearchParams(location.search).get("orderCode") || paymentData?.transactionId || "TIX-24032023-8721"}
           </span>
         </div>
       </header>
@@ -465,9 +465,7 @@ export default function PaymentQueuePage() {
                   </div>
                 )}
                 <h1 className="text-xl font-bold">
-                  {isComplete || paymentStatus === "PAID"
-                    ? "Thanh toán thành công!"
-                    : "Đã hủy thanh toán"}
+                  {isComplete || paymentStatus === "PAID" ? "Thanh toán thành công!" : "Đã hủy thanh toán"}
                 </h1>
               </div>
             </div>
@@ -483,23 +481,18 @@ export default function PaymentQueuePage() {
 
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white mb-3">
-                  {paymentData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
+                  {eventInfor?.eventName || paymentData?.eventInfo?.name || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
                 </h2>
 
                 <div className="space-y-3 text-gray-300">
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 text-[#FF8A00] mr-3" />
-                    <span>
-                      {paymentData?.eventInfo?.date ||
-                        "Thứ Bảy, 30/03/2024 - 20:00"}
-                    </span>
+                    <span>{getFormattedEventDateTime()}</span>
                   </div>
 
                   <div className="flex items-center">
                     <MapPin className="h-5 w-5 text-[#FF8A00] mr-3" />
-                    <span>
-                      {paymentData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}
-                    </span>
+                    <span>{eventInfor?.locationName || paymentData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}</span>
                   </div>
 
                   <div className="flex items-center">
@@ -525,8 +518,7 @@ export default function PaymentQueuePage() {
                     <div>
                       <p className="font-medium">Thanh toán thành công!</p>
                       <p className="text-sm mt-1">
-                        Vé của bạn đã được gửi đến email đăng ký. Vui lòng kiểm
-                        tra hộp thư của bạn.
+                        Vé của bạn đã được gửi đến email đăng ký. Vui lòng kiểm tra hộp thư của bạn.
                       </p>
                     </div>
                   </div>
@@ -543,13 +535,9 @@ export default function PaymentQueuePage() {
               <div className="bg-[#2A2A2A] rounded-md p-4 space-y-3">
                 {paymentData?.seats ? (
                   paymentData.seats.map((seat: any, index: number) => (
-                    <div
-                      key={seat.seatId || index}
-                      className="flex justify-between"
-                    >
+                    <div key={seat.seatId || index} className="flex justify-between">
                       <span className="text-gray-400">
-                        1x {seat.sectionName || ""} - {rcCode || ""} (
-                        {seat.typeName || "Vé Thường"})
+                        1x {seat.sectionName || ""} - {seat.seatLabel || rcCode || ""} ({seat.typeName || "Vé Thường"})
                       </span>
                       <span>{seat.formattedPrice || "200.000 đ"}</span>
                     </div>
@@ -586,10 +574,7 @@ export default function PaymentQueuePage() {
 
             <div className="flex justify-end">
               {isComplete || paymentStatus === "PAID" ? (
-                <Button
-                  className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white"
-                  onClick={handleViewTickets}
-                >
+                <Button className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white" onClick={handleViewTickets}>
                   Xem vé của tôi
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -610,10 +595,9 @@ export default function PaymentQueuePage() {
       <footer className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-4 px-4 text-center text-sm text-gray-400">
         <p>© 2024 TixClick. Tất cả các quyền được bảo lưu.</p>
         <p className="mt-1">
-          Nếu bạn gặp vấn đề, vui lòng liên hệ{" "}
-          <span className="text-[#FF8A00]">support@tixclick.com</span>
+          Nếu bạn gặp vấn đề, vui lòng liên hệ <span className="text-[#FF8A00]">support@tixclick.com</span>
         </p>
       </footer>
     </div>
-  );
+  )
 }

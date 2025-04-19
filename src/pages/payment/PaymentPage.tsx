@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
 import payOs from "../../assets/payOs.svg"
@@ -8,12 +8,16 @@ import { Button } from "../../components/ui/button"
 import { Checkbox } from "../../components/ui/checkbox"
 
 import { Client } from "@stomp/stompjs"
-import { Link, useNavigate } from "react-router"
+import { Link, useNavigate, useSearchParams } from "react-router"
 import { toast, Toaster } from "sonner"
 import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
+import { AuthContext } from "../../contexts/AuthProvider"
+import { EventDetailResponse } from "../../interface/EventInterface"
+import { formatDateVietnamese, formatTimeFe } from "../../lib/utils"
+import eventApi from "../../services/eventApi"
 
 export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -22,13 +26,56 @@ export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const eventId = searchParams.get("eventId")
+  const eventActivityId = searchParams.get("eventActivityId")
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
   const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
   const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] = useState(false)
-  
+  const [eventInfor, setEventInfor] =
+    useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
+  const [isLoadingEvent, setIsLoadingEvent] = useState(true)
+
   const stompClientRef = useRef<Client | null>(null)
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const context = useContext(AuthContext)
+
+  // Fetch event information
+  useEffect(() => {
+    const fetchEventInfor = async () => {
+      setIsLoadingEvent(true)
+      try {
+        if (!eventId) {
+          // Try to get eventId from localStorage
+          const storedSeatsData = localStorage.getItem("selectedSeats")
+          if (storedSeatsData) {
+            const parsedData = JSON.parse(storedSeatsData)
+            if (parsedData.eventInfo?.id) {
+              const response = await eventApi.getEventDetail(Number(parsedData.eventInfo.id))
+              if (response.data.result.length != 0) {
+                setEventInfor(response.data.result)
+                console.log("Event info fetched from API:", response.data.result)
+              }
+            }
+          }
+        } else {
+          const response = await eventApi.getEventDetail(Number(eventId))
+          if (response.data.result.length != 0) {
+            setEventInfor(response.data.result)
+            console.log("Event info fetched from API:", response.data.result)
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching event information:", error)
+        toast.error("Không thể tải thông tin sự kiện")
+      } finally {
+        setIsLoadingEvent(false)
+      }
+    }
+    fetchEventInfor()
+  }, [eventId])
 
   useEffect(() => {
     const setupWebSocketAndTimer = () => {
@@ -36,26 +83,26 @@ export default function PaymentPage() {
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current)
       }
-  
+
       // Get the ticketPurchaseId from localStorage or state
       const storedSeatsData = localStorage.getItem("selectedSeats")
       let ticketPurchaseId = null
-      
+
       if (storedSeatsData) {
         const parsedData = JSON.parse(storedSeatsData)
         if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
           ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
         }
       }
-  
+
       // If we have a ticketPurchaseId, connect to WebSocket
       if (ticketPurchaseId) {
         console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
-        
+
         // Handle WebSocket messages
         const handleWebSocketMessage = (message: any) => {
           console.log("WebSocket message received:", message)
-          
+
           // Handle different message types
           if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
             // Update the countdown timer with server-provided values
@@ -63,10 +110,12 @@ export default function PaymentPage() {
             setIsTimeoutBoundFromServer(true)
             setMinutes(Math.floor(serverTimeRemaining / 60))
             setSeconds(serverTimeRemaining % 60)
-            
+
             // Chỉ hiển thị thông báo khi còn ít thời gian (ví dụ: dưới 2 phút)
             if (serverTimeRemaining < 120) {
-              toast.info(`Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, '0')}`)
+              toast.info(
+                `Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, "0")}`,
+              )
             }
           } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
             // Handle expiration event
@@ -76,25 +125,25 @@ export default function PaymentPage() {
             }, 2000)
           }
         }
-        
+
         // Connect to WebSocket
         stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
-  
+
         // Gửi yêu cầu cập nhật thời gian còn lại ngay sau khi kết nối
         const requestTimeUpdate = () => {
           if (stompClientRef.current && stompClientRef.current.connected) {
             stompClientRef.current.publish({
               destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-              body: JSON.stringify({ requestId: Date.now() })
-            });
-            console.log("Sent time update request");
+              body: JSON.stringify({ requestId: Date.now() }),
+            })
+            console.log("Sent time update request")
           }
-        };
-        
+        }
+
         // Sau 1 giây khi kết nối, gửi yêu cầu cập nhật thời gian
-        setTimeout(requestTimeUpdate, 1000);
+        setTimeout(requestTimeUpdate, 1000)
       }
-  
+
       // Set up the local countdown timer (as backup or until we get server updates)
       countdownIntervalRef.current = setInterval(() => {
         // Chỉ sử dụng bộ đếm ngược cục bộ nếu không nhận được cập nhật từ máy chủ
@@ -119,18 +168,18 @@ export default function PaymentPage() {
           })
         }
       }, 1000)
-      
+
       // Định kỳ yêu cầu cập nhật thời gian từ máy chủ (mỗi 30 giây)
       const periodicalUpdateTimerRef = setInterval(() => {
         if (ticketPurchaseId && stompClientRef.current && stompClientRef.current.connected) {
           stompClientRef.current.publish({
             destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-            body: JSON.stringify({ requestId: Date.now() })
-          });
-          console.log("Sent periodic time update request");
+            body: JSON.stringify({ requestId: Date.now() }),
+          })
+          console.log("Sent periodic time update request")
         }
-      }, 30000); // Mỗi 30 giây
-  
+      }, 30000) // Mỗi 30 giây
+
       // Return cleanup function
       return () => {
         if (countdownIntervalRef.current) {
@@ -139,14 +188,14 @@ export default function PaymentPage() {
         if (periodicalUpdateTimerRef) {
           clearInterval(periodicalUpdateTimerRef)
         }
-      };
+      }
     }
-  
-    const cleanup = setupWebSocketAndTimer();
-  
+
+    const cleanup = setupWebSocketAndTimer()
+
     // Cleanup function
     return () => {
-      if (cleanup) cleanup();
+      if (cleanup) cleanup()
       if (stompClientRef.current) {
         websocketService.disconnect()
       }
@@ -224,7 +273,16 @@ export default function PaymentPage() {
       // Store all the necessary data for the queue page
       const queueData = {
         purchaseResponse: response,
-        eventInfo: selectedSeatsData.eventInfo,
+        eventInfo: {
+          id: eventId || selectedSeatsData?.eventInfo?.id,
+          activityId: eventActivityId || selectedSeatsData?.eventInfo?.activityId,
+          name: eventInfor?.eventName || selectedSeatsData?.eventInfo?.name,
+          location: eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
+          date:
+            eventInfor?.eventActivityDTOList && eventActivityId
+              ? `${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.startTimeEvent)} - ${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent)}, ${formatDateVietnamese(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.dateEvent.toString())}`
+              : selectedSeatsData?.eventInfo?.date,
+        },
         seats: selectedSeatsData.seats,
         totalAmount: selectedSeatsData.totalAmount,
         transactionId: `TIX-${new Date()
@@ -260,91 +318,108 @@ export default function PaymentPage() {
 
   const websocketService = {
     client: null as Client | null,
-    
+
     connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void): Client | null => {
-      if (typeof window === 'undefined') return null;
-      
+      if (typeof window === "undefined") return null
+
       const client = new Client({
-        brokerURL: 'wss://tixclick.site/ws',
-        reconnectDelay: 5000, // Tự động kết nối lại sau 5 giây nếu mất kết nối
+        brokerURL: `wss://tixclick.site/ws?token=${context?.accessToken}`,
+        connectHeaders: {
+          // Authorization: `Bearer ${context.accessToken}`,
+        },
+        debug: (str) => {
+          console.log("STOMP: " + str)
+        },
+        reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
-  
+
         onConnect: () => {
-          console.log('✅ WebSocket connected');
-          
+          console.log("✅ WebSocket connected")
+
           // Đăng ký nhận thông báo hết hạn
           client.subscribe(`/all/${ticketPurchaseId}/ticket-purchase-expired`, (message) => {
             try {
-              const body = JSON.parse(message.body);
-              console.log('📥 Received expired message:', body);
-              onMessageReceived(body);
+              const body = JSON.parse(message.body)
+              console.log("📥 Received expired message:", body)
+              onMessageReceived(body)
             } catch (e) {
-              console.log('⚠️ Raw message:', message.body);
+              console.log("⚠️ Raw message:", message.body)
             }
-          });
-          
+          })
+
           // Đăng ký nhận cập nhật thời gian còn lại
           client.subscribe(`/user/${ticketPurchaseId}/ticket-purchase-time-update`, (message) => {
             try {
-              const body = JSON.parse(message.body);
-              console.log('📥 Received time update:', body);
+              const body = JSON.parse(message.body)
+              console.log("📥 Received time update:", body)
               onMessageReceived({
                 type: "TICKET_PURCHASE_EXPIRATION_UPDATE",
-                timeRemainingSeconds: body.timeRemainingSeconds
-              });
+                timeRemainingSeconds: body.timeRemainingSeconds,
+              })
             } catch (e) {
-              console.log('⚠️ Raw time update message:', message.body);
+              console.log("⚠️ Raw time update message:", message.body)
             }
-          });
-          
+          })
+
           // Gửi yêu cầu để nhận thời gian còn lại ban đầu
           client.publish({
-            destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-            body: JSON.stringify({ requestId: Date.now() })
-          });
+            destination: `/all/ticket-purchase/${ticketPurchaseId}/request-time`,
+            body: JSON.stringify({ requestId: Date.now() }),
+          })
         },
         onStompError: (frame) => {
-          console.error('❌ STOMP error:', frame);
+          console.error("❌ STOMP error:", frame)
         },
         onWebSocketClose: () => {
-          console.log('🔌 WebSocket connection closed');
+          console.log("🔌 WebSocket connection closed")
         },
         onWebSocketError: (error) => {
-          console.error('❌ WebSocket error:', error);
+          console.error("❌ WebSocket error:", error)
           // Thử kết nối lại sau 3 giây
           setTimeout(() => {
-            if (client) client.activate();
-          }, 3000);
-        }
-      });
-      
-      websocketService.client = client;
-      client.activate();
-      return client;
+            if (client) client.activate()
+          }, 3000)
+        },
+      })
+
+      websocketService.client = client
+      client.activate()
+      return client
     },
-    
+
     disconnect: () => {
       if (websocketService.client && websocketService.client.connected) {
-        websocketService.client.deactivate();
-        websocketService.client = null;
-        console.log('🔌 WebSocket connection closed');
+        websocketService.client.deactivate()
+        websocketService.client = null
+        console.log("🔌 WebSocket connection closed")
       }
     },
-    
+
     // Thêm phương thức để yêu cầu cập nhật thời gian
     requestTimeUpdate: (ticketPurchaseId: string) => {
       if (websocketService.client && websocketService.client.connected) {
         websocketService.client.publish({
-          destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-          body: JSON.stringify({ requestId: Date.now() })
-        });
-        console.log("Sent manual time update request");
-        return true;
+          destination: `/all/ticket-purchase/${ticketPurchaseId}/request-time`,
+          body: JSON.stringify({ requestId: Date.now() }),
+        })
+        console.log("Sent manual time update request")
+        return true
       }
-      return false;
+      return false
+    },
+  }
+
+  // Format event date and time
+  const getFormattedEventDateTime = () => {
+    if (eventInfor?.eventActivityDTOList && eventActivityId) {
+      const activity = eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
+      if (activity) {
+        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent.toString())}`
+      }
     }
-  };
+    return selectedSeatsData?.eventInfo?.date || "19:30, 12 tháng 4, 2025"
+  }
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
@@ -367,33 +442,44 @@ export default function PaymentPage() {
       <div className="relative h-60 md:h-80 bg-[#1A1A1A] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#FF8A00]/20 to-[#FF8A00]/5"></div>
         <div className="absolute inset-0 flex flex-col justify-center items-center text-white p-4">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold mb-4 text-center"
-          >
-            {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex items-center gap-2 text-xl md:text-2xl mb-6"
-          >
-            <MapPin className="h-5 w-5 text-[#FF8A00]" />
-            <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
-          </motion.div>
+          {isLoadingEvent ? (
+            <div className="flex flex-col items-center">
+              <div className="h-8 w-8 rounded-full border-2 border-[#FF8A00] border-t-transparent animate-spin mb-4"></div>
+              <p>Đang tải thông tin sự kiện...</p>
+            </div>
+          ) : (
+            <>
+              <motion.h1
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-4xl md:text-5xl font-bold mb-4 text-center"
+              >
+                {eventInfor?.eventName || selectedSeatsData?.eventInfo?.name || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
+              </motion.h1>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex items-center gap-2 text-xl md:text-2xl mb-6"
+              >
+                <MapPin className="h-5 w-5 text-[#FF8A00]" />
+                <span>
+                  {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
+                </span>
+              </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex items-center gap-3 bg-[#2A2A2A] px-6 rounded-full"
-          >
-            <Calendar className="h-5 w-5 text-[#FF8A00]" />
-            <span className="font-medium">{selectedSeatsData?.eventInfo?.date || "Thứ Bảy, 30/03/2024 - 20:00"}</span>
-          </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex items-center gap-3 bg-[#2A2A2A] px-6 rounded-full"
+              >
+                <Calendar className="h-5 w-5 text-[#FF8A00]" />
+                <span className="font-medium">{getFormattedEventDateTime()}</span>
+              </motion.div>
+            </>
+          )}
         </div>
       </div>
 
@@ -479,15 +565,19 @@ export default function PaymentPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg text-white">
-                    {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
+                    {eventInfor?.eventName ||
+                      selectedSeatsData?.eventInfo?.name ||
+                      "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
                   </h3>
                   <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
                     <Calendar className="h-4 w-4 text-[#FF8A00]" />
-                    <span>{selectedSeatsData?.eventInfo?.date || "30/03/2024 - 20:00"}</span>
+                    <span>{getFormattedEventDateTime()}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
                     <MapPin className="h-4 w-4 text-[#FF8A00]" />
-                    <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
+                    <span>
+                      {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -581,10 +671,10 @@ export default function PaymentPage() {
               <span className="font-medium text-gray-400">Sự kiện</span>
               <div>
                 <div className="font-medium text-white">
-                  {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
+                  {eventInfor?.eventName || selectedSeatsData?.eventInfo?.name || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
                 </div>
                 <div className="text-sm mt-1 text-gray-400">
-                  {selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}
+                  {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
                 </div>
               </div>
             </div>
@@ -592,9 +682,7 @@ export default function PaymentPage() {
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Thời gian</span>
               <div>
-                <div className="text-[#FF8A00] font-medium">
-                  {selectedSeatsData?.eventInfo?.date || "20:00 - Thứ Bảy, 30/03/2024"}
-                </div>
+                <div className="text-[#FF8A00] font-medium">{getFormattedEventDateTime()}</div>
               </div>
             </div>
 
