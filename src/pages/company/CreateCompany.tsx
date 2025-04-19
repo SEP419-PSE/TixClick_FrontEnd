@@ -29,6 +29,7 @@ const CreateCompany = () => {
   const navigate = useNavigate();
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [codeTax, setCodeTax] = useState("");
@@ -63,6 +64,7 @@ const CreateCompany = () => {
     // Kiểm tra dữ liệu đầu vào
     if (
       !logoCompany ||
+      !email ||
       !address ||
       !companyName ||
       !description ||
@@ -84,6 +86,7 @@ const CreateCompany = () => {
       const companyData = new FormData();
       companyData.append("logoURL", logoCompany);
       companyData.append("companyName", companyName);
+      companyData.append("email", email);
       companyData.append("address", address);
       companyData.append("description", description);
       companyData.append("codeTax", codeTax);
@@ -137,6 +140,13 @@ const CreateCompany = () => {
           text={companyName}
           setText={setCompanyName}
           className="mt-4"
+        />
+        <TextInput
+          label="Email công ty"
+          maxLength={50}
+          text={email}
+          setText={setEmail}
+          className="mt-2"
         />
         <TextInput
           label="Địa chỉ"
