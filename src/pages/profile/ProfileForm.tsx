@@ -100,7 +100,6 @@ export default function ProfileForm() {
         await uploadProfileImage(croppedImage)
       }
 
-      // Close the cropper
       setImage(null)
     } catch (error) {
       console.error("Error cropping image:", error)
@@ -144,7 +143,6 @@ export default function ProfileForm() {
     setLoading(true)
 
     try {
-      // Make sure we have the required fields with proper types
       if (!profile?.accountId) {
         throw new Error("Missing account ID")
       }
@@ -162,19 +160,20 @@ export default function ProfileForm() {
         active: profile.active !== undefined ? profile.active : true,
       }
 
-      // Call the API
       const response = await profileApi.updateProfile(updateData)
+      
+      fetchProfile();
 
       if (response.data && response.data.success) {
-        // Update the local profile state with type safety
         setProfile({
           ...updateData,
         })
 
+        
+
         toast.success("Cập nhật thông tin thành công!")
         setEditMode(false)
       } else {
-        // Handle API error with message
         toast.error(response.data?.message || "Cập nhật thất bại")
       }
     } catch (error) {
@@ -187,7 +186,6 @@ export default function ProfileForm() {
 
   useEffect(() => {
     if (profile) {
-      // Sử dụng trực tiếp dữ liệu từ profile
       setFormData({
         ...profile,
       })

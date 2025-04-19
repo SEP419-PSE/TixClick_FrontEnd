@@ -1,136 +1,118 @@
-import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Calendar,
-  CheckCircle,
-  Clock,
-  CreditCard,
-  Loader2,
-  MapPin,
-  Tag,
-  X,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import banner from "../../assets/banner.jpg";
-import Logo from "../../assets/Logo.png";
-import payOs from "../../assets/payOs.svg";
-import { Button } from "../../components/ui/button";
-import { Checkbox } from "../../components/ui/checkbox";
+import { motion } from "framer-motion"
+import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import banner from "../../assets/banner.jpg"
+import Logo from "../../assets/Logo.png"
+import payOs from "../../assets/payOs.svg"
+import { Button } from "../../components/ui/button"
+import { Checkbox } from "../../components/ui/checkbox"
 
-import { Link, useNavigate } from "react-router";
-import { toast, Toaster } from "sonner";
-import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Separator } from "../../components/ui/separator";
+import { Link, useNavigate } from "react-router"
+import { toast, Toaster } from "sonner"
+import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Separator } from "../../components/ui/separator"
 
 export default function PaymentPage() {
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [minutes, setMinutes] = useState(10);
-  const [seconds, setSeconds] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const navigate = useNavigate();
-  const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [purchaseResponse, setPurchaseResponse] = useState<any>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [minutes, setMinutes] = useState(10)
+  const [seconds, setSeconds] = useState(0)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const navigate = useNavigate()
+  const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
+  const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
 
   useEffect(() => {
     const countdownInterval = setInterval(() => {
       if (seconds > 0) {
-        setSeconds(seconds - 1);
+        setSeconds(seconds - 1)
       } else if (minutes > 0) {
-        setMinutes(minutes - 1);
-        setSeconds(59);
+        setMinutes(minutes - 1)
+        setSeconds(59)
       } else {
-        toast.success("Hết thời gian thanh toán");
+        toast.success("Hết thời gian thanh toán")
 
-        clearInterval(countdownInterval);
+        clearInterval(countdownInterval)
 
         setTimeout(() => {
-          navigate("/");
-        }, 2000);
+          navigate("/")
+        }, 2000)
       }
-    }, 1000);
+    }, 1000)
 
-    return () => clearInterval(countdownInterval);
-  }, [minutes, seconds, navigate]);
+    return () => clearInterval(countdownInterval)
+  }, [minutes, seconds, navigate])
 
   useEffect(() => {
     // Load selected seats data
-    const storedSeatsData = localStorage.getItem("selectedSeats");
+    const storedSeatsData = localStorage.getItem("selectedSeats")
     if (storedSeatsData) {
-      const parsedData = JSON.parse(storedSeatsData);
-      setSelectedSeatsData(parsedData);
+      const parsedData = JSON.parse(storedSeatsData)
+      setSelectedSeatsData(parsedData)
 
-      // Log the API responses for debugging
       if (parsedData.apiResponses) {
-        console.log("Ticket API response:", parsedData.apiResponses.ticket);
-        console.log("Seat API responses:", parsedData.apiResponses.seats);
-        console.log(
-          "Purchase API response:",
-          JSON.stringify(parsedData.apiResponses.purchase, null, 2)
-        );
-        console.log(
-          "Purchase Response:",
-          parsedData.apiResponses.purchaseResponse
-        );
+        console.log("Ticket API response:", parsedData.apiResponses.ticket)
+        console.log("Seat API responses:", parsedData.apiResponses.seats)
+        console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
+        console.log("Purchase Response:", parsedData.apiResponses.purchase.result)
       }
 
       // Log the ticketPurchaseId
       if (parsedData.ticketPurchaseId) {
-        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId);
+        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId)
       }
     } else {
       // If no data is found, redirect back to the booking page
-      toast.error("Không tìm thấy thông tin đặt vé");
+      toast.error("Không tìm thấy thông tin đặt vé")
       setTimeout(() => {
-        navigate("/");
-      }, 1500);
+        navigate("/")
+      }, 1500)
     }
 
     // Load purchase response
-    const storedPurchaseResponse = localStorage.getItem("purchaseResponse");
+    const storedPurchaseResponse = localStorage.getItem("purchaseResponse")
     if (storedPurchaseResponse) {
       try {
-        const parsedResponse = JSON.parse(storedPurchaseResponse);
-        setPurchaseResponse(parsedResponse);
-        console.log("Loaded purchase response:", parsedResponse);
+        const parsedResponse = JSON.parse(storedPurchaseResponse)
+        setPurchaseResponse(parsedResponse)
+        console.log("Loaded purchase response:", parsedResponse)
       } catch (error) {
-        console.error("Error parsing purchase response:", error);
+        console.error("Error parsing purchase response:", error)
       }
     }
-  }, [navigate]);
+  }, [navigate])
 
+  // Update the handleConfirmPayment function to pass parameters to the queue page
   const handleConfirmPayment = async () => {
-    if (!acceptTerms) return;
+    if (!acceptTerms) return
 
-    setIsProcessing(true);
-    setApiError(null);
+    setIsProcessing(true)
+    setApiError(null)
 
     try {
       // Get the purchase response from state or localStorage
       const response =
         purchaseResponse ||
-        selectedSeatsData?.apiResponses?.purchaseResponse ||
-        JSON.parse(localStorage.getItem("purchaseResponse") || "null");
+        selectedSeatsData?.apiResponses?.purchase ||
+        JSON.parse(localStorage.getItem("purchaseResponse") || "null")
 
       if (!response) {
-        throw new Error("Không tìm thấy thông tin đặt vé");
+        throw new Error("Không tìm thấy thông tin đặt vé")
       }
 
-      console.log("Using purchase response:", response);
+      console.log("Using purchase response:", response)
 
-      // Get the ticketPurchaseIds from the response
-      const ticketPurchaseIds = response.result.map(
-        (item: any) => item.ticketPurchaseId
-      );
+      // Get the ticketPurchaseId from the response
+      const ticketPurchaseId = response.result[0]?.ticketPurchaseId
 
-      if (!ticketPurchaseIds || ticketPurchaseIds.length === 0) {
-        throw new Error("Không tìm thấy ID mua vé");
+      if (!ticketPurchaseId) {
+        throw new Error("Không tìm thấy ID mua vé")
       }
 
-      console.log("Using ticket purchase IDs:", ticketPurchaseIds);
+      console.log("Using ticket purchase ID:", ticketPurchaseId)
 
       // Store all the necessary data for the queue page
       const queueData = {
@@ -143,37 +125,31 @@ export default function PaymentPage() {
           .slice(0, 10)
           .replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`,
         timestamp: new Date().toISOString(),
-        ticketPurchaseIds: ticketPurchaseIds,
-      };
+        apiResponses: {
+          purchase: response,
+        },
+      }
 
       // Save to localStorage for the queue page to access
-      localStorage.setItem("paymentQueueData", JSON.stringify(queueData));
+      localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
 
-      // If successful, close the confirmation dialog and navigate to the queue page
-      setShowConfirmation(false);
+      // Close the confirmation dialog
+      setShowConfirmation(false)
 
       // Show success message
-      toast.success("Thanh toán thành công!");
+      toast.success("Đang chuyển hướng đến trang thanh toán!")
 
       // Navigate to the queue page after a short delay
       setTimeout(() => {
-        navigate("/payment/queue");
-      }, 2000);
+        navigate("/payment/queue")
+      }, 1500)
     } catch (error) {
-      console.error("Error during payment confirmation:", error);
-      setApiError(
-        error instanceof Error
-          ? error.message
-          : "Đã xảy ra lỗi khi xử lý thanh toán"
-      );
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Đã xảy ra lỗi khi xử lý thanh toán"
-      );
-      setIsProcessing(false);
+      console.error("Error during payment confirmation:", error)
+      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
+      setIsProcessing(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
@@ -181,19 +157,12 @@ export default function PaymentPage() {
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center sticky top-0 z-10">
         <Link to="/">
           <div className="flex items-center ml-4">
-            <img
-              src={Logo || "/placeholder.svg"}
-              alt="Event Ticket"
-              className="h-12 w-auto mr-4"
-            />
+            <img src={Logo || "/placeholder.svg"} alt="Event Ticket" className="h-12 w-auto mr-4" />
             <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
           </div>
         </Link>
         <Link to="/">
-          <Button
-            variant="ghost"
-            className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
-          >
+          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
             <X className="h-4 w-4 mr-2" />
             Hủy giao dịch
           </Button>
@@ -218,9 +187,7 @@ export default function PaymentPage() {
             className="flex items-center gap-2 text-xl md:text-2xl mb-6"
           >
             <MapPin className="h-5 w-5 text-[#FF8A00]" />
-            <span>
-              {selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}
-            </span>
+            <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
           </motion.div>
 
           <motion.div
@@ -230,10 +197,7 @@ export default function PaymentPage() {
             className="flex items-center gap-3 bg-[#2A2A2A] px-6 rounded-full"
           >
             <Calendar className="h-5 w-5 text-[#FF8A00]" />
-            <span className="font-medium">
-              {selectedSeatsData?.eventInfo?.date ||
-                "Thứ Bảy, 30/03/2024 - 20:00"}
-            </span>
+            <span className="font-medium">{selectedSeatsData?.eventInfo?.date || "Thứ Bảy, 30/03/2024 - 20:00"}</span>
           </motion.div>
         </div>
       </div>
@@ -247,10 +211,7 @@ export default function PaymentPage() {
             </h2>
 
             <div className="mb-4">
-              <label
-                htmlFor="promo-code"
-                className="block text-sm font-medium mb-2 text-gray-300"
-              >
+              <label htmlFor="promo-code" className="block text-sm font-medium mb-2 text-gray-300">
                 Mã khuyến mãi
               </label>
               <div className="flex gap-2">
@@ -263,9 +224,7 @@ export default function PaymentPage() {
                   Áp Dụng
                 </Button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
-                Lưu ý: Chỉ áp dụng một mã khuyến mãi cho mỗi đơn hàng
-              </p>
+              <p className="text-xs text-gray-400 mt-2">Lưu ý: Chỉ áp dụng một mã khuyến mãi cho mỗi đơn hàng</p>
             </div>
           </section>
 
@@ -281,29 +240,20 @@ export default function PaymentPage() {
                   <div className="h-2 w-2 rounded-full bg-white"></div>
                 </div>
                 <Label className="flex items-center cursor-pointer text-white">
-                  <img
-                    src={payOs || "/placeholder.svg"}
-                    alt="Payos"
-                    width={60}
-                    height={30}
-                    className="mr-2"
-                  />
-                  ( payOS - Thanh toán an toàn với thẻ nội địa, Visa, Master,
-                  JCB )
+                  <img src={payOs || "/placeholder.svg"} alt="Payos" width={60} height={30} className="mr-2" />( payOS -
+                  Thanh toán an toàn với thẻ nội địa, Visa, Master, JCB )
                 </Label>
               </div>
 
               <div className="flex items-center space-x-3 border border-[#3A3A3A] rounded-md p-4 bg-[#2A2A2A] transition-all duration-300 hover:border-[#FF8A00] cursor-pointer opacity-60">
                 <div className="h-5 w-5 rounded-full border border-gray-500 flex items-center justify-center"></div>
-                <Label className="flex items-center cursor-pointer text-white">
-                  Ví điện tử (MoMo, ZaloPay, VNPay)
-                </Label>
+                <Label className="flex items-center cursor-pointer text-white">Ví điện tử (MoMo, ZaloPay, VNPay)</Label>
               </div>
             </div>
 
             <p className="text-xs text-[#FF8A00] mt-6">
-              (*) Bằng việc click/chạm vào THANH TOÁN bên phải, bạn đã xác nhận
-              hiểu rõ các Điều khoản và Điều kiện của chúng tôi.
+              (*) Bằng việc click/chạm vào THANH TOÁN bên phải, bạn đã xác nhận hiểu rõ các Điều khoản và Điều kiện của
+              chúng tôi.
             </p>
           </section>
         </div>
@@ -316,8 +266,7 @@ export default function PaymentPage() {
                 <Clock className="h-4 w-4 mr-1 text-[#FF8A00]" />
                 <span>Còn lại: </span>
                 <span className="text-[#FF8A00] font-medium ml-1">
-                  {String(minutes).padStart(2, "0")}:
-                  {String(seconds).padStart(2, "0")}
+                  {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
                 </span>
               </div>
             </div>
@@ -335,22 +284,15 @@ export default function PaymentPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg text-white">
-                    {selectedSeatsData?.eventInfo?.name ||
-                      "Hòa nhạc Mùa Xuân 2024"}
+                    {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
                   </h3>
                   <div className="flex items-center gap-2 mt-2 text-gray-400 text-sm">
                     <Calendar className="h-4 w-4 text-[#FF8A00]" />
-                    <span>
-                      {selectedSeatsData?.eventInfo?.date ||
-                        "30/03/2024 - 20:00"}
-                    </span>
+                    <span>{selectedSeatsData?.eventInfo?.date || "30/03/2024 - 20:00"}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
                     <MapPin className="h-4 w-4 text-[#FF8A00]" />
-                    <span>
-                      {selectedSeatsData?.eventInfo?.location ||
-                        "Nhà hát Lớn Hà Nội"}
-                    </span>
+                    <span>{selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}</span>
                   </div>
                 </div>
               </div>
@@ -360,17 +302,13 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div
-                      key={seat.id || index}
-                      className="flex justify-between text-sm"
-                    >
+                    <div key={seat.id || index} className="flex justify-between text-sm">
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           1x
                         </div>
                         <div>
-                          {seat.sectionName} - {seat.seatLabel} ({seat.typeName}
-                          )
+                          {seat.sectionName} - {seat.seatLabel} ({seat.typeName})
                         </div>
                       </div>
                       <div className="font-medium">{seat.formattedPrice}</div>
@@ -448,12 +386,10 @@ export default function PaymentPage() {
               <span className="font-medium text-gray-400">Sự kiện</span>
               <div>
                 <div className="font-medium text-white">
-                  {selectedSeatsData?.eventInfo?.name ||
-                    "Hòa nhạc Mùa Xuân 2024"}
+                  {selectedSeatsData?.eventInfo?.name || "Hòa nhạc Mùa Xuân 2024"}
                 </div>
                 <div className="text-sm mt-1 text-gray-400">
-                  {selectedSeatsData?.eventInfo?.location ||
-                    "Nhà hát Lớn Hà Nội"}
+                  {selectedSeatsData?.eventInfo?.location || "Nhà hát Lớn Hà Nội"}
                 </div>
               </div>
             </div>
@@ -462,8 +398,7 @@ export default function PaymentPage() {
               <span className="font-medium text-gray-400">Thời gian</span>
               <div>
                 <div className="text-[#FF8A00] font-medium">
-                  {selectedSeatsData?.eventInfo?.date ||
-                    "20:00 - Thứ Bảy, 30/03/2024"}
+                  {selectedSeatsData?.eventInfo?.date || "20:00 - Thứ Bảy, 30/03/2024"}
                 </div>
               </div>
             </div>
@@ -473,10 +408,7 @@ export default function PaymentPage() {
               <div className="bg-[#2A2A2A] p-3 rounded-md">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div
-                      key={seat.id || index}
-                      className="flex items-center mb-1"
-                    >
+                    <div key={seat.id || index} className="flex items-center mb-1">
                       <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
                         1x
                       </div>
@@ -528,9 +460,7 @@ export default function PaymentPage() {
                 id="terms"
                 className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-white"
                 checked={acceptTerms}
-                onCheckedChange={(checked) =>
-                  setAcceptTerms(checked as boolean)
-                }
+                onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
               />
               <label
                 htmlFor="terms"
@@ -569,14 +499,12 @@ export default function PaymentPage() {
                   <div className="h-10 w-10 rounded-full bg-[#FF8A00]/20"></div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">
-                Đang xử lý thanh toán
-              </h3>
+              <h3 className="text-xl font-bold text-white mb-2">Đang xử lý thanh toán</h3>
               <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
             </motion.div>
           )}
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }
