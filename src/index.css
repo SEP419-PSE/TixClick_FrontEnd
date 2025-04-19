@@ -96,3 +96,12 @@
     filter: invert(100%) sepia(100%) saturate(1000%) hue-rotate(180deg); /* Chỉnh màu */
   }
 }
+
+.text-glow-orange {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 138, 0, 0.5);
+}
+
+.hover\:shadow-orange-glow:hover {
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3), 0 0 20px rgba(255, 138, 0, 0.5);
+}
+

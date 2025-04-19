@@ -7,6 +7,7 @@ import { EventForConsumer } from "../interface/EventInterface";
 import eventApi from "../services/eventApi";
 import EventsByCategory from "../components/TabEvent/EventsByCategory";
 import Categories from "../components/Categories/Categories";
+import HeroSection from "../components/HeroSlider/HeroSection";
 
 const HomePage = () => {
   const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
@@ -33,6 +34,7 @@ const HomePage = () => {
       <EventsByCategory eventCategoryId={2} status="SCHEDULED" />
       <EventsByCategory eventCategoryId={3} status="SCHEDULED" />
       <EventsByCategory eventCategoryId={4} status="SCHEDULED" />
+      <HeroSection />
     </div>
   );
 };
