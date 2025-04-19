@@ -616,7 +616,7 @@ export default function ContractsPage() {
             <DialogDescription>View and manage the details of the selected contract.</DialogDescription>
           </DialogHeader>
           {selectedContract && (
-            <Tabs defaultValue="details" className="w-full">
+            <Tabs defaultValue="contractDetails" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="contractDetails">Payment Schedule</TabsTrigger>
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
@@ -653,7 +653,7 @@ export default function ContractsPage() {
                               <TableCell>{getContractDetailStatusBadge(detail.status)}</TableCell>
                               <TableCell>
                                 <Dialog>
-                                  <DialogTrigger asChild>
+                                  <DialogTrigger asChild className="flex items-center justify-center">
                                     <Button
                                       variant="outline"
                                       size="sm"
