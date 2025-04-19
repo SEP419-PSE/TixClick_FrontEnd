@@ -265,7 +265,7 @@ export default function PaymentPage() {
       if (typeof window === 'undefined') return null;
       
       const client = new Client({
-        brokerURL: 'wss://localhost:8443/ws',
+        brokerURL: 'wss://tixclick.site/ws',
         reconnectDelay: 5000, // Tự động kết nối lại sau 5 giây nếu mất kết nối
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

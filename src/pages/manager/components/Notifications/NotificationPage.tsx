@@ -73,7 +73,6 @@ export default function NotificationPage() {
       
     };
 
-    // Rest of your client setup...
 
     client.activate();
     stompClient.current = client;
