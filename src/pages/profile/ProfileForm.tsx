@@ -33,6 +33,13 @@ interface ExtendedProfile extends Profile {
   fullName?: string
 }
 
+// Define crop area pixels interface
+interface CroppedAreaPixels {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export default function ProfileForm() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -43,7 +50,7 @@ export default function ProfileForm() {
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState<ExtendedProfile>({} as ExtendedProfile)
   const [loading, setLoading] = useState(false)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -55,59 +62,60 @@ export default function ProfileForm() {
 
   const uploadProfileImage = async (croppedImageBlob: Blob) => {
     try {
-      setLoading(true)
-
-      // Tạo URL từ blob để hiển thị ảnh
-      const imageUrl = URL.createObjectURL(croppedImageBlob)
-
-      // Cập nhật profile với URL ảnh mới
-      const updateData: Profile = {
-        ...profile!,
-        avatarURL: imageUrl,
-      }
-
-      const response = await profileApi.updateProfile(updateData)
-
+      setLoading(true);
+      
+      // Convert blob to File object with an appropriate name and type
+      const avatarFile = new File([croppedImageBlob], "avatar.jpg", { 
+        type: "image/jpeg" 
+      });
+      
+      // Call the API with current profile data and the new avatar file
+      // Need to update ProfileApi.updateProfile to accept File or null
+      const response = await profileApi.updateProfile(profile as Profile, avatarFile as File);
+      
       if (response.data && response.data.success) {
-        setProfile({
-          ...profile!,
-          avatarURL: imageUrl,
-        })
-        toast.success("Cập nhật ảnh đại diện thành công!")
+        // Update local state with the response from server
+        if (profile) {
+          setProfile({
+            ...profile,
+            avatarURL: response.data.result?.avatarURL || URL.createObjectURL(croppedImageBlob)
+          });
+        }
+        
+        toast.success("Cập nhật ảnh đại diện thành công!");
       } else {
-        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại")
+        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại");
       }
     } catch (error) {
-      console.error("Error uploading profile image:", error)
-      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.")
+      console.error("Error uploading profile image:", error);
+      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
+      setLoading(false);
+      setImage(null); // Close the cropper modal
     }
-  }
+  };
 
-  const handleCropComplete = async (_: any, croppedAreaPixels: any) => {
+  const handleCropComplete = async (_: unknown, croppedAreaPixels: CroppedAreaPixels) => {
     try {
-      if (!image) return
-
+      if (!image) return;
+      
       // Show loading state
-      setLoading(true)
-
+      setLoading(true);
+      
       // Get the cropped image as a blob
-      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0)
-
+      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0);
+      
       if (croppedImage) {
-        // Upload the cropped image
-        await uploadProfileImage(croppedImage)
+        // Upload the cropped image using the updated function
+        await uploadProfileImage(croppedImage);
       }
-
-      setImage(null)
     } catch (error) {
-      console.error("Error cropping image:", error)
-      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.")
+      console.error("Error cropping image:", error);
+      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -138,51 +146,48 @@ export default function ProfileForm() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    
     try {
       if (!profile?.accountId) {
-        throw new Error("Missing account ID")
+        throw new Error("Missing account ID");
       }
-
+      
+      // Extract only the fields accepted by the API
       const updateData: Profile = {
+        ...profile,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
         phone: formData.phone || "",
         email: formData.email || "",
         dob: formData.dob || "",
-        avatarURL: formData.avatarURL || profile?.avatarURL || "",
-        accountId: profile.accountId,
-        userName: profile.userName || "",
-        roleId: profile.roleId || 0,
-        active: profile.active !== undefined ? profile.active : true,
-      }
-
-      const response = await profileApi.updateProfile(updateData)
+      };
       
-      fetchProfile();
-
+      // Call API with form data but no avatar file (null)
+      const response = await profileApi.updateProfile(updateData, null);
+      
       if (response.data && response.data.success) {
-        setProfile({
-          ...updateData,
-        })
-
+        // Update profile state with response data
+        const updatedProfile = response.data.result || {
+          ...profile,
+          ...updateData
+        };
         
-
-        toast.success("Cập nhật thông tin thành công!")
-        setEditMode(false)
+        setProfile(updatedProfile);
+        toast.success("Cập nhật thông tin thành công!");
+        setEditMode(false);
       } else {
-        toast.error(response.data?.message || "Cập nhật thất bại")
+        toast.error(response.data?.message || "Cập nhật thất bại");
       }
     } catch (error) {
-      console.error("Error updating profile:", error)
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.")
+      console.error("Error updating profile:", error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -352,14 +357,14 @@ export default function ProfileForm() {
                           <Input
                             name="email"
                             type="email"
-                            value={profile?.email}
+                            value={formData.email || ""}
                             onChange={handleInputChange}
                             disabled={!editMode}
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
                               !editMode ? "opacity-80" : ""
                             }`}
                           />
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         </div>
                       </div>
 
@@ -477,7 +482,7 @@ export default function ProfileForm() {
                     </Button>
                     <Button
                       className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                      onClick={() => handleCropComplete(null, croppedAreaPixels)}
+                      onClick={() => handleCropComplete(null, croppedAreaPixels as CroppedAreaPixels)}
                       disabled={loading}
                     >
                       {loading ? (

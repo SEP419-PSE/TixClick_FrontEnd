@@ -5,7 +5,7 @@ export interface Profile {
     userName: string;
     email: string;
     phone: string;
-    active: boolean;
+    // active: boolean;
     avatarURL: string | null;
     dob: Date;
     roleId: number;

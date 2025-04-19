@@ -13,6 +13,7 @@ import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 import eventApi from "../services/eventApi";
 import { EventDetailResponse } from "../interface/EventInterface";
+import { Client } from "@stomp/stompjs"
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -44,6 +45,57 @@ const ticketPurchaseApi = {
       throw error;
     }
   },
+}
+
+const websocketService = {
+  client: null as Client | null,
+  
+  connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void) => {
+    if (typeof window === 'undefined') return; // Only run on client-side
+    
+    // Create new STOMP client
+    const client = new Client({
+      brokerURL: 'wss://localhost:8443/ws',
+      // For browser implementation, we don't need webSocketFactory
+      // as the browser's WebSocket implementation will be used automatically
+      
+      onConnect: () => {
+        console.log('✅ WebSocket connected');
+        const destination = `/all/${ticketPurchaseId}/ticket-purchase-expired`;
+        console.log(`📩 Subscribing to: ${destination}`);
+        client.subscribe(destination, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            console.log('📥 Received message:', body);
+            onMessageReceived(body);
+          } catch (e) {
+            console.log('⚠️ Raw message:', message.body);
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error('❌ STOMP error:', frame);
+      },
+      onWebSocketClose: () => {
+        console.log('🔌 WebSocket connection closed');
+      },
+      onWebSocketError: (error) => {
+        console.error('❌ WebSocket error:', error);
+      }
+    });
+    
+    websocketService.client = client;
+    client.activate();
+    return client;
+  },
+  
+  disconnect: () => {
+    if (websocketService.client && websocketService.client.connected) {
+      websocketService.client.deactivate();
+      websocketService.client = null;
+      console.log('🔌 WebSocket connection closed');
+    }
+  }
 };
 
 // Utility functions
