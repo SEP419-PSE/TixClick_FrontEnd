@@ -25,8 +25,8 @@ export default function PaymentPage() {
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
   const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
-  // const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] = useState(false)
-
+  const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] = useState(false)
+  
   const stompClientRef = useRef<Client | null>(null)
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -36,7 +36,7 @@ export default function PaymentPage() {
       if (countdownIntervalRef.current) {
         clearInterval(countdownIntervalRef.current)
       }
-
+  
       // Get the ticketPurchaseId from localStorage or state
       const storedSeatsData = localStorage.getItem("selectedSeats")
       let ticketPurchaseId = null
@@ -47,7 +47,7 @@ export default function PaymentPage() {
           ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
         }
       }
-
+  
       // If we have a ticketPurchaseId, connect to WebSocket
       if (ticketPurchaseId) {
         console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
@@ -60,11 +60,14 @@ export default function PaymentPage() {
           if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
             // Update the countdown timer with server-provided values
             const serverTimeRemaining = message.timeRemainingSeconds || 0
-            // setIsTimeoutBoundFromServer(true)
+            setIsTimeoutBoundFromServer(true)
             setMinutes(Math.floor(serverTimeRemaining / 60))
             setSeconds(serverTimeRemaining % 60)
             
-            toast.info(`Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, '0')}`)
+            // Chỉ hiển thị thông báo khi còn ít thời gian (ví dụ: dưới 2 phút)
+            if (serverTimeRemaining < 120) {
+              toast.info(`Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, '0')}`)
+            }
           } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
             // Handle expiration event
             toast.error("Thời gian giữ vé đã hết")
@@ -76,44 +79,79 @@ export default function PaymentPage() {
         
         // Connect to WebSocket
         stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
-
+  
+        // Gửi yêu cầu cập nhật thời gian còn lại ngay sau khi kết nối
+        const requestTimeUpdate = () => {
+          if (stompClientRef.current && stompClientRef.current.connected) {
+            stompClientRef.current.publish({
+              destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
+              body: JSON.stringify({ requestId: Date.now() })
+            });
+            console.log("Sent time update request");
+          }
+        };
+        
+        // Sau 1 giây khi kết nối, gửi yêu cầu cập nhật thời gian
+        setTimeout(requestTimeUpdate, 1000);
       }
-
+  
       // Set up the local countdown timer (as backup or until we get server updates)
       countdownIntervalRef.current = setInterval(() => {
-        setSeconds((prevSeconds) => {
-          if (prevSeconds > 0) {
-            return prevSeconds - 1
-          } else if (minutes > 0) {
-            setMinutes((prevMinutes) => prevMinutes - 1)
-            return 59
-          } else {
-            // Time's up
-            if (countdownIntervalRef.current) {
-              clearInterval(countdownIntervalRef.current)
+        // Chỉ sử dụng bộ đếm ngược cục bộ nếu không nhận được cập nhật từ máy chủ
+        if (!isTimeoutBoundFromServer) {
+          setSeconds((prevSeconds) => {
+            if (prevSeconds > 0) {
+              return prevSeconds - 1
+            } else if (minutes > 0) {
+              setMinutes((prevMinutes) => prevMinutes - 1)
+              return 59
+            } else {
+              // Time's up
+              if (countdownIntervalRef.current) {
+                clearInterval(countdownIntervalRef.current)
+              }
+              toast.error("Hết thời gian thanh toán")
+              setTimeout(() => {
+                navigate("/")
+              }, 2000)
+              return 0
             }
-            toast.error("Hết thời gian thanh toán")
-            setTimeout(() => {
-              navigate("/")
-            }, 2000)
-            return 0
-          }
-        })
+          })
+        }
       }, 1000)
+      
+      // Định kỳ yêu cầu cập nhật thời gian từ máy chủ (mỗi 30 giây)
+      const periodicalUpdateTimerRef = setInterval(() => {
+        if (ticketPurchaseId && stompClientRef.current && stompClientRef.current.connected) {
+          stompClientRef.current.publish({
+            destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
+            body: JSON.stringify({ requestId: Date.now() })
+          });
+          console.log("Sent periodic time update request");
+        }
+      }, 30000); // Mỗi 30 giây
+  
+      // Return cleanup function
+      return () => {
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current)
+        }
+        if (periodicalUpdateTimerRef) {
+          clearInterval(periodicalUpdateTimerRef)
+        }
+      };
     }
-
-    setupWebSocketAndTimer()
-
+  
+    const cleanup = setupWebSocketAndTimer();
+  
     // Cleanup function
     return () => {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current)
-      }
+      if (cleanup) cleanup();
       if (stompClientRef.current) {
         websocketService.disconnect()
       }
     }
-  }, [navigate])
+  }, [navigate, minutes, isTimeoutBoundFromServer])
 
   useEffect(() => {
     // Load selected seats data
@@ -224,23 +262,46 @@ export default function PaymentPage() {
     client: null as Client | null,
     
     connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void): Client | null => {
-      if (typeof window === 'undefined') return null; // Return null instead of undefined
+      if (typeof window === 'undefined') return null;
       
       const client = new Client({
-        brokerURL: 'wss://tixclick.site/ws',
+        brokerURL: 'wss://localhost:8443/ws',
+        reconnectDelay: 5000, // Tự động kết nối lại sau 5 giây nếu mất kết nối
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
   
         onConnect: () => {
           console.log('✅ WebSocket connected');
-          const destination = `/all/${ticketPurchaseId}/ticket-purchase-expired`;
-          console.log(`📩 Subscribing to: ${destination}`);
-          client.subscribe(destination, (message) => {
+          
+          // Đăng ký nhận thông báo hết hạn
+          client.subscribe(`/all/${ticketPurchaseId}/ticket-purchase-expired`, (message) => {
             try {
               const body = JSON.parse(message.body);
-              console.log('📥 Received message:', body);
+              console.log('📥 Received expired message:', body);
               onMessageReceived(body);
             } catch (e) {
               console.log('⚠️ Raw message:', message.body);
             }
+          });
+          
+          // Đăng ký nhận cập nhật thời gian còn lại
+          client.subscribe(`/user/${ticketPurchaseId}/ticket-purchase-time-update`, (message) => {
+            try {
+              const body = JSON.parse(message.body);
+              console.log('📥 Received time update:', body);
+              onMessageReceived({
+                type: "TICKET_PURCHASE_EXPIRATION_UPDATE",
+                timeRemainingSeconds: body.timeRemainingSeconds
+              });
+            } catch (e) {
+              console.log('⚠️ Raw time update message:', message.body);
+            }
+          });
+          
+          // Gửi yêu cầu để nhận thời gian còn lại ban đầu
+          client.publish({
+            destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
+            body: JSON.stringify({ requestId: Date.now() })
           });
         },
         onStompError: (frame) => {
@@ -251,6 +312,10 @@ export default function PaymentPage() {
         },
         onWebSocketError: (error) => {
           console.error('❌ WebSocket error:', error);
+          // Thử kết nối lại sau 3 giây
+          setTimeout(() => {
+            if (client) client.activate();
+          }, 3000);
         }
       });
       
@@ -265,6 +330,19 @@ export default function PaymentPage() {
         websocketService.client = null;
         console.log('🔌 WebSocket connection closed');
       }
+    },
+    
+    // Thêm phương thức để yêu cầu cập nhật thời gian
+    requestTimeUpdate: (ticketPurchaseId: string) => {
+      if (websocketService.client && websocketService.client.connected) {
+        websocketService.client.publish({
+          destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
+          body: JSON.stringify({ requestId: Date.now() })
+        });
+        console.log("Sent manual time update request");
+        return true;
+      }
+      return false;
     }
   };
 
