@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
 import payOs from "../../assets/payOs.svg"
@@ -25,27 +25,95 @@ export default function PaymentPage() {
   const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
   const [apiError, setApiError] = useState<string | null>(null)
   const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
+  // const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] = useState(false)
+
+  const stompClientRef = useRef<Client | null>(null)
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const countdownInterval = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds(seconds - 1)
-      } else if (minutes > 0) {
-        setMinutes(minutes - 1)
-        setSeconds(59)
-      } else {
-        toast.success("Hết thời gian thanh toán")
-
-        clearInterval(countdownInterval)
-
-        setTimeout(() => {
-          navigate("/")
-        }, 2000)
+    const setupWebSocketAndTimer = () => {
+      // Clear any existing interval
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current)
       }
-    }, 1000)
 
-    return () => clearInterval(countdownInterval)
-  }, [minutes, seconds, navigate])
+      // Get the ticketPurchaseId from localStorage or state
+      const storedSeatsData = localStorage.getItem("selectedSeats")
+      let ticketPurchaseId = null
+      
+      if (storedSeatsData) {
+        const parsedData = JSON.parse(storedSeatsData)
+        if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
+          ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+        }
+      }
+
+      // If we have a ticketPurchaseId, connect to WebSocket
+      if (ticketPurchaseId) {
+        console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
+        
+        // Handle WebSocket messages
+        const handleWebSocketMessage = (message: any) => {
+          console.log("WebSocket message received:", message)
+          
+          // Handle different message types
+          if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
+            // Update the countdown timer with server-provided values
+            const serverTimeRemaining = message.timeRemainingSeconds || 0
+            // setIsTimeoutBoundFromServer(true)
+            setMinutes(Math.floor(serverTimeRemaining / 60))
+            setSeconds(serverTimeRemaining % 60)
+            
+            toast.info(`Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, '0')}`)
+          } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
+            // Handle expiration event
+            toast.error("Thời gian giữ vé đã hết")
+            setTimeout(() => {
+              navigate("/")
+            }, 2000)
+          }
+        }
+        
+        // Connect to WebSocket
+        stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
+
+      }
+
+      // Set up the local countdown timer (as backup or until we get server updates)
+      countdownIntervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds > 0) {
+            return prevSeconds - 1
+          } else if (minutes > 0) {
+            setMinutes((prevMinutes) => prevMinutes - 1)
+            return 59
+          } else {
+            // Time's up
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current)
+            }
+            toast.error("Hết thời gian thanh toán")
+            setTimeout(() => {
+              navigate("/")
+            }, 2000)
+            return 0
+          }
+        })
+      }, 1000)
+    }
+
+    setupWebSocketAndTimer()
+
+    // Cleanup function
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current)
+      }
+      if (stompClientRef.current) {
+        websocketService.disconnect()
+      }
+    }
+  }, [navigate])
 
   useEffect(() => {
     // Load selected seats data
@@ -155,11 +223,11 @@ export default function PaymentPage() {
   const websocketService = {
     client: null as Client | null,
     
-    connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void) => {
-      if (typeof window === 'undefined') return; 
+    connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void): Client | null => {
+      if (typeof window === 'undefined') return null; // Return null instead of undefined
       
       const client = new Client({
-        brokerURL: 'wss://localhost:8443/ws',
+        brokerURL: 'wss://tixclick.site/ws',
   
         onConnect: () => {
           console.log('✅ WebSocket connected');
