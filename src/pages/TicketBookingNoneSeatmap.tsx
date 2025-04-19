@@ -12,7 +12,6 @@ import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils"
 import eventApi from "../services/eventApi"
 import ticketMappingApi from "../services/ticketMappingApi"
 
-// Add the ticketPurchaseApi service
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
     try {
@@ -76,7 +75,7 @@ export interface TicketPurchaseRequestElement {
 }
 
 const TicketBookingNoneSeatmap = () => {
-  const navigate = useNavigate() // Added for navigation
+  const navigate = useNavigate() 
   const [searchParams] = useSearchParams()
   const eventId = searchParams.get("eventId")
   const activityEventId = searchParams.get("eventActivityId")
@@ -150,7 +149,6 @@ const TicketBookingNoneSeatmap = () => {
     setTotalQuantity((prevTotalQuantity) => prevTotalQuantity - 1)
   }
 
-  // Now, let's modify the createTicketPurchase function to call the API and pass the response to the payment page
   const createTicketPurchase = async () => {
     setIsLoading(true)
 
