@@ -121,7 +121,11 @@ export default function PaymentQueuePage() {
   console.log(isLoadingEvent)
   const navigate = useNavigate()
   const location = useLocation()
-  // const [searchParams] = useSearchParams()
+  const [discountInfo, setDiscountInfo] = useState<{
+    code: string
+    discountAmount: number
+    discountPercentage: number
+  } | null>(null)
 
   const getQueryParams = (): Record<string, string> => {
     return Object.fromEntries(new URLSearchParams(location.search))
@@ -168,6 +172,9 @@ export default function PaymentQueuePage() {
         const parsedData = JSON.parse(storedPaymentData)
         setPaymentData(parsedData)
         console.log("Payment queue data loaded:", parsedData)
+        if (paymentData?.voucher) {
+          setDiscountInfo(paymentData.voucher)
+        }
 
         const queryParams = new URLSearchParams(location.search)
         if (queryParams.has("orderCode")) {
@@ -187,7 +194,7 @@ export default function PaymentQueuePage() {
     } else {
       setInitialLoading(false)
     }
-  }, [location.search])
+  }, [location.search, paymentData?.voucher])
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
@@ -556,17 +563,55 @@ export default function PaymentQueuePage() {
                   </>
                 )}
 
+                {/* Show original amount if discount is applied */}
+                {discountInfo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Tạm tính</span>
+                    <span>
+                      {paymentData?.totalAmount
+                        ? new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(paymentData.totalAmount)
+                        : "1.100.000 đ"}
+                    </span>
+                  </div>
+                )}
+
+                {/* Show discount if applied */}
+                {discountInfo && (
+                  <div className="flex justify-between text-green-400 text-sm">
+                    <span className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Giảm giá ({discountInfo.code})
+                    </span>
+                    <span>
+                      {discountInfo.discountPercentage > 0
+                        ? `-${discountInfo.discountPercentage}%`
+                        : `-${new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(discountInfo.discountAmount)}`}
+                    </span>
+                  </div>
+                )}
+
                 <Separator className="border-[#3A3A3A]" />
 
                 <div className="flex justify-between font-medium">
                   <span>Tổng cộng</span>
                   <span className="text-[#FF8A00]">
-                    {paymentData?.totalAmount
+                    {paymentData?.discountedAmount
                       ? new Intl.NumberFormat("vi-VN", {
                           style: "currency",
                           currency: "VND",
-                        }).format(paymentData.totalAmount)
-                      : "1.100.000 đ"}
+                        }).format(paymentData.discountedAmount)
+                      : paymentData?.totalAmount
+                        ? new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(paymentData.totalAmount)
+                        : "1.100.000 đ"}
                   </span>
                 </div>
               </div>
