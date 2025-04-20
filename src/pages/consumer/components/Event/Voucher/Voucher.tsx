@@ -19,7 +19,6 @@ const Voucher = () => {
   const onChangeStatusVoucher = (e: string) => {
     setStatus(e.toUpperCase() as VoucherStatus);
   };
-  console.log(status);
 
   if (error) return <div>Lỗi fetch API</div>;
 
