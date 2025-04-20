@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import { ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
+import { AlertCircle, ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
 import { useContext, useEffect, useRef, useState } from "react"
 import banner from "../../assets/banner.jpg"
 import Logo from "../../assets/Logo.png"
@@ -36,6 +36,16 @@ export default function PaymentPage() {
   const [eventInfor, setEventInfor] =
     useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
   const [isLoadingEvent, setIsLoadingEvent] = useState(true)
+
+  // Add a new state for voucher code and discount information
+  const [voucherCode, setVoucherCode] = useState("")
+  const [voucherDiscount, setVoucherDiscount] = useState<{
+    isValid: boolean
+    discountAmount: number
+    discountPercentage: number
+    message: string
+  } | null>(null)
+  const [isCheckingVoucher, setIsCheckingVoucher] = useState(false)
 
   const stompClientRef = useRef<Client | null>(null)
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -76,245 +86,6 @@ export default function PaymentPage() {
     }
     fetchEventInfor()
   }, [eventId])
-
-  useEffect(() => {
-    const setupWebSocketAndTimer = () => {
-      // Clear any existing interval
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current)
-      }
-
-      // Get the ticketPurchaseId from localStorage or state
-      const storedSeatsData = localStorage.getItem("selectedSeats")
-      let ticketPurchaseId = null
-
-      if (storedSeatsData) {
-        const parsedData = JSON.parse(storedSeatsData)
-        if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
-          ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
-        }
-      }
-
-      // If we have a ticketPurchaseId, connect to WebSocket
-      if (ticketPurchaseId) {
-        console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
-
-        // Handle WebSocket messages
-        const handleWebSocketMessage = (message: any) => {
-          console.log("WebSocket message received:", message)
-
-          // Handle different message types
-          if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
-            // Update the countdown timer with server-provided values
-            const serverTimeRemaining = message.timeRemainingSeconds || 0
-            setIsTimeoutBoundFromServer(true)
-            setMinutes(Math.floor(serverTimeRemaining / 60))
-            setSeconds(serverTimeRemaining % 60)
-
-            // Chỉ hiển thị thông báo khi còn ít thời gian (ví dụ: dưới 2 phút)
-            if (serverTimeRemaining < 120) {
-              toast.info(
-                `Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, "0")}`,
-              )
-            }
-          } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
-            // Handle expiration event
-            toast.error("Thời gian giữ vé đã hết")
-            setTimeout(() => {
-              navigate("/")
-            }, 2000)
-          }
-        }
-
-        // Connect to WebSocket
-        stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
-
-        // Gửi yêu cầu cập nhật thời gian còn lại ngay sau khi kết nối
-        const requestTimeUpdate = () => {
-          if (stompClientRef.current && stompClientRef.current.connected) {
-            stompClientRef.current.publish({
-              destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-              body: JSON.stringify({ requestId: Date.now() }),
-            })
-            console.log("Sent time update request")
-          }
-        }
-
-        // Sau 1 giây khi kết nối, gửi yêu cầu cập nhật thời gian
-        setTimeout(requestTimeUpdate, 1000)
-      }
-
-      // Set up the local countdown timer (as backup or until we get server updates)
-      countdownIntervalRef.current = setInterval(() => {
-        // Chỉ sử dụng bộ đếm ngược cục bộ nếu không nhận được cập nhật từ máy chủ
-        if (!isTimeoutBoundFromServer) {
-          setSeconds((prevSeconds) => {
-            if (prevSeconds > 0) {
-              return prevSeconds - 1
-            } else if (minutes > 0) {
-              setMinutes((prevMinutes) => prevMinutes - 1)
-              return 59
-            } else {
-              // Time's up
-              if (countdownIntervalRef.current) {
-                clearInterval(countdownIntervalRef.current)
-              }
-              toast.error("Hết thời gian thanh toán")
-              setTimeout(() => {
-                navigate("/")
-              }, 2000)
-              return 0
-            }
-          })
-        }
-      }, 1000)
-
-      // Định kỳ yêu cầu cập nhật thời gian từ máy chủ (mỗi 30 giây)
-      const periodicalUpdateTimerRef = setInterval(() => {
-        if (ticketPurchaseId && stompClientRef.current && stompClientRef.current.connected) {
-          stompClientRef.current.publish({
-            destination: `/app/ticket-purchase/${ticketPurchaseId}/request-time`,
-            body: JSON.stringify({ requestId: Date.now() }),
-          })
-          console.log("Sent periodic time update request")
-        }
-      }, 30000) // Mỗi 30 giây
-
-      // Return cleanup function
-      return () => {
-        if (countdownIntervalRef.current) {
-          clearInterval(countdownIntervalRef.current)
-        }
-        if (periodicalUpdateTimerRef) {
-          clearInterval(periodicalUpdateTimerRef)
-        }
-      }
-    }
-
-    const cleanup = setupWebSocketAndTimer()
-
-    // Cleanup function
-    return () => {
-      if (cleanup) cleanup()
-      if (stompClientRef.current) {
-        websocketService.disconnect()
-      }
-    }
-  }, [navigate, minutes, isTimeoutBoundFromServer])
-
-  useEffect(() => {
-    // Load selected seats data
-    const storedSeatsData = localStorage.getItem("selectedSeats")
-    if (storedSeatsData) {
-      const parsedData = JSON.parse(storedSeatsData)
-      setSelectedSeatsData(parsedData)
-
-      if (parsedData.apiResponses) {
-        console.log("Ticket API response:", parsedData.apiResponses.ticket)
-        console.log("Seat API responses:", parsedData.apiResponses.seats)
-        console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
-        console.log("Purchase Response:", parsedData.apiResponses.purchase.result)
-      }
-
-      // Log the ticketPurchaseId
-      if (parsedData.ticketPurchaseId) {
-        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId)
-      }
-    } else {
-      // If no data is found, redirect back to the booking page
-      toast.error("Không tìm thấy thông tin đặt vé")
-      setTimeout(() => {
-        navigate("/")
-      }, 1500)
-    }
-
-    // Load purchase response
-    const storedPurchaseResponse = localStorage.getItem("purchaseResponse")
-    if (storedPurchaseResponse) {
-      try {
-        const parsedResponse = JSON.parse(storedPurchaseResponse)
-        setPurchaseResponse(parsedResponse)
-        console.log("Loaded purchase response:", parsedResponse)
-      } catch (error) {
-        console.error("Error parsing purchase response:", error)
-      }
-    }
-  }, [navigate])
-
-  // Update the handleConfirmPayment function to pass parameters to the queue page
-  const handleConfirmPayment = async () => {
-    if (!acceptTerms) return
-
-    setIsProcessing(true)
-    setApiError(null)
-
-    try {
-      // Get the purchase response from state or localStorage
-      const response =
-        purchaseResponse ||
-        selectedSeatsData?.apiResponses?.purchase ||
-        JSON.parse(localStorage.getItem("purchaseResponse") || "null")
-
-      if (!response) {
-        throw new Error("Không tìm thấy thông tin đặt vé")
-      }
-
-      console.log("Using purchase response:", response)
-
-      // Get the ticketPurchaseId from the response
-      const ticketPurchaseId = response.result[0]?.ticketPurchaseId
-
-      if (!ticketPurchaseId) {
-        throw new Error("Không tìm thấy ID mua vé")
-      }
-
-      console.log("Using ticket purchase ID:", ticketPurchaseId)
-
-      // Store all the necessary data for the queue page
-      const queueData = {
-        purchaseResponse: response,
-        eventInfo: {
-          id: eventId || selectedSeatsData?.eventInfo?.id,
-          activityId: eventActivityId || selectedSeatsData?.eventInfo?.activityId,
-          name: eventInfor?.eventName || selectedSeatsData?.eventInfo?.name,
-          location: eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
-          date:
-            eventInfor?.eventActivityDTOList && eventActivityId
-              ? `${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.startTimeEvent)} - ${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent)}, ${formatDateVietnamese(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.dateEvent.toString())}`
-              : selectedSeatsData?.eventInfo?.date,
-        },
-        seats: selectedSeatsData.seats,
-        totalAmount: selectedSeatsData.totalAmount,
-        transactionId: `TIX-${new Date()
-          .toISOString()
-          .slice(0, 10)
-          .replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`,
-        timestamp: new Date().toISOString(),
-        apiResponses: {
-          purchase: response,
-        },
-      }
-
-      // Save to localStorage for the queue page to access
-      localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
-
-      // Close the confirmation dialog
-      setShowConfirmation(false)
-
-      // Show success message
-      toast.success("Đang chuyển hướng đến trang thanh toán!")
-
-      // Navigate to the queue page after a short delay
-      setTimeout(() => {
-        navigate("/payment/queue")
-      }, 1500)
-    } catch (error) {
-      console.error("Error during payment confirmation:", error)
-      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
-      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
-      setIsProcessing(false)
-    }
-  }
 
   const websocketService = {
     client: null as Client | null,
@@ -371,8 +142,8 @@ export default function PaymentPage() {
         onStompError: (frame) => {
           console.error("❌ STOMP error:", frame)
         },
-        onWebSocketClose: () => {
-          console.log("🔌 WebSocket connection closed")
+        onWebSocketClose: (error) => {
+          console.log("🔌 WebSocket connection closed", error)
         },
         onWebSocketError: (error) => {
           console.error("❌ WebSocket error:", error)
@@ -410,12 +181,329 @@ export default function PaymentPage() {
     },
   }
 
-  // Format event date and time
+  useEffect(() => {
+    const setupWebSocketAndTimer = () => {
+      // Clear any existing interval
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current)
+      }
+
+      // Get the ticketPurchaseId from localStorage or state
+      const storedSeatsData = localStorage.getItem("selectedSeats")
+      let ticketPurchaseId = null
+
+      if (storedSeatsData) {
+        const parsedData = JSON.parse(storedSeatsData)
+        if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
+          ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+        }
+      }
+
+      // If we have a ticketPurchaseId, connect to WebSocket
+      if (ticketPurchaseId) {
+        console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
+
+        // Handle WebSocket messages
+        const handleWebSocketMessage = (message: any) => {
+          console.log("WebSocket message received:", message)
+
+          // Handle different message types
+          if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
+            // Update the countdown timer with server-provided values
+            const serverTimeRemaining = message.timeRemainingSeconds || 0
+            setIsTimeoutBoundFromServer(true)
+            setMinutes(Math.floor(serverTimeRemaining / 60))
+            setSeconds(serverTimeRemaining % 60)
+
+            // Only show notification when time is running low (e.g., under 2 minutes)
+            if (serverTimeRemaining < 120) {
+              toast.info(
+                `Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, "0")}`,
+                { id: "time-remaining" },
+              )
+            }
+          } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
+            // Handle expiration event
+            toast.error("Thời gian giữ vé đã hết", { id: "ticket-expired" })
+            setTimeout(() => {
+              navigate("/")
+            }, 2000)
+          }
+        }
+
+        // Connect to WebSocket
+        stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
+
+        // Set up a reconnection mechanism
+        const checkConnectionInterval = setInterval(() => {
+          if (stompClientRef.current && !stompClientRef.current.connected) {
+            console.log("WebSocket disconnected, attempting to reconnect...")
+            stompClientRef.current.activate()
+          }
+        }, 10000) // Check every 10 seconds
+
+        // Return cleanup function for this interval
+        return () => {
+          clearInterval(checkConnectionInterval)
+        }
+      }
+
+      // Set up the local countdown timer (as backup or until we get server updates)
+      countdownIntervalRef.current = setInterval(() => {
+        // Only use local countdown if not receiving updates from server
+        if (!isTimeoutBoundFromServer) {
+          setSeconds((prevSeconds) => {
+            if (prevSeconds > 0) {
+              return prevSeconds - 1
+            } else if (minutes > 0) {
+              setMinutes((prevMinutes) => prevMinutes - 1)
+              return 59
+            } else {
+              // Time's up
+              if (countdownIntervalRef.current) {
+                clearInterval(countdownIntervalRef.current)
+              }
+              toast.error("Hết thời gian thanh toán", { id: "time-up" })
+              setTimeout(() => {
+                navigate("/")
+              }, 2000)
+              return 0
+            }
+          })
+        }
+      }, 1000)
+
+      // Periodically request time updates from server (every 30 seconds)
+      const periodicalUpdateTimerRef = setInterval(() => {
+        if (ticketPurchaseId && stompClientRef.current && stompClientRef.current.connected) {
+          websocketService.requestTimeUpdate(ticketPurchaseId)
+          console.log("Sent periodic time update request")
+        }
+      }, 30000) // Every 30 seconds
+
+      // Return cleanup function
+      return () => {
+        if (countdownIntervalRef.current) {
+          clearInterval(countdownIntervalRef.current)
+        }
+        if (periodicalUpdateTimerRef) {
+          clearInterval(periodicalUpdateTimerRef)
+        }
+      }
+    }
+
+    const cleanup = setupWebSocketAndTimer()
+
+    // Cleanup function
+    return () => {
+      if (cleanup) cleanup()
+      if (stompClientRef.current) {
+        websocketService.disconnect()
+      }
+    }
+  }, [navigate, minutes, isTimeoutBoundFromServer, context?.accessToken])
+
+  useEffect(() => {
+    // Load selected seats data
+    const storedSeatsData = localStorage.getItem("selectedSeats")
+    if (storedSeatsData) {
+      const parsedData = JSON.parse(storedSeatsData)
+      setSelectedSeatsData(parsedData)
+
+      if (parsedData.apiResponses) {
+        console.log("Ticket API response:", parsedData.apiResponses.ticket)
+        console.log("Seat API responses:", parsedData.apiResponses.seats)
+        console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
+        console.log("Purchase Response:", parsedData.apiResponses.purchase.result)
+      }
+
+      // Log the ticketPurchaseId
+      if (parsedData.ticketPurchaseId) {
+        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId)
+      }
+    } else {
+      // If no data is found, redirect back to the booking page
+      toast.error("Không tìm thấy thông tin đặt vé")
+      setTimeout(() => {
+        navigate("/")
+      }, 1500)
+    }
+
+    // Load purchase response
+    const storedPurchaseResponse = localStorage.getItem("purchaseResponse")
+    if (storedPurchaseResponse) {
+      try {
+        const parsedResponse = JSON.parse(storedPurchaseResponse)
+        setPurchaseResponse(parsedResponse)
+        console.log("Loaded purchase response:", parsedResponse)
+      } catch (error) {
+        console.error("Error parsing purchase response:", error)
+      }
+    }
+  }, [navigate])
+
+  // Add a function to check voucher validity
+  const checkVoucher = async () => {
+    if (!voucherCode.trim()) {
+      toast.error("Vui lòng nhập mã khuyến mãi")
+      return
+    }
+
+    if (!eventId) {
+      toast.error("Không tìm thấy thông tin sự kiện")
+      return
+    }
+
+    setIsCheckingVoucher(true)
+    try {
+      const response = await fetch(`https://tixclick.site/api/voucher/check/${voucherCode}/${eventId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${context?.accessToken}`,
+        },
+      })
+
+      const data = await response.json()
+      console.log("Voucher check response:", data)
+
+      if (response.ok && data.success) {
+        setVoucherDiscount({
+          isValid: true,
+          discountAmount: data.result.discountAmount || 0,
+          discountPercentage: data.result.discountPercentage || 0,
+          message: "Mã khuyến mãi hợp lệ",
+        })
+        toast.success("Áp dụng mã khuyến mãi thành công!")
+      } else {
+        setVoucherDiscount({
+          isValid: false,
+          discountAmount: 0,
+          discountPercentage: 0,
+          message: data.message || "Mã khuyến mãi không hợp lệ",
+        })
+        toast.error(data.message || "Mã khuyến mãi không hợp lệ")
+      }
+    } catch (error) {
+      console.error("Error checking voucher:", error)
+      toast.error("Đã xảy ra lỗi khi kiểm tra mã khuyến mãi")
+      setVoucherDiscount({
+        isValid: false,
+        discountAmount: 0,
+        discountPercentage: 0,
+        message: "Đã xảy ra lỗi khi kiểm tra mã khuyến mãi",
+      })
+    } finally {
+      setIsCheckingVoucher(false)
+    }
+  }
+
+  // Calculate discounted amount
+  const calculateDiscountedAmount = () => {
+    if (!selectedSeatsData || !voucherDiscount?.isValid) {
+      return selectedSeatsData?.totalAmount || 0
+    }
+
+    const totalAmount = selectedSeatsData.totalAmount
+    let discountedAmount = totalAmount
+
+    if (voucherDiscount.discountPercentage > 0) {
+      discountedAmount = totalAmount - (totalAmount * voucherDiscount.discountPercentage) / 100
+    } else if (voucherDiscount.discountAmount > 0) {
+      discountedAmount = totalAmount - voucherDiscount.discountAmount
+    }
+
+    return Math.max(0, discountedAmount)
+  }
+
+  // Update the handleConfirmPayment function to include voucher code
+  const handleConfirmPayment = async () => {
+    if (!acceptTerms) return
+
+    setIsProcessing(true)
+    setApiError(null)
+
+    try {
+      // Get the purchase response from state or localStorage
+      const response =
+        purchaseResponse ||
+        selectedSeatsData?.apiResponses?.purchase ||
+        JSON.parse(localStorage.getItem("purchaseResponse") || "null")
+
+      if (!response) {
+        throw new Error("Không tìm thấy thông tin đặt vé")
+      }
+
+      console.log("Using purchase response:", response)
+
+      // Get the ticketPurchaseId from the response
+      const ticketPurchaseId = response.result[0]?.ticketPurchaseId
+
+      if (!ticketPurchaseId) {
+        throw new Error("Không tìm thấy ID mua vé")
+      }
+
+      console.log("Using ticket purchase ID:", ticketPurchaseId)
+
+      // Store all the necessary data for the queue page
+      const queueData = {
+        purchaseResponse: response,
+        eventInfo: {
+          id: eventId || selectedSeatsData?.eventInfo?.id,
+          activityId: eventActivityId || selectedSeatsData?.eventInfo?.activityId,
+          name: eventInfor?.eventName || selectedSeatsData?.eventInfo?.name,
+          location: eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
+          date:
+            eventInfor?.eventActivityDTOList && eventActivityId
+              ? `${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.startTimeEvent)} - ${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent)}, ${formatDateVietnamese(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.dateEvent.toString())}`
+              : selectedSeatsData?.eventInfo?.date,
+        },
+        seats: selectedSeatsData.seats,
+        totalAmount: selectedSeatsData.totalAmount,
+        discountedAmount: calculateDiscountedAmount(),
+        voucher: voucherDiscount?.isValid
+          ? {
+              code: voucherCode,
+              discountAmount: voucherDiscount.discountAmount,
+              discountPercentage: voucherDiscount.discountPercentage,
+            }
+          : null,
+        transactionId: `TIX-${new Date()
+          .toISOString()
+          .slice(0, 10)
+          .replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`,
+        timestamp: new Date().toISOString(),
+        apiResponses: {
+          purchase: response,
+        },
+      }
+
+      // Save to localStorage for the queue page to access
+      localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
+    } catch (error) {
+      console.error("Error processing payment:", error)
+      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
+      setIsProcessing(false)
+      return
+    }
+
+    // Close the confirmation dialog
+    setShowConfirmation(false)
+
+    // Show success message
+    toast.success("Đang chuyển hướng đến trang thanh toán!")
+
+    // Navigate to the queue page after a short delay
+    setTimeout(() => {
+      navigate("/payment/queue")
+    }, 1500)
+  }
+
   const getFormattedEventDateTime = () => {
     if (eventInfor?.eventActivityDTOList && eventActivityId) {
       const activity = eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
       if (activity) {
-        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent.toString())}`
+        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent?.toString())}`
       }
     }
     return selectedSeatsData?.eventInfo?.date || "19:30, 12 tháng 4, 2025"
@@ -500,11 +588,56 @@ export default function PaymentPage() {
                   id="promo-code"
                   className="bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00]"
                   placeholder="Nhập mã khuyến mãi"
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value)}
+                  disabled={isCheckingVoucher || voucherDiscount?.isValid}
                 />
-                <Button className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white px-6 transition-colors duration-300">
-                  Áp Dụng
+                <Button
+                  className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white px-6 transition-colors duration-300"
+                  onClick={checkVoucher}
+                  disabled={isCheckingVoucher || voucherDiscount?.isValid}
+                >
+                  {isCheckingVoucher ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang kiểm tra...
+                    </>
+                  ) : voucherDiscount?.isValid ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Đã áp dụng
+                    </>
+                  ) : (
+                    "Áp Dụng"
+                  )}
                 </Button>
               </div>
+              {voucherDiscount && (
+                <div
+                  className={`mt-3 p-2 rounded-md text-sm ${voucherDiscount.isValid ? "bg-green-900/20 text-green-400 border border-green-800" : "bg-red-900/20 text-red-400 border border-red-800"}`}
+                >
+                  <div className="flex items-start">
+                    {voucherDiscount.isValid ? (
+                      <CheckCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                    )}
+                    <div>
+                      <p className="font-medium">{voucherDiscount.message}</p>
+                      {voucherDiscount.isValid && (
+                        <p className="mt-1">
+                          {voucherDiscount.discountPercentage > 0
+                            ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị đơn hàng`
+                            : `Giảm ${new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(voucherDiscount.discountAmount)}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
               <p className="text-xs text-gray-400 mt-2">Lưu ý: Chỉ áp dụng một mã khuyến mãi cho mỗi đơn hàng</p>
             </div>
           </section>
@@ -625,6 +758,38 @@ export default function PaymentPage() {
 
                 <Separator className="my-3 border-[#2A2A2A]" />
 
+                {/* Original price */}
+                <div className="flex justify-between text-sm">
+                  <div>Tạm tính</div>
+                  <div>
+                    {selectedSeatsData
+                      ? new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(selectedSeatsData.totalAmount)
+                      : "1.100.000 đ"}
+                  </div>
+                </div>
+
+                {/* Discount if voucher is applied */}
+                {voucherDiscount?.isValid && (
+                  <div className="flex justify-between text-sm text-green-400">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Giảm giá ({voucherCode})
+                    </div>
+                    <div>
+                      {voucherDiscount.discountPercentage > 0
+                        ? `-${voucherDiscount.discountPercentage}%`
+                        : `-${new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(voucherDiscount.discountAmount)}`}
+                    </div>
+                  </div>
+                )}
+
+                {/* Final price */}
                 <div className="flex justify-between font-medium">
                   <div>Tổng cộng</div>
                   <div className="text-[#FF8A00] text-lg">
@@ -632,7 +797,7 @@ export default function PaymentPage() {
                       ? new Intl.NumberFormat("vi-VN", {
                           style: "currency",
                           currency: "VND",
-                        }).format(selectedSeatsData.totalAmount)
+                        }).format(calculateDiscountedAmount())
                       : "1.100.000 đ"}
                   </div>
                 </div>
@@ -719,15 +884,63 @@ export default function PaymentPage() {
               </div>
             </div>
 
+            {voucherDiscount?.isValid && (
+              <div className="grid grid-cols-[100px_1fr] items-start">
+                <span className="font-medium text-gray-400">Khuyến mãi</span>
+                <div className="bg-[#2A2A2A] p-3 rounded-md">
+                  <div className="flex items-center mb-1">
+                    <div>Mã: {voucherCode}</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div>
+                      Giảm:{" "}
+                      {voucherDiscount.discountPercentage > 0
+                        ? `${voucherDiscount.discountPercentage}%`
+                        : new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(voucherDiscount.discountAmount)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Tổng</span>
-              <div className="bg-[#FF8A00] text-white font-medium p-2 text-center rounded-md">
-                {selectedSeatsData
-                  ? new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(selectedSeatsData.totalAmount)
-                  : "1.100.000 VND"}
+              <div>
+                {voucherDiscount?.isValid && (
+                  <div className="bg-[#2A2A2A] p-2 rounded-md mb-2 text-sm">
+                    <div className="flex justify-between mb-1">
+                      <span>Tạm tính:</span>
+                      <span>
+                        {selectedSeatsData
+                          ? new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(selectedSeatsData.totalAmount)
+                          : "1.100.000 VND"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-green-400">
+                      <span>Giảm giá ({voucherCode}):</span>
+                      <span>
+                        {voucherDiscount.discountPercentage > 0
+                          ? `-${voucherDiscount.discountPercentage}%`
+                          : `-${new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(voucherDiscount.discountAmount)}`}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div className="bg-[#FF8A00] text-white font-medium p-2 text-center rounded-md">
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(calculateDiscountedAmount())}
+                </div>
               </div>
             </div>
 
