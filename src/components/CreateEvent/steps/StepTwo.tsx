@@ -49,6 +49,7 @@ interface TicketType {
 }
 
 export interface Activity {
+  eventActivityId?: number;
   activityName: string;
   dateEvent: Date;
   startTimeEvent: string;
@@ -75,7 +76,7 @@ const StepTwo: React.FC<StepProps> = ({
   updateStep,
   event,
 }) => {
-  console.log(JSON.stringify(event?.eventActivityDTOList, null, 2));
+  // console.log(JSON.stringify(event?.eventActivityDTOList, null, 2));
   const [hasSeatMap, setHasSeatMap] = useState<boolean | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
