@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { Calendar, Loader2, MapPin, Ticket } from "lucide-react";
+import { Calendar, Loader2, LogIn, MapPin, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { useNavigate, useSearchParams } from "react-router";
@@ -13,6 +13,7 @@ import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
 import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -109,6 +110,8 @@ interface DraggableSectionProps {
   getSeatColor: (seat: ISeat) => string
   onSeatClick: (seat: ISeat, sectionName: string) => void
   selectedSeats: SelectedSeatInfo[] // Add this line
+  isLoggedIn: boolean // Add this line
+  showLoginPrompt: () => void // Add this line
 }
 
 const DraggableSection: React.FC<DraggableSectionProps> = ({
@@ -116,12 +119,21 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   seatTypes,
   getSeatColor,
   onSeatClick,
-  selectedSeats, // Add this line
+  selectedSeats,
+  isLoggedIn,
+  showLoginPrompt,
 }) => {
   const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null)
 
   const handleSeatClick = (seat: ISeat) => {
     if (!seat.status) return
+
+    // Check if user is logged in before allowing seat selection
+    if (!isLoggedIn) {
+      showLoginPrompt()
+      return
+    }
+
     onSeatClick(seat, section.name)
   }
 
@@ -154,6 +166,12 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
               boxShadow: selectedSeats.some((s) => s.id === `standing-${section.id}`) ? "0 0 0 2px #059669" : "none",
             }}
             onClick={() => {
+              // Check if user is logged in before allowing seat selection
+              if (!isLoggedIn) {
+                showLoginPrompt()
+                return
+              }
+
               // Create a "virtual seat" for the standing section
               const standingSeat: ISeat = {
                 id: `standing-${section.id}`,
@@ -305,8 +323,16 @@ const TicketBooking = () => {
     useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
 
   console.log("Sections:", sections)
+
+  // Check if user is logged in
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken")
+    setIsLoggedIn(!!accessToken)
+  }, [])
 
   useEffect(() => {
     const fetchEventInfor = async () => {
@@ -337,6 +363,19 @@ const TicketBooking = () => {
     fetchSeatmap()
   }, [eventId, eventActivityId])
 
+  // Function to show login prompt
+  const showLoginPrompt = () => {
+    setShowLoginDialog(true)
+  }
+
+  // Function to handle login redirect
+  const handleLoginRedirect = () => {
+    // Save current page URL to return after login
+    localStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search)
+    // Redirect to login page
+    navigate("/login")
+  }
+
   // Function to get the seat color based on selection status
   const getSeatColor = (seat: ISeat): string => {
     // Nếu seat.status là falsy (null, undefined, false, ""), dùng màu xám
@@ -357,6 +396,12 @@ const TicketBooking = () => {
 
   // Handle seat click
   const handleSeatClick = (seat: ISeat, sectionName: string) => {
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      showLoginPrompt()
+      return
+    }
+
     // Find the section
     const section = sections.find((s) => s.name === sectionName)
     const isStandingSection = section?.type === "STANDING"
@@ -472,6 +517,12 @@ const TicketBooking = () => {
   const handleProceedToPayment = async () => {
     if (selectedSeats.length === 0) return
 
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      showLoginPrompt()
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -527,8 +578,8 @@ const TicketBooking = () => {
           eventInfo: {
             id: eventId,
             activityId: eventActivityId,
-            name: "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
-            location: "Nhà Hát Kịch IDECAF",
+            name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+            location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
             date: "19:30, 12 tháng 4, 2025",
           },
           apiResponses: {
@@ -571,7 +622,9 @@ const TicketBooking = () => {
                 seatTypes={seatTypes}
                 getSeatColor={getSeatColor}
                 onSeatClick={(seat, sectionName) => handleSeatClick(seat, sectionName)}
-                selectedSeats={selectedSeats} // Add this line
+                selectedSeats={selectedSeats}
+                isLoggedIn={isLoggedIn}
+                showLoginPrompt={showLoginPrompt}
               />
             ))}
           </div>
@@ -681,6 +734,29 @@ const TicketBooking = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Đăng nhập để tiếp tục</DialogTitle>
+            <DialogDescription>Bạn cần đăng nhập để có thể đặt vé cho sự kiện này.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <p className="text-center text-sm text-muted-foreground">
+              Vui lòng đăng nhập để tiếp tục quá trình đặt vé. Sau khi đăng nhập, bạn sẽ được chuyển trở lại trang này.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
+            <Button variant="outline" onClick={() => setShowLoginDialog(false)}>
+              Hủy
+            </Button>
+            <Button onClick={handleLoginRedirect} className="gap-2">
+              <LogIn className="h-4 w-4" />
+              Đăng nhập ngay
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
