@@ -130,7 +130,7 @@ const Tasks = () => {
             {tasks.map((activity) => (
               <Card
                 key={activity.eventActivityId}
-                className="bg-background h-auto text-foreground shadow-md rounded-2xl borderbg-white p-6 space-y-2 border border-gray-200"
+                className="bg-background h-auto text-foreground shadow-md rounded-2xl border bg-white p-6 space-y-2 border-gray-200"
               >
                 <h2 className="text-lg font-semibold text-gray-800">
                   {activity.activityName}

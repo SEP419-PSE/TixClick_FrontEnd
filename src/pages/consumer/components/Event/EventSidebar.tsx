@@ -6,6 +6,7 @@ import {
   CircleDollarSign,
   ClipboardList,
   PieChart,
+  TicketMinus,
 } from "lucide-react";
 import { NavLink } from "react-router";
 import { cn } from "../../../../lib/utils";
@@ -15,7 +16,6 @@ import { SidebarContext } from "../../../../contexts/SideBarContext";
 
 export function EventSidebar() {
   const context = useContext(SidebarContext);
-  console.log(context?.isCollapsed);
 
   const navigation = [
     { name: "Tổng kết", href: "summary-revenue", icon: PieChart },
@@ -27,6 +27,7 @@ export function EventSidebar() {
       icon: CircleDollarSign,
     },
     { name: "Phân chia công việc", href: "tasks", icon: FaTasks },
+    { name: "Mã giảm giá", href: "vouchers", icon: TicketMinus },
   ];
 
   return (

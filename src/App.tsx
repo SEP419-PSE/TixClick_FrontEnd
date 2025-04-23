@@ -48,6 +48,7 @@ import Order from "./pages/consumer/components/Event/Order/Order";
 import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
 import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
 import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
+import Voucher from "./pages/consumer/components/Event/Voucher/Voucher";
 
 export default function App() {
   return (
@@ -127,6 +128,7 @@ export default function App() {
               <Route path="revenue" element={<Revenue />} />
               <Route path="check-in" element={<CheckIn />} />
               <Route path="tasks" element={<Tasks />} />
+              <Route path="vouchers" element={<Voucher />} />
             </Route>
 
             <Route />

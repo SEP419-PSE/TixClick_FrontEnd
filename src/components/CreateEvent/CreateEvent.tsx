@@ -36,7 +36,7 @@ export default function CreateEvent() {
 
   const checkStatusCompany = async () => {
     const response = await companyApi.isAccountHaveCompany();
-    console.log(response);
+    // console.log(response);
     if (response.data.result) {
       setStatusCompany(response.data.result.status);
     }
@@ -57,7 +57,7 @@ export default function CreateEvent() {
     const fetchUpdate = async () => {
       if (eventId) {
         const updateEvent = await eventApi.getEventDetail(eventId);
-        console.log(updateEvent.data.result);
+        // console.log(updateEvent.data.result);
         if (updateEvent.data.result) {
           setEvent(updateEvent.data.result);
         }
