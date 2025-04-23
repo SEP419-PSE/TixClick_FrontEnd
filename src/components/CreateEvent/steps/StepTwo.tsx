@@ -37,6 +37,7 @@ import { format } from "date-fns";
 import TimeInput from "../../Input/TimeInput";
 import Popup from "../../Popup/Popup";
 import { TOAST_MESSAGE } from "../../../constants/constants";
+import eventActivityApi from "../../../services/eventActivityApi";
 
 interface TicketType {
   ticketCode: string;
@@ -49,6 +50,7 @@ interface TicketType {
 }
 
 export interface Activity {
+  eventActivityId?: number;
   activityName: string;
   dateEvent: Date;
   startTimeEvent: string;
@@ -75,7 +77,7 @@ const StepTwo: React.FC<StepProps> = ({
   updateStep,
   event,
 }) => {
-  console.log(JSON.stringify(event?.eventActivityDTOList, null, 2));
+  // console.log(JSON.stringify(event?.eventActivityDTOList, null, 2));
   const [hasSeatMap, setHasSeatMap] = useState<boolean | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -97,11 +99,39 @@ const StepTwo: React.FC<StepProps> = ({
     };
   }>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isUpdate, setIsUdpdate] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const eventId = Number(searchParams.get("id"));
   const navigate = useNavigate();
   // console.log(activities);
+
+  const fetchData = async () => {
+    try {
+      if (!eventId) return;
+
+      const response = await eventActivityApi.getWithTicketByEventId(eventId);
+      const result = response.data.result;
+
+      if (result) setActivities(result);
+
+      // Kiểm tra nếu có bất kỳ activity nào có ticket khác rỗng
+      const hasAnyTickets = result.some(
+        (activity: Activity) =>
+          Array.isArray(activity.tickets) && activity.tickets.length > 0
+      );
+      setHasSeatMap(hasAnyTickets ? false : true);
+      setIsUdpdate(true);
+    } catch (error) {
+      console.log(error);
+      setActivities([]);
+      setIsUdpdate(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [eventId]);
 
   useEffect(() => {
     const hasValidActivity = activities.some(
@@ -211,26 +241,50 @@ const StepTwo: React.FC<StepProps> = ({
   };
 
   const submitActivity = async () => {
-    setIsLoading(true);
-    const formatActivities = activities.map((activity) => ({
-      ...activity,
-      dateEvent: formatDate(activity.dateEvent),
-      startTicketSale: formatDateTime(activity.startTicketSale),
-      endTicketSale: formatDateTime(activity.endTicketSale),
-      startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
-      endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
-    })) as any; // Any tạm thời
+    if (isUpdate) {
+      setIsLoading(true);
+      const formatActivities = activities.map((activity) => ({
+        ...activity,
+        eventActivityId: activity.eventActivityId,
+        dateEvent: formatDate(activity.dateEvent),
+        startTicketSale: formatDateTime(activity.startTicketSale),
+        endTicketSale: formatDateTime(activity.endTicketSale),
+        startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
+        endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
+      })) as any; // Any tạm thời
 
-    console.log(JSON.stringify(formatActivities, null, 2));
-    const response = await eventApi.createEventActivity(formatActivities);
-    console.log(response);
-    setIsLoading(false);
-    toast.success(response.data.message);
-    const queryParams = new URLSearchParams({
-      id: eventId.toString(),
-      step: hasSeatMap ? "3" : "4",
-    }).toString();
-    await navigate(`?${queryParams}`);
+      console.log(JSON.stringify(formatActivities, null, 2));
+      const response = await eventApi.createEventActivity(formatActivities);
+      console.log("Update response", response);
+      setIsLoading(false);
+      toast.success(response.data.message);
+      const queryParams = new URLSearchParams({
+        id: eventId.toString(),
+        step: hasSeatMap ? "3" : "4",
+      }).toString();
+      await navigate(`?${queryParams}`);
+    } else {
+      setIsLoading(true);
+      const formatActivities = activities.map((activity) => ({
+        ...activity,
+        dateEvent: formatDate(activity.dateEvent),
+        startTicketSale: formatDateTime(activity.startTicketSale),
+        endTicketSale: formatDateTime(activity.endTicketSale),
+        startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
+        endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
+      })) as any; // Any tạm thời
+
+      console.log(JSON.stringify(formatActivities, null, 2));
+      const response = await eventApi.createEventActivity(formatActivities);
+      console.log("Create response", response);
+      setIsLoading(false);
+      toast.success(response.data.message);
+      const queryParams = new URLSearchParams({
+        id: eventId.toString(),
+        step: hasSeatMap ? "3" : "4",
+      }).toString();
+      await navigate(`?${queryParams}`);
+    }
   };
 
   const nextStep = async () => {
@@ -276,11 +330,11 @@ const StepTwo: React.FC<StepProps> = ({
             onClick={handleAddActivity}
             className="flex items-center gap-2 bg-pse-green hover:bg-pse-green/80 text-white px-4 py-2 rounded"
           >
-            <CalendarCheck size={18} /> Thêm Activity
+            <CalendarCheck size={18} /> Thêm hoạt động
           </button>
 
           {activities.map((activity, index) => (
-            <Card className="px-4 py-2 bg-transparent text-white">
+            <Card key={index} className="px-4 py-2 bg-transparent text-white">
               <CardTitle className="flex justify-between items-center mb-4 mt-2 ml-4 text-[20px] font-bold">
                 <p>Hoạt động {index + 1}</p>
                 <X

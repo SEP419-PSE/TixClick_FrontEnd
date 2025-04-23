@@ -7,6 +7,7 @@ import { EventForConsumer } from "../interface/EventInterface";
 import eventApi from "../services/eventApi";
 import EventsByCategory from "../components/TabEvent/EventsByCategory";
 import Categories from "../components/Categories/Categories";
+import HeroSection from "../components/HeroSlider/HeroSection";
 
 const HomePage = () => {
   const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
@@ -26,6 +27,7 @@ const HomePage = () => {
   return (
     <div>
       <HeroSlider />
+      <HeroSection />
       <Categories />
       <SpecialEvent specialEvents={specialEvents} />
       <TabEvent />

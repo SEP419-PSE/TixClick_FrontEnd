@@ -79,5 +79,6 @@ export const TOAST_MESSAGE = {
   sentOTPsuccess: "Mã OTP đã được gửi lại",
   emmptyEventActivity:
     "Vui lòng điền đầy đủ thông tin cho hoạt động trước khi thêm loại vé",
+  createVoucherSuccess: "Tạo mã giảm thành công",
   error: "Đã có lỗi xảy ra",
 };
