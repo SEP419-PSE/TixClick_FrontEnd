@@ -14,7 +14,6 @@ const Voucher = () => {
     Number(eventId),
     status
   );
-  console.log(data);
 
   const onChangeStatusVoucher = (e: string) => {
     setStatus(e.toUpperCase() as VoucherStatus);

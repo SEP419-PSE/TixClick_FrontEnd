@@ -10,6 +10,7 @@ import voucherApi from "../../../../../services/voucherApi";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { TOAST_MESSAGE } from "../../../../../constants/constants";
+import { AxiosError } from "axios";
 
 type Props = {
   onCreated: () => void;
@@ -51,7 +52,7 @@ const CreateVoucher = ({ onCreated }: Props) => {
   const onSubmit = async (data: VoucherRequest) => {
     try {
       const updateEventId = { ...data, eventId: Number(eventId) };
-      console.log(updateEventId);
+      // console.log(updateEventId);
       const response = await voucherApi.create(updateEventId);
       if (response.data.code == 200) {
         toast.success(TOAST_MESSAGE.createVoucherSuccess);
@@ -59,8 +60,9 @@ const CreateVoucher = ({ onCreated }: Props) => {
       }
       console.log(response);
     } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
       console.error(error);
-      toast.error(TOAST_MESSAGE.error);
+      toast.error(axiosError.response?.data.message);
     }
 
     handleClose();
