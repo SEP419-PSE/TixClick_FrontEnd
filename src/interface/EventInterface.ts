@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface CreateEvent {
   eventName: string;
   location: string;
@@ -14,6 +16,7 @@ export interface EventType {
   vietnamName?: string;
   color: string;
   img: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
 interface ImageEvent {
