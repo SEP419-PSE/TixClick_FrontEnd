@@ -6,7 +6,7 @@ interface CategoriesProps {
 
 const Categories = ({ onCategoryClick }: CategoriesProps) => {
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4 px-4 lg:px-14 py-4 bg-transparent overflow-x-auto">
+    <div className="flex flex-col md:flex-row items-center gap-4 px-4 lg:px-14 py-10 bg-transparent overflow-x-auto">
       {eventTypes.map((type) => {
         const Icon = type.icon; // Lấy component icon
         return (

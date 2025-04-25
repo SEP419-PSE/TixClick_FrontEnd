@@ -8,9 +8,12 @@ import eventApi from "../services/eventApi";
 import EventsByCategory from "../components/TabEvent/EventsByCategory";
 import Categories from "../components/Categories/Categories";
 import HeroSection from "../components/HeroSlider/HeroSection";
+import Top10Event from "../components/SpecialEvent/Top10Event";
+import useTop10Event from "../hooks/useTop10Event";
 
 const HomePage = () => {
   const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
+  const { data } = useTop10Event();
 
   const musicRef = useRef<HTMLDivElement | null>(null);
   const sportRef = useRef<HTMLDivElement | null>(null);
@@ -47,6 +50,7 @@ const HomePage = () => {
       <HeroSlider />
       <HeroSection />
       <Categories onCategoryClick={scrollToCategory} />
+      <Top10Event data={data} />
       <SpecialEvent specialEvents={specialEvents} />
       <TabEvent />
       <div ref={musicRef}>

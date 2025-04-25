@@ -86,6 +86,10 @@ const eventApi = {
     const url = `${baseURL}/consumer/event-category/${eventCategoryId}?status=${status}`;
     return axiosClient.get(url);
   },
+  getTop10: () => {
+    const url = `${baseURL}/consumer/top-10`;
+    return axiosClient.get(url);
+  },
 };
 
 export default eventApi;

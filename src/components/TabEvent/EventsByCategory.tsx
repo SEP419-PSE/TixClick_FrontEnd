@@ -40,7 +40,7 @@ const EventsByCategory = ({ eventCategoryId, status }: Props) => {
   };
 
   return (
-    <div className="mx-4 my-8 lg:mx-14">
+    <div className="mx-4 my-10 lg:mx-14">
       <div className="sm:text-sm md:text-base font-bold">
         {eventTypes.find((type) => type.id === eventCategoryId)?.vietnamName}
       </div>
@@ -77,15 +77,15 @@ const EventsByCategory = ({ eventCategoryId, status }: Props) => {
               </div>
               <div
                 onClick={scrollLeft}
-                className="absolute hidden lg:block bg-black/60 top-[30%] cursor-pointer p-2 left-0"
+                className="absolute hidden lg:block bg-black/60 top-[33%] cursor-pointer p-3 left-0 rounded-r-lg"
               >
-                <FaAngleLeft size={20} />
+                <FaAngleLeft size={18} />
               </div>
               <div
                 onClick={scrollRight}
-                className="absolute hidden lg:block bg-black/60 top-[30%] cursor-pointer p-2 right-0"
+                className="absolute hidden lg:block bg-black/60 top-[33%] cursor-pointer p-3 right-0 rounded-l-lg"
               >
-                <FaAngleRight size={20} />
+                <FaAngleRight size={18} />
               </div>
             </div>
           ))}
