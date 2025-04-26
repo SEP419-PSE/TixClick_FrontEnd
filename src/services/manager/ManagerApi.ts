@@ -59,12 +59,15 @@ const managerApi = {
 
   getAllEvent() {
     const url = "/event/all_scheduled_pending_approved";
-    return axiosClient.get(url);
+    const token = localStorage.getItem("accessToken2");
+
+    return axiosClient.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 10000,
+    });
   },
-  // approveCompany(status:string, companyVerificationId:number){
-  // const url = `/company-verification/${companyVerificationId}/approve?status=${status}`
-  //     return axiosClient.patch(url, {header});
-  // }
 
   getContractsByEventId(eventId: number) {
     const url = `/contract-document/all_by_event/${eventId}`;

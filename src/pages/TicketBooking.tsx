@@ -377,7 +377,7 @@ const TicketBooking = () => {
     // Save current page URL to return after login
     localStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search)
     // Redirect to login page
-    navigate("/login")
+    navigate("/auth/signin")
   }
 
   // Function to get the seat color based on selection status
@@ -559,61 +559,66 @@ const TicketBooking = () => {
   }
 
   // Hàm xử lý việc chuyển đến trang thanh toán
-  const handleProceedToPayment = async () => {
-    if (selectedSeats.length === 0) return
+const handleProceedToPayment = async () => {
+  if (selectedSeats.length === 0) return
 
-    // Check if user is logged in
-    if (!isLoggedIn) {
-      showLoginPrompt()
-      return
-    }
+  // Check if user is logged in
+  if (!isLoggedIn) {
+    showLoginPrompt()
+    return
+  }
 
-    setIsLoading(true)
+  setIsLoading(true)
 
-    try {
-      // Prepare ticket purchase requests
-      const ticketPurchaseRequests = selectedSeats.map((seat) => {
-        // Check if this is a standing section (id starts with "standing-")
-        const isStandingSection = seat.id.startsWith("standing-")
+  try {
+    // Prepare ticket purchase requests
+    const ticketPurchaseRequests = selectedSeats.map((seat) => {
+      // Check if this is a standing section (id starts with "standing-")
+      const isStandingSection = seat.id.startsWith("standing-")
 
-        // For standing sections, we need to use a different format
-        if (isStandingSection) {
-          const sectionId = seat.id.replace("standing-", "")
-          const section = sections.find((s) => s.id === sectionId)
+      // For standing sections, we need to use a different format
+      if (isStandingSection) {
+        const sectionId = seat.id.replace("standing-", "")
+        const section = sections.find((s) => s.id === sectionId)
 
-          return {
-            zoneId: seat.zoneId || 0,
-            seatId: 0, // For standing sections, we don't have a specific seat ID
-            eventActivityId: Number(eventActivityId),
-            ticketId: seat.ticketId,
-            eventId: Number(eventId),
-            quantity: seat.quantity || 1,
-            isStanding: true,
-            price: section?.price || 0,
-          }
-        }
-
-        // Regular seated section
         return {
           zoneId: seat.zoneId || 0,
-          seatId: seat.seatId,
+          seatId: null, // Use null instead of 0 for standing sections
           eventActivityId: Number(eventActivityId),
           ticketId: seat.ticketId,
           eventId: Number(eventId),
-          quantity: 1,
+          quantity: seat.quantity || 1,
+          isStanding: true,
+          price: section?.price || 0,
         }
-      })
+      }
 
-      console.log("Ticket purchase requests:", ticketPurchaseRequests)
+      // Regular seated section
+      return {
+        zoneId: seat.zoneId || 0,
+        seatId: seat.seatId,
+        eventActivityId: Number(eventActivityId),
+        ticketId: seat.ticketId,
+        eventId: Number(eventId),
+        quantity: 1,
+      }
+    })
 
-      // Call the API to create the ticket purchase
-      const response = await ticketPurchaseApi.createTicketPurchase(
-        { ticketPurchaseRequests },
-        localStorage.getItem("accessToken") || "",
-      )
+    console.log("Ticket purchase requests:", ticketPurchaseRequests)
 
-      console.log("Ticket purchase response:", response)
+    // Call the API to create the ticket purchase
+    const response = await ticketPurchaseApi.createTicketPurchase(
+      { ticketPurchaseRequests },
+      localStorage.getItem("accessToken") || "",
+    )
 
+    console.log("Ticket purchase response:", response)
+
+    // Kiểm tra thông báo phản hồi thay vì chỉ kiểm tra trạng thái success
+    if (response.message && response.message.toLowerCase().includes("successfully")) {
+      // LƯU Ý: Nếu API trả về thành công với message chứa "successfully", 
+      // chúng ta coi đó là thành công dù response.success có thể là false
+      
       // Store data for payment page
       localStorage.setItem(
         "selectedSeats",
@@ -640,13 +645,78 @@ const TicketBooking = () => {
 
       // Chuyển đến trang thanh toán
       navigate("/payment")
-    } catch (error) {
-      console.error("Error creating ticket purchase:", error)
-      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi khi tạo đơn hàng")
-    } finally {
-      setIsLoading(false)
+      return // Kết thúc sớm nếu thành công
+    } 
+    
+    // Nếu có success attribute và nó là true
+    else if (response.success === true) {
+      // Xử lý tương tự như trên khi API trả về success: true
+      localStorage.setItem(
+        "selectedSeats",
+        JSON.stringify({
+          seats: selectedSeats,
+          totalAmount: calculateTotal(),
+          eventInfo: {
+            id: eventId,
+            activityId: eventActivityId,
+            name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+            location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
+            date: "19:30, 12 tháng 4, 2025",
+          },
+          apiResponses: {
+            ticket: seatTypes,
+            seats: selectedSeats,
+            purchase: response,
+          },
+        }),
+      )
+
+      toast.success("Đã tạo đơn hàng thành công!")
+      navigate("/payment")
+      return
     }
+    
+    // Nếu không có message success và success không phải true, coi như lỗi
+    throw new Error(response.message || "Không thể tạo đơn hàng")
+    
+  } catch (error) {
+    console.error("Error creating ticket purchase:", error)
+    
+    // Kiểm tra nội dung lỗi - nếu chứa "successfully" thì đó có thể là thành công
+    if (error instanceof Error && error.message && error.message.toLowerCase().includes("successfully")) {
+      // Dù ở trong catch block nhưng message cho thấy đây là thành công
+      toast.success("Đã tạo đơn hàng thành công!")
+      
+      // Lưu trữ dữ liệu cho trang thanh toán và chuyển hướng
+      localStorage.setItem(
+        "selectedSeats",
+        JSON.stringify({
+          seats: selectedSeats,
+          totalAmount: calculateTotal(),
+          eventInfo: {
+            id: eventId,
+            activityId: eventActivityId,
+            name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+            location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
+            date: "19:30, 12 tháng 4, 2025",
+          },
+          apiResponses: {
+            ticket: seatTypes,
+            seats: selectedSeats,
+          },
+        }),
+      )
+      
+      navigate("/payment")
+    } else if (error instanceof Error) {
+      toast.error(`Lỗi: ${error.message}`)
+    } else {
+      toast.error("Đã xảy ra lỗi khi tạo đơn hàng")
+    }
+  } finally {
+    setIsLoading(false)
   }
+}
 
   return (
     <div className="h-screen w-full text-black">
