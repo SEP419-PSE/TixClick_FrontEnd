@@ -42,7 +42,7 @@ const SelectTypeEvent = ({
                   : ""
               }`}
             >
-              {type.name}
+              {type.vietnamName}
             </SelectItem>
           ))}
         </SelectContent>

@@ -360,8 +360,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     string | null
   >(null);
   const [viewMode, setViewMode] = useState<ViewMode>("edit");
-  const [newSectionRows, setNewSectionRows] = useState<number>(6);
-  const [newSectionColumns, setNewSectionColumns] = useState<number>(8);
+  const [newSectionRows, setNewSectionRows] = useState<string>("6");
+  const [newSectionColumns, setNewSectionColumns] = useState<string>("8");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   // Seat types state
@@ -369,8 +369,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#000000");
   const [textColor, setTextColor] = useState("#FFFFFF");
-  const [price, setPrice] = useState(0);
-  const [maxQuantity, setMaxQuantity] = useState(2);
+  const [price, setPrice] = useState<string>("0");
+  const [maxQuantity, setMaxQuantity] = useState<string>("2");
   const [editingSeat, setEditingSeat] = useState<SeatTypeEdit | null>(null);
 
   const [newSectionType, setNewSectionType] = useState<SectionType>("SEATED");
@@ -432,11 +432,11 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
       toast.error("Vui lòng nhập giá cho loại ghế");
       return;
     }
-    if (price <= 0) {
+    if (Number(price) <= 0) {
       toast.error("Giá ghế phải lớn hơn 0");
       return;
     }
-    if (maxQuantity < 2) {
+    if (Number(maxQuantity) < 2) {
       toast.error("Số lượng vé tối đa phải lớn hơn hoặc bằng 2");
       return;
     }
@@ -469,9 +469,9 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
         name: name.trim(),
         color: color,
         textColor: textColor,
-        price: price,
+        price: Number(price),
         minQuantity: 1,
-        maxQuantity: maxQuantity,
+        maxQuantity: Number(maxQuantity),
       };
       ticketApi
         .updateTicket(editSeat)
@@ -489,9 +489,9 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
           name: name.trim(),
           color,
           textColor,
-          price,
+          price: Number(price),
           minQuantity: 1,
-          maxQuantity,
+          maxQuantity: Number(maxQuantity),
           eventId: Number(eventId),
         })
         .then((response) => {
@@ -511,8 +511,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     setName("");
     setColor("#000000");
     setTextColor("#FFFFFF");
-    setPrice(0);
-    setMaxQuantity(2);
+    setPrice("0");
+    setMaxQuantity("2");
   };
 
   const handleEdit = (seat: SeatTypeEdit) => {
@@ -520,7 +520,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     setName(seat.name);
     setColor(seat.color);
     setTextColor(seat.textColor);
-    setPrice(seat.price);
+    setPrice(seat.price.toString());
   };
 
   const handleDelete = async (id: string) => {
@@ -576,7 +576,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     }
 
     if (newSectionType == "SEATED") {
-      if (newSectionRows <= 0 || newSectionColumns <= 0) {
+      if (Number(newSectionRows) <= 0 || Number(newSectionColumns) <= 0) {
         toast.error("Số hàng và số cột phải lớn hơn 0");
         return;
       }
@@ -590,8 +590,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
 
     // Calculate section dimensions based on rows and columns
     const { width: sectionWidth, height: sectionHeight } = calculateSectionSize(
-      newSectionType == "SEATED" ? newSectionRows : 1,
-      newSectionType == "SEATED" ? newSectionColumns : 1
+      newSectionType == "SEATED" ? Number(newSectionRows) : 1,
+      newSectionType == "SEATED" ? Number(newSectionColumns) : 1
     );
 
     // Calculate default position - center of the container
@@ -604,8 +604,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     const newSection: ISection = {
       id: Date.now().toString(),
       name: `Section ${sections.length + 1}`,
-      rows: newSectionType == "SEATED" ? newSectionRows : 1,
-      columns: newSectionType == "SEATED" ? newSectionColumns : 1,
+      rows: newSectionType == "SEATED" ? Number(newSectionRows) : 1,
+      columns: newSectionType == "SEATED" ? Number(newSectionColumns) : 1,
       seats: [],
       x: Math.max(0, centerX),
       y: Math.max(40, centerY),
@@ -641,7 +641,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
           row,
           column: col,
           // status: "available",
-          price: defaultSeatType?.price || price,
+          price: defaultSeatType?.price || Number(price),
           seatTypeId: defaultSeatType.id?.toString() || "",
         });
       }
@@ -693,7 +693,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
         return section;
       })
     );
-    toast.success("Cập nhật khu vực thành công");
+    // toast.success("Cập nhật khu vực thành công");
   };
 
   // Handle seat click
@@ -757,7 +757,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
 
   // Delete a section
   const deleteSection = async (sectionId: string) => {
-    console.log(sectionId, eventId, sections);
+    console.log(sectionId, eventId, JSON.stringify(sections, null, 2));
     const response = await seatmapApi.deleteSections(
       sectionId,
       Number(eventId),
@@ -793,7 +793,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
     setName("");
     setColor("#000000");
     setTextColor("#FFFFFF");
-    setPrice(0);
+    setPrice("0");
   };
 
   useEffect(() => {
@@ -929,9 +929,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
                       type="number"
                       className="px-4 py-2.5 border rounded-lg w-full text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={newSectionRows}
-                      onChange={(e) =>
-                        setNewSectionRows(parseInt(e.target.value) || 6)
-                      }
+                      onChange={(e) => setNewSectionRows(e.target.value)}
                       min="1"
                       max="20"
                     />
@@ -944,9 +942,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
                       type="number"
                       className="px-4 py-2.5 border rounded-lg w-full text-gray-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       value={newSectionColumns}
-                      onChange={(e) =>
-                        setNewSectionColumns(parseInt(e.target.value) || 8)
-                      }
+                      onChange={(e) => setNewSectionColumns(e.target.value)}
                       min="1"
                       max="20"
                     />
@@ -1376,7 +1372,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
                   A1
                 </div>
                 <div className="text-sm text-gray-600">
-                  {name ? name : "Tên loại ghế"} - {formatCurrency(price || 0)}
+                  {name ? name : "Tên loại ghế"} -{" "}
+                  {formatCurrency(Number(price) || 0)}
                 </div>
               </div>
             </div>
@@ -1389,9 +1386,8 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
                 <input
                   type="number"
                   value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
+                  onChange={(e) => setPrice(e.target.value)}
                   className="w-full px-4 py-2.5 border rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-gray-50"
-                  min="0"
                 />
               </div>
 
@@ -1402,7 +1398,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
                 <input
                   type="number"
                   value={maxQuantity}
-                  onChange={(e) => setMaxQuantity(Number(e.target.value))}
+                  onChange={(e) => setMaxQuantity(e.target.value)}
                   className="w-full px-4 py-2.5 border rounded-lg focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-gray-50"
                   min="2"
                 />

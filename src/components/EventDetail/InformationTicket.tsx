@@ -62,7 +62,7 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                   </p>
                 ) : isStillSelling ? (
                   <p className="ml-auto bg-yellow-100 text-yellow-700 flex w-fit h-fit px-2 py-1 rounded-md">
-                    Hết thời gian bán vé
+                    Ngưng bán vé
                   </p>
                 ) : (
                   <NavLink

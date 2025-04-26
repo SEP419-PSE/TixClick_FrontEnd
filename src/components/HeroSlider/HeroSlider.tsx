@@ -26,7 +26,7 @@ const HeroSlider = () => {
         setIsBackDrop(false);
       }
 
-      if (window.scrollY > window.innerHeight - 86) {
+      if (window.scrollY > window.innerHeight - 102) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
@@ -93,7 +93,7 @@ const HeroSlider = () => {
 
         {/* Header  */}
         <header
-          className={`fixed flex items-center top-0 left-0 w-full h-20 p-4 lg:px-14 text-white transition-all duration-500 z-10 ${
+          className={`fixed flex items-center top-0 left-0 w-full h-[70px] p-4 lg:px-14 text-white transition-all duration-500 z-10 ${
             isVisible ? "translate-y-0 " : "-translate-y-full"
           } ${isBackDrop && "backdrop-blur-[20px] bg-black bg-opacity-30"}`}
         >
