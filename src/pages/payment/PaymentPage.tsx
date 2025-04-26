@@ -400,20 +400,44 @@ export default function PaymentPage() {
 
   // Calculate discounted amount
   const calculateDiscountedAmount = () => {
-    if (!selectedSeatsData || !voucherDiscount?.isValid) {
-      return selectedSeatsData?.totalAmount || 0
+    // Kiểm tra đầu vào
+    if (!selectedSeatsData) {
+      console.warn("selectedSeatsData is undefined or null");
+      return 0;
     }
-
-    const totalAmount = selectedSeatsData.totalAmount
-    let discountedAmount = totalAmount
-
+    
+    // Lấy tổng số tiền ban đầu (đảm bảo là số)
+    const totalAmount = Number(selectedSeatsData.totalAmount) || 0;
+    
+    // Nếu không có voucher hợp lệ, trả về tổng ban đầu
+    if (!voucherDiscount?.isValid) {
+      return totalAmount;
+    }
+  
+    // Log để debug
+    console.log("Original total:", totalAmount);
+    console.log("Voucher details:", voucherDiscount);
+    
+    let discountedAmount = totalAmount;
+  
+    // Áp dụng giảm giá theo phần trăm
     if (voucherDiscount.discountPercentage > 0) {
-      discountedAmount = totalAmount - (totalAmount * voucherDiscount.discountPercentage) / 100
-    } else if (voucherDiscount.discountAmount > 0) {
-      discountedAmount = totalAmount - voucherDiscount.discountAmount
+      const discountValue = (totalAmount * Number(voucherDiscount.discountPercentage)) / 100;
+      console.log("Percentage discount:", discountValue);
+      discountedAmount = totalAmount - discountValue;
+    } 
+    // Áp dụng giảm giá theo số tiền cố định
+    else if (voucherDiscount.discountAmount > 0) {
+      const discountValue = Number(voucherDiscount.discountAmount);
+      console.log("Fixed amount discount:", discountValue);
+      discountedAmount = totalAmount - discountValue;
     }
-
-    return Math.max(0, discountedAmount)
+  
+    // Làm tròn số đến 2 chữ số thập phân và đảm bảo không âm
+    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100);
+    console.log("Final discounted amount:", finalAmount);
+    
+    return finalAmount;
   }
 
   // Update the handleConfirmPayment function to include voucher code
@@ -627,7 +651,7 @@ export default function PaymentPage() {
                       {voucherDiscount.isValid && (
                         <p className="mt-1">
                           {voucherDiscount.discountPercentage > 0
-                            ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị đơn hàng`
+                            ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị vé`
                             : `Giảm ${new Intl.NumberFormat("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
@@ -739,9 +763,9 @@ export default function PaymentPage() {
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           2x
                         </div>
-                        <div>Vé Thường</div>
+                        <div>Vé Tc jbcjcbjkcbjkbcjkjnkdjcchường</div>
                       </div>
-                      <div className="font-medium">600.000 đ</div>
+                      <div className="font-medium">600.000 jbvijbvjkvjvkwvn ựvbw vjvjvkrw vjkrwjk</div>
                     </div>
 
                     <div className="flex justify-between text-sm">
