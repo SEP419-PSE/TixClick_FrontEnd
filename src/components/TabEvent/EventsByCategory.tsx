@@ -47,7 +47,7 @@ const EventsByCategory = ({ eventCategoryId, status }: Props) => {
       <div className="relative">
         <div
           ref={containerRef}
-          className=" pt-4 pb-2 flex overflow-x-auto lg:overflow-x-hidden gap-4"
+          className="pt-4 pb-2 flex overflow-x-auto lg:overflow-x-hidden gap-4"
         >
           {activeEvents?.map((item) => (
             <div key={item.eventId}>

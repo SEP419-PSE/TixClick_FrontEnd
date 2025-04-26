@@ -1,62 +1,48 @@
-import { FaRegCopyright } from "react-icons/fa6";
-import CustomDivider from "../Divider/CustomDivider";
+import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <div className="bg-pse-footer text-white">
-      <div className="px-4 py-4 lg:px-14 flex flex-col sm:flex-row sm:flex-wrap sm:justify-between gap-3 bg-pse-footer">
-        <div className="leading-8">
-          <p className="uppercase font-bold text-pse-green">Giới thiệu</p>
-          <ul className="font-normal">
-            <li>Về Chúng Tôi</li>
-            <li>Thỏa Thuận Sử Dụng</li>
-            <li>Quy Chế Hoạt Động</li>
-            <li>Chính sách bảo mật</li>
-          </ul>
+    <footer className="bg-[#2a2a2a] text-white py-16 shadow-[0_4px_10px_rgba(255,255,255,0.1)]">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+          <div className="flex-1">
+            <p className="text-sm lg:text-base mb-4">
+              &copy; {new Date().getFullYear()} TixClick. All rights reserved
+            </p>
+            <p className="text-xs lg:text-sm text-gray-400 mb-4">
+              TixClick là nền tảng bán vé trực tuyến hàng đầu, giúp kết nối
+              người dùng với các sự kiện âm nhạc, thể thao và văn hóa. Chúng tôi
+              cam kết mang đến trải nghiệm mua vé nhanh chóng, an toàn và tiện
+              lợi.
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-6">
+            <a className="hover:text-gray-400 transition-colors text-sm lg:text-base">
+              Giới thiệu
+            </a>
+            <a className="hover:text-gray-400 transition-colors text-sm lg:text-base">
+              Chính sách bảo mật
+            </a>
+            <a className="hover:text-gray-400 transition-colors text-sm lg:text-base">
+              Điều khoản sử dụng
+            </a>
+          </div>
+
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <a className="hover:text-gray-400 transition-colors">
+              <FaFacebookF size={24} />
+            </a>
+            <a className="hover:text-gray-400 transition-colors">
+              <FaInstagram size={24} />
+            </a>
+            <a className="hover:text-gray-400 transition-colors">
+              <FaTiktok size={24} />
+            </a>
+          </div>
         </div>
-        <div className="leading-8">
-          <p className="uppercase font-bold text-pse-green">
-            Dành cho Khách hàng
-          </p>
-          <ul className="font-normal">
-            <li>Điều khoản sử dụng cho khách hàng</li>
-          </ul>
-        </div>
-        <div className="leading-8">
-          <p className="uppercase font-bold text-pse-green">
-            Dành cho Ban Tổ chức
-          </p>
-          <ul className="font-normal">
-            <li>Điều khoản sử dụng cho ban tổ chức</li>
-          </ul>
-        </div>
-        <div className="leading-8">
-          <p className="uppercase font-bold text-pse-green">Hỏi đáp</p>
-          <ul className="font-normal">
-            <li>Hỗ trợ tài khoản</li>
-            <li>Quy định về mua & bán vé</li>
-          </ul>
-        </div>
-        <div className="leading-8">
-          <p className="uppercase font-bold text-pse-green">
-            Theo dõi chúng tôi
-          </p>
-          <ul className="font-normal">
-            <li>Facebook</li>
-            <li>Instagram</li>
-            <li>Twitter</li>
-            <li>Youtube</li>
-          </ul>
-        </div>
-        <CustomDivider />
       </div>
-      <div className="font-semibold pb-8 text-center flex items-center justify-center">
-        <span className="mr-1">
-          <FaRegCopyright />
-        </span>
-        2023 Tixclick. All rights reserved
-      </div>
-    </div>
+    </footer>
   );
 };
 
