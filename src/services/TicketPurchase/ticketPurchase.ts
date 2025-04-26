@@ -12,6 +12,11 @@ const ticketPurchase = {
     const url = `${ticketPurchaseUrl}/create`;
     return axiosClient.post(url, data);
   },
+
+  // unblockTicket: (ticketPurchaseId: number) => {
+  //   const url = "/ticket-purchase/cancel";
+  //   return axiosClient.post(url);
+  // }
 };
 
 export default ticketPurchase;

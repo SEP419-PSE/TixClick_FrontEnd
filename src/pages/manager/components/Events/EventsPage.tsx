@@ -869,7 +869,10 @@ export default function EventsPage() {
           <DialogFooter className="border-t border-[#333333] pt-4 mt-4">
             <div className="flex gap-2 w-full justify-between">
               <Button
-                // onClick={() => navigateToEventPage(selectedEvent?.eventId ?? 0, selectedEvent?.contractCode ?? "")}
+                onClick={() => navigateToEventPage(
+                  selectedEvent?.eventId ?? 0,
+                  relatedContracts[0]?.contractCode ?? ""
+                )}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Eye className="mr-2 h-4 w-4" /> View Event Page
