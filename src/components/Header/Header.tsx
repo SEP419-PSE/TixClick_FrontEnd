@@ -19,7 +19,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 100) {
+      if (window.scrollY > window.innerHeight - 86) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -55,7 +55,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
+      className={`fixed top-0 left-0 w-full h-20 p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
         location.pathname !== "/" && "translate-y-0"
       } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >

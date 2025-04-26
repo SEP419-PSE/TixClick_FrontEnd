@@ -48,7 +48,7 @@ const HomePage = () => {
   return (
     <div>
       <HeroSlider />
-      <HeroSection />
+
       <Categories onCategoryClick={scrollToCategory} />
       <Top10Event data={data} />
       <SpecialEvent specialEvents={specialEvents} />
@@ -65,6 +65,7 @@ const HomePage = () => {
       <div ref={otherRef}>
         <EventsByCategory eventCategoryId={4} status="SCHEDULED" />
       </div>
+      <HeroSection />
     </div>
   );
 };
