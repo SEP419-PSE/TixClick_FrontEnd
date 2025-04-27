@@ -15,7 +15,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
 import { AuthContext } from "../../contexts/AuthProvider"
-import { EventDetailResponse } from "../../interface/EventInterface"
+import type { EventDetailResponse } from "../../interface/EventInterface"
 import { formatDateVietnamese, formatTimeFe } from "../../lib/utils"
 import eventApi from "../../services/eventApi"
 
@@ -86,6 +86,73 @@ export default function PaymentPage() {
     }
     fetchEventInfor()
   }, [eventId])
+
+  const payOsApi = {
+    createPayment: async (ticketPurchaseId: number, accessToken: string) => {
+      try {
+        console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
+        const returnUrl = `${window.location.origin}/payment/queue`
+        console.log("tic:", ticketPurchaseId)
+
+        const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            ticketOrderDTOS: [
+              {
+                ticketPurchaseId: ticketPurchaseId,
+              },
+            ],
+            expiredTime: 1000,
+            voucherCode: "",
+            returnUrl: returnUrl,
+          }),
+        })
+        console.log("payment response", response)
+
+        if (!response.ok) {
+          throw new Error("Failed to create payment")
+        }
+
+        return await response.json()
+      } catch (error) {
+        console.error("Error creating payment:", error)
+        throw error
+      }
+    },
+    createPaymentAttachment: async (ticketPurchaseId: number, accessToken: string, attachmentData: any) => {
+      try {
+        console.log("Creating payment attachment with ticketPurchaseId:", ticketPurchaseId)
+        const response = await fetch("https://tixclick.site/api/payment/pay-os-create-attachment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            ticketPurchaseId: ticketPurchaseId,
+            paymentMethod: attachmentData.paymentMethod,
+            amount: attachmentData.amount,
+            currency: attachmentData.currency,
+            description: attachmentData.description,
+          }),
+        })
+        console.log("payment attachment response", response)
+
+        if (!response.ok) {
+          throw new Error("Failed to create payment attachment")
+        }
+
+        return await response.json()
+      } catch (error) {
+        console.error("Error creating payment attachment:", error)
+        throw error
+      }
+    },
+  }
 
   const websocketService = {
     client: null as Client | null,
@@ -402,42 +469,42 @@ export default function PaymentPage() {
   const calculateDiscountedAmount = () => {
     // Kiểm tra đầu vào
     if (!selectedSeatsData) {
-      console.warn("selectedSeatsData is undefined or null");
-      return 0;
+      console.warn("selectedSeatsData is undefined or null")
+      return 0
     }
-    
+
     // Lấy tổng số tiền ban đầu (đảm bảo là số)
-    const totalAmount = Number(selectedSeatsData.totalAmount) || 0;
-    
+    const totalAmount = Number(selectedSeatsData.totalAmount) || 0
+
     // Nếu không có voucher hợp lệ, trả về tổng ban đầu
     if (!voucherDiscount?.isValid) {
-      return totalAmount;
+      return totalAmount
     }
-  
+
     // Log để debug
-    console.log("Original total:", totalAmount);
-    console.log("Voucher details:", voucherDiscount);
-    
-    let discountedAmount = totalAmount;
-  
+    console.log("Original total:", totalAmount)
+    console.log("Voucher details:", voucherDiscount)
+
+    let discountedAmount = totalAmount
+
     // Áp dụng giảm giá theo phần trăm
     if (voucherDiscount.discountPercentage > 0) {
-      const discountValue = (totalAmount * Number(voucherDiscount.discountPercentage)) / 100;
-      console.log("Percentage discount:", discountValue);
-      discountedAmount = totalAmount - discountValue;
-    } 
+      const discountValue = (totalAmount * Number(voucherDiscount.discountPercentage)) / 100
+      console.log("Percentage discount:", discountValue)
+      discountedAmount = totalAmount - discountValue
+    }
     // Áp dụng giảm giá theo số tiền cố định
     else if (voucherDiscount.discountAmount > 0) {
-      const discountValue = Number(voucherDiscount.discountAmount);
-      console.log("Fixed amount discount:", discountValue);
-      discountedAmount = totalAmount - discountValue;
+      const discountValue = Number(voucherDiscount.discountAmount)
+      console.log("Fixed amount discount:", discountValue)
+      discountedAmount = totalAmount - discountValue
     }
-  
+
     // Làm tròn số đến 2 chữ số thập phân và đảm bảo không âm
-    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100);
-    console.log("Final discounted amount:", finalAmount);
-    
-    return finalAmount;
+    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100)
+    console.log("Final discounted amount:", finalAmount)
+
+    return finalAmount
   }
 
   // Update the handleConfirmPayment function to include voucher code
@@ -468,6 +535,22 @@ export default function PaymentPage() {
       }
 
       console.log("Using ticket purchase ID:", ticketPurchaseId)
+
+      // Create payment attachment if needed
+      try {
+        const attachmentData = {
+          paymentMethod: "PAYOS",
+          amount: calculateDiscountedAmount(),
+          currency: "VND",
+          description: "Payment for tickets",
+        }
+
+        await payOsApi.createPaymentAttachment(ticketPurchaseId, context?.accessToken || "", attachmentData)
+        console.log("Payment attachment created successfully")
+      } catch (attachmentError) {
+        console.error("Error creating payment attachment:", attachmentError)
+        // Continue with the payment process even if attachment creation fails
+      }
 
       // Store all the necessary data for the queue page
       const queueData = {
@@ -504,6 +587,7 @@ export default function PaymentPage() {
 
       // Save to localStorage for the queue page to access
       localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
+      console.log("paymentQueueData:", queueData)
     } catch (error) {
       console.error("Error processing payment:", error)
       setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
