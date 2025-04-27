@@ -21,9 +21,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import {
   Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
+  TabsContent
 } from "../../components/ui/tabs";
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
@@ -270,27 +268,7 @@ export default function ProfileForm() {
 
             <div className="lg:col-span-2">
               <Tabs defaultValue="profile" className="w-full">
-                <TabsList className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-1 mb-6">
-                  <TabsTrigger
-                    value="profile"
-                    className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
-                  >
-                    Thông tin cá nhân
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="security"
-                    className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
-                  >
-                    Bảo mật
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="preferences"
-                    className="flex-1 rounded-lg data-[state=active]:bg-[#2A2A2A] data-[state=active]:text-white"
-                  >
-                    Tùy chọn
-                  </TabsTrigger>
-                </TabsList>
-
+                
                 <TabsContent value="profile">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -359,7 +337,7 @@ export default function ProfileForm() {
                             type="email"
                             value={formData.email || ""}
                             onChange={handleInputChange}
-                            disabled={!editMode}
+                            disabled
                             className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
                               !editMode ? "opacity-80" : ""
                             }`}

@@ -129,7 +129,7 @@ export default function TicketManagement() {
 
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[180px] bg-[#2a2a2a] border-gray-800 text-white">
-                <SelectValue placeholder="Sắp xếp theo" />
+                <SelectValue placeholder="Sắp theo" />
               </SelectTrigger>
               <SelectContent className="bg-[#2a2a2a] border-gray-800 text-white">
                 <SelectItem value="date">Ngày sự kiện</SelectItem>
