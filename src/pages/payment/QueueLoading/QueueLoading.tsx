@@ -1,110 +1,14 @@
-import confetti from "canvas-confetti";
-import { motion } from "framer-motion";
-import {
-  AlertCircle,
-  ArrowRight,
-  Calendar,
-  CheckCircle,
-  Clock,
-  CreditCard,
-  MapPin,
-  Ticket,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "../../../components/ui/button";
-import { Separator } from "../../../components/ui/separator";
-import { EventDetailResponse } from "../../../interface/EventInterface";
-import eventApi from "../../../services/eventApi";
-import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
-import { Toaster } from "sonner";
-
-const payOsApi = {
-  createPayment: async (ticketPurchaseId: number, accessToken: string) => {
-    try {
-      console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
-      const returnUrl = `${window.location.origin}/payment/queue`
-
-      const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          ticketOrderDTOS: [
-            {
-              ticketPurchaseId: ticketPurchaseId,
-            },
-          ],
-          expiredTime: 900,
-          voucherCode: "",
-          returnUrl: returnUrl,
-        }),
-      })
-      console.log("payment response", response)
-
-      if (!response.ok) {
-        throw new Error("Failed to create payment")
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error creating payment:", error)
-      throw error
-    }
-  },
-
-  checkPaymentStatus: async (queryParams: Record<string, string> | null = null) => {
-    try {
-      // Determine if we should use query parameters or not
-      let url = "https://tixclick.site/api/payment/payos_call_back"
-
-      // If queryParams is provided and not empty, append them to the URL
-      if (queryParams) {
-        const queryString = new URLSearchParams(queryParams).toString()
-        if (queryString) {
-          url = `${url}?${queryString}`
-        }
-      }
-
-      console.log("Calling payment status URL:", url)
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Accept: "*/*",
-          Authorization: `Bearer ${localStorage.getItem("accessToken") || ""}`,
-        },
-        mode: "cors",
-      })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Error response:", errorText)
-
-        // Check for QR code truncation error
-        if (errorText.includes("String or binary data would be truncated") && errorText.includes("qr_code")) {
-          console.warn("QR code truncation error detected, will handle as successful payment")
-          // Return a mock successful response
-          return {
-            data: {
-              status: "PAID",
-              message: "Payment successful (handled by client due to QR code size issue)",
-            },
-          }
-        }
-
-        throw new Error(`Failed to check payment status: ${response.status} ${errorText}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Error checking payment status:", error)
-      throw error
-    }
-  },
-}
+import confetti from "canvas-confetti"
+import { motion } from "framer-motion"
+import { AlertCircle, ArrowRight, Calendar, CheckCircle, Clock, CreditCard, MapPin, Ticket } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { Toaster } from "sonner"
+import { Button } from "../../../components/ui/button"
+import { Separator } from "../../../components/ui/separator"
+import type { EventDetailResponse } from "../../../interface/EventInterface"
+import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils"
+import eventApi from "../../../services/eventApi"
 
 export default function PaymentQueuePage() {
   const [isComplete, setIsComplete] = useState(false)
@@ -132,6 +36,120 @@ export default function PaymentQueuePage() {
   }
 
   const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || ""
+
+  const payOsApi = {
+    createPayment: async (ticketPurchaseId: number, accessToken: string) => {
+      try {
+        console.log("Creating payment with ticketPurchaseId:", ticketPurchaseId)
+        const returnUrl = `${window.location.origin}/payment/queue`
+        console.log("tic:", ticketPurchaseId)
+
+        const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            ticketOrderDTOS: [
+              {
+                ticketPurchaseId: ticketPurchaseId,
+              },
+            ],
+            expiredTime: 1000,
+            voucherCode: "",
+            returnUrl: returnUrl,
+          }),
+        })
+        console.log("payment response", response)
+
+        if (!response.ok) {
+          throw new Error("Failed to create payment")
+        }
+
+        return await response.json()
+      } catch (error) {
+        console.error("Error creating payment:", error)
+        throw error
+      }
+    },
+
+    checkPaymentStatus: async (queryParams: Record<string, string> | null = null) => {
+      try {
+        // Determine if we should use query parameters or not
+        let url = "https://tixclick.site/api/payment/payos_call_back"
+
+        // If queryParams is provided and not empty, append them to the URL
+        if (queryParams) {
+          const queryString = new URLSearchParams(queryParams).toString()
+          if (queryString) {
+            url = `${url}?${queryString}`
+          }
+        }
+
+        console.log("Calling payment status URL:", url)
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "*/*",
+            Authorization: `Bearer ${localStorage.getItem("accessToken") || ""}`,
+          },
+          mode: "cors",
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error("Error response:", errorText)
+
+          // Check for QR code truncation error
+          if (errorText.includes("String or binary data would be truncated") && errorText.includes("qr_code")) {
+            console.warn("QR code truncation error detected, will handle as successful payment")
+            // Return a mock successful response
+            return {
+              data: {
+                status: "PAID",
+                message: "Payment successful (handled by client due to QR code size issue)",
+              },
+            }
+          }
+
+          throw new Error(`Failed to check payment status: ${response.status} ${errorText}`)
+        }
+
+        return await response.json()
+      } catch (error) {
+        console.error("Error checking payment status:", error)
+        throw error
+      }
+    },
+
+    createPaymentAttachment: async (ticketPurchaseId: number, accessToken: string, attachmentData: any) => {
+      try {
+        const response = await fetch(
+          `https://tixclick.site/api/payment/ticket-purchase/${ticketPurchaseId}/attachment`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(attachmentData),
+          },
+        )
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`Failed to create payment attachment: ${response.status} ${errorText}`)
+        }
+
+        return await response.json()
+      } catch (error) {
+        console.error("Error creating payment attachment:", error)
+        throw error
+      }
+    },
+  }
 
   // Fetch event information
   useEffect(() => {
@@ -221,7 +239,7 @@ export default function PaymentQueuePage() {
 
       payOsApi
         .checkPaymentStatus(allParams)
-        .then((response) => {
+        .then(async (response) => {
           console.log("Payment verification response:", response)
 
           // Update UI based on backend response
@@ -230,6 +248,36 @@ export default function PaymentQueuePage() {
             setIsComplete(true)
             setShowConfetti(true)
             // setProgress(100)
+
+            // Create payment attachment for successful payment
+            try {
+              const storedPaymentData = localStorage.getItem("paymentQueueData")
+              if (storedPaymentData) {
+                const parsedData = JSON.parse(storedPaymentData)
+                const ticketPurchaseId = parsedData.purchaseResponse?.result?.[0]?.ticketPurchaseId
+
+                if (ticketPurchaseId) {
+                  const attachmentData = {
+                    paymentMethod: "PAYOS",
+                    amount: parsedData.discountedAmount || parsedData.totalAmount,
+                    currency: "VND",
+                    orderCode: orderCode,
+                    status: "PAID",
+                    description: "Payment completed successfully",
+                  }
+
+                  await payOsApi.createPaymentAttachment(
+                    ticketPurchaseId,
+                    localStorage.getItem("accessToken") || "",
+                    attachmentData,
+                  )
+                  console.log("Payment attachment created successfully")
+                }
+              }
+            } catch (attachmentError) {
+              console.error("Error creating payment attachment:", attachmentError)
+              // Continue with the payment process even if attachment creation fails
+            }
           } else if (response.data?.status === "CANCELED") {
             setPaymentStatus("CANCELED")
             setPaymentError("")
