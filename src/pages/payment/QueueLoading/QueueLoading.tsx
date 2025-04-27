@@ -1,5 +1,3 @@
-"use client";
-
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { AlertCircle, ArrowRight, Calendar, CheckCircle, CreditCard, MapPin, Ticket } from "lucide-react";
@@ -10,7 +8,7 @@ import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
 import type { EventDetailResponse } from "../../../interface/EventInterface";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
-import eventApi from "../../../services/eventApi";
+
 
 export default function PaymentQueuePage() {
   const [isComplete, setIsComplete] = useState(false);
@@ -24,7 +22,6 @@ export default function PaymentQueuePage() {
   const [eventInfor, setEventInfor] = useState<
     Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">
   >();
-  const [isLoadingEvent, setIsLoadingEvent] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +37,7 @@ export default function PaymentQueuePage() {
     return params;
   };
 
-  const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || "";
+  // const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || "";
 
   const payOsApi = {
    checkPaymentStatus: async (queryParams: Record<string, string>) => {
