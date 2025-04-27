@@ -11,21 +11,21 @@ import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
 
 
 export default function PaymentQueuePage() {
-  const [isComplete, setIsComplete] = useState(false);
+  const [____, setIsComplete] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentData, ___] = useState<any>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<"PENDING" | "PAID" | "CANCELED" | "FAILED">("PENDING");
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
-  const [eventInfor, setEventInfor] = useState<
+  const [eventInfor, _] = useState<
     Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">
   >();
 
   const navigate = useNavigate();
   const location = useLocation();
-  const [discountInfo, setDiscountInfo] = useState<{
+  const [discountInfo, __] = useState<{
     code: string;
     discountAmount: number;
     discountPercentage: number;
@@ -96,75 +96,6 @@ export default function PaymentQueuePage() {
       }
     },
   };
-
-  // useEffect(() => {
-  //   const fetchEventInfor = async () => {
-  //     try {
-  //       setIsLoadingEvent(true);
-  //       const storedPaymentData = localStorage.getItem("paymentQueueData");
-
-  //       if (storedPaymentData) {
-  //         const parsedData = JSON.parse(storedPaymentData);
-  //         const eventId = parsedData.eventInfo?.id;
-
-  //         if (eventId) {
-  //           const response = await eventApi.getEventDetail(Number(eventId));
-  //           if (response.data.result.length !== 0) {
-  //             setEventInfor(response.data.result);
-  //             console.log("Event info:", response.data.result);
-  //           }
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching event info:", error);
-  //       toast.error("Failed to load event information");
-  //     } finally {
-  //       setIsLoadingEvent(false);
-  //     }
-  //   };
-
-  //   fetchEventInfor();
-  // }, []);
-
-  // useEffect(() => {
-  //   const storedPaymentData = localStorage.getItem("paymentQueueData");
-
-  //   if (!storedPaymentData) {
-  //     setPaymentError("No payment data found");
-  //     setInitialLoading(false);
-  //     toast.error("No payment data found");
-  //     return;
-  //   }
-
-  //   try {
-  //     const parsedData = JSON.parse(storedPaymentData);
-  //     console.log("Payment queue data:", parsedData);
-  //     setPaymentData(parsedData);
-
-  //     if (parsedData?.voucher) {
-  //       setDiscountInfo(parsedData.voucher);
-  //     }
-
-  //     const queryParams = new URLSearchParams(location.search);
-  //     if (queryParams.has("orderCode")) {
-  //       setInitialLoading(false);
-  //       return;
-  //     }
-
-  //     const timer = setTimeout(() => {
-  //       processPayment(parsedData);
-  //     }, 2000);
-
-  //     return () => clearTimeout(timer);
-  //   } catch (error) {
-  //     console.error("Error parsing payment queue data:", error);
-  //     setPaymentError("Failed to parse payment data");
-  //     setInitialLoading(false);
-  //     toast.error("Error parsing payment data");
-  //   }
-  // }, [location.search]);
-
-  
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
