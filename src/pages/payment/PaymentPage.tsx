@@ -465,6 +465,87 @@ export default function PaymentPage() {
     }
   }
 
+  const handleCancelPayment = async (isBackButton = false) => {
+    // Get the ticketPurchaseId from localStorage or state
+    const storedSeatsData = localStorage.getItem("selectedSeats")
+    let ticketPurchaseId = null
+
+    if (storedSeatsData) {
+      const parsedData = JSON.parse(storedSeatsData)
+      if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
+        ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+      }
+    }
+
+    if (!ticketPurchaseId) {
+      console.error("No ticketPurchaseId found")
+      if (isBackButton) {
+        navigate(-1)
+      } else {
+        navigate("/")
+      }
+      return
+    }
+
+    try {
+      // Show loading toast
+      toast.loading("Đang hủy giao dịch...", { id: "cancel-payment" })
+
+      // Call the cancel API
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/cancel", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${context?.accessToken}`,
+        },
+        body: JSON.stringify([ticketPurchaseId]),
+      })
+
+      const data = await response.json()
+      console.log("Cancel payment response:", data)
+
+      if (response.ok && data.success) {
+        toast.success("Đã hủy giao dịch thành công", { id: "cancel-payment" })
+
+        // Clear the selected seats data from localStorage
+        localStorage.removeItem("selectedSeats")
+        localStorage.removeItem("purchaseResponse")
+        localStorage.removeItem("paymentQueueData")
+
+        // Navigate based on which button was clicked
+        setTimeout(() => {
+          if (isBackButton) {
+            navigate(-1)
+          } else {
+            navigate("/")
+          }
+        }, 1000)
+      } else {
+        toast.error(data.message || "Không thể hủy giao dịch", { id: "cancel-payment" })
+        // Still navigate if the user wants to leave
+        setTimeout(() => {
+          if (isBackButton) {
+            navigate(-1)
+          } else {
+            navigate("/")
+          }
+        }, 1500)
+      }
+    } catch (error) {
+      console.error("Error cancelling payment:", error)
+      toast.error("Đã xảy ra lỗi khi hủy giao dịch", { id: "cancel-payment" })
+
+      // Still navigate if the user wants to leave
+      setTimeout(() => {
+        if (isBackButton) {
+          navigate(-1)
+        } else {
+          navigate("/")
+        }
+      }, 1500)
+    }
+  }
+
   // Calculate discounted amount
   const calculateDiscountedAmount = () => {
     // Kiểm tra đầu vào
@@ -628,7 +709,12 @@ export default function PaymentPage() {
           </div>
         </Link>
         <Link to="/">
-          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
+          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
+          onClick={(e) => {
+            e.preventDefault()
+            handleCancelPayment()
+          }}
+          >
             <X className="h-4 w-4 mr-2" />
             Hủy giao dịch
           </Button>
@@ -915,7 +1001,10 @@ export default function PaymentPage() {
                 <Button
                   variant="outline"
                   className="flex-1 border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
-                  onClick={() => navigate(-1)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleCancelPayment(true)
+                  }}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Quay lại
