@@ -1,4 +1,4 @@
-import { Calendar, Ticket, User } from "lucide-react";
+import { Ticket, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import AlterAvatar from "../../../assets/Vie-flag.png";
@@ -18,11 +18,7 @@ const menuItems = [
     label: "Vé đã mua",
     href: "/ticketManagement",
   },
-  {
-    icon: Calendar,
-    label: "Sự kiện của tôi",
-    href: "/consumerCenter",
-  },
+ 
 ]
 
 export function SidebarProfile() {

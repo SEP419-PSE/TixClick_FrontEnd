@@ -12,6 +12,7 @@ const ticketPurchase = {
     const url = `${ticketPurchaseUrl}/create`;
     return axiosClient.post(url, data);
   },
+
 };
 
 export default ticketPurchase;

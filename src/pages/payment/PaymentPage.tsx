@@ -15,7 +15,7 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
 import { AuthContext } from "../../contexts/AuthProvider"
-import { EventDetailResponse } from "../../interface/EventInterface"
+import type { EventDetailResponse } from "../../interface/EventInterface"
 import { formatDateVietnamese, formatTimeFe } from "../../lib/utils"
 import eventApi from "../../services/eventApi"
 
@@ -86,6 +86,53 @@ export default function PaymentPage() {
     }
     fetchEventInfor()
   }, [eventId])
+
+  const payOsApi = {
+
+    createPaymentAttachment: async (ticketPurchaseIds: number[], accessToken: string, attachmentData: any) => {
+      try {
+        console.log("Creating payment attachment with ticketPurchaseIds:", ticketPurchaseIds);
+    
+        // Tạo ticketOrderDTOS từ danh sách ticketPurchaseIds
+        const ticketOrderDTOS = ticketPurchaseIds.map((id) => ({
+          ticketPurchaseId: id,
+        }));
+    
+        // Ghi log attachmentData (nếu cần cho debug)
+        console.log("Attachment Data:", {
+          paymentMethod: attachmentData.paymentMethod,
+          amount: attachmentData.amount,
+          currency: attachmentData.currency,
+          description: attachmentData.description,
+        });
+    
+        const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            ticketOrderDTOS: ticketOrderDTOS,
+            expiredTime: 900,
+            voucherCode: "",
+          }),
+        });
+    
+        console.log("Payment attachment response:", response);
+    
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Không thể tạo tệp đính kèm thanh toán: ${response.status} ${errorText}`);
+        }
+    
+        return await response.json();
+      } catch (error) {
+        console.error("Error creating payment attachment:", error);
+        throw error;
+      }
+    },
+  }
 
   const websocketService = {
     client: null as Client | null,
@@ -398,54 +445,187 @@ export default function PaymentPage() {
     }
   }
 
+  const handleCancelPayment = async (isBackButton = false) => {
+    // Get the ticketPurchaseId from localStorage or state
+    const storedSeatsData = localStorage.getItem("selectedSeats")
+    let ticketPurchaseId = null
+
+    if (storedSeatsData) {
+      const parsedData = JSON.parse(storedSeatsData)
+      if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
+        ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+      }
+    }
+
+    if (!ticketPurchaseId) {
+      console.error("No ticketPurchaseId found")
+      if (isBackButton) {
+        navigate(-1)
+      } else {
+        navigate("/")
+      }
+      return
+    }
+
+    try {
+      // Show loading toast
+      toast.loading("Đang hủy giao dịch...", { id: "cancel-payment" })
+
+      // Call the cancel API
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/cancel", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${context?.accessToken}`,
+        },
+        body: JSON.stringify([ticketPurchaseId]),
+      })
+
+      const data = await response.json()
+      console.log("Cancel payment response:", data)
+
+      if (response.ok && data.success) {
+        toast.success("Đã hủy giao dịch thành công", { id: "cancel-payment" })
+
+        // Clear the selected seats data from localStorage
+        localStorage.removeItem("selectedSeats")
+        localStorage.removeItem("purchaseResponse")
+        localStorage.removeItem("paymentQueueData")
+
+        // Navigate based on which button was clicked
+        setTimeout(() => {
+          if (isBackButton) {
+            navigate(-1)
+          } else {
+            navigate("/")
+          }
+        }, 1000)
+      } else {
+        toast.error(data.message || "Không thể hủy giao dịch", { id: "cancel-payment" })
+        // Still navigate if the user wants to leave
+        setTimeout(() => {
+          if (isBackButton) {
+            navigate(-1)
+          } else {
+            navigate("/")
+          }
+        }, 1500)
+      }
+    } catch (error) {
+      console.error("Error cancelling payment:", error)
+      toast.error("Đã xảy ra lỗi khi hủy giao dịch", { id: "cancel-payment" })
+
+      // Still navigate if the user wants to leave
+      setTimeout(() => {
+        if (isBackButton) {
+          navigate(-1)
+        } else {
+          navigate("/")
+        }
+      }, 1500)
+    }
+  }
+
   // Calculate discounted amount
   const calculateDiscountedAmount = () => {
-    if (!selectedSeatsData || !voucherDiscount?.isValid) {
-      return selectedSeatsData?.totalAmount || 0
+    // Kiểm tra đầu vào
+    if (!selectedSeatsData) {
+      console.warn("selectedSeatsData is undefined or null")
+      return 0
     }
 
-    const totalAmount = selectedSeatsData.totalAmount
+    // Lấy tổng số tiền ban đầu (đảm bảo là số)
+    const totalAmount = Number(selectedSeatsData.totalAmount) || 0
+
+    // Nếu không có voucher hợp lệ, trả về tổng ban đầu
+    if (!voucherDiscount?.isValid) {
+      return totalAmount
+    }
+
+    // Log để debug
+    console.log("Original total:", totalAmount)
+    console.log("Voucher details:", voucherDiscount)
+
     let discountedAmount = totalAmount
 
+    // Áp dụng giảm giá theo phần trăm
     if (voucherDiscount.discountPercentage > 0) {
-      discountedAmount = totalAmount - (totalAmount * voucherDiscount.discountPercentage) / 100
-    } else if (voucherDiscount.discountAmount > 0) {
-      discountedAmount = totalAmount - voucherDiscount.discountAmount
+      const discountValue = (totalAmount * Number(voucherDiscount.discountPercentage)) / 100
+      console.log("Percentage discount:", discountValue)
+      discountedAmount = totalAmount - discountValue
+    }
+    // Áp dụng giảm giá theo số tiền cố định
+    else if (voucherDiscount.discountAmount > 0) {
+      const discountValue = Number(voucherDiscount.discountAmount)
+      console.log("Fixed amount discount:", discountValue)
+      discountedAmount = totalAmount - discountValue
     }
 
-    return Math.max(0, discountedAmount)
+    // Làm tròn số đến 2 chữ số thập phân và đảm bảo không âm
+    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100)
+    console.log("Final discounted amount:", finalAmount)
+
+    return finalAmount
   }
 
   // Update the handleConfirmPayment function to include voucher code
   const handleConfirmPayment = async () => {
-    if (!acceptTerms) return
-
-    setIsProcessing(true)
-    setApiError(null)
-
+    if (!acceptTerms) return;
+  
+    setIsProcessing(true);
+    setApiError(null);
+  
     try {
       // Get the purchase response from state or localStorage
       const response =
         purchaseResponse ||
         selectedSeatsData?.apiResponses?.purchase ||
-        JSON.parse(localStorage.getItem("purchaseResponse") || "null")
-
-      if (!response) {
-        throw new Error("Không tìm thấy thông tin đặt vé")
+        JSON.parse(localStorage.getItem("purchaseResponse") || "null");
+  
+      if (!response || !response.result || !response.result.length) {
+        throw new Error("Không tìm thấy thông tin đặt vé hoặc danh sách ticketPurchaseId");
       }
-
-      console.log("Using purchase response:", response)
-
-      // Get the ticketPurchaseId from the response
-      const ticketPurchaseId = response.result[0]?.ticketPurchaseId
-
-      if (!ticketPurchaseId) {
-        throw new Error("Không tìm thấy ID mua vé")
+  
+      console.log("Using purchase response:", response);
+  
+      // Get the ticketPurchaseIds from the response
+      const ticketPurchaseIds = response.result.map((item: any) => item.ticketPurchaseId);
+      console.log("Using ticket purchase IDs:", ticketPurchaseIds); // Output: [401, 402]
+  
+      let checkoutUrl = null;
+  
+      // Create payment attachment
+      try {
+        const attachmentData = {
+          paymentMethod: "PAYOS",
+          amount: calculateDiscountedAmount(),
+          currency: "VND",
+          description: "Payment for tickets",
+        };
+  
+        const paymentResponse = await payOsApi.createPaymentAttachment(
+          ticketPurchaseIds,
+          context?.accessToken || "",
+          attachmentData
+        );
+        console.log("Payment attachment created successfully:", paymentResponse);
+  
+        // Giả sử phản hồi có cấu trúc: { code: 200, result: { error: "ok", data: { checkoutUrl: "..." } } }
+        if (
+          paymentResponse.code === 200 &&
+          paymentResponse.result?.error === "ok" &&
+          paymentResponse.result?.data?.checkoutUrl
+        ) {
+          checkoutUrl = paymentResponse.result.data.checkoutUrl;
+        } else {
+          throw new Error("Phản hồi thanh toán không chứa checkoutUrl");
+        }
+      } catch (attachmentError) {
+        console.error("Error creating payment attachment:", attachmentError);
+        throw new Error("Không thể tạo liên kết thanh toán");
       }
-
-      console.log("Using ticket purchase ID:", ticketPurchaseId)
-
-      // Store all the necessary data for the queue page
+  
+      // Store all the necessary data for the queue page (nếu cần sau khi thanh toán hoàn tất)
       const queueData = {
         purchaseResponse: response,
         eventInfo: {
@@ -455,7 +635,16 @@ export default function PaymentPage() {
           location: eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
           date:
             eventInfor?.eventActivityDTOList && eventActivityId
-              ? `${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.startTimeEvent)} - ${formatTimeFe(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent)}, ${formatDateVietnamese(eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.dateEvent.toString())}`
+              ? `${formatTimeFe(
+                  eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
+                    ?.startTimeEvent,
+                )} - ${formatTimeFe(
+                  eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent,
+                )}, ${formatDateVietnamese(
+                  eventInfor.eventActivityDTOList
+                    .find((x) => x.eventActivityId == Number(eventActivityId))
+                    ?.dateEvent.toString(),
+                )}`
               : selectedSeatsData?.eventInfo?.date,
         },
         seats: selectedSeatsData.seats,
@@ -476,28 +665,33 @@ export default function PaymentPage() {
         apiResponses: {
           purchase: response,
         },
+      };
+  
+      // Save to localStorage for use after payment (if needed)
+      localStorage.setItem("paymentQueueData", JSON.stringify(queueData));
+      console.log("paymentQueueData:", queueData);
+  
+      // Close the confirmation dialog
+      setShowConfirmation(false);
+  
+      // Show success message
+      toast.success("Đang chuyển hướng đến trang thanh toán!");
+  
+      // Redirect to checkoutUrl
+      if (checkoutUrl) {
+        setTimeout(() => {
+          window.location.href = checkoutUrl; // Chuyển hướng đến checkoutUrl
+        }, 1500);
+      } else {
+        throw new Error("Không tìm thấy checkoutUrl để chuyển hướng");
       }
-
-      // Save to localStorage for the queue page to access
-      localStorage.setItem("paymentQueueData", JSON.stringify(queueData))
     } catch (error) {
-      console.error("Error processing payment:", error)
-      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán")
-      setIsProcessing(false)
-      return
+      console.error("Error processing payment:", error);
+      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán");
+    } finally {
+      setIsProcessing(false);
     }
-
-    // Close the confirmation dialog
-    setShowConfirmation(false)
-
-    // Show success message
-    toast.success("Đang chuyển hướng đến trang thanh toán!")
-
-    // Navigate to the queue page after a short delay
-    setTimeout(() => {
-      navigate("/payment/queue")
-    }, 1500)
-  }
+  };
 
   const getFormattedEventDateTime = () => {
     if (eventInfor?.eventActivityDTOList && eventActivityId) {
@@ -520,7 +714,12 @@ export default function PaymentPage() {
           </div>
         </Link>
         <Link to="/">
-          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]">
+          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
+          onClick={(e) => {
+            e.preventDefault()
+            handleCancelPayment()
+          }}
+          >
             <X className="h-4 w-4 mr-2" />
             Hủy giao dịch
           </Button>
@@ -627,11 +826,11 @@ export default function PaymentPage() {
                       {voucherDiscount.isValid && (
                         <p className="mt-1">
                           {voucherDiscount.discountPercentage > 0
-                            ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị đơn hàng`
+                            ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị vé`
                             : `Giảm ${new Intl.NumberFormat("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              }).format(voucherDiscount.discountAmount)}`}
+                              style: "currency",
+                              currency: "VND",
+                            }).format(voucherDiscount.discountAmount)}`}
                         </p>
                       )}
                     </div>
@@ -739,9 +938,9 @@ export default function PaymentPage() {
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           2x
                         </div>
-                        <div>Vé Thường</div>
+                        <div>Vé Tc jbcjcbjkcbjkbcjkjnkdjcchường</div>
                       </div>
-                      <div className="font-medium">600.000 đ</div>
+                      <div className="font-medium">600.000 jbvijbvjkvjvkwvn ựvbw vjvjvkrw vjkrwjk</div>
                     </div>
 
                     <div className="flex justify-between text-sm">
@@ -764,9 +963,9 @@ export default function PaymentPage() {
                   <div>
                     {selectedSeatsData
                       ? new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(selectedSeatsData.totalAmount)
+                        style: "currency",
+                        currency: "VND",
+                      }).format(selectedSeatsData.totalAmount)
                       : "1.100.000 đ"}
                   </div>
                 </div>
@@ -782,9 +981,9 @@ export default function PaymentPage() {
                       {voucherDiscount.discountPercentage > 0
                         ? `-${voucherDiscount.discountPercentage}%`
                         : `-${new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(voucherDiscount.discountAmount)}`}
+                          style: "currency",
+                          currency: "VND",
+                        }).format(voucherDiscount.discountAmount)}`}
                     </div>
                   </div>
                 )}
@@ -795,9 +994,9 @@ export default function PaymentPage() {
                   <div className="text-[#FF8A00] text-lg">
                     {selectedSeatsData
                       ? new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(calculateDiscountedAmount())
+                        style: "currency",
+                        currency: "VND",
+                      }).format(calculateDiscountedAmount())
                       : "1.100.000 đ"}
                   </div>
                 </div>
@@ -807,7 +1006,10 @@ export default function PaymentPage() {
                 <Button
                   variant="outline"
                   className="flex-1 border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
-                  onClick={() => navigate(-1)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleCancelPayment(true)
+                  }}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Quay lại
@@ -897,9 +1099,9 @@ export default function PaymentPage() {
                       {voucherDiscount.discountPercentage > 0
                         ? `${voucherDiscount.discountPercentage}%`
                         : new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(voucherDiscount.discountAmount)}
+                          style: "currency",
+                          currency: "VND",
+                        }).format(voucherDiscount.discountAmount)}
                     </div>
                   </div>
                 </div>
@@ -916,9 +1118,9 @@ export default function PaymentPage() {
                       <span>
                         {selectedSeatsData
                           ? new Intl.NumberFormat("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }).format(selectedSeatsData.totalAmount)
+                            style: "currency",
+                            currency: "VND",
+                          }).format(selectedSeatsData.totalAmount)
                           : "1.100.000 VND"}
                       </span>
                     </div>
@@ -928,9 +1130,9 @@ export default function PaymentPage() {
                         {voucherDiscount.discountPercentage > 0
                           ? `-${voucherDiscount.discountPercentage}%`
                           : `-${new Intl.NumberFormat("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }).format(voucherDiscount.discountAmount)}`}
+                            style: "currency",
+                            currency: "VND",
+                          }).format(voucherDiscount.discountAmount)}`}
                       </span>
                     </div>
                   </div>
