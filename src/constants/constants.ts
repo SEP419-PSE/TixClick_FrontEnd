@@ -3,6 +3,10 @@ import MusicEvent from "../assets/MusicEvent.jpg";
 import SportEvent from "../assets/SportEvent.jpg";
 import ArtistEvent from "../assets/ArtistEvent.jpg";
 import OtherEvent from "../assets/OtherEvent.jpg";
+import { FaMusic } from "react-icons/fa6";
+import { MdSportsVolleyball } from "react-icons/md";
+import { FaMasksTheater } from "react-icons/fa6";
+import { LuBlocks } from "react-icons/lu";
 
 export const PATHNAME_EXCEPT = [
   "/auth/signin",
@@ -45,6 +49,7 @@ export const eventTypes: EventType[] = [
     vietnamName: "Âm nhạc",
     color: "#E91E63",
     img: MusicEvent,
+    icon: FaMusic, // Truyền component icon thay vì JSX
   },
   {
     id: 2,
@@ -52,6 +57,7 @@ export const eventTypes: EventType[] = [
     vietnamName: "Thể thao",
     color: "#27AE60",
     img: SportEvent,
+    icon: MdSportsVolleyball, // Truyền component icon thay vì JSX
   },
   {
     id: 3,
@@ -59,6 +65,7 @@ export const eventTypes: EventType[] = [
     vietnamName: "Sân khấu & Nghệ thuật",
     color: "#9B59B6",
     img: ArtistEvent,
+    icon: FaMasksTheater, // Truyền component icon thay vì JSX
   },
   {
     id: 4,
@@ -66,6 +73,7 @@ export const eventTypes: EventType[] = [
     vietnamName: "Thể loại khác",
     color: "#3498DB",
     img: OtherEvent,
+    icon: LuBlocks, // Truyền component icon thay vì JSX
   },
 ];
 

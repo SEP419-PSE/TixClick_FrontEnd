@@ -7,6 +7,10 @@ const accountApi = {
     const url = `${accountUrl}/search-account?email=${email}`;
     return axiosClient.get(url);
   },
+  getProfile: () => {
+    const url = `${accountUrl}/my-profile`;
+    return axiosClient.get(url);
+  },
 };
 
 export default accountApi;

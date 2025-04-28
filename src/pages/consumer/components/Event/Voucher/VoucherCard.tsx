@@ -1,6 +1,9 @@
 import { Card } from "../../../../../components/ui/card";
 import { Switch } from "../../../../../components/ui/switch";
-import { VoucherResponse } from "../../../../../interface/company/Voucher";
+import {
+  VoucherResponse,
+  VoucherStatus,
+} from "../../../../../interface/company/Voucher";
 import { formatDateVietnamese } from "../../../../../lib/utils";
 import { TicketMinus } from "lucide-react";
 import { motion } from "framer-motion";
@@ -9,9 +12,16 @@ const MotionCard = motion(Card);
 
 type Props = {
   voucher: VoucherResponse;
+  onChangeStatus: (voucher: number, newStatus: VoucherStatus) => void;
 };
 
-const VoucherCard = ({ voucher }: Props) => {
+const VoucherCard = ({ voucher, onChangeStatus }: Props) => {
+  const handleToggle = () => {
+    const newStatus = voucher.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    console.log(voucher.voucherId, newStatus);
+    onChangeStatus(voucher.voucherId, newStatus);
+  };
+
   return (
     <MotionCard
       initial={{ opacity: 0, y: 20 }}
@@ -38,7 +48,10 @@ const VoucherCard = ({ voucher }: Props) => {
         </p>
       </div>
       <div className="flex flex-col ml-auto items-center">
-        <Switch checked={voucher.status === "ACTIVE" ? true : false} />
+        <Switch
+          checked={voucher.status === "ACTIVE"}
+          onCheckedChange={handleToggle}
+        />
       </div>
     </MotionCard>
   );

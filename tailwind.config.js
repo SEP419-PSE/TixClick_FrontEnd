@@ -15,7 +15,7 @@ export default {
 				"pse-black-light": "#252525",
 				"pse-gray": "#828282",
 				"pse-header": "#111111",
-				"pse-footer": "#060606",
+				"pse-footer": "#303030",
 				"pse-text": "#ffffff",
 				"pse-error": "#ff0000",
 				"pse-success": "#23C10A",
