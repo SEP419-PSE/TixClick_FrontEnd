@@ -83,7 +83,7 @@ const Header = () => {
               onClick={() => setOpenMenu(true)}
               className="relative p-[6px] rounded-full border border-pse-text"
             >
-              {profile ? (
+              {profile?.avatarURL ? (
                 <img src={profile.avatarURL} width={24} />
               ) : (
                 <img src={Avatar} width={24} />
