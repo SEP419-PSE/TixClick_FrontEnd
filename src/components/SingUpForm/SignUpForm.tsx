@@ -5,7 +5,7 @@ import { RegisterRequest } from "../../interface/AuthInterface";
 import { toast } from "sonner";
 import { NavLink, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-
+import Logo from "../../assets/Logo.png";
 import GoogleImg from "../../assets/google.png";
 import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
@@ -75,7 +75,7 @@ const SignUpForm = () => {
       className="px-3 pt-6 pb-20 lg:px-8 lg:py-12 w-[550px] h-auto"
     >
       <div className="hidden lg:flex items-center gap-2 font-bold text-[20px]">
-        <img src={GoogleImg} width={64} />
+        <img src={Logo} width={64} />
         <p>Event booking</p>
       </div>
       <p className="font-bold text-[22px] my-4">Tham gia với chúng tôi</p>
