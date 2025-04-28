@@ -9,7 +9,6 @@ import { SidebarProvider } from "./contexts/SideBarContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
     <AuthProvider>
       <LanguageProvider>
         <SidebarProvider>
@@ -17,6 +16,5 @@ createRoot(document.getElementById("root")!).render(
         </SidebarProvider>
       </LanguageProvider>
     </AuthProvider>
-    </BrowserRouter>
   </StrictMode>
 );
