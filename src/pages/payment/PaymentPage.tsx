@@ -1,103 +1,131 @@
-import { motion } from "framer-motion"
-import { AlertCircle, ArrowLeft, Calendar, CheckCircle, Clock, CreditCard, Loader2, MapPin, Tag, X } from "lucide-react"
-import { useContext, useEffect, useRef, useState } from "react"
-import banner from "../../assets/banner.jpg"
-import Logo from "../../assets/Logo.png"
-import payOs from "../../assets/payOs.svg"
-import { Button } from "../../components/ui/button"
-import { Checkbox } from "../../components/ui/checkbox"
+import { motion } from "framer-motion";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Loader2,
+  MapPin,
+  Tag,
+  X,
+} from "lucide-react";
+import { useContext, useEffect, useRef, useState } from "react";
+import banner from "../../assets/banner.jpg";
+import Logo from "../../assets/Logo.png";
+import payOs from "../../assets/payOs.svg";
+import { Button } from "../../components/ui/button";
+import { Checkbox } from "../../components/ui/checkbox";
 
-import { Client } from "@stomp/stompjs"
-import { Link, useNavigate, useSearchParams } from "react-router"
-import { toast, Toaster } from "sonner"
-import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Separator } from "../../components/ui/separator"
-import { AuthContext } from "../../contexts/AuthProvider"
-import type { EventDetailResponse } from "../../interface/EventInterface"
-import { formatDateVietnamese, formatTimeFe } from "../../lib/utils"
-import eventApi from "../../services/eventApi"
+import { Client } from "@stomp/stompjs";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { toast, Toaster } from "sonner";
+import { Dialog, DialogContent, DialogTitle } from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Separator } from "../../components/ui/separator";
+import { AuthContext } from "../../contexts/AuthProvider";
+import type { EventDetailResponse } from "../../interface/EventInterface";
+import { formatDateVietnamese, formatTimeFe } from "../../lib/utils";
+import eventApi from "../../services/eventApi";
 
 export default function PaymentPage() {
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [minutes, setMinutes] = useState(10)
-  const [seconds, setSeconds] = useState(0)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [acceptTerms, setAcceptTerms] = useState(false)
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const eventId = searchParams.get("eventId")
-  const eventActivityId = searchParams.get("eventActivityId")
-  const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null)
-  const [apiError, setApiError] = useState<string | null>(null)
-  const [purchaseResponse, setPurchaseResponse] = useState<any>(null)
-  const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [minutes, setMinutes] = useState(10);
+  const [seconds, setSeconds] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const eventId = searchParams.get("eventId");
+  const eventActivityId = searchParams.get("eventActivityId");
+  const [selectedSeatsData, setSelectedSeatsData] = useState<any>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [purchaseResponse, setPurchaseResponse] = useState<any>(null);
+  const [isTimeoutBoundFromServer, setIsTimeoutBoundFromServer] =
+    useState(false);
   const [eventInfor, setEventInfor] =
-    useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
-  const [isLoadingEvent, setIsLoadingEvent] = useState(true)
+    useState<
+      Pick<
+        EventDetailResponse,
+        "eventName" | "eventActivityDTOList" | "locationName"
+      >
+    >();
+  const [isLoadingEvent, setIsLoadingEvent] = useState(true);
 
   // Add a new state for voucher code and discount information
-  const [voucherCode, setVoucherCode] = useState("")
+  const [voucherCode, setVoucherCode] = useState("");
   const [voucherDiscount, setVoucherDiscount] = useState<{
-    isValid: boolean
-    discountAmount: number
-    discountPercentage: number
-    message: string
-  } | null>(null)
-  const [isCheckingVoucher, setIsCheckingVoucher] = useState(false)
+    isValid: boolean;
+    discountAmount: number;
+    discountPercentage: number;
+    message: string;
+  } | null>(null);
+  const [isCheckingVoucher, setIsCheckingVoucher] = useState(false);
 
-  const stompClientRef = useRef<Client | null>(null)
-  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const stompClientRef = useRef<Client | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
 
   // Fetch event information
   useEffect(() => {
     const fetchEventInfor = async () => {
-      setIsLoadingEvent(true)
+      setIsLoadingEvent(true);
       try {
         if (!eventId) {
           // Try to get eventId from localStorage
-          const storedSeatsData = localStorage.getItem("selectedSeats")
+          const storedSeatsData = localStorage.getItem("selectedSeats");
           if (storedSeatsData) {
-            const parsedData = JSON.parse(storedSeatsData)
+            const parsedData = JSON.parse(storedSeatsData);
             if (parsedData.eventInfo?.id) {
-              const response = await eventApi.getEventDetail(Number(parsedData.eventInfo.id))
+              const response = await eventApi.getEventDetail(
+                Number(parsedData.eventInfo.id)
+              );
               if (response.data.result.length != 0) {
-                setEventInfor(response.data.result)
-                console.log("Event info fetched from API:", response.data.result)
+                setEventInfor(response.data.result);
+                console.log(
+                  "Event info fetched from API:",
+                  response.data.result
+                );
               }
             }
           }
         } else {
-          const response = await eventApi.getEventDetail(Number(eventId))
+          const response = await eventApi.getEventDetail(Number(eventId));
           if (response.data.result.length != 0) {
-            setEventInfor(response.data.result)
-            console.log("Event info fetched from API:", response.data.result)
+            setEventInfor(response.data.result);
+            console.log("Event info fetched from API:", response.data.result);
           }
         }
       } catch (error) {
-        console.error("Error fetching event information:", error)
-        toast.error("Không thể tải thông tin sự kiện")
+        console.error("Error fetching event information:", error);
+        toast.error("Không thể tải thông tin sự kiện");
       } finally {
-        setIsLoadingEvent(false)
+        setIsLoadingEvent(false);
       }
-    }
-    fetchEventInfor()
-  }, [eventId])
+    };
+    fetchEventInfor();
+  }, [eventId]);
 
   const payOsApi = {
-
-    createPaymentAttachment: async (ticketPurchaseIds: number[], accessToken: string, attachmentData: any) => {
+    createPaymentAttachment: async (
+      ticketPurchaseIds: number[],
+      accessToken: string,
+      attachmentData: any
+    ) => {
       try {
-        console.log("Creating payment attachment with ticketPurchaseIds:", ticketPurchaseIds);
-    
+        console.log(
+          "Creating payment attachment with ticketPurchaseIds:",
+          ticketPurchaseIds
+        );
+
         // Tạo ticketOrderDTOS từ danh sách ticketPurchaseIds
         const ticketOrderDTOS = ticketPurchaseIds.map((id) => ({
           ticketPurchaseId: id,
         }));
-    
+
         // Ghi log attachmentData (nếu cần cho debug)
         console.log("Attachment Data:", {
           paymentMethod: attachmentData.paymentMethod,
@@ -105,40 +133,48 @@ export default function PaymentPage() {
           currency: attachmentData.currency,
           description: attachmentData.description,
         });
-    
-        const response = await fetch("https://tixclick.site/api/payment/pay-os-create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            ticketOrderDTOS: ticketOrderDTOS,
-            expiredTime: 900,
-            voucherCode: "",
-          }),
-        });
-    
+
+        const response = await fetch(
+          "https://tixclick.site/api/payment/pay-os-create",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              ticketOrderDTOS: ticketOrderDTOS,
+              expiredTime: 900,
+              voucherCode: "",
+            }),
+          }
+        );
+
         console.log("Payment attachment response:", response);
-    
+
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`Không thể tạo tệp đính kèm thanh toán: ${response.status} ${errorText}`);
+          throw new Error(
+            `Không thể tạo tệp đính kèm thanh toán: ${response.status} ${errorText}`
+          );
         }
-    
+
         return await response.json();
       } catch (error) {
         console.error("Error creating payment attachment:", error);
         throw error;
       }
     },
-  }
+  };
 
   const websocketService = {
     client: null as Client | null,
 
-    connect: (ticketPurchaseId: string, onMessageReceived: (message: any) => void): Client | null => {
-      if (typeof window === "undefined") return null
+    connect: (
+      ticketPurchaseId: string,
+      onMessageReceived: (message: any) => void
+    ): Client | null => {
+      if (typeof window === "undefined") return null;
 
       const client = new Client({
         brokerURL: `wss://tixclick.site/ws?token=${context?.accessToken}`,
@@ -146,71 +182,77 @@ export default function PaymentPage() {
           // Authorization: `Bearer ${context.accessToken}`,
         },
         debug: (str) => {
-          console.log("STOMP: " + str)
+          console.log("STOMP: " + str);
         },
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
 
         onConnect: () => {
-          console.log("✅ WebSocket connected")
+          console.log("✅ WebSocket connected");
 
           // Đăng ký nhận thông báo hết hạn
-          client.subscribe(`/all/${ticketPurchaseId}/ticket-purchase-expired`, (message) => {
-            try {
-              const body = JSON.parse(message.body)
-              console.log("📥 Received expired message:", body)
-              onMessageReceived(body)
-            } catch (e) {
-              console.log("⚠️ Raw message:", message.body)
+          client.subscribe(
+            `/all/${ticketPurchaseId}/ticket-purchase-expired`,
+            (message) => {
+              try {
+                const body = JSON.parse(message.body);
+                console.log("📥 Received expired message:", body);
+                onMessageReceived(body);
+              } catch (e) {
+                console.log("⚠️ Raw message:", message.body);
+              }
             }
-          })
+          );
 
           // Đăng ký nhận cập nhật thời gian còn lại
-          client.subscribe(`/user/${ticketPurchaseId}/ticket-purchase-time-update`, (message) => {
-            try {
-              const body = JSON.parse(message.body)
-              console.log("📥 Received time update:", body)
-              onMessageReceived({
-                type: "TICKET_PURCHASE_EXPIRATION_UPDATE",
-                timeRemainingSeconds: body.timeRemainingSeconds,
-              })
-            } catch (e) {
-              console.log("⚠️ Raw time update message:", message.body)
+          client.subscribe(
+            `/user/${ticketPurchaseId}/ticket-purchase-time-update`,
+            (message) => {
+              try {
+                const body = JSON.parse(message.body);
+                console.log("📥 Received time update:", body);
+                onMessageReceived({
+                  type: "TICKET_PURCHASE_EXPIRATION_UPDATE",
+                  timeRemainingSeconds: body.timeRemainingSeconds,
+                });
+              } catch (e) {
+                console.log("⚠️ Raw time update message:", message.body);
+              }
             }
-          })
+          );
 
           // Gửi yêu cầu để nhận thời gian còn lại ban đầu
           client.publish({
             destination: `/all/ticket-purchase/${ticketPurchaseId}/request-time`,
             body: JSON.stringify({ requestId: Date.now() }),
-          })
+          });
         },
         onStompError: (frame) => {
-          console.error("❌ STOMP error:", frame)
+          console.error("❌ STOMP error:", frame);
         },
         onWebSocketClose: (error) => {
-          console.log("🔌 WebSocket connection closed", error)
+          console.log("🔌 WebSocket connection closed", error);
         },
         onWebSocketError: (error) => {
-          console.error("❌ WebSocket error:", error)
+          console.error("❌ WebSocket error:", error);
           // Thử kết nối lại sau 3 giây
           setTimeout(() => {
-            if (client) client.activate()
-          }, 3000)
+            if (client) client.activate();
+          }, 3000);
         },
-      })
+      });
 
-      websocketService.client = client
-      client.activate()
-      return client
+      websocketService.client = client;
+      client.activate();
+      return client;
     },
 
     disconnect: () => {
       if (websocketService.client && websocketService.client.connected) {
-        websocketService.client.deactivate()
-        websocketService.client = null
-        console.log("🔌 WebSocket connection closed")
+        websocketService.client.deactivate();
+        websocketService.client = null;
+        console.log("🔌 WebSocket connection closed");
       }
     },
 
@@ -220,79 +262,88 @@ export default function PaymentPage() {
         websocketService.client.publish({
           destination: `/all/ticket-purchase/${ticketPurchaseId}/request-time`,
           body: JSON.stringify({ requestId: Date.now() }),
-        })
-        console.log("Sent manual time update request")
-        return true
+        });
+        console.log("Sent manual time update request");
+        return true;
       }
-      return false
+      return false;
     },
-  }
+  };
 
   useEffect(() => {
     const setupWebSocketAndTimer = () => {
       // Clear any existing interval
       if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current)
+        clearInterval(countdownIntervalRef.current);
       }
 
       // Get the ticketPurchaseId from localStorage or state
-      const storedSeatsData = localStorage.getItem("selectedSeats")
-      let ticketPurchaseId = null
+      const storedSeatsData = localStorage.getItem("selectedSeats");
+      let ticketPurchaseId = null;
 
       if (storedSeatsData) {
-        const parsedData = JSON.parse(storedSeatsData)
+        const parsedData = JSON.parse(storedSeatsData);
         if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
-          ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+          ticketPurchaseId =
+            parsedData.apiResponses.purchase.result[0].ticketPurchaseId;
         }
       }
 
       // If we have a ticketPurchaseId, connect to WebSocket
       if (ticketPurchaseId) {
-        console.log("Setting up WebSocket connection for ticketPurchaseId:", ticketPurchaseId)
+        console.log(
+          "Setting up WebSocket connection for ticketPurchaseId:",
+          ticketPurchaseId
+        );
 
         // Handle WebSocket messages
         const handleWebSocketMessage = (message: any) => {
-          console.log("WebSocket message received:", message)
+          console.log("WebSocket message received:", message);
 
           // Handle different message types
           if (message.type === "TICKET_PURCHASE_EXPIRATION_UPDATE") {
             // Update the countdown timer with server-provided values
-            const serverTimeRemaining = message.timeRemainingSeconds || 0
-            setIsTimeoutBoundFromServer(true)
-            setMinutes(Math.floor(serverTimeRemaining / 60))
-            setSeconds(serverTimeRemaining % 60)
+            const serverTimeRemaining = message.timeRemainingSeconds || 0;
+            setIsTimeoutBoundFromServer(true);
+            setMinutes(Math.floor(serverTimeRemaining / 60));
+            setSeconds(serverTimeRemaining % 60);
 
             // Only show notification when time is running low (e.g., under 2 minutes)
             if (serverTimeRemaining < 120) {
               toast.info(
-                `Thời gian thanh toán còn lại: ${Math.floor(serverTimeRemaining / 60)}:${(serverTimeRemaining % 60).toString().padStart(2, "0")}`,
-                { id: "time-remaining" },
-              )
+                `Thời gian thanh toán còn lại: ${Math.floor(
+                  serverTimeRemaining / 60
+                )}:${(serverTimeRemaining % 60).toString().padStart(2, "0")}`,
+                { id: "time-remaining" }
+              );
             }
           } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
             // Handle expiration event
-            toast.error("Thời gian giữ vé đã hết", { id: "ticket-expired" })
+            toast.error("Thời gian giữ vé đã hết", { id: "ticket-expired" });
             setTimeout(() => {
-              navigate("/")
-            }, 2000)
+              navigate("/");
+            }, 2000);
           }
-        }
+        };
 
         // Connect to WebSocket
-        stompClientRef.current = websocketService.connect(ticketPurchaseId, handleWebSocketMessage)
+        stompClientRef.current = websocketService.connect(
+          ticketPurchaseId,
+          handleWebSocketMessage
+        );
 
         // Set up a reconnection mechanism
         const checkConnectionInterval = setInterval(() => {
           if (stompClientRef.current && !stompClientRef.current.connected) {
-            console.log("WebSocket disconnected, attempting to reconnect...")
-            stompClientRef.current.activate()
+            console.log("WebSocket disconnected, attempting to reconnect...");
+            stompClientRef.current.activate();
           }
-        }, 10000) // Check every 10 seconds
+        }, 10000); // Check every 10 seconds
 
         // Return cleanup function for this interval
         return () => {
-          clearInterval(checkConnectionInterval)
-        }
+          clearInterval(checkConnectionInterval);
+        };
       }
 
       // Set up the local countdown timer (as backup or until we get server updates)
@@ -301,118 +352,131 @@ export default function PaymentPage() {
         if (!isTimeoutBoundFromServer) {
           setSeconds((prevSeconds) => {
             if (prevSeconds > 0) {
-              return prevSeconds - 1
+              return prevSeconds - 1;
             } else if (minutes > 0) {
-              setMinutes((prevMinutes) => prevMinutes - 1)
-              return 59
+              setMinutes((prevMinutes) => prevMinutes - 1);
+              return 59;
             } else {
               // Time's up
               if (countdownIntervalRef.current) {
-                clearInterval(countdownIntervalRef.current)
+                clearInterval(countdownIntervalRef.current);
               }
-              toast.error("Hết thời gian thanh toán", { id: "time-up" })
+              toast.error("Hết thời gian thanh toán", { id: "time-up" });
               setTimeout(() => {
-                navigate("/")
-              }, 2000)
-              return 0
+                navigate("/");
+              }, 2000);
+              return 0;
             }
-          })
+          });
         }
-      }, 1000)
+      }, 1000);
 
       // Periodically request time updates from server (every 30 seconds)
       const periodicalUpdateTimerRef = setInterval(() => {
-        if (ticketPurchaseId && stompClientRef.current && stompClientRef.current.connected) {
-          websocketService.requestTimeUpdate(ticketPurchaseId)
-          console.log("Sent periodic time update request")
+        if (
+          ticketPurchaseId &&
+          stompClientRef.current &&
+          stompClientRef.current.connected
+        ) {
+          websocketService.requestTimeUpdate(ticketPurchaseId);
+          console.log("Sent periodic time update request");
         }
-      }, 30000) // Every 30 seconds
+      }, 30000); // Every 30 seconds
 
       // Return cleanup function
       return () => {
         if (countdownIntervalRef.current) {
-          clearInterval(countdownIntervalRef.current)
+          clearInterval(countdownIntervalRef.current);
         }
         if (periodicalUpdateTimerRef) {
-          clearInterval(periodicalUpdateTimerRef)
+          clearInterval(periodicalUpdateTimerRef);
         }
-      }
-    }
+      };
+    };
 
-    const cleanup = setupWebSocketAndTimer()
+    const cleanup = setupWebSocketAndTimer();
 
     // Cleanup function
     return () => {
-      if (cleanup) cleanup()
+      if (cleanup) cleanup();
       if (stompClientRef.current) {
-        websocketService.disconnect()
+        websocketService.disconnect();
       }
-    }
-  }, [navigate, minutes, isTimeoutBoundFromServer, context?.accessToken])
+    };
+  }, [navigate, minutes, isTimeoutBoundFromServer, context?.accessToken]);
 
   useEffect(() => {
     // Load selected seats data
-    const storedSeatsData = localStorage.getItem("selectedSeats")
+    const storedSeatsData = localStorage.getItem("selectedSeats");
     if (storedSeatsData) {
-      const parsedData = JSON.parse(storedSeatsData)
-      setSelectedSeatsData(parsedData)
+      const parsedData = JSON.parse(storedSeatsData);
+      setSelectedSeatsData(parsedData);
 
       if (parsedData.apiResponses) {
-        console.log("Ticket API response:", parsedData.apiResponses.ticket)
-        console.log("Seat API responses:", parsedData.apiResponses.seats)
-        console.log("Purchase API response:", JSON.stringify(parsedData.apiResponses.purchase, null, 2))
-        console.log("Purchase Response:", parsedData.apiResponses.purchase.result)
+        console.log("Ticket API response:", parsedData.apiResponses.ticket);
+        console.log("Seat API responses:", parsedData.apiResponses.seats);
+        console.log(
+          "Purchase API response:",
+          JSON.stringify(parsedData.apiResponses.purchase, null, 2)
+        );
+        console.log(
+          "Purchase Response:",
+          parsedData.apiResponses.purchase.result
+        );
       }
 
       // Log the ticketPurchaseId
       if (parsedData.ticketPurchaseId) {
-        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId)
+        console.log("Ticket Purchase ID:", parsedData.ticketPurchaseId);
       }
     } else {
       // If no data is found, redirect back to the booking page
-      toast.error("Không tìm thấy thông tin đặt vé")
+      toast.error("Không tìm thấy thông tin đặt vé");
       setTimeout(() => {
-        navigate("/")
-      }, 1500)
+        navigate("/");
+      }, 1500);
     }
 
     // Load purchase response
-    const storedPurchaseResponse = localStorage.getItem("purchaseResponse")
+    const storedPurchaseResponse = localStorage.getItem("purchaseResponse");
     if (storedPurchaseResponse) {
       try {
-        const parsedResponse = JSON.parse(storedPurchaseResponse)
-        setPurchaseResponse(parsedResponse)
-        console.log("Loaded purchase response:", parsedResponse)
+        const parsedResponse = JSON.parse(storedPurchaseResponse);
+        setPurchaseResponse(parsedResponse);
+        console.log("Loaded purchase response:", parsedResponse);
       } catch (error) {
-        console.error("Error parsing purchase response:", error)
+        console.error("Error parsing purchase response:", error);
       }
     }
-  }, [navigate])
+  }, [navigate]);
 
   // Add a function to check voucher validity
   const checkVoucher = async () => {
     if (!voucherCode.trim()) {
-      toast.error("Vui lòng nhập mã khuyến mãi")
-      return
+      toast.error("Vui lòng nhập mã khuyến mãi");
+      return;
     }
 
     if (!eventId) {
-      toast.error("Không tìm thấy thông tin sự kiện")
-      return
+      toast.error("Không tìm thấy thông tin sự kiện");
+      return;
     }
 
-    setIsCheckingVoucher(true)
+    setIsCheckingVoucher(true);
     try {
-      const response = await fetch(`https://tixclick.site/api/voucher/check/${voucherCode}/${eventId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${context?.accessToken}`,
-        },
-      })
+      const response = await fetch(
+        `https://tixclick.site/api/voucher/check/${voucherCode}/${eventId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${context?.accessToken}`,
+          },
+        }
+      );
 
-      const data = await response.json()
-      console.log("Voucher check response:", data)
+      const data = await response.json();
+      console.log("Voucher check response:", data);
 
       if (response.ok && data.success) {
         setVoucherDiscount({
@@ -420,180 +484,192 @@ export default function PaymentPage() {
           discountAmount: data.result.discountAmount || 0,
           discountPercentage: data.result.discountPercentage || 0,
           message: "Mã khuyến mãi hợp lệ",
-        })
-        toast.success("Áp dụng mã khuyến mãi thành công!")
+        });
+        toast.success("Áp dụng mã khuyến mãi thành công!");
       } else {
         setVoucherDiscount({
           isValid: false,
           discountAmount: 0,
           discountPercentage: 0,
           message: data.message || "Mã khuyến mãi không hợp lệ",
-        })
-        toast.error(data.message || "Mã khuyến mãi không hợp lệ")
+        });
+        toast.error(data.message || "Mã khuyến mãi không hợp lệ");
       }
     } catch (error) {
-      console.error("Error checking voucher:", error)
-      toast.error("Đã xảy ra lỗi khi kiểm tra mã khuyến mãi")
+      console.error("Error checking voucher:", error);
+      toast.error("Đã xảy ra lỗi khi kiểm tra mã khuyến mãi");
       setVoucherDiscount({
         isValid: false,
         discountAmount: 0,
         discountPercentage: 0,
         message: "Đã xảy ra lỗi khi kiểm tra mã khuyến mãi",
-      })
+      });
     } finally {
-      setIsCheckingVoucher(false)
+      setIsCheckingVoucher(false);
     }
-  }
+  };
 
   const handleCancelPayment = async (isBackButton = false) => {
     // Get the ticketPurchaseId from localStorage or state
-    const storedSeatsData = localStorage.getItem("selectedSeats")
-    let ticketPurchaseId = null
+    const storedSeatsData = localStorage.getItem("selectedSeats");
+    const ticketPurchaseId: number[] = [];
 
     if (storedSeatsData) {
-      const parsedData = JSON.parse(storedSeatsData)
+      const parsedData = JSON.parse(storedSeatsData);
       if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
-        ticketPurchaseId = parsedData.apiResponses.purchase.result[0].ticketPurchaseId
+        parsedData.apiResponses.purchase.result.forEach((item: any) => {
+          ticketPurchaseId.push(item.ticketPurchaseId);
+        });
       }
     }
 
-    if (!ticketPurchaseId) {
-      console.error("No ticketPurchaseId found")
+    if (ticketPurchaseId.length == 0) {
+      console.error("No ticketPurchaseId found");
       if (isBackButton) {
-        navigate(-1)
+        navigate(-1);
       } else {
-        navigate("/")
+        navigate("/");
       }
-      return
+      return;
     }
 
     try {
       // Show loading toast
-      toast.loading("Đang hủy giao dịch...", { id: "cancel-payment" })
+      toast.loading("Đang hủy giao dịch...", { id: "cancel-payment" });
 
       // Call the cancel API
-      const response = await fetch("https://tixclick.site/api/ticket-purchase/cancel", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${context?.accessToken}`,
-        },
-        body: JSON.stringify([ticketPurchaseId]),
-      })
+      const response = await fetch(
+        "https://tixclick.site/api/ticket-purchase/cancel",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${context?.accessToken}`,
+          },
+          body: JSON.stringify(ticketPurchaseId),
+        }
+      );
 
-      const data = await response.json()
-      console.log("Cancel payment response:", data)
+      const data = await response.json();
+      console.log("Cancel payment response:", data);
 
       if (response.ok && data.success) {
-        toast.success("Đã hủy giao dịch thành công", { id: "cancel-payment" })
+        toast.success("Đã hủy giao dịch thành công", { id: "cancel-payment" });
 
         // Clear the selected seats data from localStorage
-        localStorage.removeItem("selectedSeats")
-        localStorage.removeItem("purchaseResponse")
-        localStorage.removeItem("paymentQueueData")
+        localStorage.removeItem("selectedSeats");
+        localStorage.removeItem("purchaseResponse");
+        localStorage.removeItem("paymentQueueData");
 
         // Navigate based on which button was clicked
         setTimeout(() => {
           if (isBackButton) {
-            navigate(-1)
+            navigate(-1);
           } else {
-            navigate("/")
+            navigate("/");
           }
-        }, 1000)
+        }, 1000);
       } else {
-        toast.error(data.message || "Không thể hủy giao dịch", { id: "cancel-payment" })
+        toast.error(data.message || "Không thể hủy giao dịch", {
+          id: "cancel-payment",
+        });
         // Still navigate if the user wants to leave
         setTimeout(() => {
           if (isBackButton) {
-            navigate(-1)
+            navigate(-1);
           } else {
-            navigate("/")
+            navigate("/");
           }
-        }, 1500)
+        }, 1500);
       }
     } catch (error) {
-      console.error("Error cancelling payment:", error)
-      toast.error("Đã xảy ra lỗi khi hủy giao dịch", { id: "cancel-payment" })
+      console.error("Error cancelling payment:", error);
+      toast.error("Đã xảy ra lỗi khi hủy giao dịch", { id: "cancel-payment" });
 
       // Still navigate if the user wants to leave
       setTimeout(() => {
         if (isBackButton) {
-          navigate(-1)
+          navigate(-1);
         } else {
-          navigate("/")
+          navigate("/");
         }
-      }, 1500)
+      }, 1500);
     }
-  }
+  };
 
   // Calculate discounted amount
   const calculateDiscountedAmount = () => {
     // Kiểm tra đầu vào
     if (!selectedSeatsData) {
-      console.warn("selectedSeatsData is undefined or null")
-      return 0
+      console.warn("selectedSeatsData is undefined or null");
+      return 0;
     }
 
     // Lấy tổng số tiền ban đầu (đảm bảo là số)
-    const totalAmount = Number(selectedSeatsData.totalAmount) || 0
+    const totalAmount = Number(selectedSeatsData.totalAmount) || 0;
 
     // Nếu không có voucher hợp lệ, trả về tổng ban đầu
     if (!voucherDiscount?.isValid) {
-      return totalAmount
+      return totalAmount;
     }
 
     // Log để debug
-    console.log("Original total:", totalAmount)
-    console.log("Voucher details:", voucherDiscount)
+    console.log("Original total:", totalAmount);
+    console.log("Voucher details:", voucherDiscount);
 
-    let discountedAmount = totalAmount
+    let discountedAmount = totalAmount;
 
     // Áp dụng giảm giá theo phần trăm
     if (voucherDiscount.discountPercentage > 0) {
-      const discountValue = (totalAmount * Number(voucherDiscount.discountPercentage)) / 100
-      console.log("Percentage discount:", discountValue)
-      discountedAmount = totalAmount - discountValue
+      const discountValue =
+        (totalAmount * Number(voucherDiscount.discountPercentage)) / 100;
+      console.log("Percentage discount:", discountValue);
+      discountedAmount = totalAmount - discountValue;
     }
     // Áp dụng giảm giá theo số tiền cố định
     else if (voucherDiscount.discountAmount > 0) {
-      const discountValue = Number(voucherDiscount.discountAmount)
-      console.log("Fixed amount discount:", discountValue)
-      discountedAmount = totalAmount - discountValue
+      const discountValue = Number(voucherDiscount.discountAmount);
+      console.log("Fixed amount discount:", discountValue);
+      discountedAmount = totalAmount - discountValue;
     }
 
     // Làm tròn số đến 2 chữ số thập phân và đảm bảo không âm
-    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100)
-    console.log("Final discounted amount:", finalAmount)
+    const finalAmount = Math.max(0, Math.round(discountedAmount * 100) / 100);
+    console.log("Final discounted amount:", finalAmount);
 
-    return finalAmount
-  }
+    return finalAmount;
+  };
 
   // Update the handleConfirmPayment function to include voucher code
   const handleConfirmPayment = async () => {
     if (!acceptTerms) return;
-  
+
     setIsProcessing(true);
     setApiError(null);
-  
+
     try {
       // Get the purchase response from state or localStorage
       const response =
         purchaseResponse ||
         selectedSeatsData?.apiResponses?.purchase ||
         JSON.parse(localStorage.getItem("purchaseResponse") || "null");
-  
+
       if (!response || !response.result || !response.result.length) {
-        throw new Error("Không tìm thấy thông tin đặt vé hoặc danh sách ticketPurchaseId");
+        throw new Error(
+          "Không tìm thấy thông tin đặt vé hoặc danh sách ticketPurchaseId"
+        );
       }
-  
+
       console.log("Using purchase response:", response);
-  
+
       // Get the ticketPurchaseIds from the response
-      const ticketPurchaseIds = response.result.map((item: any) => item.ticketPurchaseId);
+      const ticketPurchaseIds = response.result.map(
+        (item: any) => item.ticketPurchaseId
+      );
       console.log("Using ticket purchase IDs:", ticketPurchaseIds); // Output: [401, 402]
-  
+
       let checkoutUrl = null;
-  
+
       // Create payment attachment
       try {
         const attachmentData = {
@@ -602,14 +678,17 @@ export default function PaymentPage() {
           currency: "VND",
           description: "Payment for tickets",
         };
-  
+
         const paymentResponse = await payOsApi.createPaymentAttachment(
           ticketPurchaseIds,
           context?.accessToken || "",
           attachmentData
         );
-        console.log("Payment attachment created successfully:", paymentResponse);
-  
+        console.log(
+          "Payment attachment created successfully:",
+          paymentResponse
+        );
+
         // Giả sử phản hồi có cấu trúc: { code: 200, result: { error: "ok", data: { checkoutUrl: "..." } } }
         if (
           paymentResponse.code === 200 &&
@@ -624,26 +703,31 @@ export default function PaymentPage() {
         console.error("Error creating payment attachment:", attachmentError);
         throw new Error("Không thể tạo liên kết thanh toán");
       }
-  
+
       // Store all the necessary data for the queue page (nếu cần sau khi thanh toán hoàn tất)
       const queueData = {
         purchaseResponse: response,
         eventInfo: {
           id: eventId || selectedSeatsData?.eventInfo?.id,
-          activityId: eventActivityId || selectedSeatsData?.eventInfo?.activityId,
+          activityId:
+            eventActivityId || selectedSeatsData?.eventInfo?.activityId,
           name: eventInfor?.eventName || selectedSeatsData?.eventInfo?.name,
-          location: eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
+          location:
+            eventInfor?.locationName || selectedSeatsData?.eventInfo?.location,
           date:
             eventInfor?.eventActivityDTOList && eventActivityId
               ? `${formatTimeFe(
-                  eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
-                    ?.startTimeEvent,
+                  eventInfor.eventActivityDTOList.find(
+                    (x) => x.eventActivityId == Number(eventActivityId)
+                  )?.startTimeEvent
                 )} - ${formatTimeFe(
-                  eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))?.endTimeEvent,
+                  eventInfor.eventActivityDTOList.find(
+                    (x) => x.eventActivityId == Number(eventActivityId)
+                  )?.endTimeEvent
                 )}, ${formatDateVietnamese(
                   eventInfor.eventActivityDTOList
                     .find((x) => x.eventActivityId == Number(eventActivityId))
-                    ?.dateEvent.toString(),
+                    ?.dateEvent.toString()
                 )}`
               : selectedSeatsData?.eventInfo?.date,
         },
@@ -666,17 +750,17 @@ export default function PaymentPage() {
           purchase: response,
         },
       };
-  
+
       // Save to localStorage for use after payment (if needed)
       localStorage.setItem("paymentQueueData", JSON.stringify(queueData));
       console.log("paymentQueueData:", queueData);
-  
+
       // Close the confirmation dialog
       setShowConfirmation(false);
-  
+
       // Show success message
       toast.success("Đang chuyển hướng đến trang thanh toán!");
-  
+
       // Redirect to checkoutUrl
       if (checkoutUrl) {
         setTimeout(() => {
@@ -687,7 +771,11 @@ export default function PaymentPage() {
       }
     } catch (error) {
       console.error("Error processing payment:", error);
-      setApiError(error instanceof Error ? error.message : "Đã xảy ra lỗi khi xử lý thanh toán");
+      setApiError(
+        error instanceof Error
+          ? error.message
+          : "Đã xảy ra lỗi khi xử lý thanh toán"
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -695,13 +783,17 @@ export default function PaymentPage() {
 
   const getFormattedEventDateTime = () => {
     if (eventInfor?.eventActivityDTOList && eventActivityId) {
-      const activity = eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
+      const activity = eventInfor.eventActivityDTOList.find(
+        (x) => x.eventActivityId == Number(eventActivityId)
+      );
       if (activity) {
-        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent?.toString())}`
+        return `${formatTimeFe(
+          activity.startTimeEvent
+        )}, ${formatDateVietnamese(activity.dateEvent?.toString())}`;
       }
     }
-    return selectedSeatsData?.eventInfo?.date || "19:30, 12 tháng 4, 2025"
-  }
+    return selectedSeatsData?.eventInfo?.date || "19:30, 12 tháng 4, 2025";
+  };
 
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200">
@@ -709,16 +801,22 @@ export default function PaymentPage() {
       <header className="bg-[#1A1A1A] border-b border-[#2A2A2A] py-3 px-4 flex justify-between items-center sticky top-0 z-10">
         <Link to="/">
           <div className="flex items-center ml-4">
-            <img src={Logo || "/placeholder.svg"} alt="Event Ticket" className="h-12 w-auto mr-4" />
+            <img
+              src={Logo || "/placeholder.svg"}
+              alt="Event Ticket"
+              className="h-12 w-auto mr-4"
+            />
             <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
           </div>
         </Link>
         <Link to="/">
-          <Button variant="ghost" className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
-          onClick={(e) => {
-            e.preventDefault()
-            handleCancelPayment()
-          }}
+          <Button
+            variant="ghost"
+            className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
+            onClick={(e) => {
+              e.preventDefault();
+              handleCancelPayment();
+            }}
           >
             <X className="h-4 w-4 mr-2" />
             Hủy giao dịch
@@ -742,7 +840,9 @@ export default function PaymentPage() {
                 transition={{ duration: 0.5 }}
                 className="text-4xl md:text-5xl font-bold mb-4 text-center"
               >
-                {eventInfor?.eventName || selectedSeatsData?.eventInfo?.name || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
+                {eventInfor?.eventName ||
+                  selectedSeatsData?.eventInfo?.name ||
+                  "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
               </motion.h1>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -752,7 +852,9 @@ export default function PaymentPage() {
               >
                 <MapPin className="h-5 w-5 text-[#FF8A00]" />
                 <span>
-                  {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
+                  {eventInfor?.locationName ||
+                    selectedSeatsData?.eventInfo?.location ||
+                    "Nhà Hát Kịch IDECAF"}
                 </span>
               </motion.div>
 
@@ -763,7 +865,9 @@ export default function PaymentPage() {
                 className="flex items-center gap-3 bg-[#2A2A2A] px-6 rounded-full"
               >
                 <Calendar className="h-5 w-5 text-[#FF8A00]" />
-                <span className="font-medium">{getFormattedEventDateTime()}</span>
+                <span className="font-medium">
+                  {getFormattedEventDateTime()}
+                </span>
               </motion.div>
             </>
           )}
@@ -779,7 +883,10 @@ export default function PaymentPage() {
             </h2>
 
             <div className="mb-4">
-              <label htmlFor="promo-code" className="block text-sm font-medium mb-2 text-gray-300">
+              <label
+                htmlFor="promo-code"
+                className="block text-sm font-medium mb-2 text-gray-300"
+              >
                 Mã khuyến mãi
               </label>
               <div className="flex gap-2">
@@ -813,7 +920,11 @@ export default function PaymentPage() {
               </div>
               {voucherDiscount && (
                 <div
-                  className={`mt-3 p-2 rounded-md text-sm ${voucherDiscount.isValid ? "bg-green-900/20 text-green-400 border border-green-800" : "bg-red-900/20 text-red-400 border border-red-800"}`}
+                  className={`mt-3 p-2 rounded-md text-sm ${
+                    voucherDiscount.isValid
+                      ? "bg-green-900/20 text-green-400 border border-green-800"
+                      : "bg-red-900/20 text-red-400 border border-red-800"
+                  }`}
                 >
                   <div className="flex items-start">
                     {voucherDiscount.isValid ? (
@@ -828,16 +939,18 @@ export default function PaymentPage() {
                           {voucherDiscount.discountPercentage > 0
                             ? `Giảm ${voucherDiscount.discountPercentage}% tổng giá trị vé`
                             : `Giảm ${new Intl.NumberFormat("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }).format(voucherDiscount.discountAmount)}`}
+                                style: "currency",
+                                currency: "VND",
+                              }).format(voucherDiscount.discountAmount)}`}
                         </p>
                       )}
                     </div>
                   </div>
                 </div>
               )}
-              <p className="text-xs text-gray-400 mt-2">Lưu ý: Chỉ áp dụng một mã khuyến mãi cho mỗi đơn hàng</p>
+              <p className="text-xs text-gray-400 mt-2">
+                Lưu ý: Chỉ áp dụng một mã khuyến mãi cho mỗi đơn hàng
+              </p>
             </div>
           </section>
 
@@ -853,20 +966,29 @@ export default function PaymentPage() {
                   <div className="h-2 w-2 rounded-full bg-white"></div>
                 </div>
                 <Label className="flex items-center cursor-pointer text-white">
-                  <img src={payOs || "/placeholder.svg"} alt="Payos" width={60} height={30} className="mr-2" />( payOS -
-                  Thanh toán an toàn với thẻ nội địa, Visa, Master, JCB )
+                  <img
+                    src={payOs || "/placeholder.svg"}
+                    alt="Payos"
+                    width={60}
+                    height={30}
+                    className="mr-2"
+                  />
+                  ( payOS - Thanh toán an toàn với thẻ nội địa, Visa, Master,
+                  JCB )
                 </Label>
               </div>
 
               <div className="flex items-center space-x-3 border border-[#3A3A3A] rounded-md p-4 bg-[#2A2A2A] transition-all duration-300 hover:border-[#FF8A00] cursor-pointer opacity-60">
                 <div className="h-5 w-5 rounded-full border border-gray-500 flex items-center justify-center"></div>
-                <Label className="flex items-center cursor-pointer text-white">Ví điện tử (MoMo, ZaloPay, VNPay)</Label>
+                <Label className="flex items-center cursor-pointer text-white">
+                  Ví điện tử (MoMo, ZaloPay, VNPay)
+                </Label>
               </div>
             </div>
 
             <p className="text-xs text-[#FF8A00] mt-6">
-              (*) Bằng việc click/chạm vào THANH TOÁN bên phải, bạn đã xác nhận hiểu rõ các Điều khoản và Điều kiện của
-              chúng tôi.
+              (*) Bằng việc click/chạm vào THANH TOÁN bên phải, bạn đã xác nhận
+              hiểu rõ các Điều khoản và Điều kiện của chúng tôi.
             </p>
           </section>
         </div>
@@ -879,7 +1001,8 @@ export default function PaymentPage() {
                 <Clock className="h-4 w-4 mr-1 text-[#FF8A00]" />
                 <span>Còn lại: </span>
                 <span className="text-[#FF8A00] font-medium ml-1">
-                  {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
+                  {String(minutes).padStart(2, "0")}:
+                  {String(seconds).padStart(2, "0")}
                 </span>
               </div>
             </div>
@@ -908,7 +1031,9 @@ export default function PaymentPage() {
                   <div className="flex items-center gap-2 mt-1 text-gray-400 text-sm">
                     <MapPin className="h-4 w-4 text-[#FF8A00]" />
                     <span>
-                      {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
+                      {eventInfor?.locationName ||
+                        selectedSeatsData?.eventInfo?.location ||
+                        "Nhà Hát Kịch IDECAF"}
                     </span>
                   </div>
                 </div>
@@ -919,13 +1044,17 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.id || index} className="flex justify-between text-sm">
+                    <div
+                      key={seat.id || index}
+                      className="flex justify-between text-sm"
+                    >
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center mr-2 text-xs">
                           1x
                         </div>
                         <div>
-                          {seat.sectionName} - {seat.seatLabel} ({seat.typeName})
+                          {seat.sectionName} - {seat.seatLabel} ({seat.typeName}
+                          )
                         </div>
                       </div>
                       <div className="font-medium">{seat.formattedPrice}</div>
@@ -940,7 +1069,9 @@ export default function PaymentPage() {
                         </div>
                         <div>Vé Tc jbcjcbjkcbjkbcjkjnkdjcchường</div>
                       </div>
-                      <div className="font-medium">600.000 jbvijbvjkvjvkwvn ựvbw vjvjvkrw vjkrwjk</div>
+                      <div className="font-medium">
+                        600.000 jbvijbvjkvjvkwvn ựvbw vjvjvkrw vjkrwjk
+                      </div>
                     </div>
 
                     <div className="flex justify-between text-sm">
@@ -963,9 +1094,9 @@ export default function PaymentPage() {
                   <div>
                     {selectedSeatsData
                       ? new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(selectedSeatsData.totalAmount)
+                          style: "currency",
+                          currency: "VND",
+                        }).format(selectedSeatsData.totalAmount)
                       : "1.100.000 đ"}
                   </div>
                 </div>
@@ -981,9 +1112,9 @@ export default function PaymentPage() {
                       {voucherDiscount.discountPercentage > 0
                         ? `-${voucherDiscount.discountPercentage}%`
                         : `-${new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(voucherDiscount.discountAmount)}`}
+                            style: "currency",
+                            currency: "VND",
+                          }).format(voucherDiscount.discountAmount)}`}
                     </div>
                   </div>
                 )}
@@ -994,9 +1125,9 @@ export default function PaymentPage() {
                   <div className="text-[#FF8A00] text-lg">
                     {selectedSeatsData
                       ? new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(calculateDiscountedAmount())
+                          style: "currency",
+                          currency: "VND",
+                        }).format(calculateDiscountedAmount())
                       : "1.100.000 đ"}
                   </div>
                 </div>
@@ -1007,8 +1138,8 @@ export default function PaymentPage() {
                   variant="outline"
                   className="flex-1 border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A] hover:text-white transition-colors duration-300"
                   onClick={(e) => {
-                    e.preventDefault()
-                    handleCancelPayment(true)
+                    e.preventDefault();
+                    handleCancelPayment(true);
                   }}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -1038,10 +1169,14 @@ export default function PaymentPage() {
               <span className="font-medium text-gray-400">Sự kiện</span>
               <div>
                 <div className="font-medium text-white">
-                  {eventInfor?.eventName || selectedSeatsData?.eventInfo?.name || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
+                  {eventInfor?.eventName ||
+                    selectedSeatsData?.eventInfo?.name ||
+                    "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!"}
                 </div>
                 <div className="text-sm mt-1 text-gray-400">
-                  {eventInfor?.locationName || selectedSeatsData?.eventInfo?.location || "Nhà Hát Kịch IDECAF"}
+                  {eventInfor?.locationName ||
+                    selectedSeatsData?.eventInfo?.location ||
+                    "Nhà Hát Kịch IDECAF"}
                 </div>
               </div>
             </div>
@@ -1049,7 +1184,9 @@ export default function PaymentPage() {
             <div className="grid grid-cols-[100px_1fr] items-start">
               <span className="font-medium text-gray-400">Thời gian</span>
               <div>
-                <div className="text-[#FF8A00] font-medium">{getFormattedEventDateTime()}</div>
+                <div className="text-[#FF8A00] font-medium">
+                  {getFormattedEventDateTime()}
+                </div>
               </div>
             </div>
 
@@ -1058,7 +1195,10 @@ export default function PaymentPage() {
               <div className="bg-[#2A2A2A] p-3 rounded-md">
                 {selectedSeatsData?.seats ? (
                   selectedSeatsData.seats.map((seat: any, index: number) => (
-                    <div key={seat.id || index} className="flex items-center mb-1">
+                    <div
+                      key={seat.id || index}
+                      className="flex items-center mb-1"
+                    >
                       <div className="w-5 h-5 rounded-full bg-[#3A3A3A] flex items-center justify-center mr-2 text-xs">
                         1x
                       </div>
@@ -1099,9 +1239,9 @@ export default function PaymentPage() {
                       {voucherDiscount.discountPercentage > 0
                         ? `${voucherDiscount.discountPercentage}%`
                         : new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(voucherDiscount.discountAmount)}
+                            style: "currency",
+                            currency: "VND",
+                          }).format(voucherDiscount.discountAmount)}
                     </div>
                   </div>
                 </div>
@@ -1118,9 +1258,9 @@ export default function PaymentPage() {
                       <span>
                         {selectedSeatsData
                           ? new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(selectedSeatsData.totalAmount)
+                              style: "currency",
+                              currency: "VND",
+                            }).format(selectedSeatsData.totalAmount)
                           : "1.100.000 VND"}
                       </span>
                     </div>
@@ -1130,9 +1270,9 @@ export default function PaymentPage() {
                         {voucherDiscount.discountPercentage > 0
                           ? `-${voucherDiscount.discountPercentage}%`
                           : `-${new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(voucherDiscount.discountAmount)}`}
+                              style: "currency",
+                              currency: "VND",
+                            }).format(voucherDiscount.discountAmount)}`}
                       </span>
                     </div>
                   </div>
@@ -1158,7 +1298,9 @@ export default function PaymentPage() {
                 id="terms"
                 className="data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00] bg-white"
                 checked={acceptTerms}
-                onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                onCheckedChange={(checked) =>
+                  setAcceptTerms(checked as boolean)
+                }
               />
               <label
                 htmlFor="terms"
@@ -1197,12 +1339,14 @@ export default function PaymentPage() {
                   <div className="h-10 w-10 rounded-full bg-[#FF8A00]/20"></div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Đang xử lý thanh toán</h3>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Đang xử lý thanh toán
+              </h3>
               <p className="text-gray-300">Vui lòng đợi trong giây lát...</p>
             </motion.div>
           )}
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
