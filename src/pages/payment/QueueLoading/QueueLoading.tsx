@@ -1,6 +1,14 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
-import { AlertCircle, ArrowRight, Calendar, CheckCircle, CreditCard, MapPin, Ticket } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  Calendar,
+  CheckCircle,
+  CreditCard,
+  MapPin,
+  Ticket,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
@@ -9,20 +17,92 @@ import { Separator } from "../../../components/ui/separator";
 import type { EventDetailResponse } from "../../../interface/EventInterface";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
 
+const payOsApi = {
+  checkPaymentStatus: async (queryParams: Record<string, string>) => {
+    try {
+      const queryString = new URLSearchParams(queryParams).toString();
+      const url = `https://tixclick.site/api/payment/payos_call_back${
+        queryString ? `?${queryString}` : ""
+      }`;
+      console.log("Calling callback API:", url);
+
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        throw new Error("Missing access token. Please log in again.");
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Callback API failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+      throw error;
+    }
+  },
+
+  createPaymentAttachment: async (
+    ticketPurchaseId: number,
+    accessToken: string,
+    attachmentData: any
+  ) => {
+    try {
+      const response = await fetch(
+        `https://tixclick.site/api/payment/ticket-purchase/${ticketPurchaseId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(attachmentData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to create payment attachment: ${response.status} ${errorText}`
+        );
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error creating payment attachment:", error);
+      throw error;
+    }
+  },
+};
 
 export default function PaymentQueuePage() {
   const [____, setIsComplete] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [paymentData, ___] = useState<any>(null);
+  const [paymentData, setPaymentData] = useState<any>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<"PENDING" | "PAID" | "CANCELED" | "FAILED">("PENDING");
+  const [paymentStatus, setPaymentStatus] = useState<
+    "PENDING" | "PAID" | "CANCELLED" | "FAILED"
+  >("PENDING");
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
-  const [eventInfor, _] = useState<
-    Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">
-  >();
-
+  const [eventInfor, setEventInfor] =
+    useState<
+      Pick<
+        EventDetailResponse,
+        "eventName" | "eventActivityDTOList" | "locationName"
+      >
+    >();
+  const [event, setEvent] = useState<any>();
+  const [tickets, setTickets] = useState<any[]>();
   const navigate = useNavigate();
   const location = useLocation();
   const [discountInfo, __] = useState<{
@@ -38,133 +118,6 @@ export default function PaymentQueuePage() {
   };
 
   // const rcCode = paymentData?.seats?.id?.split("-").slice(1).join("-") || "";
-
-  const payOsApi = {
-   checkPaymentStatus: async (queryParams: Record<string, string>) => {
-      try {
-        const queryString = new URLSearchParams(queryParams).toString();
-        const url = `https://tixclick.site/api/payment/payos_call_back${queryString ? `?${queryString}` : ""}`;
-        console.log("Calling callback API:", url);
-
-        const accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
-          throw new Error("Missing access token. Please log in again.");
-        }
-
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Callback API failed: ${response.status}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        console.error("Error checking payment status:", error);
-        throw error;
-      }
-    },
-
-    createPaymentAttachment: async (ticketPurchaseId: number, accessToken: string, attachmentData: any) => {
-      try {
-        const response = await fetch(
-          `https://tixclick.site/api/payment/ticket-purchase/${ticketPurchaseId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify(attachmentData),
-          },
-        );
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Failed to create payment attachment: ${response.status} ${errorText}`);
-        }
-
-        return await response.json();
-      } catch (error) {
-        console.error("Error creating payment attachment:", error);
-        throw error;
-      }
-    },
-  };
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const orderCode = queryParams.get("orderCode");
-
-    if (orderCode) {
-      setIsVerifyingPayment(true);
-      const allParams = getQueryParams();
-
-      payOsApi
-        .checkPaymentStatus(allParams)
-        .then(async (response) => {
-          if (response.data?.status === "PAID") {
-            setPaymentStatus("PAID");
-            setIsComplete(true);
-            setShowConfetti(true);
-
-            try {
-              const storedPaymentData = localStorage.getItem("paymentQueueData");
-              if (storedPaymentData) {
-                const parsedData = JSON.parse(storedPaymentData);
-                const ticketPurchaseId = parsedData.purchaseResponse?.result?.[0]?.ticketPurchaseId;
-
-                if (ticketPurchaseId) {
-                  const attachmentData = {
-                    paymentMethod: "PAYOS",
-                    amount: parsedData.discountedAmount || parsedData.totalAmount,
-                    currency: "VND",
-                    orderCode,
-                    status: "PAID",
-                    description: "Payment completed successfully",
-                  };
-
-                  await payOsApi.createPaymentAttachment(
-                    ticketPurchaseId,
-                    localStorage.getItem("accessToken") || "",
-                    attachmentData,
-                  );
-                  console.log("Payment attachment created successfully");
-                }
-              }
-            } catch (attachmentError) {
-              console.error("Error creating payment attachment:", attachmentError);
-              toast.error("Error saving payment information");
-            }
-          } else if (response.data?.status === "CANCELED") {
-            setPaymentStatus("CANCELED");
-            setPaymentError("Payment was canceled");
-          } else {
-            setPaymentStatus("FAILED");
-            setPaymentError("Payment failed");
-          }
-        })
-        .catch((error) => {
-          console.error("Error verifying payment:", error);
-          setPaymentStatus("FAILED");
-          setPaymentError(error.message || "Failed to verify payment. Please try again.");
-          toast.error(error.message || "Failed to verify payment");
-        })
-        .finally(() => {
-          setIsVerifyingPayment(false);
-          setInitialLoading(false);
-        });
-    } else {
-      console.warn("No orderCode found in URL");
-      setPaymentError("No transaction information found");
-      setInitialLoading(false);
-    }
-  }, [location.search]);
 
   const processPayment = async (data: any) => {
     if (isProcessingPayment) return;
@@ -185,11 +138,14 @@ export default function PaymentQueuePage() {
       if (!ticketPurchaseId || isNaN(ticketPurchaseId)) {
         throw new Error("Invalid or missing transaction ID");
       }
-
     } catch (error) {
       console.error("Error processing payment:", error);
-      setPaymentError(error instanceof Error ? error.message : "Error processing payment");
-      toast.error(error instanceof Error ? error.message : "Error processing payment");
+      setPaymentError(
+        error instanceof Error ? error.message : "Error processing payment"
+      );
+      toast.error(
+        error instanceof Error ? error.message : "Error processing payment"
+      );
     } finally {
       setIsProcessingPayment(false);
       setInitialLoading(false);
@@ -214,7 +170,8 @@ export default function PaymentQueuePage() {
       const animationEnd = Date.now() + duration;
       const colors = ["#FF8A00", "#FFFFFF"];
 
-      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+      const randomInRange = (min: number, max: number) =>
+        Math.random() * (max - min) + min;
 
       const confettiInterval = setInterval(() => {
         if (Date.now() > animationEnd) {
@@ -235,6 +192,43 @@ export default function PaymentQueuePage() {
     }
   }, [showConfetti]);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const storedData = localStorage.getItem("paymentQueueData");
+    const jsonData = JSON.parse(storedData ? storedData : "");
+    const orderCode = queryParams.get("orderCode");
+    const status = queryParams.get("status");
+
+    // Check orderCode and callback to create transaction
+    if (orderCode) {
+      setIsVerifyingPayment(true);
+      const allParams = getQueryParams();
+      payOsApi.checkPaymentStatus(allParams);
+    } else {
+      console.warn("No orderCode found in URL");
+      setPaymentError("No transaction information found");
+      setInitialLoading(false);
+    }
+
+    // Check status of order
+    if (status == "PAID") {
+      setPaymentStatus("PAID");
+      setPaymentData(jsonData);
+      setEvent(jsonData.eventInfo);
+      setTickets(jsonData.seats);
+      setIsComplete(true);
+      setShowConfetti(true);
+      setInitialLoading(false);
+      setIsVerifyingPayment(false);
+    } else {
+      setPaymentStatus("CANCELLED");
+      setIsComplete(true);
+      setShowConfetti(true);
+      setInitialLoading(false);
+      setIsVerifyingPayment(false);
+    }
+  }, []);
+
   const handleViewTickets = () => {
     navigate("/ticketManagement");
   };
@@ -249,25 +243,37 @@ export default function PaymentQueuePage() {
   };
 
   const getFormattedEventDateTime = () => {
-    if (eventInfor?.eventActivityDTOList && paymentData?.eventInfo?.activityId) {
+    if (
+      eventInfor?.eventActivityDTOList &&
+      paymentData?.eventInfo?.activityId
+    ) {
       const activity = eventInfor.eventActivityDTOList.find(
-        (x) => x.eventActivityId == Number(paymentData.eventInfo.activityId),
+        (x) => x.eventActivityId == Number(paymentData.eventInfo.activityId)
       );
       if (activity) {
-        return `${formatTimeFe(activity.startTimeEvent)}, ${formatDateVietnamese(activity.dateEvent.toString())}`;
+        return `${formatTimeFe(
+          activity.startTimeEvent
+        )}, ${formatDateVietnamese(activity.dateEvent.toString())}`;
       }
     }
     return paymentData?.eventInfo?.date || "19:30, 12 tháng 4, 2025";
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   if (initialLoading || isProcessingPayment || isVerifyingPayment) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center"
+        >
           <div className="relative h-20 w-20 mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-[#FF8A00] border-t-transparent animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -287,7 +293,11 @@ export default function PaymentQueuePage() {
     );
   }
 
-  if (paymentError || paymentStatus === "CANCELED" || paymentStatus === "FAILED") {
+  if (
+    paymentError ||
+    paymentStatus === "CANCELLED" ||
+    paymentStatus === "FAILED"
+  ) {
     return (
       <div className="min-h-screen bg-[#121212] flex items-center justify-center">
         <div className="bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] p-6 max-w-md w-full">
@@ -296,27 +306,32 @@ export default function PaymentQueuePage() {
               <AlertCircle className="h-8 w-8 text-red-500" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">
-              {paymentStatus === "CANCELED" ? "Payment Canceled" : "Payment Error"}
+              {paymentStatus === "CANCELLED"
+                ? "Payment Cancelled"
+                : "Payment Error"}
             </h2>
-            <p className="text-gray-400">{paymentError || "Payment failed. Please try again."}</p>
+            <p className="text-gray-400">
+              {paymentError || "Trở về trang chủ ngay!"}
+            </p>
           </div>
           <div className="space-y-3">
-            <Button className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white" onClick={handleRetryPayment}>
-              Try Again
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full border-[#2A2A2A] text-gray-300 hover:bg-[#2A2A2A]"
-              onClick={() => navigate("/payment")}
+            {/* <Button
+              className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white"
+              onClick={handleRetryPayment}
             >
-              Back to Payment Page
+              Try Again
+            </Button> */}
+            <Button
+              className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white"
+              onClick={() => navigate("/")}
+            >
+              Trang chủ
             </Button>
           </div>
         </div>
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-[#121212] text-gray-200 flex flex-col">
       <Toaster />
@@ -325,7 +340,10 @@ export default function PaymentQueuePage() {
           <div className="text-[#FF8A00] font-bold text-2xl">TixClick</div>
         </div>
         <div className="text-sm text-gray-400">
-          Transaction ID: <span className="text-white font-medium">{getQueryParams().orderCode || paymentData?.transactionId}</span>
+          Transaction ID:{" "}
+          <span className="text-white font-medium">
+            {getQueryParams().orderCode || paymentData?.transactionId}
+          </span>
         </div>
       </header>
 
@@ -354,7 +372,9 @@ export default function PaymentQueuePage() {
               </div>
 
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-3">{eventInfor?.eventName || paymentData?.eventInfo?.name}</h2>
+                <h2 className="text-2xl font-bold text-white mb-3">
+                  {event.name}
+                </h2>
                 <div className="space-y-3 text-gray-300">
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 text-[#FF8A00] mr-3" />
@@ -362,26 +382,30 @@ export default function PaymentQueuePage() {
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-5 w-5 text-[#FF8A00] mr-3" />
-                    <span>{eventInfor?.locationName || paymentData?.eventInfo?.location}</span>
+                    <span>{event?.location}</span>
                   </div>
                   <div className="flex items-center">
                     <Ticket className="h-5 w-5 text-[#FF8A00] mr-3" />
                     <span>
-                      {paymentData?.seats
-                        ? `${paymentData.seats.length}x Ticket (${paymentData.seats.map((s: any) => s.typeName).join(", ")})`
+                      {tickets
+                        ? `${tickets.length}x Ticket (${tickets
+                            .map((s: any) => s.typeName)
+                            .join(", ")})`
                         : "No ticket information"}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <CreditCard className="h-5 w-5 text-[#FF8A00] mr-3" />
-                    <span>Paid via PayOS</span>
+                    <span>Thanh toán bằng PayOS</span>
                   </div>
                 </div>
                 <div className="mt-4 bg-green-900/20 border border-green-800 rounded-md p-3 text-green-400 flex items-start">
                   <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-medium">Payment Successful!</p>
-                    <p className="text-sm mt-1">Tickets have been sent to your email.</p>
+                    <p className="text-sm mt-1">
+                      Tickets have been sent to your email.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -392,12 +416,15 @@ export default function PaymentQueuePage() {
             <div className="mb-6">
               <h3 className="text-lg font-medium mb-4">Payment Details</h3>
               <div className="bg-[#2A2A2A] rounded-md p-4 space-y-3">
-                {paymentData?.seats?.map((seat: any, index: number) => (
-                  <div key={seat.seatId || index} className="flex justify-between">
+                {tickets?.map((seat: any, index: number) => (
+                  <div
+                    key={seat.seatId || index}
+                    className="flex justify-between"
+                  >
                     <span className="text-gray-400">
                       1x {seat.sectionName} - {seat.seatLabel} ({seat.typeName})
                     </span>
-                    <span>{formatCurrency(seat.price || 0)}</span>
+                    <span>{seat.formattedPrice || 0}</span>
                   </div>
                 ))}
                 {discountInfo && (
@@ -422,13 +449,20 @@ export default function PaymentQueuePage() {
                 <Separator className="border-[#3A3A3A]" />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span className="text-[#FF8A00]">{formatCurrency(paymentData?.discountedAmount || paymentData?.totalAmount)}</span>
+                  <span className="text-[#FF8A00]">
+                    {formatCurrency(
+                      paymentData?.discountedAmount || paymentData?.totalAmount
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end">
-              <Button className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white" onClick={handleViewTickets}>
+              <Button
+                className="bg-[#FF8A00] hover:bg-[#FF9A20] text-white"
+                onClick={handleViewTickets}
+              >
                 View My Tickets
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -440,7 +474,8 @@ export default function PaymentQueuePage() {
       <footer className="bg-[#1A1A1A] border-t border-[#2A2A2A] py-4 px-4 text-center text-sm text-gray-400">
         <p>© 2025 TixClick. All rights reserved.</p>
         <p className="mt-1">
-          Contact support: <span className="text-[#FF8A00]">support@tixclick.com</span>
+          Contact support:{" "}
+          <span className="text-[#FF8A00]">support@tixclick.com</span>
         </p>
       </footer>
     </div>

@@ -15,7 +15,7 @@ export type EventDetailProps = {
 
 const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
   return (
-    <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-pse-black ">
+    <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-[#1E1E1E] ">
       <div>
         <img
           src={eventDetail?.bannerURL}

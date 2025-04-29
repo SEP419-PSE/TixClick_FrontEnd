@@ -76,13 +76,13 @@ export default function App() {
 
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
+            <Route path="/search" element={<SearchPage />} />
           </Route>
 
           <Route
             path="event-detail/:id/booking-ticket-no-seatmap"
             element={<TicketBookingNoneSeatmap />}
           />
-          <Route path="/search" element={<SearchPage />} />
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
