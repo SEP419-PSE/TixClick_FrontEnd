@@ -197,7 +197,12 @@
 // export default SearchPage;
 
 const SearchPage = () => {
-  return <div className="min-h-screen mt-[70px] p-4">SearchPage</div>;
+  return (
+    <div className="grid grid-cols-12 min-h-screen mt-[70px] p-4 lg:px-14">
+      <section className="col-span-3">Filter</section>
+      <section className="col-span-9">Event</section>
+    </div>
+  );
 };
 
 export default SearchPage;
