@@ -516,12 +516,17 @@ export default function PaymentPage() {
 
     if (storedSeatsData) {
       const parsedData = JSON.parse(storedSeatsData);
-      if (parsedData.apiResponses?.purchase?.result?.[0]?.ticketPurchaseId) {
+      if (parsedData.apiResponses?.purchaseResponse?.result) {
+        parsedData.apiResponses.purchaseResponse.result.forEach((item: any) => {
+          ticketPurchaseId.push(item.ticketPurchaseId);
+        });
+      } else {
         parsedData.apiResponses.purchase.result.forEach((item: any) => {
           ticketPurchaseId.push(item.ticketPurchaseId);
         });
       }
     }
+    console.log(ticketPurchaseId);
 
     if (ticketPurchaseId.length == 0) {
       console.error("No ticketPurchaseId found");
@@ -809,19 +814,18 @@ export default function PaymentPage() {
             <div className="text-[#FF8A00] font-semibold text-xl">TixClick</div>
           </div>
         </Link>
-        <Link to="/">
-          <Button
-            variant="ghost"
-            className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
-            onClick={(e) => {
-              e.preventDefault();
-              handleCancelPayment();
-            }}
-          >
-            <X className="h-4 w-4 mr-2" />
-            Hủy giao dịch
-          </Button>
-        </Link>
+
+        <Button
+          variant="ghost"
+          className="text-gray-400 hover:text-white hover:bg-[#2A2A2A]"
+          onClick={(e) => {
+            e.preventDefault();
+            handleCancelPayment();
+          }}
+        >
+          <X className="h-4 w-4 mr-2" />
+          Hủy giao dịch
+        </Button>
       </header>
 
       <div className="relative h-60 md:h-80 bg-[#1A1A1A] overflow-hidden">
