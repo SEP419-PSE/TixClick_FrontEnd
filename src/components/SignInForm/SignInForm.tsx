@@ -74,8 +74,8 @@ const SignInForm = () => {
             "user",
             response.data.result.accessToken
           );
-          navigate("/");
           toast.success("Đăng nhập thành công");
+          navigate("/");
         } else {
           navigate("/auth/code", { state: response.data.result.email });
           toast.error("Bạn cần phải kích hoạt tài khoản");
