@@ -1,36 +1,37 @@
-// import Categories from "../components/Categories/Categories";
-import { useEffect, useRef, useState } from "react";
-import HeroSlider from "../components/HeroSlider/HeroSlider";
-import SpecialEvent from "../components/SpecialEvent/SpecialEvent";
-import TabEvent from "../components/TabEvent/TabEvent";
-import { EventForConsumer } from "../interface/EventInterface";
-import eventApi from "../services/eventApi";
-import EventsByCategory from "../components/TabEvent/EventsByCategory";
-import Categories from "../components/Categories/Categories";
-import HeroSection from "../components/HeroSlider/HeroSection";
-import Top10Event from "../components/SpecialEvent/Top10Event";
-import useTop10Event from "../hooks/useTop10Event";
+import type React from "react"
+
+import { useEffect, useRef, useState } from "react"
+import Categories from "../components/Categories/Categories"
+import HeroSection from "../components/HeroSlider/HeroSection"
+import HeroSlider from "../components/HeroSlider/HeroSlider"
+import SpecialEvent from "../components/SpecialEvent/SpecialEvent"
+import Top10Event from "../components/SpecialEvent/Top10Event"
+import EventsByCategory from "../components/TabEvent/EventsByCategory"
+import TabEvent from "../components/TabEvent/TabEvent"
+import useTop10Event from "../hooks/useTop10Event"
+import type { EventForConsumer } from "../interface/EventInterface"
+import eventApi from "../services/eventApi"
 
 const HomePage = () => {
-  const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
-  const { data } = useTop10Event();
+  const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([])
+  const { data } = useTop10Event()
 
-  const musicRef = useRef<HTMLDivElement | null>(null);
-  const sportRef = useRef<HTMLDivElement | null>(null);
-  const artRef = useRef<HTMLDivElement | null>(null);
-  const otherRef = useRef<HTMLDivElement | null>(null);
+  const musicRef = useRef<HTMLDivElement | null>(null)
+  const sportRef = useRef<HTMLDivElement | null>(null)
+  const artRef = useRef<HTMLDivElement | null>(null)
+  const otherRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const response = await eventApi.getEventList();
+      const response = await eventApi.getEventList()
       if (response.data.result.length != 0) {
-        setSpecialEvents(response.data.result);
+        setSpecialEvents(response.data.result)
       } else {
-        setSpecialEvents([]);
+        setSpecialEvents([])
       }
-    };
-    fetchEvents();
-  }, []);
+    }
+    fetchEvents()
+  }, [])
 
   const scrollToCategory = (categoryId: number) => {
     const refMap: Record<number, React.RefObject<HTMLDivElement>> = {
@@ -38,15 +39,15 @@ const HomePage = () => {
       2: sportRef,
       3: artRef,
       4: otherRef,
-    };
+    }
     refMap[categoryId]?.current?.scrollIntoView({
       behavior: "smooth",
       block: "center",
-    });
-  };
+    })
+  }
 
   return (
-    <div>
+    <div className="bg-black text-white">
       <HeroSlider />
 
       <Categories onCategoryClick={scrollToCategory} />
@@ -67,7 +68,7 @@ const HomePage = () => {
       </div>
       <HeroSection />
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

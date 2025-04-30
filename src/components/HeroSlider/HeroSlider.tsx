@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Menu, Play, Search, X } from "lucide-react";
+import { Menu, Play, Search, X } from 'lucide-react';
 import { FormEvent, useContext, useEffect, useState } from "react";
 import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
@@ -78,6 +78,7 @@ const HeroSlider = () => {
   return (
     <div className="">
       <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70 z-[1]"></div>
         <video
           autoPlay
           loop
@@ -97,93 +98,94 @@ const HeroSlider = () => {
             isVisible ? "translate-y-0 " : "-translate-y-full"
           } ${isBackDrop && "backdrop-blur-[20px] bg-black bg-opacity-30"}`}
         >
-          <p className="font-semibold text-2xl">TixClick</p>
+          <p className="font-bold text-2xl text-[#FF8A00]">TixClick</p>
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
                 <NavLink to="/ticketManagement">
-                  <li className="px-4 py-2 hover:opacity-60">Vé của tôi</li>
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">Vé của tôi</li>
                 </NavLink>
                 <NavLink to="/company">
-                  <li className="px-4 py-2 hover:opacity-60">
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
                     Sự kiện của tôi
                   </li>
                 </NavLink>
                 <NavLink to="/profileForm">
-                  <li className="px-4 py-2 hover:opacity-60">Trang cá nhân</li>
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">Trang cá nhân</li>
                 </NavLink>
                 <button onClick={hanldeClickCreateEvent}>
-                  <li className="px-4 py-2 border rounded-md hover:opacity-60">
+                  <li className="px-4 py-2 border border-[#FF8A00] text-[#FF8A00] rounded-md hover:bg-[#FF8A00] hover:text-white transition-all">
                     Tạo sự kiện
                   </li>
                 </button>
                 <li
                   onClick={() => authContext?.logout()}
-                  className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-60"
+                  className="px-4 py-2 border rounded-md bg-[#FF8A00] text-white hover:bg-[#E67E00] transition-colors cursor-pointer"
                 >
                   Đăng xuất
                 </li>
               </ul>
             ) : (
               <NavLink to="/auth/signin">
-                <button className="px-4 py-1 border rounded-md">
+                <button className="px-6 py-2 border border-[#FF8A00] bg-[#FF8A00] text-white rounded-md hover:bg-[#E67E00] transition-colors">
                   Đăng nhập
                 </button>
               </NavLink>
             )}
           </div>
           <button onClick={handleOpenMobileMenu} className="md:hidden ml-auto">
-            <Menu />
+            <Menu className="text-[#FF8A00]" />
           </button>
         </header>
 
         <form
           onSubmit={submitSearchValue}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 z-[2]"
         >
           <div className="w-full flex flex-col gap-2">
-            <p className="text-4xl font-bold text-center">
-              ALL ABOUT EVENT - ITS ALL HERE
+            <p className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white">
+              <span className="text-[#FF8A00]">KHÁM PHÁ NHỮNG</span> SỰ KIỆN TUYỆT VỜI
             </p>
-            <p className="text-xl text-center font-medium">
-              Turn on the feeling with all music event{" "}
+            <p className="text-xl text-center font-medium text-white">
+            Tìm và đặt vé cho những sự kiện tốt nhất trong khu vực của bạn
             </p>
+            
             <button type="button" className="flex justify-center mt-6 p-3">
-              <span className="bg-white p-3 rounded-full ring ring-offset-4 ring-white/50">
-                <Play className="fill-pse-green stroke-pse-green" />
+              <span className="bg-[#FF8A00] p-3 rounded-full ring ring-offset-4 ring-[#FF8A00]/50 hover:bg-[#E67E00] transition-colors">
+                <Play className="fill-white stroke-white" />
               </span>
             </button>
           </div>
-          {/* <div className="relative w-md">
+          <div className="relative max-w-2xl mx-auto mt-8">
             <input
               type="text"
               name="searchValue"
               placeholder="Tìm kiếm sự kiện..."
-              className="w-full bg-transparent border-2 border-white text-white placeholder-white rounded-full py-3 px-5 pr-12 outline-none focus:ring-2 focus:ring-white transition-all duration-300 sm:text-sm"
+              className="w-full bg-white/10 backdrop-blur-md border-2 border-[#FF8A00] text-white placeholder-white/80 rounded-full py-4 px-6 pr-16 outline-none focus:ring-2 focus:ring-[#FF8A00] transition-all duration-300"
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white text-black p-2 rounded-full hover:bg-gray-300 transition-all duration-300"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8A00] text-white p-3 rounded-full hover:bg-[#E67E00] transition-all duration-300"
             >
               <Search />
             </button>
-          </div> */}
+          </div>
         </form>
       </div>
 
-      {/* Mobile Menu  */}
+      {/*  Menu  */}
       <div
         className={` ${
           openMobileMenu ? "translate-x-0" : "-translate-x-[100%]"
         } fixed flex flex-col w-full h-screen top-0 left-0 bg-white z-20 transition-all duration-500`}
       >
-        <div className="relative bg-black p-6 flex gap-4 rounded-br-[60px] items-center">
-          <div className="bg-white h-16 w-16 flex items-center justify-center text-black rounded-full">
+        <div className="relative bg-[#FF8A00] p-6 flex gap-4 rounded-br-[60px] items-center">
+          <div className="bg-white h-16 w-16 flex items-center justify-center text-[#FF8A00] font-bold rounded-full">
             TixClick
           </div>
-          <div className="text-base font-semibold">Đăng nhập</div>
+          <div className="text-base font-semibold text-white">Đăng nhập</div>
           <div className="absolute top-6 right-6">
-            <X onClick={handleOpenMobileMenu} />
+            <X onClick={handleOpenMobileMenu} className="text-white" />
           </div>
         </div>
         <div className="text-black my-8">
@@ -191,49 +193,49 @@ const HeroSlider = () => {
             <li>
               <a
                 href="/ticketManagement"
-                className="flex items-center gap-2 py-3 px-6 hover:bg-pse-black/20"
+                className="flex items-center gap-2 py-3 px-6 hover:bg-[#FF8A00]/10 transition-colors"
               >
-                <LuTicketCheck size={24} />
+                <LuTicketCheck size={24} className="text-[#FF8A00]" />
                 Vé đã mua
               </a>
             </li>
             <li>
               <a
                 href="/consumerCenter"
-                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-[#FF8A00]/10 transition-colors"
               >
-                <RiCalendarEventLine size={24} />
+                <RiCalendarEventLine size={24} className="text-[#FF8A00]" />
                 Sự kiện của tôi
               </a>
             </li>
             <li>
               <a
                 href="/profileForm"
-                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-[#FF8A00]/10 transition-colors"
               >
-                <CgProfile size={24} />
+                <CgProfile size={24} className="text-[#FF8A00]" />
                 Trang cá nhân
               </a>
             </li>
             <li>
               <a
                 href="/logout"
-                className="flex items-center p-3 px-6 gap-2 hover:bg-pse-black/20"
+                className="flex items-center p-3 px-6 gap-2 hover:bg-[#FF8A00]/10 transition-colors"
               >
-                <LuLogOut size={24} />
+                <LuLogOut size={24} className="text-[#FF8A00]" />
                 Đăng xuất
               </a>
             </li>
           </ul>
         </div>
-        <div className="text-white rounded-tl-[60px] flex justify-end items-center gap-4 mt-auto text-right p-6 bg-pse-black">
-          <span className="border p-2 rounded-full">
+        <div className="text-white rounded-tl-[60px] flex justify-end items-center gap-4 mt-auto text-right p-6 bg-[#FF8A00]">
+          <span className="border border-white p-2 rounded-full hover:bg-white hover:text-[#FF8A00] transition-colors cursor-pointer">
             <FaFacebookSquare size={24} />
           </span>
-          <span className="border p-2 rounded-full">
+          <span className="border border-white p-2 rounded-full hover:bg-white hover:text-[#FF8A00] transition-colors cursor-pointer">
             <AiFillTikTok size={24} />
           </span>
-          <span className="border p-2 rounded-full">
+          <span className="border border-white p-2 rounded-full hover:bg-white hover:text-[#FF8A00] transition-colors cursor-pointer">
             <FaYoutube size={24} />
           </span>
         </div>
