@@ -11,7 +11,7 @@ type Props = {
 
 const EventList: React.FC<Props> = ({ eventList }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 ">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 ">
       {eventList.length == 0 && (
         <div className="col-span-2 md:col-span-4">
           <EmptyList label="Không có sự kiện phù hợp" />
@@ -22,7 +22,7 @@ const EventList: React.FC<Props> = ({ eventList }) => {
           <NavLink to={`/event-detail/${event.eventId}`}>
             <div className="lg:relative group overflow-hidden cursor-pointer">
               <img
-                className="rounded-lg w-full lg:group-hover:opacity-50 transition-all duration-300"
+                className="rounded-lg w-full h-[200px] lg:group-hover:opacity-50 transition-all duration-300"
                 src={event.bannerURL}
               />
 

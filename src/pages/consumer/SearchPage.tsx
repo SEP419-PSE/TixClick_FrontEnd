@@ -1,206 +1,250 @@
-// import { Search } from "lucide-react";
-// import { useSearchParams } from "react-router";
-// import { Input } from "../../components/ui/input";
-// import { EventDetailResponse } from "../../interface/EventInterface";
-// import { Button } from "../../components/ui/button";
-// import EventList from "./components/Search/EventList";
-// import { FormEvent, useEffect, useState } from "react";
-// import eventApi from "../../services/eventApi";
-// import FilterEvent from "./components/Search/FilterEvent";
-// import { toast } from "sonner";
+import { useState } from "react";
+import {
+  EventDetailResponse,
+  EventStatus,
+} from "../../interface/EventInterface";
+import EventList from "./components/Search/EventList";
+import { FilterEvent } from "./components/Search/FilterEvent";
+import { useLocation, useNavigate } from "react-router";
 
-// const SearchPage = () => {
-//   const [searchParams, setSearchParams] = useSearchParams();
-//   const eventName = searchParams.get("event-name") || "";
-//   const [eventList, setEventList] = useState<EventDetailResponse[]>([]);
-//   const [eventMode, setEventMode] = useState<string>("");
-//   const [openFilter, setOpenFilter] = useState<boolean>(false);
-//   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-//   const [startDate, setStartDate] = useState<string>("");
-//   const [endDate, setEndDate] = useState<string>("");
-//   const [maxPrice, setMaxPrice] = useState(100000);
-//   const currentDate = new Date().toISOString().split("T")[0];
-
-//   useEffect(() => {
-//     const handleResize = () => {
-//       setOpenFilter(window.innerWidth > 1024);
-//     };
-
-//     handleResize();
-//     window.addEventListener("resize", handleResize);
-//     return () => window.removeEventListener("resize", handleResize);
-//   }, []);
-
-//   useEffect(() => {
-//     console.log("Call lại list");
-//     const params: any = {
-//       eventName: searchParams.get("event-name") || undefined,
-//       startDate: searchParams.get("startDate") || undefined,
-//       endDate: searchParams.get("endDate") || undefined,
-//       eventType: searchParams.get("eventMode") || undefined,
-//       eventCategory:
-//         searchParams.get("types")?.split(",").filter(Boolean) || undefined,
-//       maxPrice: searchParams.get("maxPrice")
-//         ? Number(searchParams.get("maxPrice"))
-//         : undefined,
-//     };
-
-//     eventApi.search(params).then((response) => {
-//       console.log(response);
-//       setEventList(response.data.result || []);
-//     });
-//   }, [searchParams, eventName]);
-
-//   useEffect(() => {
-//     setStartDate(searchParams.get("startDate") || "");
-//     setEndDate(searchParams.get("endDate") || "");
-//     setEventMode(searchParams.get("eventMode") || "");
-//     setSelectedItems(
-//       searchParams.get("types")?.split(",").filter(Boolean) || []
-//     );
-//     setMaxPrice(
-//       searchParams.get("maxPrice")
-//         ? Number(searchParams.get("maxPrice"))
-//         : 100000
-//     );
-//   }, [searchParams]);
-
-//   const updateSearchParam = (key: string, value?: string) => {
-//     const params = new URLSearchParams(searchParams);
-//     if (value) params.set(key, value);
-//     else params.delete(key);
-//     setSearchParams(params);
-//   };
-
-//   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const selected = e.target.value;
-//     if (selected < currentDate) {
-//       toast.warning("Ngày bắt đầu không được nhỏ hơn ngày hiện tại");
-//     } else if (endDate && selected >= endDate) {
-//       toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-//     } else {
-//       setStartDate(selected);
-//       updateSearchParam("startDate", selected);
-//     }
-//   };
-
-//   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const selected = e.target.value;
-//     if (startDate && selected <= startDate) {
-//       toast.warning("Ngày kết thúc phải lớn hơn ngày bắt đầu");
-//     } else {
-//       setEndDate(selected);
-//       updateSearchParam("endDate", selected);
-//     }
-//   };
-
-//   const handleToggleChange = (value: string) => {
-//     const updated = selectedItems.includes(value)
-//       ? selectedItems.filter((item) => item !== value)
-//       : [...selectedItems, value];
-//     setSelectedItems(updated);
-//     updateSearchParam("types", updated.join(","));
-//   };
-
-//   const handleSwitchChange = (checked: boolean) => {
-//     const value = checked ? "Online" : "Offline";
-//     setEventMode(value);
-//     updateSearchParam("eventMode", value);
-//   };
-
-//   const handleOpenFilter = () => setOpenFilter(true);
-//   const handleCloseFilter = () => setOpenFilter(false);
-
-//   const resetForm = () => {
-//     setStartDate("");
-//     setEndDate("");
-//     setEventMode("");
-//     setSelectedItems([]);
-//     setMaxPrice(100000);
-
-//     const params = new URLSearchParams(searchParams);
-//     params.delete("startDate");
-//     params.delete("endDate");
-//     params.delete("eventMode");
-//     params.delete("types");
-//     params.delete("maxPrice");
-//     setSearchParams(params);
-//   };
-
-//   const onSubmitSearch = (e: FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     const formData = new FormData(e.currentTarget);
-//     console.log(formData.get("event-name"));
-//     const searchValue = formData.get("event-name")?.toString().trim() || "";
-//     updateSearchParam("event-name", searchValue || undefined);
-//   };
-
-//   const submitForm = () => {
-//     updateSearchParam("startDate", startDate || undefined);
-//     updateSearchParam("endDate", endDate || undefined);
-//     updateSearchParam("eventMode", eventMode || undefined);
-//     updateSearchParam("types", selectedItems.join(",") || undefined);
-//     updateSearchParam("maxPrice", maxPrice.toString() || undefined);
-//   };
-
-//   return (
-//     <div className="bg-pse-black pl-[400px] px-4 py-4">
-//       <form onSubmit={onSubmitSearch} className="mb-6 flex justify-center">
-//         <div className="flex w-full max-w-xl items-center gap-2">
-//           <div className="relative w-full">
-//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-//             <Input
-//               name="event-name"
-//               type="text"
-//               defaultValue={eventName}
-//               placeholder="Tìm kiếm sự kiện..."
-//               className="pl-10 text-black"
-//             />
-//           </div>
-//           <Button
-//             type="submit"
-//             variant="default"
-//             className="bg-white text-black hover:bg-opacity-80"
-//           >
-//             Tìm kiếm
-//           </Button>
-//         </div>
-//       </form>
-//       <EventList eventList={eventList} />
-
-//       <FilterEvent
-//         currentDate={currentDate}
-//         endDate={endDate}
-//         eventMode={eventMode}
-//         handleCloseFilter={handleCloseFilter}
-//         handleEndDateChange={handleEndDateChange}
-//         handleStartDateChange={handleStartDateChange}
-//         handleSwitchChange={handleSwitchChange}
-//         handleToggleChange={handleToggleChange}
-//         resetForm={resetForm}
-//         selectedItems={selectedItems}
-//         startDate={startDate}
-//         submitForm={submitForm}
-//         handleOpenFilter={handleOpenFilter}
-//         openFilter={openFilter}
-//         maxPrice={maxPrice}
-//         onChangePrice={(price) => {
-//           setMaxPrice(price);
-//           updateSearchParam("maxPrice", price.toString());
-//         }}
-//         maxLimit={2000000}
-//       />
-//     </div>
-//   );
-// };
-
-// export default SearchPage;
+const mockEvents: EventDetailResponse[] = [
+  {
+    eventId: 1,
+    eventName: "Sự kiện Âm nhạc 2025",
+    address: "12 Nguyễn Huệ",
+    city: "TP.HCM",
+    district: "Quận 1",
+    ward: "Phường Bến Nghé",
+    locationName: "Nhà hát Thành phố",
+    status: EventStatus.APPROVED,
+    typeEvent: "music",
+    countView: 3200,
+    logoURL:
+      "https://plus.unsplash.com/premium_photo-1683121126477-17ef068309bc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    bannerURL:
+      "https://plus.unsplash.com/premium_photo-1683121126477-17ef068309bc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Một buổi hòa nhạc lớn với các nghệ sĩ hàng đầu.",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    urlOnline: null,
+    eventCategory: "Âm nhạc",
+    eventCategoryId: 1,
+    countTicketSold: null,
+    totalRevenue: null,
+    haveSeatMap: true,
+    price: 120000,
+    eventActivityDTOList: [
+      {
+        eventActivityId: 101,
+        activityName: "Buổi diễn chính",
+        dateEvent: new Date(),
+        startTimeEvent: "19:00",
+        endTimeEvent: "22:00",
+        startTicketSale: new Date(),
+        endTicketSale: new Date(),
+        eventId: 1,
+        tickets: [],
+      },
+    ],
+  },
+  {
+    eventId: 2,
+    eventName: "Hội thảo Công nghệ 2025",
+    address: "Số 5 Duy Tân",
+    city: "Hà Nội",
+    district: "Cầu Giấy",
+    ward: "Dịch Vọng Hậu",
+    locationName: "Trung tâm Hội nghị Quốc gia",
+    status: EventStatus.SCHEDULED,
+    typeEvent: "conference",
+    countView: 1800,
+    logoURL:
+      "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    bannerURL:
+      "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Hội thảo công nghệ với nhiều diễn giả nổi tiếng.",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    urlOnline: null,
+    eventCategory: "Công nghệ",
+    eventCategoryId: 2,
+    countTicketSold: null,
+    totalRevenue: null,
+    haveSeatMap: false,
+    price: 180000,
+    eventActivityDTOList: [
+      {
+        eventActivityId: 102,
+        activityName: "Diễn thuyết chính",
+        dateEvent: new Date(),
+        startTimeEvent: "09:00",
+        endTimeEvent: "17:00",
+        startTicketSale: new Date(),
+        endTicketSale: new Date(),
+        eventId: 2,
+        tickets: [],
+      },
+    ],
+  },
+  {
+    eventId: 3,
+    eventName: "Lễ hội Ẩm thực Việt 2025",
+    address: "Công viên Lê Văn Tám",
+    city: "TP.HCM",
+    district: "Quận 3",
+    ward: "Phường 6",
+    locationName: "Công viên Lê Văn Tám",
+    status: EventStatus.APPROVED,
+    typeEvent: "festival",
+    countView: 2450,
+    logoURL:
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    bannerURL:
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Lễ hội ẩm thực truyền thống với hơn 100 gian hàng.",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    urlOnline: null,
+    eventCategory: "Ẩm thực",
+    eventCategoryId: 3,
+    countTicketSold: null,
+    totalRevenue: null,
+    haveSeatMap: false,
+    price: 50000,
+    eventActivityDTOList: [
+      {
+        eventActivityId: 103,
+        activityName: "Khai mạc lễ hội",
+        dateEvent: new Date(),
+        startTimeEvent: "08:00",
+        endTimeEvent: "10:00",
+        startTicketSale: new Date(),
+        endTicketSale: new Date(),
+        eventId: 3,
+        tickets: [],
+      },
+    ],
+  },
+  {
+    eventId: 4,
+    eventName: "Show Thời Trang Xuân Hè 2025",
+    address: "Vinpearl Landmark 81",
+    city: "TP.HCM",
+    district: "Bình Thạnh",
+    ward: "Phường 22",
+    locationName: "Vinpearl Ballroom",
+    status: EventStatus.SCHEDULED,
+    typeEvent: "fashion",
+    countView: 1200,
+    logoURL: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c",
+    bannerURL: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c",
+    description: "Sự kiện giới thiệu bộ sưu tập thời trang mới nhất.",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    urlOnline: null,
+    eventCategory: "Thời trang",
+    eventCategoryId: 4,
+    countTicketSold: null,
+    totalRevenue: null,
+    haveSeatMap: true,
+    price: 250000,
+    eventActivityDTOList: [
+      {
+        eventActivityId: 104,
+        activityName: "Trình diễn chính",
+        dateEvent: new Date(),
+        startTimeEvent: "18:00",
+        endTimeEvent: "21:00",
+        startTicketSale: new Date(),
+        endTicketSale: new Date(),
+        eventId: 4,
+        tickets: [],
+      },
+    ],
+  },
+  {
+    eventId: 5,
+    eventName: "Workshop Khởi Nghiệp 2025",
+    address: "Toong Phạm Ngọc Thạch",
+    city: "TP.HCM",
+    district: "Quận 3",
+    ward: "Phường 6",
+    locationName: "Toong Coworking Space",
+    status: EventStatus.APPROVED,
+    typeEvent: "workshop",
+    countView: 980,
+    logoURL: "https://images.unsplash.com/photo-1603570413160-b742f909c9a2",
+    bannerURL:
+      "https://plus.unsplash.com/premium_photo-1661315452408-ab1839e8d468?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Buổi chia sẻ và networking dành cho startup.",
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    urlOnline: null,
+    eventCategory: "Kinh doanh",
+    eventCategoryId: 5,
+    countTicketSold: null,
+    totalRevenue: null,
+    haveSeatMap: false,
+    price: 100000,
+    eventActivityDTOList: [
+      {
+        eventActivityId: 105,
+        activityName: "Chia sẻ kinh nghiệm",
+        dateEvent: new Date(),
+        startTimeEvent: "13:00",
+        endTimeEvent: "17:00",
+        startTicketSale: new Date(),
+        endTicketSale: new Date(),
+        eventId: 5,
+        tickets: [],
+      },
+    ],
+  },
+];
 
 const SearchPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [selectedArea, setSelectedArea] = useState<string>("all");
+  const [typeEvent, setTypeEvent] = useState<string>("all");
+  const [priceRange, setPriceRange] = useState([50000]);
+
+  const onChangeSearchParams = (key: string, value: string) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set(key, value);
+    navigate(`${location.pathname}?${searchParams.toString()}`);
+  };
+
+  const onChangeArea = (e: string) => {
+    setSelectedArea(e);
+    onChangeSearchParams("area", e);
+  };
+
+  const onChanngeTypeEvent = (e: string) => {
+    setTypeEvent(e);
+    onChangeSearchParams("type", e);
+  };
+
+  const onChangePriceRange = (e: number[]) => {
+    setPriceRange(e);
+    onChangeSearchParams("price", e.toString());
+  };
   return (
-    <div className="grid grid-cols-12 min-h-screen mt-[70px] p-4 lg:px-14">
-      <section className="col-span-3">Filter</section>
-      <section className="col-span-9">Event</section>
+    <div className="grid grid-cols-12 gap-6 min-h-screen mt-[70px] p-4 lg:px-14 bg-[#1e1e1e] text-white">
+      <section className="col-span-12 lg:col-span-3 mb-8 lg:mb-0">
+        <FilterEvent
+          typeEvent={typeEvent}
+          onChangeTypeEvent={onChanngeTypeEvent}
+          selectedArea={selectedArea}
+          onChangeArea={onChangeArea}
+          priceRange={priceRange}
+          onChangePriceRange={onChangePriceRange}
+        />
+      </section>
+
+      <section className="col-span-12 lg:col-span-9">
+        <EventList eventList={mockEvents} />
+      </section>
     </div>
   );
 };

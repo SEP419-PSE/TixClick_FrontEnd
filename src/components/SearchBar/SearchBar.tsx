@@ -1,17 +1,18 @@
 import { FormEvent } from "react";
 import { LuSearch } from "react-icons/lu";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 const SearchBar = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const submitSearchValue = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
     const searchValue = formData.get("searchValue") as string;
-    navigate(`/search?event-name=${searchValue}&maxPrice=${100000}`);
-
-    console.log(searchValue);
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("event-name", searchValue); // Thêm hoặc cập nhật tham số 'area'
+    navigate(`/search?${searchParams.toString()}`);
   };
   return (
     <form onSubmit={submitSearchValue}>
