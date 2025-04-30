@@ -1,5 +1,4 @@
 import { Lock } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useEffect, useState, type ReactNode } from "react"
 import { PinInput } from "./PinInput"
 

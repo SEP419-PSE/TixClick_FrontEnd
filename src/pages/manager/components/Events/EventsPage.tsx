@@ -491,8 +491,6 @@ export default function EventsPage() {
                         <DropdownMenuItem onClick={() => navigateToEventPage(event.eventId, event.contractCode)}>
                           Go to event page
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Edit event information</DropdownMenuItem>
-                        {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
                         <DropdownMenuItem onClick={handleViewRelatedContracts}>
                           View associated contracts
                         </DropdownMenuItem>
