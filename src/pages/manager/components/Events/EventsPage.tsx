@@ -554,10 +554,6 @@ export default function EventsPage() {
                         >
                           Go to event page
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          Edit event information
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuItem>Manage attendees</DropdownMenuItem> */}
                         <DropdownMenuItem onClick={handleViewRelatedContracts}>
                           View associated contracts
                         </DropdownMenuItem>
