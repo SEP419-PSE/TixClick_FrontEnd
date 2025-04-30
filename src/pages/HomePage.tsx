@@ -1,5 +1,5 @@
 // import Categories from "../components/Categories/Categories";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import HeroSlider from "../components/HeroSlider/HeroSlider";
 import SpecialEvent from "../components/SpecialEvent/SpecialEvent";
 import TabEvent from "../components/TabEvent/TabEvent";
@@ -8,9 +8,17 @@ import eventApi from "../services/eventApi";
 import EventsByCategory from "../components/TabEvent/EventsByCategory";
 import Categories from "../components/Categories/Categories";
 import HeroSection from "../components/HeroSlider/HeroSection";
+import Top10Event from "../components/SpecialEvent/Top10Event";
+import useTop10Event from "../hooks/useTop10Event";
 
 const HomePage = () => {
   const [specialEvents, setSpecialEvents] = useState<EventForConsumer[]>([]);
+  const { data } = useTop10Event();
+
+  const musicRef = useRef<HTMLDivElement | null>(null);
+  const sportRef = useRef<HTMLDivElement | null>(null);
+  const artRef = useRef<HTMLDivElement | null>(null);
+  const otherRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -24,17 +32,40 @@ const HomePage = () => {
     fetchEvents();
   }, []);
 
+  const scrollToCategory = (categoryId: number) => {
+    const refMap: Record<number, React.RefObject<HTMLDivElement>> = {
+      1: musicRef,
+      2: sportRef,
+      3: artRef,
+      4: otherRef,
+    };
+    refMap[categoryId]?.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  };
+
   return (
     <div>
       <HeroSlider />
-      <HeroSection />
-      <Categories />
+
+      <Categories onCategoryClick={scrollToCategory} />
+      <Top10Event data={data} />
       <SpecialEvent specialEvents={specialEvents} />
       <TabEvent />
-      <EventsByCategory eventCategoryId={1} status="SCHEDULED" />
-      <EventsByCategory eventCategoryId={2} status="SCHEDULED" />
-      <EventsByCategory eventCategoryId={3} status="SCHEDULED" />
-      <EventsByCategory eventCategoryId={4} status="SCHEDULED" />
+      <div ref={musicRef}>
+        <EventsByCategory eventCategoryId={1} status="SCHEDULED" />
+      </div>
+      <div ref={sportRef}>
+        <EventsByCategory eventCategoryId={2} status="SCHEDULED" />
+      </div>
+      <div ref={artRef}>
+        <EventsByCategory eventCategoryId={3} status="SCHEDULED" />
+      </div>
+      <div ref={otherRef}>
+        <EventsByCategory eventCategoryId={4} status="SCHEDULED" />
+      </div>
+      <HeroSection />
     </div>
   );
 };

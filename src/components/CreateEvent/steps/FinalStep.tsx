@@ -1,7 +1,7 @@
 import React from "react";
 import { StepProps } from "./Step1_Infor";
 import { Button } from "../../ui/button";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import eventApi from "../../../services/eventApi";
 
 const FinalStep: React.FC<StepProps> = ({ eventId }) => {
@@ -21,9 +21,11 @@ const FinalStep: React.FC<StepProps> = ({ eventId }) => {
         Bạn có chấp nhận với các thông tin mà bạn cung cấp?
       </div>
       <div className="flex gap-4">
-        <Button className="bg-black text-white hover:bg-opacity-30">
-          Tôi muốn chỉnh sửa
-        </Button>
+        <NavLink to={`/company`}>
+          <Button className="bg-black text-white hover:bg-opacity-30">
+            Tôi muốn chỉnh sửa
+          </Button>
+        </NavLink>
         <Button
           onClick={approveEvent}
           className="bg-white text-black hover:bg-opacity-30"

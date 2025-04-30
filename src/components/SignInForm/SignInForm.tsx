@@ -7,7 +7,8 @@ import { AuthContext } from "../../contexts/AuthProvider";
 import { LoginRequest } from "../../interface/AuthInterface";
 import authApi from "../../services/authApi";
 
-import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
+import Logo from "../../assets/Logo.png";
 import GoogleImg from "../../assets/google.png";
 import { LoaderCircle } from "lucide-react";
 // import { TOAST_MESSAGE } from "../../constants/constants";
@@ -20,9 +21,21 @@ const SignInForm = () => {
     userName: "",
     password: "",
   });
-
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName");
+    const storedPassword = localStorage.getItem("password");
+    if (storedUserName && storedPassword) {
+      setFormData({
+        userName: storedUserName,
+        password: storedPassword,
+      });
+      setRememberMe(true);
+    }
+  }, []);
 
   const onChangeShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -30,6 +43,10 @@ const SignInForm = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleRememberMeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(e.target.checked); // Cập nhật trạng thái "Nhớ mật khẩu"
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -47,13 +64,18 @@ const SignInForm = () => {
             "refreshToken",
             response.data.result.refreshToken
           );
+
+          if (rememberMe) {
+            localStorage.setItem("userName", formData.userName);
+            localStorage.setItem("password", formData.password);
+          }
           authContext?.login(response.data.result.accessToken);
           authContext?.setTokenForAxios(
             "user",
             response.data.result.accessToken
           );
-          navigate("/");
           toast.success("Đăng nhập thành công");
+          navigate("/");
         } else {
           navigate("/auth/code", { state: response.data.result.email });
           toast.error("Bạn cần phải kích hoạt tài khoản");
@@ -78,7 +100,7 @@ const SignInForm = () => {
       className="px-3 py-6 lg:px-8 lg:py-12 w-[550px] h-screen"
     >
       <div className="hidden lg:flex items-center mb-12 gap-2 font-bold text-[20px]">
-        <img src={GoogleImg} width={64} />
+        <img src={Logo} width={64} />
         <p>Event booking</p>
       </div>
       <p className="font-bold text-[22px] my-4">Chào mừng bạn trở lại</p>
@@ -122,6 +144,8 @@ const SignInForm = () => {
                 <input
                   type="checkbox"
                   id="AcceptConditions"
+                  checked={rememberMe}
+                  onChange={handleRememberMeChange}
                   className="peer sr-only"
                 />
                 <span className="absolute inset-y-0 start-0 m-1 size-5 rounded-full ring-[5px] ring-inset ring-white transition-all peer-checked:start-7 bg-gray-900 peer-checked:w-2 peer-checked:bg-white peer-checked:ring-transparent"></span>
@@ -150,7 +174,7 @@ const SignInForm = () => {
       <div className="my-8">
         <CustomDivider />
       </div>
-      <a href="https://tixclick.site:8443/">
+      <a href="https://tixclick.site/login/oauth2/code/google">
         <button className="bg-[#333333] flex justify-center items-center font-light gap-2 text-white w-full rounded-md py-2 hover:opacity-80">
           <img src={GoogleImg} width={24} />
           Hoặc đăng nhập bằng Goolge

@@ -1,175 +1,89 @@
-import React from "react";
-import { Button } from "../../../../components/ui/button";
-import {  FaFilter } from "react-icons/fa6";
-import { FaAngleDown } from "react-icons/fa6";
-import { FaXmark } from "react-icons/fa6";
-import { Switch } from "../../../../components/ui/switch";
+import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
+import { Filter } from "lucide-react";
 import { Label } from "../../../../components/ui/label";
-import { EventType } from "../../../../interface/EventInterface";
 import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "../../../../components/ui/toggle-group";
-import { Toaster } from "sonner";
-import PriceRangeSlider from "./PriceRangeSLider";
-
-interface EventTypeEngLishName extends EventType {
-  englishName: string;
-}
-
-const eventTypes: EventTypeEngLishName[] = [
-  { id: 1, name: "Nhạc sống", englishName: "Music" },
-  { id: 2, name: "Thể thao", englishName: "Sport" },
-  { id: 3, name: "Sân khấu & Nghệ thuật", englishName: "Theater" },
-  { id: 4, name: "Khác", englishName: "Other" },
-];
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
+import { Slider } from "../../../../components/ui/slider";
 
 type Props = {
-  handleOpenFilter: () => void;
-  openFilter: boolean;
-  handleCloseFilter: () => void;
-  startDate: string;
-  handleStartDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  currentDate: string;
-  endDate: string;
-  handleEndDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSwitchChange: (checked: boolean) => void;
-  eventMode: string;
-  selectedItems: string[];
-  handleToggleChange: (name: string) => void;
-  submitForm: () => void;
-  resetForm: () => void;
-  maxPrice: number;
-  onChangePrice: (newMaxPrice: number) => void;
-  maxLimit?: number;
+  selectedArea: string;
+  onChangeArea: (e: string) => void;
+  typeEvent: string;
+  onChangeTypeEvent: (e: string) => void;
+  priceRange: number[];
+  onChangePriceRange: (e: number[]) => void;
 };
 
-const FilterEvent = ({
-  currentDate,
-  endDate,
-  eventMode,
-  handleCloseFilter,
-  handleEndDateChange,
-  handleOpenFilter,
-  handleStartDateChange,
-  handleSwitchChange,
-  handleToggleChange,
-  openFilter,
-  resetForm,
-  selectedItems,
-  startDate,
-  maxPrice,
-  onChangePrice,
+export const FilterEvent = ({
+  typeEvent,
+  onChangeTypeEvent,
+  selectedArea,
+  onChangeArea,
+  priceRange,
+  onChangePriceRange,
 }: Props) => {
   return (
-    <div className="flex gap-4">
-      <Button
-        onClick={handleOpenFilter}
-        className="bg-pse-gray/50 focus:bg-pse-green lg:hidden"
-      >
-        <span>
-          <FaFilter />
-        </span>
-        Bộ lọc
-        <span>
-          <FaAngleDown />
-        </span>
-      </Button>
-      {openFilter == true && (
-        <div className="fixed flex flex-col bottom-0 left-0 w-full max-w-sm h-[85%] lg:h-[100%] px-4 py-4 bg-white text-black rounded-t-lg">
-          <div className="relative flex w-full mb-2 justify-center items-center font-bold">
-            <p className="">Bộ lọc</p>
-            <button
-              onClick={handleCloseFilter}
-              className="absolute right-0 lg:hidden"
-            >
-              <FaXmark />
-            </button>
-          </div>
+    <Card className="bg-transparent text-white shadow-lg">
+      <CardHeader className="text-xl font-semibold flex items-center gap-2 pb-2">
+        <Filter size={20} /> Bộ lọc
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Loại sự kiện */}
+        <div className="space-y-1">
+          <Label className="text-sm text-gray-300">Loại sự kiện</Label>
+          <Select value={typeEvent} onValueChange={(e) => onChangeTypeEvent(e)}>
+            <SelectTrigger className="bg-[#1e1e1e] border border-gray-600 text-white">
+              <SelectValue placeholder="Chọn loại sự kiện" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#2a2a2a] text-white border-gray-700">
+              <SelectItem value={"0"}>Tất cả thể loại</SelectItem>
+              <SelectItem value={"1"}>Âm nhạc</SelectItem>
+              <SelectItem value={"2"}>Thể thao</SelectItem>
+              <SelectItem value={"3"}>Sân khấu & Nghệ thuât</SelectItem>
+              <SelectItem value={"4"}>Thể loại khác</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="w-full h-[1px] bg-pse-gray/50"></div>
-          <div className="flex my-4 justify-between gap-4">
-            <div className="flex flex-col gap-2 w-full">
-              <label className="font-semibold">Ngày diễn ra</label>
-              <input
-                value={startDate}
-                onChange={handleStartDateChange}
-                type="date"
-                className="border px-2 py-1 rounded-md"
-                min={currentDate}
-              />
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label className="font-semibold">Ngày kết thúc</label>
-              <input
-                value={endDate}
-                onChange={handleEndDateChange}
-                type="date"
-                className="border px-2 py-1 rounded-md"
-              />
-            </div>
-          </div>
-          <div className="w-full h-[1px] bg-pse-gray/50"></div>
-          <div className="flex flex-start items-center my-4 gap-2">
-            <Switch
-              onCheckedChange={handleSwitchChange}
-              id="airplane-mode"
-              checked={eventMode === "Online"}
-            />
-            <Label htmlFor="airplane-mode">Sự kiện online</Label>
-          </div>
-          <div className="w-full h-[1px] bg-pse-gray/50"></div>
-          <div className="my-4">
-            <div className="mb-2 flex justify-start font-semibold">
-              Thể loại
-            </div>
-            <ToggleGroup
-              className="flex flex-wrap justify-start"
-              type="multiple"
-              value={selectedItems} // Liên kết với mảng các giá trị được chọn
-            >
-              {eventTypes.map((eventType) => (
-                <ToggleGroupItem
-                  key={eventType.englishName}
-                  className={`border p-2 rounded-full transition-colors 
-              ${
-                selectedItems.includes(eventType.englishName)
-                  ? "text-white border-pse-black" // Được chọn
-                  : "bg-transparent text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700" // Chưa chọn
-              }`}
-                  value={eventType.englishName} // Xác định giá trị của item
-                  aria-label={`Toggle ${eventType.englishName}`}
-                  onClick={() => handleToggleChange(eventType.englishName)} // Cập nhật khi click
-                >
-                  {eventType.name}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
-          <div className="py-4">
-            <PriceRangeSlider
-              maxPrice={maxPrice}
-              onChange={onChangePrice}
-              maxLimit={2000000}
-            />
-          </div>
-          <div className="mt-auto flex justify-between gap-4">
-            <Button
-              onClick={resetForm}
-              className="w-full bg-pse-black text-white transition-all duration-500"
-              variant={"outline"}
-            >
-              Thiết lập lại
-            </Button>
-            {/* <Button onClick={submitForm} className="w-full bg-pse-black">
-              Áp dụng
-            </Button> */}
+        {/* Khu vực */}
+        <div className="space-y-1">
+          <Label className="text-sm text-gray-300">Khu vực</Label>
+          <Select value={selectedArea} onValueChange={(e) => onChangeArea(e)}>
+            <SelectTrigger className="bg-[#1e1e1e] border border-gray-600 text-white">
+              <SelectValue placeholder="Chọn khu vực" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#2a2a2a] text-white border-gray-700">
+              <SelectItem value="all">Toàn quốc</SelectItem>
+              <SelectItem value="Thành phố Hồ Chí Minh">TP.HCM</SelectItem>
+              <SelectItem value="Thành phố Hà Nội">Hà Nội</SelectItem>
+              <SelectItem value="Thành phố Đà Nẵng">Đà Nẵng</SelectItem>
+              <SelectItem value="other">Khu vực khác</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Giá vé */}
+        <div className="space-y-2">
+          <Label className="text-sm text-gray-300">Khoảng giá (đ)</Label>
+          <Slider
+            defaultValue={[50000]}
+            min={50000}
+            max={2000000}
+            step={50000}
+            value={priceRange}
+            onValueChange={(val) => onChangePriceRange(val)}
+            className="slider-custom"
+          />
+          <div className="text-sm text-gray-400">
+            Từ {priceRange[0].toLocaleString("vi-VN")} đ trở lên
           </div>
         </div>
-      )}
-      <Toaster position="top-center" />
-    </div>
+      </CardContent>
+    </Card>
   );
 };
-
-export default FilterEvent;

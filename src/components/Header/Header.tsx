@@ -9,17 +9,19 @@ import Avatar from "../../assets/boy.png";
 import { AuthContext } from "../../contexts/AuthProvider";
 import companyApi from "../../services/companyApi";
 import SearchBar from "../SearchBar/SearchBar";
+import useMyProfile from "../../hooks/useMyProfile";
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
+  const { profile } = useMyProfile();
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 100) {
+      if (window.scrollY > window.innerHeight - 102) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -55,7 +57,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
+      className={`fixed top-0 left-0 w-full h-[70px] p-4 lg:px-14 bg-pse-header flex items-center text-pse-text transition-transform duration-500 z-20 ${
         location.pathname !== "/" && "translate-y-0"
       } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
     >
@@ -81,7 +83,12 @@ const Header = () => {
               onClick={() => setOpenMenu(true)}
               className="relative p-[6px] rounded-full border border-pse-text"
             >
-              <img src={Avatar} width={24} />
+              {profile?.avatarURL ? (
+                <img src={profile.avatarURL} width={24} />
+              ) : (
+                <img src={Avatar} width={24} />
+              )}
+
               <div
                 onMouseLeave={() => setOpenMenu(false)}
                 className={`absolute ${

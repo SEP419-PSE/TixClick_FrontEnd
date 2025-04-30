@@ -3,19 +3,19 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "../../../../../components/ui/select";
 
 type Props = {
+  status: string;
   onChange: (e: string) => void;
 };
 
-const FilterVoucher = ({ onChange }: Props) => {
+const FilterVoucher = ({ status, onChange }: Props) => {
   return (
     <div>
-      <Select onValueChange={onChange}>
+      <Select value={status.toLowerCase()} onValueChange={onChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Chọn trạng thái" />
         </SelectTrigger>

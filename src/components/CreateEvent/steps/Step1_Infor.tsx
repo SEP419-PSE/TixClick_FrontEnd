@@ -79,13 +79,29 @@ export default function StepOne({
   }, [event]);
 
   useEffect(() => {
-    const isValid =
-      editorContent.trim() !== "<p><br></p>" &&
-      eventName.trim() !== "" &&
-      (joinUrl.trim() !== "" || locationEvent !== "") &&
-      typeEvent !== "" &&
-      (logoImage !== null || logoImageUrl !== null) &&
-      (background !== null || backgroundUrl !== null);
+    let isValid = false;
+
+    if (eventMode === "OFFLINE") {
+      isValid =
+        editorContent.trim() !== "<p><br></p>" &&
+        eventName.trim() !== "" &&
+        locationEvent.trim() !== "" &&
+        address.province !== "" &&
+        address.district !== "" &&
+        address.ward !== "" &&
+        address.address.trim() !== "" &&
+        typeEvent !== "" &&
+        (logoImage !== null || logoImageUrl !== null) &&
+        (background !== null || backgroundUrl !== null);
+    } else if (eventMode === "ONLINE") {
+      isValid =
+        editorContent.trim() !== "<p><br></p>" &&
+        eventName.trim() !== "" &&
+        joinUrl.trim() !== "" &&
+        typeEvent !== "" &&
+        (logoImage !== null || logoImageUrl !== null) &&
+        (background !== null || backgroundUrl !== null);
+    }
 
     setIsStepValid(isValid);
   }, [
@@ -96,21 +112,39 @@ export default function StepOne({
     typeEvent,
     logoImage,
     background,
-    setIsStepValid,
     logoImageUrl,
     backgroundUrl,
     joinUrl,
+    eventMode,
+    setIsStepValid,
   ]);
 
   const submitInfo = async () => {
-    if (
-      editorContent.trim() == "<p><br></p>" ||
-      eventName == "" ||
-      locationEvent == "" ||
-      typeEvent == "" ||
-      (logoImage == null && logoImageUrl == null) ||
-      (background == null && backgroundUrl == null)
-    ) {
+    let isValid = false;
+
+    if (eventMode === "OFFLINE") {
+      isValid =
+        editorContent.trim() !== "<p><br></p>" &&
+        eventName.trim() !== "" &&
+        locationEvent.trim() !== "" &&
+        address.province !== "" &&
+        address.district !== "" &&
+        address.ward !== "" &&
+        address.address.trim() !== "" &&
+        typeEvent !== "" &&
+        (logoImage !== null || logoImageUrl !== null) &&
+        (background !== null || backgroundUrl !== null);
+    } else if (eventMode === "ONLINE") {
+      isValid =
+        editorContent.trim() !== "<p><br></p>" &&
+        eventName.trim() !== "" &&
+        joinUrl.trim() !== "" &&
+        typeEvent !== "" &&
+        (logoImage !== null || logoImageUrl !== null) &&
+        (background !== null || backgroundUrl !== null);
+    }
+
+    if (!isValid) {
       toast.warning("Vui lòng nhập đầy đủ thông tin", {
         position: "top-center",
       });

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Play, Search, X } from "lucide-react";
 import { FormEvent, useContext, useEffect, useState } from "react";
 import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
@@ -26,7 +26,7 @@ const HeroSlider = () => {
         setIsBackDrop(false);
       }
 
-      if (window.scrollY > window.innerHeight - 100) {
+      if (window.scrollY > window.innerHeight - 102) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
@@ -93,7 +93,7 @@ const HeroSlider = () => {
 
         {/* Header  */}
         <header
-          className={`fixed flex items-center top-0 left-0 w-full p-4 lg:px-14 text-white transition-all duration-500 z-10 ${
+          className={`fixed flex items-center top-0 left-0 w-full h-[70px] p-4 lg:px-14 text-white transition-all duration-500 z-10 ${
             isVisible ? "translate-y-0 " : "-translate-y-full"
           } ${isBackDrop && "backdrop-blur-[20px] bg-black bg-opacity-30"}`}
         >
@@ -139,9 +139,22 @@ const HeroSlider = () => {
 
         <form
           onSubmit={submitSearchValue}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4"
         >
-          <div className="relative w-full">
+          <div className="w-full flex flex-col gap-2">
+            <p className="text-4xl font-bold text-center">
+              ALL ABOUT EVENT - ITS ALL HERE
+            </p>
+            <p className="text-xl text-center font-medium">
+              Turn on the feeling with all music event{" "}
+            </p>
+            <button type="button" className="flex justify-center mt-6 p-3">
+              <span className="bg-white p-3 rounded-full ring ring-offset-4 ring-white/50">
+                <Play className="fill-pse-green stroke-pse-green" />
+              </span>
+            </button>
+          </div>
+          {/* <div className="relative w-md">
             <input
               type="text"
               name="searchValue"
@@ -154,7 +167,7 @@ const HeroSlider = () => {
             >
               <Search />
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
 

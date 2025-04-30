@@ -53,7 +53,7 @@ export default function Consumer() {
     const companyId = (await companyApi.isAccountHaveCompany()).data.result
       .companyId;
     const eventsResponse = await eventApi.getAllByCompany(companyId);
-    if (eventsResponse.data.result.length > 0) {
+    if (eventsResponse.data.result) {
       setEvents(eventsResponse.data.result);
     } else {
       setEvents([]);
