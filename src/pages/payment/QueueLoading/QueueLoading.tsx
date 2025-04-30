@@ -10,12 +10,12 @@ import {
   Ticket,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
 import type { EventDetailResponse } from "../../../interface/EventInterface";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
+import { useLocation, useNavigate } from "react-router";
 
 const payOsApi = {
   checkPaymentStatus: async (queryParams: Record<string, string>) => {
@@ -84,7 +84,7 @@ const payOsApi = {
 };
 
 export default function PaymentQueuePage() {
-  const [____, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -153,6 +153,43 @@ export default function PaymentQueuePage() {
   };
 
   useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const storedData = localStorage.getItem("paymentQueueData");
+    const jsonData = JSON.parse(storedData ? storedData : "");
+    const orderCode = queryParams.get("orderCode");
+    const status = queryParams.get("status");
+
+    // Check orderCode and callback to create transaction
+    if (orderCode) {
+      setIsVerifyingPayment(true);
+      const allParams = getQueryParams();
+      payOsApi.checkPaymentStatus(allParams);
+    } else {
+      console.warn("No orderCode found in URL");
+      setPaymentError("No transaction information found");
+      setInitialLoading(false);
+    }
+
+    // Check status of order
+    if (status == "PAID") {
+      setPaymentStatus("PAID");
+      setPaymentData(jsonData);
+      setEvent(jsonData.eventInfo);
+      setTickets(jsonData.seats);
+      setIsComplete(true);
+      setShowConfetti(true);
+      setInitialLoading(false);
+      setIsVerifyingPayment(false);
+    } else {
+      setPaymentStatus("CANCELLED");
+      setIsComplete(true);
+      setShowConfetti(true);
+      setInitialLoading(false);
+      setIsVerifyingPayment(false);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!initialLoading) return;
 
     const timer = setTimeout(() => {
@@ -191,43 +228,6 @@ export default function PaymentQueuePage() {
       return () => clearInterval(confettiInterval);
     }
   }, [showConfetti]);
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const storedData = localStorage.getItem("paymentQueueData");
-    const jsonData = JSON.parse(storedData ? storedData : "");
-    const orderCode = queryParams.get("orderCode");
-    const status = queryParams.get("status");
-
-    // Check orderCode and callback to create transaction
-    if (orderCode) {
-      setIsVerifyingPayment(true);
-      const allParams = getQueryParams();
-      payOsApi.checkPaymentStatus(allParams);
-    } else {
-      console.warn("No orderCode found in URL");
-      setPaymentError("No transaction information found");
-      setInitialLoading(false);
-    }
-
-    // Check status of order
-    if (status == "PAID") {
-      setPaymentStatus("PAID");
-      setPaymentData(jsonData);
-      setEvent(jsonData.eventInfo);
-      setTickets(jsonData.seats);
-      setIsComplete(true);
-      setShowConfetti(true);
-      setInitialLoading(false);
-      setIsVerifyingPayment(false);
-    } else {
-      setPaymentStatus("CANCELLED");
-      setIsComplete(true);
-      setShowConfetti(true);
-      setInitialLoading(false);
-      setIsVerifyingPayment(false);
-    }
-  }, []);
 
   const handleViewTickets = () => {
     navigate("/ticketManagement");
