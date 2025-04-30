@@ -54,109 +54,100 @@ import LoginGoogleSucces from "./pages/auth/LoginGoogleSucces";
 export default function App() {
   return (
     <div className="font-inter text-[14px] text-white min-h-screen bg-[#1E1E1E] overflow-x-hidden">
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route element={<RootLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="event-detail/:id" element={<EventDetail />} />
-            <Route
-              path="event-detail/:id/booking-ticket"
-              element={<TicketBooking />}
-            />
-            <Route path="create-event" element={<CreateEvent />} />
-            {/* Authitencation route */}
-            <Route path="auth" element={<SignInPage />}>
-              <Route index path="signin" element={<SignInForm />} />
-              <Route path="signup" element={<SignUpForm />} />
-              <Route path="verify" element={<OTPVerify />} />
-              <Route path="code" element={<EnterCode />} />
-            </Route>
-            {/* Organizer route */}
-            <Route path="404" element={<ErrorPage />} />
-
-            {/*Company route */}
-            <Route path="create-company" element={<CreateCompany />} />
-            <Route path="search" element={<SearchPage />} />
-          </Route>
-
+      <ScrollToTop />
+      <Routes>
+        <Route element={<RootLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="event-detail/:id" element={<EventDetail />} />
           <Route
-            path="event-detail/:id/booking-ticket-no-seatmap"
-            element={<TicketBookingNoneSeatmap />}
+            path="event-detail/:id/booking-ticket"
+            element={<TicketBooking />}
           />
-          <Route path="login-google-success" element={<LoginGoogleSucces />} />
+          <Route path="create-event" element={<CreateEvent />} />
+          {/* Authitencation route */}
+          <Route path="auth" element={<SignInPage />}>
+            <Route index path="signin" element={<SignInForm />} />
+            <Route path="signup" element={<SignUpForm />} />
+            <Route path="verify" element={<OTPVerify />} />
+            <Route path="code" element={<EnterCode />} />
+          </Route>
+          {/* Organizer route */}
+          <Route path="404" element={<ErrorPage />} />
 
-          <Route>
-            <Route path="organizerCenter" element={<OrganizerCenter />} />
-            <Route path="payment" element={<PaymentPage />} />
-            <Route path="payment/queue" element={<PaymentQueuePage />} />
+          {/*Company route */}
+          <Route path="create-company" element={<CreateCompany />} />
+          <Route path="search" element={<SearchPage />} />
+        </Route>
 
-            {/* MANAGER DASHBOARD */}
-            <Route path="manager-dashboard" element={<DashboardLayout />}>
-              <Route index element={<ManagerOverview />} />
-              <Route path="contracts" element={<ContractsPage />} />
-              <Route path="events" element={<EventsPage />} />
-              <Route path="payments" element={<PaymentsPage />} />
-              <Route
-                path="company-approvals"
-                element={<CompanyApprovalsPage />}
-              />
-              <Route path="notifications" element={<NotificationPage />} />
-            </Route>
+        <Route
+          path="event-detail/:id/booking-ticket-no-seatmap"
+          element={<TicketBookingNoneSeatmap />}
+        />
+        <Route path="login-google-success" element={<LoginGoogleSucces />} />
 
-            <Route path="profileForm" element={<ProfileForm />} />
-            <Route path="superLogin" element={<SuperLogin />} />
+        <Route>
+          <Route path="organizerCenter" element={<OrganizerCenter />} />
+          <Route path="payment" element={<PaymentPage />} />
+          <Route path="payment/queue" element={<PaymentQueuePage />} />
 
-            {/* COMPANY BOARD*/}
-            <Route path="company" element={<RootLayouts />}>
-              <Route index element={<Consumer />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="policies" element={<Policy />} />
-              <Route path="members" element={<Member />} />
-              <Route path="information" element={<Information />} />
-            </Route>
-
-            {/* Event Management */}
+          {/* MANAGER DASHBOARD */}
+          <Route path="manager-dashboard" element={<DashboardLayout />}>
+            <Route index element={<ManagerOverview />} />
+            <Route path="contracts" element={<ContractsPage />} />
+            <Route path="events" element={<EventsPage />} />
+            <Route path="payments" element={<PaymentsPage />} />
             <Route
-              path="/company/events/:eventId"
-              element={<EventManagement />}
-            >
-              <Route
-                index
-                path="summary-revenue"
-                element={<SummaryRevenue />}
-              />
-              <Route path="orders" element={<Order />} />
-              <Route path="revenue" element={<Revenue />} />
-              <Route path="check-in" element={<CheckIn />} />
-              <Route path="tasks" element={<Tasks />} />
-              <Route path="vouchers" element={<Voucher />} />
-            </Route>
-
-            <Route />
-
-            <Route path="ticketManagement" element={<TicketPage />} />
-
-            {/* ADMIN DASHBOARD */}
-            <Route path="proAdmin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="events" element={<AdminEvent />} />
-              <Route path="companies" element={<AdminCompany />} />
-              <Route path="managerManagement" element={<AccountsPage />} />
-              <Route path="revenues" element={<RevenuePage />} />
-
-              {/* <Route path="profile" element={<ProfileAdmin />} /> */}
-            </Route>
+              path="company-approvals"
+              element={<CompanyApprovalsPage />}
+            />
+            <Route path="notifications" element={<NotificationPage />} />
           </Route>
 
-          <Route path="404" element={<ErrorPage />} />
-          <Route path="vietqr" element={<VietQRGenerator />} />
+          <Route path="profileForm" element={<ProfileForm />} />
+          <Route path="superLogin" element={<SuperLogin />} />
 
-          {/* Chat app */}
-          <Route path="chat" element={<ChatApp />} />
-          <Route path="template" element={<ContractTemplate />} />
-        </Routes>
-      </BrowserRouter>
+          {/* COMPANY BOARD*/}
+          <Route path="company" element={<RootLayouts />}>
+            <Route index element={<Consumer />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="policies" element={<Policy />} />
+            <Route path="members" element={<Member />} />
+            <Route path="information" element={<Information />} />
+          </Route>
+
+          {/* Event Management */}
+          <Route path="/company/events/:eventId" element={<EventManagement />}>
+            <Route index path="summary-revenue" element={<SummaryRevenue />} />
+            <Route path="orders" element={<Order />} />
+            <Route path="revenue" element={<Revenue />} />
+            <Route path="check-in" element={<CheckIn />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="vouchers" element={<Voucher />} />
+          </Route>
+
+          <Route />
+
+          <Route path="ticketManagement" element={<TicketPage />} />
+
+          {/* ADMIN DASHBOARD */}
+          <Route path="proAdmin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="events" element={<AdminEvent />} />
+            <Route path="companies" element={<AdminCompany />} />
+            <Route path="managerManagement" element={<AccountsPage />} />
+            <Route path="revenues" element={<RevenuePage />} />
+
+            {/* <Route path="profile" element={<ProfileAdmin />} /> */}
+          </Route>
+        </Route>
+
+        <Route path="404" element={<ErrorPage />} />
+        <Route path="vietqr" element={<VietQRGenerator />} />
+
+        {/* Chat app */}
+        <Route path="chat" element={<ChatApp />} />
+        <Route path="template" element={<ContractTemplate />} />
+      </Routes>
     </div>
   );
 }
