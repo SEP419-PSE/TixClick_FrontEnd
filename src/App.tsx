@@ -49,6 +49,7 @@ import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
 import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
 import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
 import Voucher from "./pages/consumer/components/Event/Voucher/Voucher";
+import LoginGoogleSucces from "./pages/auth/LoginGoogleSucces";
 
 export default function App() {
   return (
@@ -76,13 +77,14 @@ export default function App() {
 
             {/*Company route */}
             <Route path="create-company" element={<CreateCompany />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="search" element={<SearchPage />} />
           </Route>
 
           <Route
             path="event-detail/:id/booking-ticket-no-seatmap"
             element={<TicketBookingNoneSeatmap />}
           />
+          <Route path="login-google-success" element={<LoginGoogleSucces />} />
 
           <Route>
             <Route path="organizerCenter" element={<OrganizerCenter />} />
