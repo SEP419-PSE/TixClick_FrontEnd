@@ -22,7 +22,7 @@ const EventList: React.FC<Props> = ({ eventList }) => {
           <NavLink to={`/event-detail/${event.eventId}`}>
             <div className="lg:relative group overflow-hidden cursor-pointer">
               <img
-                className="rounded-lg w-full h-[200px] lg:group-hover:opacity-50 transition-all duration-300"
+                className="rounded-lg w-full h-[150px] lg:h-[200px] lg:group-hover:opacity-50 transition-all duration-300"
                 src={event.bannerURL}
               />
 

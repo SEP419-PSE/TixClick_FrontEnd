@@ -206,7 +206,7 @@ const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [selectedArea, setSelectedArea] = useState<string>("all");
-  const [typeEvent, setTypeEvent] = useState<string>("all");
+  const [typeEvent, setTypeEvent] = useState<string>("0");
   const [priceRange, setPriceRange] = useState([50000]);
 
   const onChangeSearchParams = (key: string, value: string) => {

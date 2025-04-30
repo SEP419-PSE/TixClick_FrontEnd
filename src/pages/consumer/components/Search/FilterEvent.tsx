@@ -41,7 +41,7 @@ export const FilterEvent = ({
               <SelectValue placeholder="Chọn loại sự kiện" />
             </SelectTrigger>
             <SelectContent className="bg-[#2a2a2a] text-white border-gray-700">
-              <SelectItem value={"all"}>Tất cả thể loại</SelectItem>
+              <SelectItem value={"0"}>Tất cả thể loại</SelectItem>
               <SelectItem value={"1"}>Âm nhạc</SelectItem>
               <SelectItem value={"2"}>Thể thao</SelectItem>
               <SelectItem value={"3"}>Sân khấu & Nghệ thuât</SelectItem>
