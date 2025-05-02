@@ -11,7 +11,7 @@ const Categories = ({ onCategoryClick }: CategoriesProps) => {
         <h2 className="text-2xl font-bold text-[#FF8A00]">Khám Phá Sự Kiện</h2>
         <p className="text-white/80">Chọn danh mục yêu thích của bạn</p>
       </div>
-      
+
       {eventTypes.map((type) => {
         const Icon = type.icon;
         return (
@@ -29,7 +29,9 @@ const Categories = ({ onCategoryClick }: CategoriesProps) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-70 rounded-xl"></div>
             </div>
             <div
-              style={{ backgroundColor: type.id === 1 ? "#FF8A00" : type.color }}
+              style={{
+                backgroundColor: type.id === 1 ? "#FF8A00" : type.color,
+              }}
               className={`absolute bottom-0 left-0 w-full p-3 rounded-b-xl text-center transition-all duration-300 group-hover:h-1/3 flex flex-col justify-end`}
             >
               <p className="font-bold flex items-center justify-center text-base md:text-lg text-white">
