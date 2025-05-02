@@ -65,7 +65,26 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (value.province) {
+      const province = provinces.find((p) => p.name === value.province);
+      if (province) {
+        setSelectedProvinceId(province.code);
+      }
+    }
+  }, [value.province, provinces]);
+
+  useEffect(() => {
+    if (value.district) {
+      const district = districts.find((d) => d.name === value.district);
+      if (district) {
+        setSelectedDistrictId(district.code);
+      }
+    }
+  }, [value.district, districts]);
+
   const handleSelectProvince = (provinceName: string) => {
+    if (provinceName === value.province) return; // Nếu trùng, không làm gì cả
     const province = provinces.find((p) => p.name === provinceName);
     setSelectedProvinceId(province?.code);
     setSelectedDistrictId(undefined); // Reset district
@@ -73,12 +92,14 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
   };
 
   const handleSelectDistrict = (districtName: string) => {
+    if (districtName === value.district) return;
     const district = districts.find((d) => d.name === districtName);
     setSelectedDistrictId(district?.code);
     onChange({ ...value, district: districtName, ward: "" });
   };
 
   const handleSelectWard = (wardName: string) => {
+    if (wardName === value.ward) return;
     onChange({ ...value, ward: wardName });
   };
 

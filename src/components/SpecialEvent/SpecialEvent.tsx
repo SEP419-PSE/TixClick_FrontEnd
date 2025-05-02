@@ -1,35 +1,39 @@
-import type React from "react"
+import type React from "react";
 
-import { useRef } from "react"
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa6"
-import { NavLink } from "react-router"
-import type { EventForConsumer } from "../../interface/EventInterface"
+import { useRef } from "react";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { NavLink } from "react-router";
+import type { EventForConsumer } from "../../interface/EventInterface";
 
 type Props = {
-  specialEvents: EventForConsumer[]
-}
+  specialEvents: EventForConsumer[];
+};
 
 const SpecialEvent: React.FC<Props> = ({ specialEvents }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: -948, behavior: "smooth" })
+      containerRef.current.scrollBy({ left: -948, behavior: "smooth" });
     }
-  }
+  };
 
   const scrollRight = () => {
     if (containerRef.current) {
-      containerRef.current.scrollBy({ left: 948, behavior: "smooth" })
+      containerRef.current.scrollBy({ left: 948, behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <div className="py-14 px-4 lg:px-14 bg-gradient-to-b from-black/90 to-black/80">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#FF8A00]">Sự Kiện Đặc Biệt</h2>
-          <p className="text-white/70 mt-1">Những trải nghiệm không thể bỏ lỡ</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#FF8A00]">
+            Sự Kiện Đặc Biệt
+          </h2>
+          <p className="text-white/70 mt-1">
+            Những trải nghiệm không thể bỏ lỡ
+          </p>
         </div>
         <div className="hidden md:flex gap-2">
           <button
@@ -48,19 +52,24 @@ const SpecialEvent: React.FC<Props> = ({ specialEvents }) => {
       </div>
 
       <div className="relative">
-        <div className="flex gap-6 overflow-x-scroll scrollbar-hide lg:overflow-hidden pb-4" ref={containerRef}>
+        <div
+          className="flex gap-6 overflow-x-scroll scrollbar-hide lg:overflow-hidden pb-4"
+          ref={containerRef}
+        >
           {specialEvents.map((events, index) => (
             <div key={index}>
               <NavLink to={`/event-detail/${events.eventId}`}>
-                <div className="relative group w-[300px] h-[180px] overflow-hidden cursor-pointer rounded-xl">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-[1] opacity-0 group-hover:opacity-90 transition-opacity"></div>
+                <div className="relative group w-[352px] h-[450px] overflow-hidden cursor-pointer rounded-xl">
+                  {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-[1] opacity-0 group-hover:opacity-90 transition-opacity"></div> */}
                   <img
                     src={events.logoURL || "/placeholder.svg"}
                     className="rounded-xl w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
                     alt={events.eventName}
                   />
                   <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <span className="text-white text-lg font-bold mb-2">{events.eventName}</span>
+                    <span className="text-white text-lg font-bold mb-2">
+                      {events.eventName}
+                    </span>
                     <span className="text-white text-sm font-semibold px-6 py-2 rounded-full bg-[#FF8A00] transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       Mua vé
                     </span>
@@ -88,7 +97,7 @@ const SpecialEvent: React.FC<Props> = ({ specialEvents }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SpecialEvent
+export default SpecialEvent;

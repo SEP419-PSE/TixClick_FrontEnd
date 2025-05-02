@@ -57,7 +57,7 @@ export default function StepOne({
   const [joinUrl, setJoinUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const companies: Company | undefined = useAllCompany();
+  const companies: Company | undefined = useAllCompany({ eventId });
 
   // const handleSelectCompany = (companyId: number) => {
   //   setSelectedCompanyId(companyId);
@@ -69,6 +69,13 @@ export default function StepOne({
     if (event != undefined) {
       setLogoImageUrl(event.logoURL);
       setBackGroundUrl(event.bannerURL);
+      setAddress((prev) => ({
+        ...prev,
+        province: event.city,
+        district: event.district,
+        ward: event.ward,
+        address: event.address,
+      }));
       setEventName(event.eventName);
       setLocationEvent(event.locationName);
       setTypeEvent(event.eventCategoryId.toString());
@@ -80,7 +87,6 @@ export default function StepOne({
 
   useEffect(() => {
     let isValid = false;
-
     if (eventMode === "OFFLINE") {
       isValid =
         editorContent.trim() !== "<p><br></p>" &&
@@ -250,18 +256,6 @@ export default function StepOne({
         <p className="text-white">Địa chỉ sự kiện</p>
         <div className="flex flex-col space-y-2 text-white">
           <div className="flex items-center space-x-6 my-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="eventMode"
-                value="ONLINE"
-                checked={equalIgnoreCase(eventMode, "Online")}
-                onChange={() => setEventMode("ONLINE")}
-                className="accent-pse-green w-4 h-4"
-              />
-              <span>Sự kiện Online</span>
-            </label>
-
             <label className="flex items-center space-x-2">
               <input
                 type="radio"
