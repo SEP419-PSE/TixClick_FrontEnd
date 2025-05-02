@@ -33,7 +33,7 @@ const LockPage = ({ message, status }: Props) => {
           </Button>
         </NavLink>
       ) : (
-        <NavLink to="/create-conmpany">
+        <NavLink to="/create-company">
           <Button className="flex items-center gap-2 bg-pse-green hover:bg-opacity-80 text-white shadow-md">
             <House /> <span>Chỉnh sửa thông tin công ty</span>
           </Button>

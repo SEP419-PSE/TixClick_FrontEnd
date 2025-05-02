@@ -38,6 +38,14 @@ const companyApi = {
     const url = `${baseUrl}/get-company-by-event-id/${eventId}`;
     return axiosClient.get(url);
   },
+  update: (data: FormData, companyId: number | undefined) => {
+    const url = `${baseUrl}/${companyId}`;
+    return axiosClient.put(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
 };
 
 export default companyApi;
