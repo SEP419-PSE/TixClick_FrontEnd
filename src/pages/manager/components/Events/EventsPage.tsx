@@ -54,6 +54,7 @@ import {
 import type { EventResponse } from "../../../../interface/manager/EventType";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { ManagerHeader } from "../ManagerHeader";
+import { EventStatus } from "../../../../interface/EventInterface";
 
 const customStyles = `
   .description-scrollbar::-webkit-scrollbar {
@@ -118,7 +119,7 @@ export default function EventsPage() {
 
   const fetchEventList = async () => {
     try {
-      const res: any = await managerApi.getAllEvent();
+      const res = await managerApi.getAllEvent();
       console.log("Event List:", res.data.result);
       if (res.data.result && res.data.result.length > 0) {
         setEvents(res.data.result);
@@ -132,7 +133,7 @@ export default function EventsPage() {
   const fetchRelatedContracts = async (eventId: number) => {
     console.log("eventId:", eventId);
     try {
-      const res: any = await managerApi.getContractsByEventId(eventId);
+      const res = await managerApi.getContractsByEventId(eventId);
       console.log("Related Contract Documents:", res.data.result);
       if (res.data.result && res.data.result.length > 0) {
         setRelatedContracts(res.data.result);
@@ -182,7 +183,7 @@ export default function EventsPage() {
 
       setIsRejecting(true);
 
-      const res: any = await managerApi.approveEvent(
+      const res = await managerApi.approveEvent(
         "REJECTED",
         selectedEvent.eventId
       );
@@ -353,26 +354,33 @@ export default function EventsPage() {
     setFilteredEvents(result);
   }, [searchQuery, events, filterStatus, filterType, sortBy, sortOrder]);
 
-  const getStatusBadge = (status: any) => {
+  const getStatusBadge = (status: EventStatus) => {
     switch (status) {
-      case "APPROVED":
+      case EventStatus.CONFIRMED:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
-            Approved
+            Confirmed
           </span>
         );
-      case "PENDING":
+      case EventStatus.PENDING:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">
             Pending
           </span>
         );
-      case "REJECTED":
+      case EventStatus.REJECTED:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">
             Rejected
           </span>
         );
+      case EventStatus.SCHEDULED:
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
+            Scheduled
+          </span>
+        );
+
       default:
         return null;
     }
@@ -490,13 +498,14 @@ export default function EventsPage() {
           <Table>
             <TableHeader>
               <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-                <TableHead className="text-white">Event Name</TableHead>
-                <TableHead className="text-white">Date</TableHead>
-                <TableHead className="text-white">Location</TableHead>
-                <TableHead className="text-white">Organizer</TableHead>
-                <TableHead className="text-white">Type</TableHead>
-                <TableHead className="text-white">Status</TableHead>
-                <TableHead className="text-white text-right">Actions</TableHead>
+                <TableHead className="text-white">Tên sự kiện</TableHead>
+                <TableHead className="text-white">Mã sự kiện</TableHead>
+                <TableHead className="text-white">Tên địa điểm</TableHead>
+                <TableHead className="text-white">Công ty</TableHead>
+                <TableHead className="text-white">Trạng thái</TableHead>
+                <TableHead className="text-white text-right">
+                  Hành động
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -509,16 +518,13 @@ export default function EventsPage() {
                     {event.eventName}
                   </TableCell>
                   <TableCell className="text-white">
-                    {event.eventName}
+                    {event.eventCode}
                   </TableCell>
                   <TableCell className="text-white">
                     {event.locationName}
                   </TableCell>
                   <TableCell className="text-white">
                     {event.companyName}
-                  </TableCell>
-                  <TableCell className="text-white">
-                    {event.typeEvent}
                   </TableCell>
                   <TableCell className="text-white">
                     {getStatusBadge(event.status)}
@@ -865,21 +871,19 @@ export default function EventsPage() {
                           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      Basic Information
+                      Thông tin cơ bản
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-sm text-gray-400">Event Type</p>
-                        <p className="font-medium">{selectedEvent.typeEvent}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-400">Company</p>
+                        <p className="text-sm text-gray-400">
+                          Công ty phụ trách
+                        </p>
                         <p className="font-medium">
                           {selectedEvent.companyName}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">Organizer</p>
+                        <p className="text-sm text-gray-400">Chủ sự kiện</p>
                         <p className="font-medium">
                           {selectedEvent.organizerName}
                         </p>
@@ -909,18 +913,24 @@ export default function EventsPage() {
                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      Location
+                      Địa chỉ
                     </h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-sm text-gray-400">Location Name</p>
+                        <p className="text-sm text-gray-400">Tên địa điểm</p>
                         <p className="font-medium">
                           {selectedEvent.locationName}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">Address</p>
-                        <p className="font-medium">{selectedEvent.location}</p>
+                        <p className="text-sm text-gray-400">Địa chỉ</p>
+                        <p className="font-medium">
+                          {selectedEvent.ward +
+                            ", " +
+                            selectedEvent.district +
+                            ", " +
+                            selectedEvent.city}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -943,13 +953,15 @@ export default function EventsPage() {
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
-                      Detailed Description
+                      Thông tin chi tiết
                     </h3>
                     <div className="overflow-y-auto max-h-[400px] pr-2 description-scrollbar">
                       {selectedEvent.description ? (
-                        <div className="whitespace-pre-wrap">
-                          {selectedEvent.description}
-                        </div>
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: selectedEvent?.description,
+                          }}
+                        />
                       ) : (
                         <div className="text-gray-400 italic">
                           No description available

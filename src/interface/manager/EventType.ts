@@ -1,37 +1,37 @@
+import { EventStatus } from "../EventInterface";
+
 export interface EventType {
-    id: number;
-    name: string;
-    status: "pending" | "approved" | "rejected";
-    date: string;
-  };
+  id: number;
+  name: string;
+  status: "pending" | "approved" | "rejected";
+  date: string;
+}
 
-  export interface EventReview {
-    eventId: number;
-    eventName: string;
-    location: string;
-    logoURL: string;
-    bannerURL: string;
-    status: "PENDING" | "APPROVED" | "REJECTED"; 
-    typeEvent: "ONLINE" | "OFFLINE"; 
-    description: string;
-    categoryId: number;
-    organizerId: number;
-    companyId: number;
-  }
-  
+export interface EventReview {
+  eventId: number;
+  eventName: string;
+  location: string;
+  logoURL: string;
+  bannerURL: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  typeEvent: "ONLINE" | "OFFLINE";
+  description: string;
+  categoryId: number;
+  organizerId: number;
+  companyId: number;
+}
 
-export interface Event  {
-    name: string;
-    date: string;
-    location: string;
-    attendees: number;
-    priceRange: string;
-    status: "pending" | "approved" | "rejected";
-  };
-
+export interface Event {
+  name: string;
+  date: string;
+  location: string;
+  attendees: number;
+  priceRange: string;
+  status: "pending" | "approved" | "rejected";
+}
 
 export interface EventManagement {
-  id : string;
+  id: string;
   name: string;
   date: Date;
 }
@@ -49,26 +49,23 @@ export interface SelectedEvent {
   budget: number;
   sponsors: string[];
   speakers: string[];
-
 }
-
 
 export interface EventResponse {
   eventId: number;
   eventName: string;
-  location: string;
   locationName: string;
   description: string;
   bannerURL: string;
   logoURL: string;
-  status: string |"PENDING_APPROVAL" | "APPROVED" | "REJECTED" | "SCHEDULED"; 
-  typeEvent: "Offline" | "Online"; 
+  eventCode: string;
+  city: string;
+  district: string;
+  ward: string;
+  status: EventStatus;
+  typeEvent: string;
   organizerId: number;
   organizerName: string;
   companyId: number;
   companyName: string;
 }
-
-
-  
-  
