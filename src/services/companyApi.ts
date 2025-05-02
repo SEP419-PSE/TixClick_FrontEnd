@@ -34,6 +34,10 @@ const companyApi = {
     const url = `${baseUrl}/is-account-have-company`;
     return axiosClient.get(url);
   },
+  getByEventId: (eventId: number) => {
+    const url = `${baseUrl}/get-company-by-event-id/${eventId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default companyApi;

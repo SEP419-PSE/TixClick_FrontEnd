@@ -57,7 +57,7 @@ export default function StepOne({
   const [joinUrl, setJoinUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const companies: Company | undefined = useAllCompany();
+  const companies: Company | undefined = useAllCompany({ eventId });
 
   // const handleSelectCompany = (companyId: number) => {
   //   setSelectedCompanyId(companyId);

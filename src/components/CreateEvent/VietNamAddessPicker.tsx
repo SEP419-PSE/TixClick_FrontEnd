@@ -50,8 +50,6 @@ const VietNamAddressPicker = ({ value, onChange }: Props) => {
     number | undefined
   >();
 
-  console.log("Address", value);
-
   const fetchData = async () => {
     const [p, d, w] = await Promise.all([
       axios.get("https://provinces.open-api.vn/api/"),
