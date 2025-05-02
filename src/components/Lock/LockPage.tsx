@@ -2,12 +2,14 @@ import { House, LockKeyhole, PhoneCall } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
 import { NavLink } from "react-router";
+import { CompanyStatus } from "../../interface/company/Company";
 
 type Props = {
   message?: string;
+  status: CompanyStatus;
 };
 
-const LockPage = ({ message }: Props) => {
+const LockPage = ({ message, status }: Props) => {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     document.body.style.pointerEvents = "none"; // Vô hiệu toàn bộ tương tác ngoài
@@ -24,11 +26,19 @@ const LockPage = ({ message }: Props) => {
       <p className="flex items-center gap-2">
         <PhoneCall /> <span>Hotline CSKH: 0931337204</span>
       </p>
-      <NavLink to="/">
-        <Button className="flex items-center gap-2 bg-pse-green hover:bg-opacity-80 text-white shadow-md">
-          <House /> <span>Trang chủ</span>
-        </Button>
-      </NavLink>
+      {status === "PENDING" ? (
+        <NavLink to="/">
+          <Button className="flex items-center gap-2 bg-pse-green hover:bg-opacity-80 text-white shadow-md">
+            <House /> <span>Trang chủ</span>
+          </Button>
+        </NavLink>
+      ) : (
+        <NavLink to="/create-conmpany">
+          <Button className="flex items-center gap-2 bg-pse-green hover:bg-opacity-80 text-white shadow-md">
+            <House /> <span>Chỉnh sửa thông tin công ty</span>
+          </Button>
+        </NavLink>
+      )}
     </div>
   );
 };

@@ -29,8 +29,17 @@ export default function RootLayouts({ children }: { children?: ReactNode }) {
   }, []);
   return (
     <>
-      {(statusCompany == "PENDING" || statusCompany == "REJECTED") && (
-        <LockPage message="Công ty của bạn chưa được quyền thao tác do chưa được chấp nhận" />
+      {statusCompany == "PENDING" && (
+        <LockPage
+          status={statusCompany}
+          message="Công ty của bạn chưa được quyền thao tác do chưa được chấp nhận"
+        />
+      )}
+      {statusCompany == "REJECTED" && (
+        <LockPage
+          status={statusCompany}
+          message="Công ty của bạn đã bị từ chối"
+        />
       )}
       <Header />
       <div className="flex h-screen pt-16 bg-[#1a1a1a]">
