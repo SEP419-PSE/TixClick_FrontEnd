@@ -35,7 +35,7 @@ export default function NotificationPage() {
     console.log("Connecting to WebSocket for user:", currentUser);
 
     const client = new Client({
-      brokerURL: `wss://tixclick.site/ws?token=${context?.accessToken2}`,
+      brokerURL: `wss://160.191.175.172:8443/ws?token=${context?.accessToken2}`,
       connectHeaders: {
         Authorization: `Bearer ${context.accessToken2}`,
       },
@@ -52,27 +52,20 @@ export default function NotificationPage() {
 
       console.log(`Subscribing to /user/${currentUser}/queue/notifications`);
 
-      client.subscribe(
-        "/user/specific/messages",
-        async function (message) {
-          if (message.body) {
-            console.log("📬 Notification event received:", message.body);
-      
-            await fetchNotifications(); 
-      
-            toast.success("Thông báo mới", {
-              description: "Danh sách thông báo đã được cập nhật.",
-            });
-          } else {
-            console.warn("⚠️ Received empty message from WebSocket");
-          }
-        }
-      );
-      
-      
-      
-    };
+      client.subscribe("/user/specific/messages", async function (message) {
+        if (message.body) {
+          console.log("📬 Notification event received:", message.body);
 
+          await fetchNotifications();
+
+          toast.success("Thông báo mới", {
+            description: "Danh sách thông báo đã được cập nhật.",
+          });
+        } else {
+          console.warn("⚠️ Received empty message from WebSocket");
+        }
+      });
+    };
 
     client.activate();
     stompClient.current = client;
@@ -159,7 +152,6 @@ export default function NotificationPage() {
         }
       );
 
-
       if (!response.ok) {
         throw new Error("Lỗi khi tải thông báo");
       }
@@ -192,7 +184,7 @@ export default function NotificationPage() {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchNotifications();
   }, [context?.accessToken2]);

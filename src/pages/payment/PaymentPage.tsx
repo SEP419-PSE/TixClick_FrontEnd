@@ -175,9 +175,9 @@ export default function PaymentPage() {
       onMessageReceived: (message: any) => void
     ): Client | null => {
       if (typeof window === "undefined") return null;
-
+       
       const client = new Client({
-        brokerURL: `wss://tixclick.site/ws?token=${context?.accessToken}`,
+        brokerURL: `wss://160.191.175.172:8443/ws?token=${context?.accessToken}`,
         connectHeaders: {
           // Authorization: `Bearer ${context.accessToken}`,
         },

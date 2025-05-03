@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ButtonNeon from "../../components/Button/ButtonNeon";
 import ImageUpload from "../../components/CreateEvent/ImageUpload";
@@ -11,6 +11,7 @@ import LoadingFullScreen from "../../components/Loading/LoadingFullScreen";
 import { useNavigate } from "react-router";
 import { Card } from "../../components/ui/card";
 import BankCard from "./components/BankCard";
+import useCompany from "../../hooks/useCompany";
 
 export const banks = [
   { id: "970436", bankName: "Vietcombank" },
@@ -28,6 +29,7 @@ export const banks = [
 const CreateCompany = () => {
   const navigate = useNavigate();
   const [logoCompany, setLogoCompany] = useState<File | null>(null);
+  const [reviewLogo, setReviewLogo] = useState<string>("");
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
@@ -39,7 +41,26 @@ const CreateCompany = () => {
   const [cccd, setCccd] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
-  // console.log(files);
+  const { company } = useCompany();
+
+  const fetchInfor = () => {
+    if (company) {
+      setReviewLogo(company.logoURL);
+      setCompanyName(company.companyName);
+      setEmail(company.email);
+      setAddress(company.address);
+      setDescription(company.description);
+      setCodeTax(company.codeTax);
+      setBankingName(company.bankingName);
+      setBankingCode(company.bankingCode);
+      setOwnerCard(company.ownerCard);
+      setCccd(company.nationalId);
+    }
+  };
+
+  useEffect(() => {
+    fetchInfor();
+  }, [company]);
 
   // Xử lý khi chọn file
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +140,60 @@ const CreateCompany = () => {
     }
   };
 
+  const hanldeUpdateCompany = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    if (
+      !email ||
+      !address ||
+      !companyName ||
+      !description ||
+      !codeTax ||
+      !bankingName ||
+      !bankingCode ||
+      !cccd ||
+      !ownerCard ||
+      files.length === 0
+    ) {
+      toast.error("Vui lòng điền đầy đủ thông tin", { position: "top-center" });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Tạo FormData để gửi API tạo công ty
+      const companyData = new FormData();
+      if (logoCompany) companyData.append("logo", logoCompany);
+      companyData.append("companyName", companyName);
+      companyData.append("email", email);
+      companyData.append("address", address);
+      companyData.append("description", description);
+      companyData.append("codeTax", codeTax);
+      companyData.append("ownerCard", ownerCard);
+      companyData.append("bankingName", bankingName);
+      companyData.append("bankingCode", bankingCode);
+      companyData.append("nationalId", cccd);
+      Array.from(files).forEach((file) => {
+        companyData.append("documents", file); // Append từng file
+      });
+
+      // companyData.forEach((key, value) => {
+      //   console.log(key, value);
+      // });
+
+      // Gửi API đầu tiên (tạo công ty) và chờ kết quả
+      const response = await companyApi.update(companyData, company?.companyId);
+      console.log(response);
+    } catch (error) {
+      console.error("Error khi tạo công ty hoặc upload tài liệu:", error);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen mt-16 flex items-center justify-center">
       {loading && <LoadingFullScreen />}
@@ -127,7 +202,7 @@ const CreateCompany = () => {
           Đăng ký công ty
         </p>
         <ImageUpload
-          // previewImage={null}
+          previewImage={reviewLogo}
           height={275}
           width={275}
           label="Thêm ảnh công ty"
@@ -244,8 +319,10 @@ const CreateCompany = () => {
             </div>
           )}
         </div>
-        <ButtonNeon onClick={handleRegisterCompany}>
-          {loading ? "Đang thực hiện ..." : "Đăng ký"}
+        <ButtonNeon
+          onClick={company ? hanldeUpdateCompany : handleRegisterCompany}
+        >
+          {loading ? "Đang thực hiện ..." : company ? "Cập nhật" : "Đăng kí"}
         </ButtonNeon>
       </Card>
     </div>

@@ -88,5 +88,7 @@ export const TOAST_MESSAGE = {
   emmptyEventActivity:
     "Vui lòng điền đầy đủ thông tin cho hoạt động trước khi thêm loại vé",
   createVoucherSuccess: "Tạo mã giảm thành công",
+  createCompanySuccess: "Tạo công ty thành công",
+  updateCompanySuccess: "Cập nhật thông tin công ty thành công",
   error: "Đã có lỗi xảy ra",
 };
