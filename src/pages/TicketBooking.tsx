@@ -716,7 +716,10 @@ const TicketBooking = () => {
         };
       });
 
-      console.log("Ticket purchase requests:", ticketPurchaseRequests);
+      console.log(
+        "Ticket purchase requests:",
+        JSON.stringify(ticketPurchaseRequests, null, 2)
+      );
 
       // Call the API to create the ticket purchase
       const response = await ticketPurchaseApi.createTicketPurchase(
@@ -760,7 +763,7 @@ const TicketBooking = () => {
         toast.success("Đã tạo đơn hàng thành công!");
 
         // Chuyển đến trang thanh toán
-        navigate("/payment");
+        navigate(`/payment?eventId=${eventId}`);
         return; // Kết thúc sớm nếu thành công
       }
 

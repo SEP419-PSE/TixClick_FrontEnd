@@ -95,7 +95,7 @@ export default function StepOne({
         address.province !== "" &&
         address.district !== "" &&
         address.ward !== "" &&
-        address.address.trim() !== "" &&
+        address.address !== "" &&
         typeEvent !== "" &&
         (logoImage !== null || logoImageUrl !== null) &&
         (background !== null || backgroundUrl !== null);
@@ -269,7 +269,7 @@ export default function StepOne({
             </label>
           </div>
         </div>
-        {equalIgnoreCase(eventMode, "Offline") ? (
+        {equalIgnoreCase(eventMode, "Offline") && (
           <>
             <TextInput
               maxLength={80}
@@ -279,17 +279,6 @@ export default function StepOne({
             />
             <VietNamAddressPicker value={address} onChange={setAddress} />
           </>
-        ) : (
-          <div className="mx-1">
-            <Input
-              value={joinUrl}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setJoinUrl(e.target.value)
-              }
-              placeholder="Đường dẫn tham dự"
-              className="px-3 py-1 rounded-md w-full outline-none text-[15px]"
-            />
-          </div>
         )}
       </Card>
 

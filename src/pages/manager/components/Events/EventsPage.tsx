@@ -448,7 +448,7 @@ export default function EventsPage() {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="APPROVED">Approved</SelectItem>
+                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
             </Select>
@@ -994,7 +994,7 @@ export default function EventsPage() {
                     <Button
                       className="bg-green-600 hover:bg-green-700 text-white"
                       onClick={() =>
-                        handleApprove("APPROVED", selectedEvent?.eventId ?? 0)
+                        handleApprove("CONFIRMED", selectedEvent?.eventId ?? 0)
                       }
                       disabled={isApproving || isRejecting}
                     >
@@ -1020,11 +1020,11 @@ export default function EventsPage() {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                           </svg>
-                          Approving...
+                          Confirming...
                         </span>
                       ) : (
                         <>
-                          <CheckCircle className="mr-2 h-4 w-4" /> Approve
+                          <CheckCircle className="mr-2 h-4 w-4" /> Confirm
                         </>
                       )}
                     </Button>
@@ -1066,7 +1066,7 @@ export default function EventsPage() {
                     </Button>
                   </>
                 )}
-                {selectedEvent?.status === "APPROVED" && (
+                {selectedEvent?.status === "CONFIRMED" && (
                   <>
                     <Button
                       onClick={handleCreateContract}

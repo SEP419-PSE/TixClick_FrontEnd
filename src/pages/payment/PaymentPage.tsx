@@ -175,7 +175,7 @@ export default function PaymentPage() {
       onMessageReceived: (message: any) => void
     ): Client | null => {
       if (typeof window === "undefined") return null;
-       
+
       const client = new Client({
         brokerURL: `wss://160.191.175.172:8443/ws?token=${context?.accessToken}`,
         connectHeaders: {

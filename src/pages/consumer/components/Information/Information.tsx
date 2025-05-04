@@ -37,7 +37,7 @@ const Information = () => {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          className="w-auto max-w-2xl bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col gap-4"
+          className="w-auto max-w-sm bg-white rounded-xl shadow-md p-6 border border-gray-200 flex flex-col gap-4"
         >
           {/* Logo & tên công ty */}
           <div className="flex items-center gap-4">
@@ -68,7 +68,9 @@ const Information = () => {
                 {company.status}
               </p>
               <div className="flex items-start gap-1 text-black">
-                <MapPin size={14} />
+                <span>
+                  <MapPin size={14} />
+                </span>
                 <span>{company.address}</span>
               </div>
             </div>
