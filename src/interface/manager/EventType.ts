@@ -61,6 +61,7 @@ export interface EventResponse {
   eventCode: string;
   city: string;
   district: string;
+  contractCode: string;
   ward: string;
   status: EventStatus;
   typeEvent: string;

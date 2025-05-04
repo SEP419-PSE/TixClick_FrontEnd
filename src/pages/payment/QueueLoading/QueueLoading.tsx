@@ -155,7 +155,9 @@ export default function PaymentQueuePage() {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const storedData = localStorage.getItem("paymentQueueData");
-    const jsonData = JSON.parse(storedData ? storedData : "");
+    const jsonData =
+      storedData && storedData.trim() !== "" ? JSON.parse(storedData) : null;
+
     const orderCode = queryParams.get("orderCode");
     const status = queryParams.get("status");
 

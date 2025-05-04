@@ -10,7 +10,7 @@ export function EventFilter({ onFilterChange }: any) {
     { key: "ALL", label: t.filters.all },
     { key: "DRAFT", label: t.filters.draft },
     { key: "PENDING", label: t.filters.pending },
-    { key: "APPROVED", label: t.filters.approved },
+    { key: "CONFIRMED", label: t.filters.confirmed },
     { key: "SCHEDULED", label: t.filters.scheduled },
     { key: "COMPLETED", label: t.filters.completed },
     { key: "REJECTED", label: t.filters.rejected },

@@ -1,5 +1,7 @@
 export interface TicketResponse {
   eventId: number;
+  eventActivityId: number;
+  ticketPurchaseId: number;
   eventName: string;
   eventDate: string;
   eventStartTime: string;

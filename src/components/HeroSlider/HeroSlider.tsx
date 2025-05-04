@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Menu, Play, Search, X } from 'lucide-react';
+import { Menu, Play, Search, X } from "lucide-react";
 import { FormEvent, useContext, useEffect, useState } from "react";
 import { AiFillTikTok } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
@@ -103,7 +103,9 @@ const HeroSlider = () => {
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
                 <NavLink to="/ticketManagement">
-                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">Vé của tôi</li>
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                    Vé của tôi
+                  </li>
                 </NavLink>
                 <NavLink to="/company">
                   <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
@@ -111,7 +113,9 @@ const HeroSlider = () => {
                   </li>
                 </NavLink>
                 <NavLink to="/profileForm">
-                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">Trang cá nhân</li>
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                    Trang cá nhân
+                  </li>
                 </NavLink>
                 <button onClick={hanldeClickCreateEvent}>
                   <li className="px-4 py-2 border border-[#FF8A00] text-[#FF8A00] rounded-md hover:bg-[#FF8A00] hover:text-white transition-all">
@@ -143,20 +147,21 @@ const HeroSlider = () => {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 z-[2]"
         >
           <div className="w-full flex flex-col gap-2">
-            <p className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white">
-              <span className="text-[#FF8A00]">KHÁM PHÁ NHỮNG</span> SỰ KIỆN TUYỆT VỜI
+            <p className="text-xl md:text-3xl lg:text-5xl font-bold text-center text-white">
+              <span className="text-[#FF8A00]">KHÁM PHÁ NHỮNG</span> SỰ KIỆN
+              TUYỆT VỜI
             </p>
             <p className="text-xl text-center font-medium text-white">
-            Tìm và đặt vé cho những sự kiện tốt nhất trong khu vực của bạn
+              Tìm và đặt vé cho những sự kiện tốt nhất trong khu vực của bạn
             </p>
-            
+
             <button type="button" className="flex justify-center mt-6 p-3">
               <span className="bg-[#FF8A00] p-3 rounded-full ring ring-offset-4 ring-[#FF8A00]/50 hover:bg-[#E67E00] transition-colors">
                 <Play className="fill-white stroke-white" />
               </span>
             </button>
           </div>
-          <div className="relative max-w-2xl mx-auto mt-8">
+          {/* <div className="relative max-w-2xl mx-auto mt-8">
             <input
               type="text"
               name="searchValue"
@@ -169,7 +174,7 @@ const HeroSlider = () => {
             >
               <Search />
             </button>
-          </div>
+          </div> */}
         </form>
       </div>
 

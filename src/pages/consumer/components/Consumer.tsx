@@ -49,17 +49,22 @@ export default function Consumer() {
   };
 
   const fetchEvents = async () => {
-    setIsLoading(true);
-    const companyId = (await companyApi.isAccountHaveCompany()).data.result
-      .companyId;
-    const eventsResponse = await eventApi.getAllByCompany(companyId);
-    if (eventsResponse.data.result) {
-      setEvents(eventsResponse.data.result);
-    } else {
-      setEvents([]);
+    try {
+      setIsLoading(true);
+      const companyId = (await companyApi.isAccountHaveCompany()).data.result
+        .companyId;
+      const eventsResponse = await eventApi.getAllByCompany(companyId);
+      if (eventsResponse.data.result) {
+        setEvents(eventsResponse.data.result);
+      } else {
+        setEvents([]);
+      }
+      console.log(eventsResponse);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    console.log(eventsResponse);
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -161,7 +166,7 @@ export default function Consumer() {
                                 EventStatus.PENDING,
                               "bg-indigo-600":
                                 (event.status as EventStatus) ===
-                                EventStatus.APPROVED,
+                                EventStatus.CONFIRMED,
                               "bg-pse-green":
                                 (event.status as EventStatus) ===
                                 EventStatus.SCHEDULED,
@@ -180,7 +185,7 @@ export default function Consumer() {
                               EventStatus.PENDING,
                             "Chờ hợp đồng":
                               (event.status as EventStatus) ===
-                              EventStatus.APPROVED,
+                              EventStatus.CONFIRMED,
                             "Đang diễn ra":
                               (event.status as EventStatus) ===
                               EventStatus.SCHEDULED,
@@ -231,9 +236,7 @@ export default function Consumer() {
                           <Button
                             disabled={
                               (event.status as EventStatus) ===
-                                EventStatus.DRAFT ||
-                              (event.status as EventStatus) ===
-                                EventStatus.PENDING
+                              EventStatus.DRAFT
                                 ? false
                                 : true
                             }
@@ -337,7 +340,7 @@ export default function Consumer() {
                             EventStatus.PENDING,
                           "bg-indigo-600":
                             (selectedEvent.status as EventStatus) ===
-                            EventStatus.APPROVED,
+                            EventStatus.CONFIRMED,
                           "bg-pse-green":
                             (selectedEvent.status as EventStatus) ===
                             EventStatus.SCHEDULED,
@@ -357,7 +360,7 @@ export default function Consumer() {
                           EventStatus.PENDING,
                         "Chờ hợp đồng":
                           (selectedEvent.status as EventStatus) ===
-                          EventStatus.APPROVED,
+                          EventStatus.CONFIRMED,
                         "Đang diễn ra":
                           (selectedEvent.status as EventStatus) ===
                           EventStatus.SCHEDULED,
