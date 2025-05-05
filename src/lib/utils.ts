@@ -57,3 +57,16 @@ export const formatMoney = (amount: number | undefined): string => {
 export const equalIgnoreCase = (a: string, b: string): boolean => {
   return a.toLowerCase() === b.toLowerCase();
 };
+
+export const parseSeatCode = (raw: string | null | undefined): string => {
+  if (typeof raw != "string") return "Không có ghế";
+  const match = raw.match(/r(\d+)-c(\d+)/);
+  if (!match) return "";
+
+  const rowNumber = parseInt(match[1], 10); // số sau r
+  const colNumber = parseInt(match[2], 10) + 1; // số sau c + 1
+
+  const rowLetter = String.fromCharCode(65 + rowNumber); // 65 = 'A'
+
+  return `${rowLetter}${colNumber}`;
+};

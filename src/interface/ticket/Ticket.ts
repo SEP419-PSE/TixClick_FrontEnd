@@ -7,10 +7,10 @@ export interface TicketResponse {
   eventStartTime: string;
   location: string;
   price: number;
-  seatCode: null;
+  seatCode: string | null;
   ticketType: string;
   qrCode: string;
-  zoneName: null;
+  zoneName: string | null;
   quantity: number;
   ishaveSeatmap: boolean;
   logo: string;
