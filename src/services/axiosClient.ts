@@ -1,8 +1,9 @@
 import axios, { AxiosError } from "axios";
 import authApi from "./authApi";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const axiosClient = axios.create({
-  baseURL: "https://tixclick.site/api",
+  baseURL: apiUrl,
   // httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }),
   headers: {
     "Content-Type": "application/json",
