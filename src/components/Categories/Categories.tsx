@@ -30,7 +30,7 @@ const Categories = ({ onCategoryClick }: CategoriesProps) => {
             </div>
             <div
               style={{
-                backgroundColor: type.id === 1 ? "#FF8A00" : type.color,
+                backgroundColor: type.color,
               }}
               className={`absolute bottom-0 left-0 w-full p-3 rounded-b-xl text-center transition-all duration-300 group-hover:h-1/3 flex flex-col justify-end`}
             >

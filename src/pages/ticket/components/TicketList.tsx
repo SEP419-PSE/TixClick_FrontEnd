@@ -3,6 +3,7 @@ import { eventTypes } from "../../../constants/constants";
 import React from "react";
 import { TicketResponse } from "../../../interface/ticket/Ticket";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
+import { Ellipsis } from "lucide-react";
 
 type Props = {
   clickOpenPopup: () => void;
@@ -35,12 +36,16 @@ const TicketList: React.FC<Props> = ({
                 </span>
                 <p
                   style={{
-                    backgroundColor: eventTypes.find((x) => x.name == "Music")
-                      ?.color,
+                    backgroundColor: eventTypes.find(
+                      (x) => x.id == ticket.eventCategoryId
+                    )?.color,
                   }}
                   className="text-white text-xs text-center font-medium rounded-md w-fit px-2 py-1"
                 >
-                  {eventTypes.find((x) => x.name == "Music")?.vietnamName}
+                  {
+                    eventTypes.find((x) => x.id == ticket.eventCategoryId)
+                      ?.vietnamName
+                  }
                 </p>
               </div>
             </div>
@@ -48,7 +53,7 @@ const TicketList: React.FC<Props> = ({
           <div className="ml-auto w-80">
             <p className="w-full truncate">
               <span className="text-pse-green font-semibold">
-                FPT University
+                {ticket.locationName}
               </span>
               {" - "}
               {ticket.location}

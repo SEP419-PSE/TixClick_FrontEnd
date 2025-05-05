@@ -2,9 +2,11 @@ export interface TicketResponse {
   eventId: number;
   eventActivityId: number;
   ticketPurchaseId: number;
+  eventCategoryId: number;
   eventName: string;
   eventDate: Date;
   eventStartTime: string;
+  locationName: string;
   location: string;
   price: number;
   seatCode: string | null;
