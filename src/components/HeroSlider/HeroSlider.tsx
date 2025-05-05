@@ -118,20 +118,20 @@ const HeroSlider = () => {
                   </li>
                 </NavLink>
                 <button onClick={hanldeClickCreateEvent}>
-                  <li className="px-4 py-2 border border-[#FF8A00] text-[#FF8A00] rounded-md hover:bg-[#FF8A00] hover:text-white transition-all">
+                  <li className="px-4 py-2 border border-white text-white rounded-md hover:bg-white hover:text-black transition-all duration-300">
                     Tạo sự kiện
                   </li>
                 </button>
                 <li
                   onClick={() => authContext?.logout()}
-                  className="px-4 py-2 border rounded-md bg-[#FF8A00] text-white hover:bg-[#E67E00] transition-colors cursor-pointer"
+                  className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-80 transition-all cursor-pointer duration-300"
                 >
                   Đăng xuất
                 </li>
               </ul>
             ) : (
               <NavLink to="/auth/signin">
-                <button className="px-6 py-2 border border-[#FF8A00] bg-[#FF8A00] text-white rounded-md hover:bg-[#E67E00] transition-colors">
+                <button className="px-6 py-2 border border-white bg-transparent text-white rounded-md hover:bg-white hover:text-black transition-all duration-300">
                   Đăng nhập
                 </button>
               </NavLink>
