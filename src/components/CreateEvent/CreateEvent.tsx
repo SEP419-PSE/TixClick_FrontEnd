@@ -8,7 +8,6 @@ import eventApi from "../../services/eventApi";
 import { EventDetailResponse } from "../../interface/EventInterface";
 import companyApi from "../../services/companyApi";
 import { CompanyStatus } from "../../interface/company/Company";
-import { CgLogOff } from "react-icons/cg";
 import LockPage from "../Lock/LockPage";
 
 // import StepTwo from "./Steps/StepTwo"; // nếu có

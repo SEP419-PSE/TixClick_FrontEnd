@@ -1,5 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -15,7 +14,6 @@ import TextEditor from "../TextEditor";
 import { Card } from "../../ui/card";
 import { equalIgnoreCase } from "../../../lib/utils";
 import VietNamAddressPicker from "../VietNamAddessPicker";
-import { Input } from "../../ui/input";
 import { eventTypes } from "../../../constants/constants";
 
 export type StepProps = {

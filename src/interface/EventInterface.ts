@@ -56,6 +56,9 @@ export interface EventDetailResponse {
   haveSeatMap: boolean;
   eventActivityDTOList: EventActivityDTOList[];
   price: number;
+  companyURL: string;
+  companyName: string;
+  descriptionCompany: string;
 }
 
 export interface EventActivityDTOList {

@@ -6,7 +6,7 @@ import { CompanyStatus } from "../../interface/company/Company";
 
 type Props = {
   message?: string;
-  status: CompanyStatus;
+  status?: CompanyStatus;
 };
 
 const LockPage = ({ message, status }: Props) => {
