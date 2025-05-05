@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 import CreateEvent from "./components/CreateEvent/CreateEvent";
 import EnterCode from "./components/OTP/EnterCode";
 import OTPVerify from "./components/OTP/OTPVerify";
