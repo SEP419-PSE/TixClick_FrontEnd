@@ -1,12 +1,14 @@
 import { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import clsx from "clsx";
 
 type PopupProps = {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: ReactNode;
+  className?: string; // thêm className
 };
 
 export default function Popup({
@@ -14,6 +16,7 @@ export default function Popup({
   onClose,
   title,
   children,
+  className,
 }: PopupProps) {
   return (
     <AnimatePresence>
@@ -23,7 +26,10 @@ export default function Popup({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="bg-white rounded-2xl shadow-xl p-6 max-w-lg overflow-y-auto w-full mx-4 relative"
+            className={clsx(
+              "bg-white rounded-2xl shadow-xl p-6 max-w-lg overflow-y-auto w-full mx-4 relative",
+              className
+            )}
           >
             <button
               onClick={onClose}

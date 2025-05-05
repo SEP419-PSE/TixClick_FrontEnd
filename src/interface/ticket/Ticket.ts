@@ -3,17 +3,19 @@ export interface TicketResponse {
   eventActivityId: number;
   ticketPurchaseId: number;
   eventName: string;
-  eventDate: string;
+  eventDate: Date;
   eventStartTime: string;
-  location: string | null;
+  location: string;
   price: number;
   seatCode: string | null;
   ticketType: string;
-  qrCode: string | null;
+  qrCode: string;
   zoneName: string | null;
   quantity: number;
+  ishaveSeatmap: boolean;
+  logo: string;
+  banner: string;
 }
-
 export interface TicketPurchaseRequest {
   zoneId: number;
   seatId: number;
@@ -29,4 +31,9 @@ export interface TicketCheckin {
   checkedIn: number;
   total: number;
   percentage: number;
+}
+
+export interface ChangeTicket {
+  ticketPurchaseId: number;
+  caseTicket: string;
 }
