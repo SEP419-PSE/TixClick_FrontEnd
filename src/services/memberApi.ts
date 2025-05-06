@@ -32,6 +32,13 @@ const memberApi = {
     const url = `/member-activity/${eventActivityId}`;
     return axiosClient.get(url);
   },
+  deleteMemberOfActivity(
+    memberActivityId: number,
+    companyId: number | undefined
+  ) {
+    const url = `/member-activity/${memberActivityId}/${companyId}`;
+    return axiosClient.delete(url);
+  },
 };
 
 export default memberApi;
