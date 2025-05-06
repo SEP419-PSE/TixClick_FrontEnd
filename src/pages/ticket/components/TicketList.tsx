@@ -22,7 +22,7 @@ const TicketList: React.FC<Props> = ({
   return (
     <div className="mx-20 my-5">
       {loading ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col mt-8 gap-2">
           {[...Array(3)].map((_, i) => (
             <TicketCardSkeleton key={i} />
           ))}

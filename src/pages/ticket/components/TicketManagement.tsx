@@ -57,9 +57,8 @@ export default function TicketManagement() {
           <span className="text-white">Vé đã mua</span>
         </nav>
       </div>
-
-      <section className="my-4">
-        <h1 className="text-xl font-semibold">Vé đã mua </h1>
+      <h1 className="text-xl mt-4 font-semibold">Vé đã mua </h1>
+      <section className="mt-auto">
         <TicketList
           ticketList={ticketPurchases}
           clickOpenPopup={handleOpenPopup}
