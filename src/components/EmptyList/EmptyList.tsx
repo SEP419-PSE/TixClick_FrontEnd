@@ -1,4 +1,4 @@
-import EmptyImg from "../../assets/Empty.png";
+import EmptyImg from "../../assets/no content backup.png";
 
 type EmptyListType = {
   label: string;
