@@ -8,7 +8,7 @@ const NotHaveCompany = () => {
       <div className="flex flex-col items-center gap-2 text-center">
         <div className="text-lg">Tài khoản của bạn chưa tạo công ty !</div>
         <NavLink to="/create-company">
-          <Button className="bg-background text-foreground hover:bg-opacity-80">
+          <Button className="bg-background text-foreground hover:bg-pse-green hover:text-white transition-all duration-300">
             Tạo công ty ngay
           </Button>
         </NavLink>
