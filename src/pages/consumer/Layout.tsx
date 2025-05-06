@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState, type ReactNode } from "react";
 import { Outlet } from "react-router";
 import Header from "../../components/Header/Header";
-import { LanguageProvider } from "../organizer/components/LanguageContext";
-import { LanguageSwitcher } from "../organizer/components/LanguageSwitcher";
 import { ConsumerSidebar } from "./components/ConsumerSidebar";
 import { Toaster } from "sonner";
 import companyApi from "../../services/companyApi";
@@ -49,7 +47,7 @@ export default function RootLayouts({ children }: { children?: ReactNode }) {
 
         <main
           className={cn(
-            "flex-1 transition-all duration-300",
+            "flex-1 transition-all duration-300 bg-[#1e1e1e]",
             context?.isCollapsed == true ? "ml-20" : "ml-60"
           )}
         >
