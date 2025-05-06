@@ -7,13 +7,21 @@ import {
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
-import { NavLink } from "react-router";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
 };
 
-const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
+type InforEventType = EventDetailProps & {
+  scrollToSelectTicket: () => void;
+  isSaleTicket: boolean;
+};
+
+const InformationEvent: React.FC<InforEventType> = ({
+  eventDetail,
+  scrollToSelectTicket,
+  isSaleTicket,
+}) => {
   return (
     <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-[#1E1E1E] ">
       <div>
@@ -51,11 +59,11 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
           </div>
           <div className="absolute top-5 left-5 truncate">
             {eventDetail?.address +
-              "," +
+              ", " +
               eventDetail?.ward +
-              "," +
+              ", " +
               eventDetail?.district +
-              "," +
+              ", " +
               eventDetail?.city}
           </div>
         </p>
@@ -66,18 +74,18 @@ const InformationEvent: React.FC<EventDetailProps> = ({ eventDetail }) => {
               {formatMoney(eventDetail?.price)}
             </span>
           </div>
-          <NavLink
-            to={{
-              pathname: eventDetail?.haveSeatMap
-                ? "booking-ticket"
-                : "booking-ticket-no-seatmap",
-              search: `?eventId=${eventDetail?.eventId}&eventActivityId=${eventDetail?.eventActivityDTOList?.[0].eventActivityId}`,
-            }}
+
+          <button
+            disabled={isSaleTicket ? false : true}
+            onClick={scrollToSelectTicket}
+            className={`${
+              isSaleTicket
+                ? `bg-pse-green-second hover:bg-pse-green-third`
+                : `bg-pse-gray cursor-not-allowed`
+            }   text-white w-full rounded-lg font-semibold transition-all duration-500`}
           >
-            <button className="bg-pse-green-second hover:bg-pse-green-third text-white w-full rounded-lg font-semibold transition-all duration-500">
-              Mua vé ngay
-            </button>
-          </NavLink>
+            {isSaleTicket ? "Chọn lịch diễn" : "Chưa mở bán vé"}
+          </button>
         </div>
       </div>
     </div>
