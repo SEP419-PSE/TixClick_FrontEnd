@@ -70,3 +70,7 @@ export const parseSeatCode = (raw: string | null | undefined): string => {
 
   return `${rowLetter}${colNumber}`;
 };
+
+export const stripTime = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};

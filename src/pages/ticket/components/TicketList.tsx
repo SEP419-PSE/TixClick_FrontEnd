@@ -3,7 +3,7 @@ import { eventTypes } from "../../../constants/constants";
 import React from "react";
 import { TicketResponse } from "../../../interface/ticket/Ticket";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
-import { Ellipsis } from "lucide-react";
+import EmptyList from "../../../assets/no content backup.png";
 
 type Props = {
   clickOpenPopup: () => void;
@@ -18,6 +18,14 @@ const TicketList: React.FC<Props> = ({
 }) => {
   return (
     <div className="mx-20 my-5">
+      {ticketList.length == 0 && (
+        <div className="flex flex-col justify-center items-center">
+          <img src={EmptyList} />
+          <p className="text-center text-gray-300 w-fit text-base font-semibold">
+            Bạn chưa mua vé nào
+          </p>
+        </div>
+      )}
       {ticketList.map((ticket) => (
         <Card
           onClick={() => onClickSelectTicket(ticket)}

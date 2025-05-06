@@ -7,10 +7,10 @@ import {
   formatTimeFe,
 } from "../../lib/utils";
 import { NavLink } from "react-router";
+import clsx from "clsx";
 
 const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
-  const nowDate = new Date();
 
   const onChangeActiveTicket = (id: number) => {
     setActiveShowTicket(activeShowTicket === id ? null : id);
@@ -23,10 +23,13 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
           Thông tin vé
         </div>
         {eventDetail?.eventActivityDTOList?.map((activity) => {
-          const endSaleDate = new Date(
-            activity.endTicketSale.toString().replace(" ", "T")
-          );
-          const isStillSelling = endSaleDate < nowDate;
+          const now = new Date();
+          const startSale = new Date(activity.startTicketSale);
+          const endSale = new Date(activity.endTicketSale);
+
+          const isBeforeSale = now < startSale;
+          const isAfterSale = now > endSale;
+          const isSoldOut = activity.soldOut;
 
           return (
             <div
@@ -55,14 +58,23 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                   </span>
                 </p>
 
-                {/* Điều kiện hiển thị nút hoặc thông báo */}
-                {!activity.soldOut ? (
-                  <p className="ml-auto bg-red-200 text-pse-error/80 flex w-fit h-fit px-2 py-1 rounded-md">
-                    Hết vé
-                  </p>
-                ) : isStillSelling ? (
-                  <p className="ml-auto bg-yellow-100 text-yellow-700 flex w-fit h-fit px-2 py-1 rounded-md">
-                    Ngưng bán vé
+                {/* Nút trạng thái */}
+                {isSoldOut || isBeforeSale || isAfterSale ? (
+                  <p
+                    className={clsx(
+                      "ml-auto flex w-fit h-fit px-2 py-1 rounded-md",
+                      {
+                        "bg-red-200 text-pse-error/80": isSoldOut,
+                        "bg-gray-200 text-gray-600": isBeforeSale,
+                        "bg-yellow-100 text-yellow-700": isAfterSale,
+                      }
+                    )}
+                  >
+                    {isSoldOut
+                      ? "Hết vé"
+                      : isBeforeSale
+                      ? "Chưa mở bán vé"
+                      : "Đóng bán vé"}
                   </p>
                 ) : (
                   <NavLink

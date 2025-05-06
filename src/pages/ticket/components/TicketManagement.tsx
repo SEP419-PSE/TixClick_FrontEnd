@@ -33,8 +33,13 @@ export default function TicketManagement() {
     handleOpenPopup();
   };
 
-  const saveTicketPurchaseId = (ticket: TicketResponse) => {
-    dispatch(setTicketPurchase(ticket.ticketPurchaseId));
+  const saveTicketPurchaseId = (ticket: TicketResponse | undefined) => {
+    if (!ticket) {
+      throw new Error("Don't have any ticket");
+    } else {
+      dispatch(setTicketPurchase(ticket.ticketPurchaseId));
+    }
+
     // Navigate to select change
   };
 
