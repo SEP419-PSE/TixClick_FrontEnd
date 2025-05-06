@@ -6,7 +6,6 @@ import { eventTypes } from "../../../constants/constants";
 import DashDivider from "../../../components/Divider/DashDivider";
 import { formatMoney } from "../../DataTranfer";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
-import LoadingFullScreen from "../../../components/Loading/LoadingFullScreen";
 import { TicketResponse } from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
@@ -16,9 +15,16 @@ import {
 import { Button } from "../../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setTicketPurchase } from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
+import Pagination from "../../../components/Pagination/Pagination";
 
 export default function TicketManagement() {
-  const { ticketPurchases, loading } = useTicketsPurchases();
+  const {
+    ticketPurchases,
+    loading,
+    pagination: { currentPage, totalPages, totalElements, pageSize },
+    setPage,
+  } = useTicketsPurchases();
+
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<TicketResponse>();
   const ticketPurchase = useAppSelector((state) => state.ticketPurchase);
@@ -42,24 +48,32 @@ export default function TicketManagement() {
 
     // Navigate to select change
   };
-
-  if (loading) return <LoadingFullScreen />;
   return (
-    <div className="min-h-screen bg-[#1E1E1E]">
-      <div className="px-6 py-4 border-b border-gray-800">
-        <nav className="text-sm text-gray-400">
+    <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
+      <div className="border-b border-gray-800">
+        <nav className="text-sm text-gray-400 mb-2">
           <span className="hover:text-white">Trang chủ</span>
           <span className="mx-2">/</span>
           <span className="text-white">Vé đã mua</span>
         </nav>
       </div>
 
-      <section className="px-6 py-4">
+      <section className="my-4">
         <h1 className="text-xl font-semibold">Vé đã mua </h1>
         <TicketList
           ticketList={ticketPurchases}
           clickOpenPopup={handleOpenPopup}
           onClickSelectTicket={handleSelectedTicket}
+          loading={loading}
+        />
+      </section>
+      <section className="mt-auto">
+        <Pagination
+          currentPage={currentPage + 1}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={pageSize}
+          onPageChange={(newPage) => setPage(newPage - 1)}
         />
       </section>
 

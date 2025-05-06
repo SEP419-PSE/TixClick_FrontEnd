@@ -17,9 +17,9 @@ const ticketPurchase = {
     const url = `/payment/change-ticket`;
     return axiosClient.post(url, data, { params: params });
   },
-  getAll() {
+  getAll(page: number) {
     const url = `${ticketPurchaseUrl}/all_of_account`;
-    return axiosClient.get(url);
+    return axiosClient.get(url, { params: { page } });
   },
 };
 
