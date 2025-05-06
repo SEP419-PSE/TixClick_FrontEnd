@@ -6,31 +6,21 @@ import clsx from "clsx";
 import { MapPin, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import LoadingFullScreen from "../../../../components/Loading/LoadingFullScreen";
+import useCompany from "../../../../hooks/useCompany";
+import NotHaveCompany from "../../../../components/Error/NotHaveCompany";
 
 const Information = () => {
-  const [company, setCompany] = useState<Company>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { company, loading } = useCompany();
 
-  const fetchInfor = async () => {
-    setIsLoading(true);
-    const response = await companyApi.isAccountHaveCompany();
-    if (response.data.result) {
-      setCompany(response.data.result);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchInfor();
-  }, []);
-
-  if (!company) {
-    return <LoadingFullScreen />;
-  }
-
+  if (!company)
+    return (
+      <div className="p-6 h-[calc(100vh-64px)] ">
+        <NotHaveCompany />
+      </div>
+    );
   return (
     <div className="w-full bg-gradient-to-b from-pse-green min-h-[calc(100vh-70px)] flex justify-center items-center">
-      {isLoading ? (
+      {loading ? (
         <LoadingFullScreen />
       ) : (
         <motion.div

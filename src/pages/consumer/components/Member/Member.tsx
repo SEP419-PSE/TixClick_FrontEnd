@@ -25,8 +25,10 @@ import memberApi from "../../../../services/memberApi";
 import companyApi from "../../../../services/companyApi";
 import MemberList from "./MemberList";
 import { subRoles, TOAST_MESSAGE } from "../../../../constants/constants";
-
+import useCompany from "../../../../hooks/useCompany";
+import NotHaveCompany from "../../../../components/Error/NotHaveCompany";
 const Member = () => {
+  const { company } = useCompany();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchEmail, setSearchEmail] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
@@ -115,6 +117,13 @@ const Member = () => {
     : members; // nếu searchMember rỗng thì trả lại toàn bộ danh sách
 
   console.log(mailList);
+
+  if (!company)
+    return (
+      <div className="p-6 h-[calc(100vh-64px)] ">
+        <NotHaveCompany />
+      </div>
+    );
 
   return (
     <div className="p-6">
