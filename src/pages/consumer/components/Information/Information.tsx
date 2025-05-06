@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { Company } from "../../../../interface/company/Company";
-import companyApi from "../../../../services/companyApi";
 import BankCard from "../../../company/components/BankCard";
 import clsx from "clsx";
 import { MapPin, Pencil } from "lucide-react";
@@ -19,7 +16,7 @@ const Information = () => {
       </div>
     );
   return (
-    <div className="w-full bg-gradient-to-b from-pse-green min-h-[calc(100vh-70px)] flex justify-center items-center">
+    <div className="w-full bg-gradient-to-b from-pse-green min-h-[calc(100vh-64px)] flex justify-center items-center">
       {loading ? (
         <LoadingFullScreen />
       ) : (

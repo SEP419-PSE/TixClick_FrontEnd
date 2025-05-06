@@ -302,7 +302,7 @@ export default function Consumer() {
                     className="w-16 h-16 opacity-50"
                   />
                 </div>
-                <p className="text-white/60">No events found</p>
+                <p className="text-white/60">Không tìm thấy sự kiện nào</p>
               </div>
             )}
           </main>
