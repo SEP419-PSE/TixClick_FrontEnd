@@ -36,6 +36,9 @@ import { eventTypes } from "../constants/constants";
 import DashDivider from "../components/Divider/DashDivider";
 import { QRCodeSVG } from "qrcode.react";
 import useWebSocket from "../hooks/useWebSocket";
+import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
+import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -410,7 +413,6 @@ const TicketBooking = () => {
   const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
 
   const message = useWebSocket();
-  console.log(message);
   const handleOpenOldTicket = () => {
     setOpenOldTicket(true);
   };
@@ -870,6 +872,31 @@ const TicketBooking = () => {
     }
   };
 
+  const handlechangeTicket = async () => {
+    const ticketPurchaseRequests = selectedSeats.map((seat) => {
+      // Check if this is a standing section (id starts with "standing-")
+      // Regular seated section
+      return {
+        zoneId: seat.zoneId || 0,
+        seatId: seat.seatId,
+        eventActivityId: Number(eventActivityId),
+        ticketId: seat.ticketId,
+        eventId: Number(eventId),
+        quantity: 1,
+      };
+    });
+    try {
+      const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
+        ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
+        caseTicket: oldTicketPurchase.caseTicket,
+      });
+      const paymentUrl = res.data.result.data.checkoutUrl;
+      window.location.href = paymentUrl;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="h-screen w-full text-black">
       <Header />
@@ -972,8 +999,13 @@ const TicketBooking = () => {
                     style={{ backgroundColor: seatType.color }}
                   ></div>
                   <div>
-                    <div className="font-medium text-gray-900">
-                      {seatType.name}
+                    <div className="flex items-center font-medium text-gray-900">
+                      <p>
+                        {seatType.name}{" "}
+                        <span className="text-xs text-pse-gray ml-auto">
+                          (Tối đa {seatType.maxQuantity} vé)
+                        </span>
+                      </p>
                     </div>
                     <div className="text-sm text-gray-600">
                       {formatCurrency(seatType.price)}
@@ -1113,15 +1145,26 @@ const TicketBooking = () => {
               <Ticket fill="white" className="text-pse-black-light" />
               {selectedSeats.length > 0
                 ? selectedSeats
-                    .map((seat) => `(${seat.sectionName} ${seat.rcCode})`)
+                    .map(
+                      (seat) =>
+                        `(${seat.sectionName} ${parseSeatCode(seat.rcCode)})`
+                    )
                     .join(", ")
                 : "Chưa chọn ghế"}
             </div>
 
             <Button
-              className="w-full bg-white text-black"
+              className={`w-full ${
+                selectedSeats.length != 0
+                  ? "bg-pse-green text-white"
+                  : "bg-white text-pse-gray"
+              }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
               disabled={selectedSeats.length === 0 || isLoading}
-              onClick={handleProceedToPayment}
+              onClick={
+                changeTicket == true
+                  ? handlechangeTicket
+                  : handleProceedToPayment
+              }
             >
               {isLoading ? (
                 <>

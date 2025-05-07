@@ -1,5 +1,8 @@
 import { ChangeTicket } from "../../interface/ticket/Ticket";
-import { TicketPurchaseRequest } from "../../pages/TicketBookingNoneSeatmap";
+import {
+  TicketPurchaseRequest,
+  TicketPurchaseRequestElement,
+} from "../../pages/TicketBookingNoneSeatmap";
 import axiosClient from "../axiosClient";
 
 const ticketPurchaseUrl = "/ticket-purchase";
@@ -13,7 +16,7 @@ const ticketPurchase = {
     const url = `${ticketPurchaseUrl}/create`;
     return axiosClient.post(url, data);
   },
-  changeTicket(data: TicketPurchaseRequest, params: ChangeTicket) {
+  changeTicket(data: any[], params: ChangeTicket) {
     const url = `/payment/change-ticket`;
     return axiosClient.post(url, data, { params: params });
   },
