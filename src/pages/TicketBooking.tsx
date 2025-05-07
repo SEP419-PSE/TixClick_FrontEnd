@@ -3,7 +3,7 @@ import type React from "react";
 import { Calendar, Loader2, LogIn, MapPin, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import CustomDivider from "../components/Divider/CustomDivider";
 import Header from "../components/Header/Header";
@@ -17,13 +17,25 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import { EventDetailResponse } from "../interface/EventInterface";
-import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
+import {
+  formatDateVietnamese,
+  formatMoney,
+  formatTimeFe,
+  parseSeatCode,
+} from "../lib/utils";
 import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 import useTicketByEventId, {
   TicketResponse,
 } from "../hooks/useTicketByEventId";
+import { useAppSelector } from "../redux/hooks";
+import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+import Popup from "../components/Popup/Popup";
+import { eventTypes } from "../constants/constants";
+import DashDivider from "../components/Divider/DashDivider";
+import { QRCodeSVG } from "qrcode.react";
+import useWebSocket from "../hooks/useWebSocket";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -384,12 +396,28 @@ const TicketBooking = () => {
       >
     >();
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state;
+  const changeTicket = state?.changeTicket ?? "Không có change ticket";
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { tickets } = useTicketByEventId(Number(eventId));
+  const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
+  const { ticket, loading } = useTicketPurchaseById(
+    oldTicketPurchase.ticketPurchaseId
+  );
+  const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
 
-  console.log("Sections:", sections);
+  const message = useWebSocket();
+  console.log(message);
+  const handleOpenOldTicket = () => {
+    setOpenOldTicket(true);
+  };
+
+  const closeOldTicket = () => {
+    setOpenOldTicket(false);
+  };
 
   // Check if user is logged in
   useEffect(() => {
@@ -429,7 +457,7 @@ const TicketBooking = () => {
       }
     };
     fetchSeatmap();
-  }, [eventId, eventActivityId]);
+  }, [eventId, eventActivityId, message]);
 
   const validateSeatQuantity = (
     seats: any[],
@@ -854,6 +882,16 @@ const TicketBooking = () => {
             <div className="absolute top-0 left-0 right-0 p-5 bg-gray-800 text-white text-center">
               STAGE
             </div>
+            {changeTicket == true && (
+              <div className="absolute top-4 left-5">
+                <button
+                  onClick={handleOpenOldTicket}
+                  className=" bg-black text-white px-3 py-1 rounded-md shadow-box"
+                >
+                  Xem vé muốn đổi
+                </button>
+              </div>
+            )}
 
             {sections?.map((section) => (
               <DraggableSection
@@ -1126,6 +1164,96 @@ const TicketBooking = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Popup
+        isOpen={openOldTicket}
+        onClose={closeOldTicket}
+        title="Thông tin vé chi tiết"
+        className="w-auto max-w-sm p-4"
+      >
+        <div className="overflow-x-hidden text-black">
+          <div className="flex flex-col justify-center items-center">
+            <img src={ticket?.banner} alt="" className="w-40 h-20 rounded-md" />
+            <div className="font-semibold mt-1 text-black text-xl text-center break-words">
+              {ticket?.eventName}
+            </div>
+            <div className="flex gap-1 items-center">
+              <span className="text-pse-gray font-medium">
+                {ticket?.ticketType}
+              </span>
+              <p
+                style={{
+                  backgroundColor: eventTypes.find(
+                    (x) => x.id == ticket?.eventCategoryId
+                  )?.color,
+                }}
+                className="text-white text-xs text-center font-medium rounded-md w-fit px-2 py-1"
+              >
+                {
+                  eventTypes.find((x) => x.id == ticket?.eventCategoryId)
+                    ?.vietnamName
+                }
+              </p>
+            </div>
+          </div>
+          <DashDivider />
+          <div className="space-y-2">
+            <p className="break-words">
+              <span className="text-pse-green font-semibold">
+                {ticket?.locationName}
+              </span>{" "}
+              {"- "}
+              {ticket?.location}
+            </p>
+            <p className="w-full truncate">
+              Giờ bắt đầu: {formatTimeFe(ticket?.eventStartTime)} {"-"}
+              <span className="font-semibold">
+                {formatDateVietnamese(ticket?.eventDate.toString())}
+              </span>
+            </p>
+          </div>
+          <DashDivider />
+          {ticket?.ishaveSeatmap && (
+            <div>
+              <div>
+                Ghế {"- "}
+                <span className="font-bold">
+                  {parseSeatCode(ticket?.seatCode)}
+                </span>{" "}
+              </div>
+              <div>
+                Khu vực {"- "}
+                <span className="font-bold">{ticket.zoneName}</span>{" "}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-center mt-4">
+            <QRCodeSVG
+              value={ticket?.qrCode as string}
+              size={140}
+              bgColor={"#FFFFFF"}
+              level={"M"}
+            />
+          </div>
+          <DashDivider />
+          <section className="flex justify-between text-black">
+            <div>
+              <h1 className="text-left">Mã vé</h1>
+              <p className="text-left font-bold">{ticket?.ticketPurchaseId}</p>
+            </div>
+            <div>
+              <h1 className="text-center">Số lượng</h1>
+              <p className="text-center font-bold">{ticket?.quantity}</p>
+            </div>
+            <div>
+              <h1 className="text-right">Giá</h1>
+              <p className="text-right font-bold">
+                {formatMoney(ticket?.price)}
+              </p>
+            </div>
+          </section>
+        </div>
+      </Popup>
     </div>
   );
 };

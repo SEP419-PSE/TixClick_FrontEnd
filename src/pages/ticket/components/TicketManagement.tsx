@@ -70,7 +70,11 @@ export default function TicketManagement() {
           caseTicket: payloadCaseTicket,
         })
       );
-      navigate(urlNavigate);
+      navigate(urlNavigate, {
+        state: {
+          changeTicket: true,
+        },
+      });
     }
     // Navigate to select change
   };

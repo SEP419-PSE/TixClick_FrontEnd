@@ -21,6 +21,10 @@ const ticketPurchase = {
     const url = `${ticketPurchaseUrl}/all_of_account`;
     return axiosClient.get(url, { params: { page } });
   },
+  getOne(ticketPurchaseId: number) {
+    const url = `${ticketPurchaseUrl}/${ticketPurchaseId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default ticketPurchase;
