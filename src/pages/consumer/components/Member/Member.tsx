@@ -27,18 +27,23 @@ import MemberList from "./MemberList";
 import { subRoles, TOAST_MESSAGE } from "../../../../constants/constants";
 import useCompany from "../../../../hooks/useCompany";
 import NotHaveCompany from "../../../../components/Error/NotHaveCompany";
+import LoadingFullScreen from "../../../../components/Loading/LoadingFullScreen";
 const Member = () => {
-  const { company } = useCompany();
+  const { company, loading } = useCompany();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchEmail, setSearchEmail] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
-  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
+  const [accounts, setAccounts] = useState<AccountResponse[] | undefined>(
+    undefined
+  );
   const [mailList, setMailList] = useState<MailList[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>(
     {}
   );
   const [searchMember, setSearchMember] = useState<string>();
-  const [members, setMembers] = useState<MemberResponse[]>([]);
+  const [members, setMembers] = useState<MemberResponse[] | undefined>(
+    undefined
+  );
   // const [checkedAccounts, setCheckedAccounts] = useState<Set<string>>(
   //   new Set()
   // );
@@ -111,19 +116,24 @@ const Member = () => {
   };
 
   const filterMembers = searchMember
-    ? members.filter((member) =>
+    ? members?.filter((member) =>
         member.email.toLowerCase().includes(searchMember.toLowerCase())
       )
     : members; // nếu searchMember rỗng thì trả lại toàn bộ danh sách
 
   console.log(mailList);
 
-  if (!company)
+  if (loading) {
+    return <LoadingFullScreen />;
+  }
+
+  if (!loading && company === null) {
     return (
-      <div className="p-6 h-[calc(100vh-64px)] ">
+      <div className="p-6 h-[calc(100vh-64px)]">
         <NotHaveCompany />
       </div>
     );
+  }
 
   return (
     <div className="p-6">
@@ -162,10 +172,10 @@ const Member = () => {
           </div>
           <h1 className="text-black">Kết quả tìm kiếm</h1>
           <div className="my-4 flex flex-col gap-2 max-h-60 overflow-y-auto">
-            {accounts.length == 0 && (
+            {accounts?.length == 0 && (
               <div className="text-center">Không có tài khoản tương thích</div>
             )}
-            {accounts.map((account) => {
+            {accounts?.map((account) => {
               const selectedRole = selectedRoles[account.email];
               const isChecked = mailList.some(
                 (item) => item.mail === account.email

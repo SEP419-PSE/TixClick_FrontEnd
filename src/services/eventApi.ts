@@ -44,9 +44,9 @@ const eventApi = {
     const url = `${baseURL}/search`;
     return axiosClient.get(url, { params: params });
   },
-  getAllByCompany: (companyId: number) => {
+  getAllByCompany: (companyId: number | undefined, page: number) => {
     const url = `${baseURL}/dashboard/${companyId}`;
-    return axiosClient.get(url);
+    return axiosClient.get(url, { params: { page } });
   },
   getRevenue: (eventId: number) => {
     const url = `${baseURL}/dashboard/event-activity/${eventId}`;

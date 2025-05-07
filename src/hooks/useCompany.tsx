@@ -4,7 +4,7 @@ import companyApi from "../services/companyApi";
 
 const useCompany = () => {
   const [company, setCompany] = useState<Company | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchCompany = async () => {
     setLoading(true);
