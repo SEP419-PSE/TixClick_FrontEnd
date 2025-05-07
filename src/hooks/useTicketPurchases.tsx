@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { TicketResponse } from "../interface/ticket/Ticket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 
-type Pagination = {
+export type Pagination = {
   currentPage: number;
   totalPages: number;
   totalElements: number;

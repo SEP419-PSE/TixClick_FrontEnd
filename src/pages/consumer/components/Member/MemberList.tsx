@@ -28,7 +28,7 @@ import { motion } from "framer-motion";
 const MotionCard = motion(Card);
 
 type MemberProps = {
-  members: MemberResponse[];
+  members: MemberResponse[] | undefined;
   fetchMembers: () => void;
 };
 
@@ -57,7 +57,7 @@ const MemberList: React.FC<MemberProps> = ({ members, fetchMembers }) => {
       }
     } else {
       // Khi ấn "Chỉnh sửa" thì lưu subRole hiện tại
-      const member = members.find((m) => m.memberId === memberId);
+      const member = members?.find((m) => m.memberId === memberId);
       setSelectedSubRole(member?.subRole || "");
       setEditMemberId(memberId);
     }
@@ -74,7 +74,7 @@ const MemberList: React.FC<MemberProps> = ({ members, fetchMembers }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {members.map((member) => (
+      {members?.map((member) => (
         <MotionCard
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
