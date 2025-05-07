@@ -14,10 +14,15 @@ import {
 } from "../../../lib/utils";
 import { Button } from "../../../components/ui/button";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { setTicketPurchase } from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
+import {
+  CaseTicketType,
+  setTicketPurchase,
+} from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
 import Pagination from "../../../components/Pagination/Pagination";
+import { useNavigate } from "react-router";
 
 export default function TicketManagement() {
+  const navigate = useNavigate();
   const {
     ticketPurchases,
     loading,
@@ -40,14 +45,36 @@ export default function TicketManagement() {
   };
 
   const saveTicketPurchaseId = (ticket: TicketResponse | undefined) => {
+    let urlNavigate = "";
     if (!ticket) {
       throw new Error("Don't have any ticket");
     } else {
-      dispatch(setTicketPurchase(ticket.ticketPurchaseId));
-    }
+      let payloadCaseTicket: CaseTicketType = null;
 
+      if (ticket.ishaveSeatmap == false) {
+        payloadCaseTicket = "noSeatMap";
+        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket-no-seatmap?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
+      }
+      if (ticket.ishaveSeatmap && ticket.seatCode != null) {
+        payloadCaseTicket = "changeSeat";
+        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
+      } else if (ticket.ishaveSeatmap && ticket.seatCode == null) {
+        payloadCaseTicket = "changeZone";
+        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
+      }
+
+      dispatch(
+        setTicketPurchase({
+          ticketPurchaseId: ticket.ticketPurchaseId,
+          quantity: ticket.quantity,
+          caseTicket: payloadCaseTicket,
+        })
+      );
+      navigate(urlNavigate);
+    }
     // Navigate to select change
   };
+  console.log(ticketPurchase);
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
       <div className="border-b border-gray-800">
