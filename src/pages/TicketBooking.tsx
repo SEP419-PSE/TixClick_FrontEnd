@@ -410,7 +410,6 @@ const TicketBooking = () => {
   const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
 
   const message = useWebSocket();
-  console.log(message);
   const handleOpenOldTicket = () => {
     setOpenOldTicket(true);
   };
@@ -972,8 +971,13 @@ const TicketBooking = () => {
                     style={{ backgroundColor: seatType.color }}
                   ></div>
                   <div>
-                    <div className="font-medium text-gray-900">
-                      {seatType.name}
+                    <div className="flex items-center font-medium text-gray-900">
+                      <p>
+                        {seatType.name}{" "}
+                        <span className="text-xs text-pse-gray ml-auto">
+                          (Tối đa {seatType.maxQuantity} vé)
+                        </span>
+                      </p>
                     </div>
                     <div className="text-sm text-gray-600">
                       {formatCurrency(seatType.price)}
@@ -1113,13 +1117,20 @@ const TicketBooking = () => {
               <Ticket fill="white" className="text-pse-black-light" />
               {selectedSeats.length > 0
                 ? selectedSeats
-                    .map((seat) => `(${seat.sectionName} ${seat.rcCode})`)
+                    .map(
+                      (seat) =>
+                        `(${seat.sectionName} ${parseSeatCode(seat.rcCode)})`
+                    )
                     .join(", ")
                 : "Chưa chọn ghế"}
             </div>
 
             <Button
-              className="w-full bg-white text-black"
+              className={`w-full ${
+                selectedSeats.length != 0
+                  ? "bg-pse-green text-white"
+                  : "bg-white text-pse-gray"
+              }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
               disabled={selectedSeats.length === 0 || isLoading}
               onClick={handleProceedToPayment}
             >
