@@ -37,5 +37,5 @@ export interface TicketCheckin {
 
 export interface ChangeTicket {
   ticketPurchaseId: number;
-  caseTicket: string;
+  caseTicket: string | null;
 }

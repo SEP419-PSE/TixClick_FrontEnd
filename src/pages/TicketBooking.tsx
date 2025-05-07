@@ -36,6 +36,9 @@ import { eventTypes } from "../constants/constants";
 import DashDivider from "../components/Divider/DashDivider";
 import { QRCodeSVG } from "qrcode.react";
 import useWebSocket from "../hooks/useWebSocket";
+import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
+import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -869,6 +872,31 @@ const TicketBooking = () => {
     }
   };
 
+  const handlechangeTicket = async () => {
+    const ticketPurchaseRequests = selectedSeats.map((seat) => {
+      // Check if this is a standing section (id starts with "standing-")
+      // Regular seated section
+      return {
+        zoneId: seat.zoneId || 0,
+        seatId: seat.seatId,
+        eventActivityId: Number(eventActivityId),
+        ticketId: seat.ticketId,
+        eventId: Number(eventId),
+        quantity: 1,
+      };
+    });
+    try {
+      const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
+        ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
+        caseTicket: oldTicketPurchase.caseTicket,
+      });
+      const paymentUrl = res.data.result.data.checkoutUrl;
+      window.location.href = paymentUrl;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="h-screen w-full text-black">
       <Header />
@@ -1132,7 +1160,11 @@ const TicketBooking = () => {
                   : "bg-white text-pse-gray"
               }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
               disabled={selectedSeats.length === 0 || isLoading}
-              onClick={handleProceedToPayment}
+              onClick={
+                changeTicket == true
+                  ? handlechangeTicket
+                  : handleProceedToPayment
+              }
             >
               {isLoading ? (
                 <>
