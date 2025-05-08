@@ -158,89 +158,14 @@ export default function TicketManagement() {
               </span>
             </p>
           </div>
-        {/* ) : ( */}
-          {/* <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-64 mb-6">
-              <img src={NoEvent || "/placeholder.svg"} alt="No tickets" className="w-full h-full object-contain" />
-            </div>
-            <p className="text-gray-400 mb-6">Không có vé nào</p>
-            <Button className="bg-pse-green hover:bg-[#00B14F]/90">Mua vé ngay</Button>
-          </div> */}
-        {/* )} */}
-      </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {selectedTicket && (
-          <DialogContent className="bg-gray-900 text-white border-gray-800 max-w-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold text-white">Chi tiết vé</DialogTitle>
-            </DialogHeader>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium text-white mb-1">{selectedTicket.eventName}</h3>
-                  {/* <StatusIndicator status={selectedTicket.status} /> */}
-                </div>
-
-                <div className="space-y-3 text-gray-300">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Ngày</p>
-                      <p>{new Date(selectedTicket.eventDate).toLocaleDateString("vi-VN")}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <LocateFixed className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Khu vực</p>
-                      <p>{selectedTicket.zoneName}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Armchair className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Mã ghế</p>
-                      <p>{selectedTicket.seatCode}</p>
-                    </div>
-                  </div>
-
-
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Giờ</p>
-                      <p>{selectedTicket.eventStartTime}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Địa điểm</p>
-                      <p>{selectedTicket.location}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Tag className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Giá vé</p>
-                      <p>{selectedTicket.price}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Ticket className="w-5 h-5 text-[#ff8a00]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Loại vé</p>
-                      <p>{selectedTicket.ticketType}</p>
-                    </div>
-                  </div>
-                </div>
+          <DashDivider />
+          {selectedTicket?.ishaveSeatmap && (
+            <div>
+              <div>
+                Ghế {"- "}
+                <span className="font-bold">
+                  {parseSeatCode(selectedTicket?.seatCode)}
+                </span>{" "}
               </div>
               <div>
                 Khu vực {"- "}
@@ -272,12 +197,11 @@ export default function TicketManagement() {
                 {selectedTicket?.quantity}
               </p>
             </div>
-
-            <div className="flex justify-end gap-4 mt-6">
-              <Button variant="outline" className="border-gray-700 text-black hover:bg-gray-400">
-                Hủy vé
-              </Button>
-              <Button className="bg-pse-green hover:bg-[#00B14F]/90">Tải vé</Button>
+            <div>
+              <h1 className="text-right">Giá</h1>
+              <p className="text-right font-bold">
+                {formatMoney(selectedTicket?.price)}
+              </p>
             </div>
           </section>
           <DashDivider />
@@ -287,5 +211,5 @@ export default function TicketManagement() {
         </div>
       </Popup>
     </div>
-  )
+  );
 }
