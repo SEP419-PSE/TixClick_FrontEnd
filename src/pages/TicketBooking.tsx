@@ -1,12 +1,15 @@
 import type React from "react";
 
 import { Calendar, Loader2, LogIn, MapPin, Ticket } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import CustomDivider from "../components/Divider/CustomDivider";
+import DashDivider from "../components/Divider/DashDivider";
 import Header from "../components/Header/Header";
+import Popup from "../components/Popup/Popup";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -16,6 +19,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
+import { eventTypes } from "../constants/constants";
+import useTicketByEventId, {
+  TicketResponse,
+} from "../hooks/useTicketByEventId";
+import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+import useWebSocket from "../hooks/useWebSocket";
 import { EventDetailResponse } from "../interface/EventInterface";
 import {
   formatDateVietnamese,
@@ -23,22 +32,11 @@ import {
   formatTimeFe,
   parseSeatCode,
 } from "../lib/utils";
+import { useAppSelector } from "../redux/hooks";
 import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
-import useTicketByEventId, {
-  TicketResponse,
-} from "../hooks/useTicketByEventId";
-import { useAppSelector } from "../redux/hooks";
-import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
-import Popup from "../components/Popup/Popup";
-import { eventTypes } from "../constants/constants";
-import DashDivider from "../components/Divider/DashDivider";
-import { QRCodeSVG } from "qrcode.react";
-import useWebSocket from "../hooks/useWebSocket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
-import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
-import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
 // type ViewMode = "edit" | "preview"
@@ -902,7 +900,7 @@ const TicketBooking = () => {
                     <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
                       <div className="flex justify-between items-center">
                         <div className="font-medium">
-                          {seat.sectionName}: {seat.rcCode}
+                          {seat.sectionName}: {parseSeatCode(seat.rcCode)}
                         </div>
                         <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
                       </div>

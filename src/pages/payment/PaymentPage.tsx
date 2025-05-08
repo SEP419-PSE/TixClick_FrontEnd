@@ -34,8 +34,8 @@ export default function PaymentPage() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [minutes, setMinutes] = useState(10)
   const [seconds, setSeconds] = useState(0)
-  
-  const [isProcessing, setIsProcessing] = useState(false);
+
+  const [isProcessing, setIsProcessing] = useState(false)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -283,11 +283,9 @@ export default function PaymentPage() {
               )
             }
           } else if (message.type === "TICKET_PURCHASE_EXPIRED") {
-            // Handle expiration event
+            // Handle expiration event by calling handleCancelPayment
             toast.error("Thời gian giữ vé đã hết", { id: "ticket-expired" })
-            setTimeout(() => {
-              navigate("/")
-            }, 2000)
+            handleCancelPayment()
           }
         }
 
@@ -308,29 +306,24 @@ export default function PaymentPage() {
         }
       }
 
-      // Set up the local countdown timer (as backup or until we get server updates)
+      // Set up the local countdown timer (always run regardless of server updates)
       countdownIntervalRef.current = setInterval(() => {
-        // Only use local countdown if not receiving updates from server
-        if (!isTimeoutBoundFromServer) {
-          setSeconds((prevSeconds) => {
-            if (prevSeconds > 0) {
-              return prevSeconds - 1
-            } else if (minutes > 0) {
-              setMinutes((prevMinutes) => prevMinutes - 1)
-              return 59
-            } else {
-              // Time's up
-              if (countdownIntervalRef.current) {
-                clearInterval(countdownIntervalRef.current)
-              }
-              toast.error("Hết thời gian thanh toán", { id: "time-up" })
-              setTimeout(() => {
-                navigate("/")
-              }, 2000)
-              return 0
+        setSeconds((prevSeconds) => {
+          if (prevSeconds > 0) {
+            return prevSeconds - 1
+          } else if (minutes > 0) {
+            setMinutes((prevMinutes) => prevMinutes - 1)
+            return 59
+          } else {
+            // Time's up - call handleCancelPayment instead of just navigating
+            if (countdownIntervalRef.current) {
+              clearInterval(countdownIntervalRef.current)
             }
-          })
-        }
+            toast.error("Hết thời gian thanh toán", { id: "time-up" })
+            handleCancelPayment()
+            return 0
+          }
+        })
       }, 1000)
 
       // Periodically request time updates from server (every 30 seconds)
@@ -361,7 +354,7 @@ export default function PaymentPage() {
         websocketService.disconnect()
       }
     }
-  }, [navigate, minutes, isTimeoutBoundFromServer, context?.accessToken])
+  }, [navigate, minutes])
 
   useEffect(() => {
     // Load selected seats data
@@ -401,6 +394,24 @@ export default function PaymentPage() {
       }
     }
   }, [navigate])
+
+  // Add a useEffect to handle browser back button
+  // Add this after the other useEffect hooks
+  useEffect(() => {
+    // Handle browser back button
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault()
+      handleCancelPayment(true)
+    }
+
+    // Add event listener for popstate (browser back/forward buttons)
+    window.addEventListener("popstate", handlePopState)
+
+    return () => {
+      // Clean up event listener
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [])
 
   // Add a function to check voucher validity
   const checkVoucher = async () => {
