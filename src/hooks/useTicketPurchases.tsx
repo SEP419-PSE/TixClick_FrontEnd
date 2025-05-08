@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TicketResponse } from "../interface/ticket/Ticket";
+import { SortType, TicketResponse } from "../interface/ticket/Ticket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 
 export type Pagination = {
@@ -13,6 +13,7 @@ const useTicketsPurchases = () => {
   const [ticketPurchases, setTicketPurchases] = useState<TicketResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
+  const [sort, setSort] = useState<SortType>("ASC");
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: 0,
     totalPages: 0,
@@ -20,10 +21,16 @@ const useTicketsPurchases = () => {
     pageSize: 3,
   });
 
-  const fetchTicketPurchases = async (pageToFetch: number) => {
+  const fetchTicketPurchases = async (
+    pageToFetch: number,
+    sortToFetch: SortType
+  ) => {
     setLoading(true);
     try {
-      const res = await ticketPurchase.getAll(pageToFetch);
+      const res = await ticketPurchase.getAll({
+        page: pageToFetch,
+        sortDirection: sortToFetch,
+      });
       const result = res.data.result;
 
       setTicketPurchases(result.items || []);
@@ -42,8 +49,8 @@ const useTicketsPurchases = () => {
   };
 
   useEffect(() => {
-    fetchTicketPurchases(page);
-  }, [page]);
+    fetchTicketPurchases(page, sort);
+  }, [page, sort]);
 
   return {
     ticketPurchases,
@@ -51,7 +58,9 @@ const useTicketsPurchases = () => {
     pagination,
     page,
     setPage,
-    refetch: () => fetchTicketPurchases(page),
+    sort,
+    setSort,
+    refetch: () => fetchTicketPurchases(page, sort),
   };
 };
 

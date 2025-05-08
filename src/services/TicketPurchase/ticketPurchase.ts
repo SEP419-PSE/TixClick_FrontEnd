@@ -1,4 +1,4 @@
-import { ChangeTicket } from "../../interface/ticket/Ticket";
+import { ChangeTicket, TicketParams } from "../../interface/ticket/Ticket";
 import {
   TicketPurchaseRequest,
   TicketPurchaseRequestElement,
@@ -20,9 +20,9 @@ const ticketPurchase = {
     const url = `/payment/change-ticket`;
     return axiosClient.post(url, data, { params: params });
   },
-  getAll(page: number) {
+  getAll(params: TicketParams) {
     const url = `${ticketPurchaseUrl}/all_of_account`;
-    return axiosClient.get(url, { params: { page } });
+    return axiosClient.get(url, { params: params });
   },
   getOne(ticketPurchaseId: number) {
     const url = `${ticketPurchaseUrl}/${ticketPurchaseId}`;
