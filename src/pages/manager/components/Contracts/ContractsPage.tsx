@@ -55,8 +55,8 @@ import type {
 } from "../../../../interface/manager/Contracts";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { banks } from "../../../company/CreateCompany";
-import { ManagerHeader } from "../ManagerHeader";
 import { formatMoney } from "../../../DataTranfer";
+import { ManagerHeader } from "../ManagerHeader";
 
 // Define the ContractDetail interface
 interface ContractDetail {
@@ -261,7 +261,7 @@ export default function ContractsPage() {
       case "PENDING":
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">
-            Pending
+            Đang xử lý
           </span>
         );
       case "Expired":
@@ -319,8 +319,8 @@ export default function ContractsPage() {
   return (
     <>
       <ManagerHeader
-        heading="Contracts"
-        text="Manage and track all contracts"
+        heading="Hợp đồng"
+        text="Xem và quản lý các hợp đồng"
       />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex justify-between items-center mb-6">
@@ -328,16 +328,16 @@ export default function ContractsPage() {
             <Search className="text-gray-400" />
             <Input
               className="w-[300px] bg-[#2A2A2A] text-white"
-              placeholder="Search contracts..."
+              placeholder="Tìm kiếm hợp đồng ..."
             />
           </div>
           <div className="flex items-center space-x-2">
             <Select>
               <SelectTrigger className="w-[180px] bg-[#2A2A2A] text-white">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Xếp theo trạng thái" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
@@ -346,7 +346,7 @@ export default function ContractsPage() {
             </Select>
             <Select>
               <SelectTrigger className="w-[180px] bg-[#2A2A2A] text-white">
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder="Xếp theo loại" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
@@ -447,22 +447,22 @@ export default function ContractsPage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-gray-400">
-                  Showing{" "}
+                  Hiển thị{" "}
                   <span className="font-medium text-white">
                     {Math.min(
                       (currentPage - 1) * itemsPerPage + 1,
                       contracts.length
                     )}
                   </span>{" "}
-                  to{" "}
+                  từ{" "}
                   <span className="font-medium text-white">
                     {Math.min(currentPage * itemsPerPage, contracts.length)}
                   </span>{" "}
-                  of{" "}
+                  đến{" "}
                   <span className="font-medium text-white">
                     {contracts.length}
                   </span>{" "}
-                  contracts
+                  hợp đồng
                 </p>
               </div>
 
@@ -478,10 +478,10 @@ export default function ContractsPage() {
                     <SelectValue placeholder="Per page" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5 per page</SelectItem>
-                    <SelectItem value="10">10 per page</SelectItem>
-                    <SelectItem value="15">15 per page</SelectItem>
-                    <SelectItem value="20">20 per page</SelectItem>
+                    <SelectItem value="5">5 / trang</SelectItem>
+                    <SelectItem value="10">10 / trang</SelectItem>
+                    <SelectItem value="15">15 / trang</SelectItem>
+                    <SelectItem value="20">20 / trang</SelectItem>
                   </SelectContent>
                 </Select>
 
