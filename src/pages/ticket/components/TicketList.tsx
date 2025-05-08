@@ -1,6 +1,6 @@
+import React from "react";
 import { Card } from "../../../components/ui/card";
 import { eventTypes } from "../../../constants/constants";
-import React from "react";
 import { TicketResponse } from "../../../interface/ticket/Ticket";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
 import EmptyList from "../../../assets/no content backup.png";
@@ -15,10 +15,11 @@ type Props = {
 
 const TicketList: React.FC<Props> = ({
   clickOpenPopup,
-  ticketList,
+  ticketList = [], 
   onClickSelectTicket,
   loading,
 }) => {
+
   return (
     <div className="mx-20 my-5">
       {loading ? (
@@ -98,7 +99,7 @@ const TicketList: React.FC<Props> = ({
         ))
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TicketList;
+export default TicketList

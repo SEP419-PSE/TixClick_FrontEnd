@@ -1,12 +1,15 @@
 import type React from "react";
 
 import { Calendar, Loader2, LogIn, MapPin, Ticket } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import CustomDivider from "../components/Divider/CustomDivider";
+import DashDivider from "../components/Divider/DashDivider";
 import Header from "../components/Header/Header";
+import Popup from "../components/Popup/Popup";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -16,6 +19,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
+import { eventTypes } from "../constants/constants";
+import useTicketByEventId, {
+  TicketResponse,
+} from "../hooks/useTicketByEventId";
+import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+import useWebSocket from "../hooks/useWebSocket";
 import { EventDetailResponse } from "../interface/EventInterface";
 import {
   formatDateVietnamese,
@@ -23,23 +32,11 @@ import {
   formatTimeFe,
   parseSeatCode,
 } from "../lib/utils";
+import { useAppSelector } from "../redux/hooks";
 import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
-import useTicketByEventId, {
-  TicketResponse,
-} from "../hooks/useTicketByEventId";
-import { useAppSelector } from "../redux/hooks";
-import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
-import Popup from "../components/Popup/Popup";
-import { eventTypes } from "../constants/constants";
-import DashDivider from "../components/Divider/DashDivider";
-import { QRCodeSVG } from "qrcode.react";
-import useWebSocket from "../hooks/useWebSocket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
-import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
-import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
-import LoadingFullScreen from "../components/Loading/LoadingFullScreen";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -876,7 +873,6 @@ const TicketBooking = () => {
   const handlechangeTicket = async () => {
     if (selectedSeats.length === 0) return;
     if (!validateSeatQuantity(selectedSeats, tickets)) return;
-    setLoadingChangeTicket(true);
     const ticketPurchaseRequests = selectedSeats.map((seat) => {
       // Check if this is a standing section (id starts with "standing-")
       const isStandingSection = seat.id.startsWith("standing-");
@@ -1072,7 +1068,7 @@ const TicketBooking = () => {
                     >
                       <div className="flex justify-between items-center">
                         <div className="font-medium">
-                          {seat.sectionName}: {seat.rcCode}
+                          {seat.sectionName}: {parseSeatCode(seat.rcCode)}
                         </div>
                         <div className="text-sm font-semibold text-gray-700">
                           {seat.formattedPrice}
@@ -1263,7 +1259,11 @@ const TicketBooking = () => {
       >
         <div className="overflow-x-hidden text-black">
           <div className="flex flex-col justify-center items-center">
-            <img src={ticket?.banner} alt="" className="w-40 h-20 rounded-md" />
+            <img
+              src={ticket?.banner || "/placeholder.svg"}
+              alt=""
+              className="w-40 h-20 rounded-md"
+            />
             <div className="font-semibold mt-1 text-black text-xl text-center break-words">
               {ticket?.eventName}
             </div>
