@@ -378,7 +378,7 @@ export default function EventsPage() {
       case EventStatus.SCHEDULED:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
-            Scheduled
+            Đã lên lịch
           </span>
         );
 
@@ -429,14 +429,14 @@ export default function EventsPage() {
 
   return (
     <>
-      <ManagerHeader heading="Events" text="Manage and view all events" />
+      <ManagerHeader heading="Sự kiện" text="Xem và quản lý các sự kiện" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Search className="text-gray-400" />
             <Input
               className="w-[300px] bg-[#2A2A2A] text-white"
-              placeholder="Search events..."
+              placeholder="Tìm kiếm sự kiện ..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -447,8 +447,8 @@ export default function EventsPage() {
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="SCHEDULED">Đã lên lịch</SelectItem>
                 <SelectItem value="CONFIRMED">Confirmed</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
@@ -458,7 +458,7 @@ export default function EventsPage() {
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="all">Tất cả loại</SelectItem>
                 {eventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -470,7 +470,7 @@ export default function EventsPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="bg-[#2A2A2A] text-white">
                   <Filter className="mr-2 h-4 w-4" />
-                  Sort by
+                  Xếp theo
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -581,25 +581,25 @@ export default function EventsPage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-gray-400">
-                  Showing{" "}
+                  Hiển thị{" "}
                   <span className="font-medium text-white">
                     {Math.min(
                       (currentPage - 1) * itemsPerPage + 1,
                       filteredEvents.length
                     )}
                   </span>{" "}
-                  to{" "}
+                  từ{" "}
                   <span className="font-medium text-white">
                     {Math.min(
                       currentPage * itemsPerPage,
                       filteredEvents.length
                     )}
                   </span>{" "}
-                  of{" "}
+                  đến{" "}
                   <span className="font-medium text-white">
                     {filteredEvents.length}
                   </span>{" "}
-                  events
+                  sự kiện
                 </p>
               </div>
 
@@ -615,10 +615,10 @@ export default function EventsPage() {
                     <SelectValue placeholder="Per page" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5 per page</SelectItem>
-                    <SelectItem value="10">10 per page</SelectItem>
-                    <SelectItem value="15">15 per page</SelectItem>
-                    <SelectItem value="20">20 per page</SelectItem>
+                    <SelectItem value="5">5 / trang</SelectItem>
+                    <SelectItem value="10">10 / trang</SelectItem>
+                    <SelectItem value="15">15 / trang</SelectItem>
+                    <SelectItem value="20">20 / trang</SelectItem>
                   </SelectContent>
                 </Select>
 

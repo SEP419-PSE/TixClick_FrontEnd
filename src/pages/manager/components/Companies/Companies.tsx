@@ -138,17 +138,17 @@ export default function CompanyApprovalsPage() {
 
   return (
     <>
-      <ManagerHeader heading="Company Approvals" text="Review and approve pending company accounts" />
+      <ManagerHeader heading="Xét duyệt công ty" text="Xem và xét duyệt các tài khoẻn công ty" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex justify-between items-center mb-6">
           <Input
             className="w-[300px] bg-[#2A2A2A] text-white"
-            placeholder="Search companies..."
+            placeholder="Tìm kiếm công ty ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="text-white text-sm">
-            Total: <span className="font-semibold">{filteredCompanies.length}</span> companies
+            Tổng: <span className="font-semibold">{filteredCompanies.length}</span> công ty
           </div>
         </div>
 
@@ -156,14 +156,14 @@ export default function CompanyApprovalsPage() {
           <Table>
             <TableHeader>
               <TableRow className="bg-[#252525] hover:bg-[#2A2A2A]">
-                <TableHead className="text-white w-12 text-center">No</TableHead>
-                <TableHead className="text-white">Company Name</TableHead>
-                <TableHead className="text-white">Code Tax</TableHead>
-                <TableHead className="text-white">Contact Person</TableHead>
+                <TableHead className="text-white w-12 text-center">Số</TableHead>
+                <TableHead className="text-white">Tên công ty</TableHead>
+                <TableHead className="text-white">Mã số thuế</TableHead>
+                <TableHead className="text-white">Người đại diện</TableHead>
                 <TableHead className="text-white">Email</TableHead>
-                <TableHead className="text-white">Status</TableHead>
-                <TableHead className="text-white">Documents</TableHead>
-                <TableHead className="text-white text-right">Actions</TableHead>
+                <TableHead className="text-white">Trạng thái</TableHead>
+                <TableHead className="text-white">Tài liệu</TableHead>
+                <TableHead className="text-white text-right"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -223,22 +223,22 @@ export default function CompanyApprovalsPage() {
                           onClick={() => handleViewDocuments(company)}
                         >
                           <FileText className="h-4 w-4" />
-                          {company.companyDocument.length} Documents
+                          {company.companyDocument.length} tài liệu
                         </Button>
                       ) : (
-                        <span className="text-gray-400 text-sm">No documents</span>
+                        <span className="text-gray-400 text-sm">Không có tài liệu nào</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-[#333333]">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">Mở menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white border-[#444444]">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                           <DropdownMenuItem
                             onSelect={() => handleReviewCompany(company)}
                             className="hover:bg-[#333333] cursor-pointer"
@@ -427,10 +427,10 @@ export default function CompanyApprovalsPage() {
                       <TableHeader>
                         <TableRow className="bg-[#252525] hover:bg-[#2A2A2A]">
                           <TableHead className="text-white w-12 text-center">#</TableHead>
-                          <TableHead className="text-white">Document Name</TableHead>
-                          <TableHead className="text-white">Type</TableHead>
-                          <TableHead className="text-white">Upload Date</TableHead>
-                          <TableHead className="text-white text-right">Actions</TableHead>
+                          <TableHead className="text-white">Tên tài liệu</TableHead>
+                          <TableHead className="text-white">Loại</TableHead>
+                          <TableHead className="text-white">Ngày </TableHead>
+                          <TableHead className="text-white text-right">Tác vụ</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -467,7 +467,7 @@ export default function CompanyApprovalsPage() {
                 ) : (
                   <div className="text-center py-8 border border-dashed rounded-md border-[#444444]">
                     <FileText className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                    <h3 className="text-lg font-medium">No Documents Found</h3>
+                    <h3 className="text-lg font-medium">Không tìm thấy tài liệu nào</h3>
                     <p className="text-gray-400">This company hasn't uploaded any documents yet.</p>
                   </div>
                 )}

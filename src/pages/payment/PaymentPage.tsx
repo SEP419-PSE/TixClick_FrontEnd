@@ -27,7 +27,7 @@ import { Label } from "../../components/ui/label";
 import { Separator } from "../../components/ui/separator";
 import { AuthContext } from "../../contexts/AuthProvider";
 import type { EventDetailResponse } from "../../interface/EventInterface";
-import { formatDateVietnamese, formatTimeFe } from "../../lib/utils";
+import { formatDateVietnamese, formatTimeFe, parseSeatCode } from "../../lib/utils";
 import eventApi from "../../services/eventApi";
 
 export default function PaymentPage() {
@@ -964,7 +964,7 @@ export default function PaymentPage() {
                           {seat.quantity || 1}x
                         </div>
                         <div>
-                          {seat.sectionName} - {seat.rcCode} ({seat.typeName})
+                          {seat.sectionName} - {parseSeatCode(seat.rcCode)} ({seat.typeName})
                         </div>
                       </div>
                       <div className="font-medium">{seat.formattedPrice}</div>
@@ -1102,7 +1102,7 @@ export default function PaymentPage() {
                         {seat.quantity || 1}x
                       </div>
                       <div>
-                        {seat.sectionName} - {seat.rcCode} ({seat.typeName})
+                        {seat.sectionName} - {parseSeatCode(seat.rcCode)} ({seat.typeName})
                       </div>
                     </div>
                   ))
