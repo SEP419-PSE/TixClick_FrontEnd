@@ -1,17 +1,29 @@
 import axios from "axios";
 import { Calendar, MapPin, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast, Toaster } from "sonner";
 import CustomDivider from "../components/Divider/CustomDivider";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import type { EventDetailResponse } from "../interface/EventInterface";
-import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
+import {
+  formatDateVietnamese,
+  formatMoney,
+  formatTimeFe,
+  parseSeatCode,
+} from "../lib/utils";
 import eventApi from "../services/eventApi";
 import ticketMappingApi from "../services/ticketMappingApi";
 import useWebSocket from "../hooks/useWebSocket";
+import { useAppSelector } from "../redux/hooks";
+import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+import Popup from "../components/Popup/Popup";
+import { eventTypes } from "../constants/constants";
+import DashDivider from "../components/Divider/DashDivider";
+import { QRCodeSVG } from "qrcode.react";
+import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
@@ -80,6 +92,12 @@ export interface TicketPurchaseRequestElement {
 
 const TicketBookingNoneSeatmap = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state;
+  const changeTicket = state?.changeTicket ?? false;
+  const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
+  const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId);
+  const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const eventId = searchParams.get("eventId");
   const activityEventId = searchParams.get("eventActivityId");
@@ -96,6 +114,13 @@ const TicketBookingNoneSeatmap = () => {
   const [isLoading, setIsLoading] = useState(false);
   const message = useWebSocket();
 
+  const handleOpenOldTicket = () => {
+    setOpenOldTicket(true);
+  };
+
+  const closeOldTicket = () => {
+    setOpenOldTicket(false);
+  };
   const fetchTickets = async () => {
     try {
       const ticketResponse = await ticketMappingApi.getAllByAcitivityEventId(
@@ -286,10 +311,75 @@ const TicketBookingNoneSeatmap = () => {
     }
   };
 
+  const handleChangeTicket = async () => {
+    const ticketRequests = tickets
+      .filter(
+        (ticket) => ticket.purchaseQuantity && ticket.purchaseQuantity > 0
+      )
+      .map((ticket) => ({
+        ticketId: ticket.ticket.ticketId,
+        quantity: ticket.purchaseQuantity as number,
+        eventId: ticket.ticket.eventId,
+        eventActivityId: Number(activityEventId),
+        seatId: 0,
+        zoneId: 0,
+      }));
+
+    console.log(JSON.stringify(ticketRequests, null, 2));
+
+    if (ticketRequests.length > oldTicketPurchase.quantity) {
+      toast.error("Số lượng vé chọn vượt quá số lượng vé cũ.");
+      return;
+    }
+
+    const totalQuantity = ticketRequests.reduce(
+      (sum, req) => sum + (req.quantity || 0),
+      0
+    );
+
+    if (totalQuantity > oldTicketPurchase.quantity) {
+      toast.error("Tổng số lượng vé vượt quá số lượng vé cũ.");
+      return;
+    }
+
+    try {
+      const res = await ticketPurchase.changeTicket(ticketRequests, {
+        ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
+        caseTicket: oldTicketPurchase.caseTicket,
+      });
+      console.log(res.data);
+
+      if (res.data.result.data) {
+        const paymentUrl = res.data.result.data.checkoutUrl;
+        window.location.href = paymentUrl;
+      } else if (res.data.result.data == null) {
+        toast.success(res.data.result.message, {
+          onAutoClose: () => {
+            navigate("/ticketManagement");
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-auto lg:min-h-screen lg:flex-row">
       <div className="lg:w-[80%]">
-        <div className="text-center bg-pse-black-light py-4">Chọn vé</div>
+        <div className="relative text-center bg-pse-black-light py-4">
+          Chọn vé
+          {changeTicket == true && (
+            <div className="absolute top-4 left-5">
+              <button
+                onClick={handleOpenOldTicket}
+                className=" bg-black text-white px-3 py-1 rounded-md shadow-box"
+              >
+                Xem vé muốn đổi
+              </button>
+            </div>
+          )}
+        </div>
         <div className="flex flex-col lg:w-[600px] mx-auto my-10">
           <div className="flex justify-between w-full bg-pse-green p-4 rounded-t-lg">
             <div className="font-bold">Loại vé</div>
@@ -426,7 +516,9 @@ const TicketBookingNoneSeatmap = () => {
           </div>
 
           <Button
-            onClick={createTicketPurchase}
+            onClick={
+              changeTicket == true ? handleChangeTicket : createTicketPurchase
+            }
             className={`w-full ${
               totalPrice != 0
                 ? "bg-pse-green text-white"
@@ -442,6 +534,94 @@ const TicketBookingNoneSeatmap = () => {
           </Button>
         </div>
       </div>
+      <Popup
+        isOpen={openOldTicket}
+        onClose={closeOldTicket}
+        className="w-auto max-w-sm p-4"
+      >
+        <div className="overflow-x-hidden text-black">
+          <div className="flex flex-col justify-center items-center">
+            <img src={ticket?.banner} alt="" className="w-40 h-20 rounded-md" />
+            <div className="font-semibold mt-1 text-black text-xl text-center break-words">
+              {ticket?.eventName}
+            </div>
+            <div className="flex gap-1 items-center">
+              <span className="text-pse-gray font-medium">
+                {ticket?.ticketType}
+              </span>
+              <p
+                style={{
+                  backgroundColor: eventTypes.find(
+                    (x) => x.id == ticket?.eventCategoryId
+                  )?.color,
+                }}
+                className="text-white text-xs text-center font-medium rounded-md w-fit px-2 py-1"
+              >
+                {
+                  eventTypes.find((x) => x.id == ticket?.eventCategoryId)
+                    ?.vietnamName
+                }
+              </p>
+            </div>
+          </div>
+          <DashDivider />
+          <div className="space-y-2">
+            <p className="break-words">
+              <span className="text-pse-green font-semibold">
+                {ticket?.locationName}
+              </span>{" "}
+              {"- "}
+              {ticket?.location}
+            </p>
+            <p className="w-full truncate">
+              Giờ bắt đầu: {formatTimeFe(ticket?.eventStartTime)} {"-"}
+              <span className="font-semibold">
+                {formatDateVietnamese(ticket?.eventDate.toString())}
+              </span>
+            </p>
+          </div>
+          <DashDivider />
+          {ticket?.ishaveSeatmap && (
+            <div>
+              <div>
+                Ghế {"- "}
+                <span className="font-bold">
+                  {parseSeatCode(ticket?.seatCode)}
+                </span>{" "}
+              </div>
+              <div>
+                Khu vực {"- "}
+                <span className="font-bold">{ticket.zoneName}</span>{" "}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-center mt-4">
+            <QRCodeSVG
+              value={ticket?.qrCode as string}
+              size={140}
+              bgColor={"#FFFFFF"}
+              level={"M"}
+            />
+          </div>
+          <DashDivider />
+          <section className="flex justify-between text-black">
+            <div>
+              <h1 className="text-left">Mã vé</h1>
+              <p className="text-left font-bold">{ticket?.ticketPurchaseId}</p>
+            </div>
+            <div>
+              <h1 className="text-center">Số lượng</h1>
+              <p className="text-center font-bold">{ticket?.quantity}</p>
+            </div>
+            <div>
+              <h1 className="text-right">Giá</h1>
+              <p className="text-right font-bold">
+                {formatMoney(ticket?.price)}
+              </p>
+            </div>
+          </section>
+        </div>
+      </Popup>
       <Toaster position="top-center" />
     </div>
   );

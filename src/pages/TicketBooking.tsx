@@ -39,6 +39,7 @@ import useWebSocket from "../hooks/useWebSocket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
 import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
+import LoadingFullScreen from "../components/Loading/LoadingFullScreen";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -401,18 +402,18 @@ const TicketBooking = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state;
-  const changeTicket = state?.changeTicket ?? "Không có change ticket";
+  const changeTicket = state?.changeTicket ?? false;
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { tickets } = useTicketByEventId(Number(eventId));
   const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
-  const { ticket, loading } = useTicketPurchaseById(
-    oldTicketPurchase.ticketPurchaseId
-  );
+  const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId);
   const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
-
+  const [loadingChangeTicket, setLoadingChangeTicket] =
+    useState<boolean>(false);
   const message = useWebSocket();
+
   const handleOpenOldTicket = () => {
     setOpenOldTicket(true);
   };
@@ -873,9 +874,26 @@ const TicketBooking = () => {
   };
 
   const handlechangeTicket = async () => {
+    if (selectedSeats.length === 0) return;
+    if (!validateSeatQuantity(selectedSeats, tickets)) return;
+    setLoadingChangeTicket(true);
     const ticketPurchaseRequests = selectedSeats.map((seat) => {
       // Check if this is a standing section (id starts with "standing-")
-      // Regular seated section
+      const isStandingSection = seat.id.startsWith("standing-");
+
+      // For standing sections, we need to use a different format
+      if (isStandingSection) {
+        return {
+          zoneId: seat.zoneId || 0,
+          seatId: 0, // Use null instead of 0 for standing sections
+          eventActivityId: Number(eventActivityId),
+          ticketId: seat.ticketId,
+          eventId: Number(eventId),
+          quantity: seat.quantity || 1,
+          // isStanding: true,
+          // price: section?.price || 0,
+        };
+      }
       return {
         zoneId: seat.zoneId || 0,
         seatId: seat.seatId,
@@ -885,15 +903,43 @@ const TicketBooking = () => {
         quantity: 1,
       };
     });
+
+    if (ticketPurchaseRequests.length > oldTicketPurchase.quantity) {
+      toast.error("Số lượng vé chọn vượt quá số lượng vé cũ.");
+      return;
+    }
+
+    const totalQuantity = ticketPurchaseRequests.reduce(
+      (sum, req) => sum + (req.quantity || 0),
+      0
+    );
+
+    if (totalQuantity > oldTicketPurchase.quantity) {
+      toast.error("Tổng số lượng vé vượt quá số lượng vé cũ.");
+      return;
+    }
+
     try {
       const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
         ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
         caseTicket: oldTicketPurchase.caseTicket,
       });
-      const paymentUrl = res.data.result.data.checkoutUrl;
-      window.location.href = paymentUrl;
+      console.log(res.data);
+
+      if (res.data.result.data) {
+        const paymentUrl = res.data.result.data.checkoutUrl;
+        window.location.href = paymentUrl;
+      } else if (res.data.result.data == null) {
+        toast.success(res.data.result.message, {
+          onAutoClose: () => {
+            navigate("/ticketManagement");
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingChangeTicket(false);
     }
   };
 
@@ -1159,7 +1205,9 @@ const TicketBooking = () => {
                   ? "bg-pse-green text-white"
                   : "bg-white text-pse-gray"
               }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
-              disabled={selectedSeats.length === 0 || isLoading}
+              disabled={
+                selectedSeats.length === 0 || isLoading || loadingChangeTicket
+              }
               onClick={
                 changeTicket == true
                   ? handlechangeTicket
@@ -1211,7 +1259,6 @@ const TicketBooking = () => {
       <Popup
         isOpen={openOldTicket}
         onClose={closeOldTicket}
-        title="Thông tin vé chi tiết"
         className="w-auto max-w-sm p-4"
       >
         <div className="overflow-x-hidden text-black">

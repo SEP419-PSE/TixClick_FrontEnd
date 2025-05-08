@@ -22,8 +22,8 @@ const TicketFilter: React.FC<TicketFilterProps> = ({ sort, setSort }) => {
           <SelectValue placeholder="Sắp xếp theo ngày" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="ASC">Mới nhất</SelectItem>
-          <SelectItem value="DESC">Lâu nhất</SelectItem>
+          <SelectItem value="DESC">Mới nhất</SelectItem>
+          <SelectItem value="ASC">Lâu nhất</SelectItem>
         </SelectContent>
       </Select>
     </div>
