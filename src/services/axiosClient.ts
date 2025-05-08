@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import authApi from "./authApi";
 
 const axiosClient = axios.create({
-  baseURL: "https://localhost:8080/api",
+  baseURL: "http://localhost:8080/api",
   // httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }),
   headers: {
     "Content-Type": "application/json",
