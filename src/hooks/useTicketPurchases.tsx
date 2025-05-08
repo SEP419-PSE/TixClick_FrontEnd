@@ -13,7 +13,7 @@ const useTicketsPurchases = () => {
   const [ticketPurchases, setTicketPurchases] = useState<TicketResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
-  const [sort, setSort] = useState<SortType>("ASC");
+  const [sort, setSort] = useState<SortType>("DESC");
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: 0,
     totalPages: 0,
