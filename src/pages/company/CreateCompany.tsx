@@ -151,8 +151,7 @@ const CreateCompany = () => {
       !bankingName ||
       !bankingCode ||
       !cccd ||
-      !ownerCard ||
-      files.length === 0
+      !ownerCard
     ) {
       toast.error("Vui lòng điền đầy đủ thông tin", { position: "top-center" });
       setLoading(false);
@@ -173,9 +172,11 @@ const CreateCompany = () => {
       companyData.append("bankingName", bankingName);
       companyData.append("bankingCode", bankingCode);
       companyData.append("nationalId", cccd);
-      Array.from(files).forEach((file) => {
-        companyData.append("documents", file); // Append từng file
-      });
+      if (files.length != 0) {
+        Array.from(files).forEach((file) => {
+          companyData.append("documents", file); // Append từng file
+        });
+      }
 
       // companyData.forEach((key, value) => {
       //   console.log(key, value);

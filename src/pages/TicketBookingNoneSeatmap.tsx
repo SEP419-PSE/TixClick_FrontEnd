@@ -11,6 +11,7 @@ import type { EventDetailResponse } from "../interface/EventInterface";
 import { formatDateVietnamese, formatMoney, formatTimeFe } from "../lib/utils";
 import eventApi from "../services/eventApi";
 import ticketMappingApi from "../services/ticketMappingApi";
+import useWebSocket from "../hooks/useWebSocket";
 
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
@@ -93,6 +94,7 @@ const TicketBookingNoneSeatmap = () => {
       >
     >();
   const [isLoading, setIsLoading] = useState(false);
+  const message = useWebSocket();
 
   const fetchTickets = async () => {
     try {
@@ -116,7 +118,7 @@ const TicketBookingNoneSeatmap = () => {
   useEffect(() => {
     fetchTickets();
     setTotalQuantity(0);
-  }, [activityEventId]);
+  }, [activityEventId, message]);
 
   useEffect(() => {
     const newTotal = tickets.reduce(
@@ -430,7 +432,7 @@ const TicketBookingNoneSeatmap = () => {
                 ? "bg-pse-green text-white"
                 : "bg-white text-pse-gray"
             }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
-            disabled={totalPrice != 0 ? false : true || isLoading}
+            disabled={totalPrice != 0 || isLoading ? false : true}
           >
             {isLoading
               ? "Đang xử lý..."

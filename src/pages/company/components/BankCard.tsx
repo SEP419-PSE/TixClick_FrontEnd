@@ -1,10 +1,10 @@
 import VisaImg from "../../../assets/VisaTag.svg";
 
 interface BankCardProps {
-  bankName: string;
-  accountNumber: string;
+  bankName?: string;
+  accountNumber?: string;
   className?: string;
-  ownerCard: string;
+  ownerCard?: string;
 }
 
 export default function BankCard({
@@ -28,7 +28,7 @@ export default function BankCard({
 
       <div className="mb-4">
         <p className="tracking-wider font-semibold text-2xl">
-          {accountNumber.replace(/(\d{4})(?=\d)/g, "$1 ") ||
+          {accountNumber?.replace(/(\d{4})(?=\d)/g, "$1 ") ||
             "____ ____ ____ ____"}
         </p>
       </div>

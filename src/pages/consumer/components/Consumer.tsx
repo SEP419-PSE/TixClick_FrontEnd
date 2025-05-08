@@ -10,12 +10,10 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import NoEvent from "../../../assets/NoEvent.png";
 import { EventFilter } from "../../organizer/components/EventFilter";
 import { useLanguage } from "../../organizer/components/LanguageContext";
-import companyApi from "../../../services/companyApi";
-import eventApi from "../../../services/eventApi";
 import {
   EventDetailResponse,
   EventStatus,
@@ -32,46 +30,29 @@ import { FaTasks } from "react-icons/fa";
 import { MdExpandMore } from "react-icons/md";
 import { motion } from "framer-motion";
 import LoadingFullScreen from "../../../components/Loading/LoadingFullScreen";
+import useCompany from "../../../hooks/useCompany";
+import useEventByCompany from "../../../hooks/useEventByCompany";
+import Pagination from "../../../components/Pagination/Pagination";
 
 export default function Consumer() {
+  const { company } = useCompany();
+  const {
+    events,
+    loading,
+    pagination: { currentPage, totalPages, totalElements, pageSize },
+    setPage,
+  } = useEventByCompany(company?.companyId);
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
-  const [events, setEvents] = useState<EventDetailResponse[]>([]);
   const [selectedEvent, setSelectedEvent] =
     useState<EventDetailResponse | null>();
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onChangeActiveTicket = (id: number) => {
     setActiveShowTicket(activeShowTicket === id ? null : id);
   };
-
-  const fetchEvents = async () => {
-    try {
-      setIsLoading(true);
-      const companyId = (await companyApi.isAccountHaveCompany()).data.result
-        .companyId;
-      const eventsResponse = await eventApi.getAllByCompany(companyId);
-      if (eventsResponse.data.result) {
-        setEvents(eventsResponse.data.result);
-      } else {
-        setEvents([]);
-      }
-      console.log(eventsResponse);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  console.log(events);
 
   const handleSearch = (e: any) => {
     setSearchTerm(e.target.value);
@@ -97,7 +78,7 @@ export default function Consumer() {
     navigate(`/company/events/${eventId}/tasks`);
   };
 
-  const filteredEvents = events.filter((event) => {
+  const filteredEvents = events?.filter((event) => {
     const matchSearch = event.eventName
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -105,12 +86,10 @@ export default function Consumer() {
     return matchSearch && matchFilter;
   });
 
-  console.log(activeFilter);
-
   return (
     <>
       {" "}
-      {isLoading ? (
+      {loading && events == undefined ? (
         <LoadingFullScreen />
       ) : (
         <div className="bg-[#1e1e1e] min-h-screen">
@@ -131,9 +110,9 @@ export default function Consumer() {
               <EventFilter onFilterChange={handleFilterChange} />
             </div>
 
-            {filteredEvents.length > 0 ? (
+            {!loading && filteredEvents && filteredEvents?.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredEvents.map((event) => (
+                {filteredEvents?.map((event) => (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -293,7 +272,8 @@ export default function Consumer() {
                   </motion.div>
                 ))}
               </div>
-            ) : (
+            )}
+            {!loading && filteredEvents?.length == 0 && (
               <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
                 <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
                   <img
@@ -302,7 +282,7 @@ export default function Consumer() {
                     className="w-16 h-16 opacity-50"
                   />
                 </div>
-                <p className="text-white/60">No events found</p>
+                <p className="text-white/60">Không tìm thấy sự kiện nào</p>
               </div>
             )}
           </main>
@@ -557,6 +537,15 @@ export default function Consumer() {
           )}
         </div>
       )}
+      <section className="mx-6 pb-6">
+        <Pagination
+          currentPage={currentPage + 1}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={pageSize}
+          onPageChange={(newPage) => setPage(newPage - 1)}
+        />
+      </section>
     </>
   );
 }

@@ -3,9 +3,11 @@ export interface TicketResponse {
   eventId: number;
   eventActivityId: number;
   ticketPurchaseId: number;
+  eventCategoryId: number;
   eventName: string;
   eventDate: Date;
   eventStartTime: string;
+  locationName: string;
   location: string;
   price: number;
   seatCode: string | null;
@@ -36,5 +38,5 @@ export interface TicketCheckin {
 
 export interface ChangeTicket {
   ticketPurchaseId: number;
-  caseTicket: string;
+  caseTicket: string | null;
 }

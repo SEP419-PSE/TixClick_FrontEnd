@@ -16,9 +16,12 @@ import { formatDateVietnamese } from "../../../../../lib/utils";
 import { Button } from "../../../../../components/ui/button";
 import { Checkbox } from "../../../../../components/ui/checkbox";
 import Popup from "../../../../../components/Popup/Popup";
+import EmptyList from "../../../../../components/EmptyList/EmptyList";
+import useCompany from "../../../../../hooks/useCompany";
 
 const Tasks = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const { company } = useCompany();
   const [tasks, setTasks] = useState<EventActivityResponse[]>([]);
   const [isOpenMenu, setIsOpenMenu] = useState<Record<number, boolean>>({});
   const [members, setMembers] = useState<MemberResponse[]>([]);
@@ -49,6 +52,22 @@ const Tasks = () => {
   useEffect(() => {
     fetchMembers();
   }, []);
+
+  const fetchMembersOfTask = async (eventActivityId: number) => {
+    memberApi
+      .getMembersByEventActivityId(eventActivityId)
+      .then((response) => {
+        if (response.data.result.length != 0) {
+          setMemberOfTask(response.data.result);
+        } else {
+          setMemberOfTask([]);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        setMemberOfTask([]);
+      });
+  };
 
   const toggleMenu = (id: number) => {
     setIsOpenMenu((prev) => ({
@@ -103,24 +122,35 @@ const Tasks = () => {
     }
   };
 
-  const changePopup = (open: boolean, eventActivity: EventActivityResponse) => {
+  const changePopup = async (
+    open: boolean,
+    eventActivity: EventActivityResponse
+  ) => {
+    await fetchMembersOfTask(eventActivity.eventActivityId);
     setOpenPopup(open);
-    memberApi
-      .getMembersByEventActivityId(eventActivity.eventActivityId)
-      .then((response) => {
-        if (response.data.result.length != 0) {
-          setMemberOfTask(response.data.result);
-        } else {
-          setMemberOfTask([]);
-        }
-      })
-      .catch((error) => console.log(error));
   };
 
   const closePopup = () => {
     setOpenPopup(false);
   };
-  console.log(memberOfTask);
+
+  const deleteMemberOfActivity = async (
+    member: MemberOfTaskResponse,
+    companyId: number | undefined
+  ) => {
+    try {
+      const res = await memberApi.deleteMemberOfActivity(
+        member.memberActivityId,
+        companyId
+      );
+      if (res.data.code == 200) {
+        await fetchMembersOfTask(member.eventActivityId);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // console.log(memberOfTask);
   return (
     <div className="p-6 bg-background text-foreground border min-h-screen">
       <p className="text-2xl font-bold mb-8">Phân chia công việc</p>
@@ -254,6 +284,9 @@ const Tasks = () => {
       </div>
       {/* Show member by event activity */}
       <Popup title="Thành viên" isOpen={openPopup} onClose={closePopup}>
+        {memberOfTask.length == 0 && (
+          <EmptyList label={`Không có thành viên nào trong hoạt động `} />
+        )}
         <ul className="flex flex-wrap gap-4">
           {memberOfTask.map((member) => (
             <li
@@ -270,9 +303,15 @@ const Tasks = () => {
               <div className="ml-auto font-bold">
                 {member.member.subRole.toLocaleLowerCase()}
               </div>
-              <span>
-                <Trash2 className="text-pse-error" />
-              </span>
+              <button
+                onClick={() =>
+                  deleteMemberOfActivity(member, company?.companyId)
+                }
+              >
+                <span>
+                  <Trash2 className="text-pse-error" />
+                </span>
+              </button>
             </li>
           ))}
         </ul>
