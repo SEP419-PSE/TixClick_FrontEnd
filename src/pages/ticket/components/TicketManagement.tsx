@@ -35,7 +35,6 @@ export default function TicketManagement() {
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<TicketResponse>();
-  const ticketPurchase = useAppSelector((state) => state.ticketPurchase);
   const dispatch = useAppDispatch();
 
   const handleOpenPopup = () => {
@@ -81,7 +80,6 @@ export default function TicketManagement() {
     }
     // Navigate to select change
   };
-  console.log(ticketPurchase);
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
       <div className="border-b border-gray-800">
