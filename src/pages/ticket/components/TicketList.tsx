@@ -19,7 +19,6 @@ const TicketList: React.FC<Props> = ({
   onClickSelectTicket,
   loading,
 }) => {
-  const tickets = Array.isArray(ticketList) ? ticketList : []
 
   return (
     <div className="mx-20 my-5">

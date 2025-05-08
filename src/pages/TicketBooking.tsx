@@ -39,111 +39,103 @@ import useWebSocket from "../hooks/useWebSocket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 import { TicketPurchaseRequest } from "../interface/ticket/Ticket";
 import { TicketPurchaseRequestElement } from "./TicketBookingNoneSeatmap";
-
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
 // type ViewMode = "edit" | "preview"
-export type SectionType = "SEATED" | "STANDING";
+export type SectionType = "SEATED" | "STANDING"
 
 const ticketPurchaseApi = {
   createTicketPurchase: async (data: any, accessToken: string) => {
     try {
-      const response = await fetch(
-        "https://tixclick.site/api/ticket-purchase/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch("https://tixclick.site/api/ticket-purchase/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(data),
+      })
 
       if (!response.ok) {
-        throw new Error("Failed to create ticket purchase");
+        throw new Error("Failed to create ticket purchase")
       }
 
-      return await response.json();
+      return await response.json()
     } catch (error) {
-      console.error("Error creating ticket purchase:", error);
-      throw error;
+      console.error("Error creating ticket purchase:", error)
+      throw error
     }
   },
-};
+}
 
 // Utility functions
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
-  }).format(amount);
-};
+  }).format(amount)
+}
 
 export type SeatTypeEdit = {
-  id: string;
-  name: string;
-  color: string;
-  textColor: string;
-  price: number;
-  minQuantity?: number;
-  maxQuantity?: number;
-  eventId?: number;
-  ticketId: number;
-};
+  id: string
+  name: string
+  color: string
+  textColor: string
+  price: number
+  minQuantity?: number
+  maxQuantity?: number
+  eventId?: number
+  ticketId: number
+}
 
 export interface ISeat {
-  seatId: number;
-  zoneActivityId?: number;
-  id: string;
-  row: number;
-  column: number;
-  status: string;
-  price: number;
-  seatTypeId: string;
-  x?: number;
-  y?: number;
+  seatId: number
+  zoneActivityId?: number
+  id: string
+  row: number
+  column: number
+  status: string
+  price: number
+  seatTypeId: string
+  x?: number
+  y?: number
 }
 
 export interface ISection {
-  id: string;
-  name: string;
-  rows: number;
-  columns: number;
-  seats: ISeat[];
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  type: SectionType;
-  priceId?: string;
-  price?: number; // Price for standing sections
-  capacity?: number; // Capacity for standing sections
-  isSave: boolean;
-  zoneActivityId?: number; // Added to ensure we can access this property
+  id: string
+  name: string
+  rows: number
+  columns: number
+  seats: ISeat[]
+  x: number
+  y: number
+  width: number
+  height: number
+  type: SectionType
+  priceId?: string
+  price?: number // Price for standing sections
+  capacity?: number // Capacity for standing sections
+  isSave: boolean
+  zoneActivityId?: number // Added to ensure we can access this property
 }
 
 // Helper function to generate seat label
 const generateSeatLabel = (row: number, column: number): string => {
   // Convert row index to letter (0 -> A, 1 -> B, etc.)
-  const rowLetter = String.fromCharCode(65 + row);
+  const rowLetter = String.fromCharCode(65 + row)
   // Column is 0-based, so add 1 for display
-  const seatNumber = column + 1;
-  return `${rowLetter}${seatNumber}`;
-};
+  const seatNumber = column + 1
+  return `${rowLetter}${seatNumber}`
+}
 
 interface DraggableSectionProps {
-  section: ISection;
-  seatTypes: SeatTypeEdit[];
-  getSeatColor: (seat: ISeat) => string;
-  onSeatClick: (
-    seat: ISeat,
-    sectionName: string,
-    quantityAction?: "increase" | "decrease"
-  ) => void;
-  selectedSeats: SelectedSeatInfo[];
-  isLoggedIn: boolean;
-  showLoginPrompt: () => void;
+  section: ISection
+  seatTypes: SeatTypeEdit[]
+  getSeatColor: (seat: ISeat) => string
+  onSeatClick: (seat: ISeat, sectionName: string, quantityAction?: "increase" | "decrease") => void
+  selectedSeats: SelectedSeatInfo[]
+  isLoggedIn: boolean
+  showLoginPrompt: () => void
 }
 
 const DraggableSection: React.FC<DraggableSectionProps> = ({
@@ -155,26 +147,22 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
   isLoggedIn,
   showLoginPrompt,
 }) => {
-  const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null);
+  const [hoveredSeat, setHoveredSeat] = useState<ISeat | null>(null)
 
   const handleSeatClick = (seat: ISeat) => {
-    if (!seat.status) return;
+    if (!seat.status) return
 
     // Check if user is logged in before allowing seat selection
     if (!isLoggedIn) {
-      showLoginPrompt();
-      return;
+      showLoginPrompt()
+      return
     }
 
-    onSeatClick(seat, section.name);
-  };
+    onSeatClick(seat, section.name)
+  }
 
   return (
-    <Draggable
-      position={{ x: section.x, y: section.y }}
-      disabled={true}
-      bounds="parent"
-    >
+    <Draggable position={{ x: section.x, y: section.y }} disabled={true} bounds="parent">
       <div
         className={`absolute w-auto h-auto p-4 overflow-visible `}
         style={{
@@ -186,9 +174,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
         <div className="text-center text-gray-800 font-semibold mb-3">
           {section.name}
           {section.type == "STANDING" && (
-            <div className="text-sm text-gray-600 mt-1">
-              Khu vực đứng - {formatCurrency(section.price || 0)}
-            </div>
+            <div className="text-sm text-gray-600 mt-1">Khu vực đứng - {formatCurrency(section.price || 0)}</div>
           )}
         </div>
         {section.type == "STANDING" ? (
@@ -200,22 +186,14 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
               minWidth: "180px",
               minHeight: "80px",
               // Add visual indication when selected
-              border: selectedSeats.some(
-                (s) => s.id === `standing-${section.id}`
-              )
-                ? "3px solid #059669"
-                : "none",
-              boxShadow: selectedSeats.some(
-                (s) => s.id === `standing-${section.id}`
-              )
-                ? "0 0 0 2px #059669"
-                : "none",
+              border: selectedSeats.some((s) => s.id === `standing-${section.id}`) ? "3px solid #059669" : "none",
+              boxShadow: selectedSeats.some((s) => s.id === `standing-${section.id}`) ? "0 0 0 2px #059669" : "none",
             }}
             onClick={() => {
               // Check if user is logged in before allowing seat selection
               if (!isLoggedIn) {
-                showLoginPrompt();
-                return;
+                showLoginPrompt()
+                return
               }
 
               // Create a "virtual seat" for the standing section
@@ -228,8 +206,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                 price: section.price || 0,
                 seatTypeId: section.priceId || "",
                 zoneActivityId: section.zoneActivityId,
-              };
-              onSeatClick(standingSeat, section.name);
+              }
+              onSeatClick(standingSeat, section.name)
             }}
           >
             <div className="absolute inset-0 opacity-10">
@@ -248,20 +226,12 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clipRule="evenodd"
-                />
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs text-gray-500">
-                Số lượng: {section.capacity || 0} vé
-              </span>
+              <span className="text-xs text-gray-500">Số lượng: {section.capacity || 0} vé</span>
 
               {/* Remove quantity controls from here - they will be in the sidebar instead */}
-              {selectedSeats.some((s) => s.id === `standing-${section.id}`) && (
-                <></>
-              )}
+              {selectedSeats.some((s) => s.id === `standing-${section.id}`) && <></>}
             </div>
           </div>
         ) : (
@@ -283,9 +253,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                   {String.fromCharCode(65 + rowIndex)}
                 </div>
                 {Array.from({ length: section.columns }).map((_, colIndex) => {
-                  const seat = section.seats.find(
-                    (s) => s.row == rowIndex && s.column == colIndex
-                  );
+                  const seat = section.seats.find((s) => s.row == rowIndex && s.column == colIndex)
 
                   if (!seat)
                     return (
@@ -297,9 +265,9 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                           marginRight: "5px",
                         }}
                       ></div>
-                    );
-                  const seatColor = getSeatColor(seat);
-                  const seatLabel = generateSeatLabel(rowIndex, colIndex);
+                    )
+                  const seatColor = getSeatColor(seat)
+                  const seatLabel = generateSeatLabel(rowIndex, colIndex)
 
                   return (
                     <div
@@ -310,9 +278,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                         height: `30px`,
                         fontSize: `14px`,
                         backgroundColor: seatColor,
-                        color:
-                          seatTypes.find((type) => type.id == seat.seatTypeId)
-                            ?.textColor || "#000000",
+                        color: seatTypes.find((type) => type.id == seat.seatTypeId)?.textColor || "#000000",
                         marginRight: "5px",
                         display: "flex",
                         alignItems: "center",
@@ -321,8 +287,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                         fontWeight: "500",
                       }}
                       onClick={(e) => {
-                        e.stopPropagation();
-                        handleSeatClick(seat);
+                        e.stopPropagation()
+                        handleSeatClick(seat)
                       }}
                       onMouseEnter={() => setHoveredSeat(seat)}
                       onMouseLeave={() => setHoveredSeat(null)}
@@ -341,28 +307,18 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                             marginTop: rowIndex == 0 ? "2px" : "0",
                           }}
                         >
-                          <div className="mb-1">
-                            Hàng: {String.fromCharCode(65 + rowIndex)}
-                          </div>
+                          <div className="mb-1">Hàng: {String.fromCharCode(65 + rowIndex)}</div>
                           <div className="mb-1">Ghế: {colIndex + 1}</div>
                           <div className="mb-1">
-                            Loại ghế:{" "}
-                            {seatTypes.find(
-                              (type) => type.id == seat.seatTypeId
-                            )?.name || "Chưa xác định"}
+                            Loại ghế: {seatTypes.find((type) => type.id == seat.seatTypeId)?.name || "Chưa xác định"}
                           </div>
                           <div className="mb-1">
-                            Giá:{" "}
-                            {formatMoney(
-                              seatTypes.find(
-                                (type) => type.id == seat.seatTypeId
-                              )?.price
-                            )}
+                            Giá: {formatMoney(seatTypes.find((type) => type.id == seat.seatTypeId)?.price)}
                           </div>
                         </div>
                       )}
                     </div>
-                  );
+                  )
                 })}
               </div>
             ))}
@@ -370,237 +326,206 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
         )}
       </div>
     </Draggable>
-  );
-};
+  )
+}
 
 export interface SelectedSeatInfo extends ISeat {
-  sectionName: string;
-  typeName: string;
-  formattedPrice: string;
-  seatLabel: string;
-  rcCode: string; // Added this property to store the seat coordinate
-  ticketId?: number; // Added to store the ticket ID
-  zoneId?: number; // Added to store the zone ID
-  quantity?: number; // Add this line for quantity tracking
+  sectionName: string
+  typeName: string
+  formattedPrice: string
+  seatLabel: string
+  rcCode: string // Added this property to store the seat coordinate
+  ticketId?: number // Added to store the ticket ID
+  zoneId?: number // Added to store the zone ID
+  quantity?: number // Add this line for quantity tracking
 }
 
 const TicketBooking = () => {
-  const [searchParms] = useSearchParams();
-  const eventId = searchParms.get("eventId");
-  const eventActivityId = searchParms.get("eventActivityId");
-  const [sections, setSections] = useState<ISection[]>([]);
-  const [seatTypes, setSeatTypes] = useState<SeatTypeEdit[]>([]);
-  const [selectedSeats, setSelectedSeats] = useState<SelectedSeatInfo[]>([]);
+  const [searchParms] = useSearchParams()
+  const eventId = searchParms.get("eventId")
+  const eventActivityId = searchParms.get("eventActivityId")
+  const [sections, setSections] = useState<ISection[]>([])
+  const [seatTypes, setSeatTypes] = useState<SeatTypeEdit[]>([])
+  const [selectedSeats, setSelectedSeats] = useState<SelectedSeatInfo[]>([])
   const [eventInfor, setEventInfor] =
-    useState<
-      Pick<
-        EventDetailResponse,
-        "eventName" | "eventActivityDTOList" | "locationName"
-      >
-    >();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const state = location.state;
-  const changeTicket = state?.changeTicket ?? "Không có change ticket";
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const { tickets } = useTicketByEventId(Number(eventId));
-  const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
-  const { ticket, loading } = useTicketPurchaseById(
-    oldTicketPurchase.ticketPurchaseId
-  );
-  const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
+    useState<Pick<EventDetailResponse, "eventName" | "eventActivityDTOList" | "locationName">>()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const state = location.state
+  const changeTicket = state?.changeTicket ?? "Không có change ticket"
+  const [isLoading, setIsLoading] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
+  const { tickets } = useTicketByEventId(Number(eventId))
+  const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase)
+  const { ticket, loading } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId)
+  const [openOldTicket, setOpenOldTicket] = useState<boolean>(false)
 
-  const message = useWebSocket();
+  const message = useWebSocket()
   const handleOpenOldTicket = () => {
-    setOpenOldTicket(true);
-  };
+    setOpenOldTicket(true)
+  }
 
   const closeOldTicket = () => {
-    setOpenOldTicket(false);
-  };
+    setOpenOldTicket(false)
+  }
 
   // Check if user is logged in
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!accessToken);
-  }, []);
+    const accessToken = localStorage.getItem("accessToken")
+    setIsLoggedIn(!!accessToken)
+  }, [])
 
   useEffect(() => {
     const fetchEventInfor = async () => {
-      const response = await eventApi.getEventDetail(Number(eventId));
+      const response = await eventApi.getEventDetail(Number(eventId))
       if (response.data.result.length != 0) {
-        setEventInfor(response.data.result);
+        setEventInfor(response.data.result)
       }
-    };
-    fetchEventInfor();
-  }, [eventId]);
+    }
+    fetchEventInfor()
+  }, [eventId])
 
   useEffect(() => {
     const fetchSeatmap = async () => {
       try {
-        const response = await seatmapApi.getSeatmapConsumer(
-          Number(eventId),
-          Number(eventActivityId)
-        );
+        const response = await seatmapApi.getSeatmapConsumer(Number(eventId), Number(eventActivityId))
         if (response.data.result.length != 0) {
-          setSections(response.data.result);
+          setSections(response.data.result)
         }
-        const ticketResponse = await ticketApi.getTicketsByEventId(
-          Number(eventId)
-        );
-        console.log("ticket:", ticketResponse.data.result);
+        const ticketResponse = await ticketApi.getTicketsByEventId(Number(eventId))
+        console.log("ticket:", ticketResponse.data.result)
         if (ticketResponse.data.result.length != 0) {
-          setSeatTypes(ticketResponse.data.result);
+          setSeatTypes(ticketResponse.data.result)
         }
       } catch (error) {
-        console.log(error);
+        console.log(error)
       }
-    };
-    fetchSeatmap();
-  }, [eventId, eventActivityId, message]);
+    }
+    fetchSeatmap()
+  }, [eventId, eventActivityId, message])
 
-  const validateSeatQuantity = (
-    seats: any[],
-    tickets: TicketResponse[]
-  ): boolean => {
-    const seatCount: { [key: string]: number } = {};
+  const validateSeatQuantity = (seats: any[], tickets: TicketResponse[]): boolean => {
+    const seatCount: { [key: string]: number } = {}
 
     seats.forEach((seat) => {
       if (seat.quantity) {
         // Nếu có quantity, cộng thêm vào số ghế
-        seatCount[seat.seatTypeId] =
-          (seatCount[seat.seatTypeId] || 0) + seat.quantity;
+        seatCount[seat.seatTypeId] = (seatCount[seat.seatTypeId] || 0) + seat.quantity
       } else {
         // Nếu không có quantity, tính mỗi ghế là 1
-        seatCount[seat.seatTypeId] = (seatCount[seat.seatTypeId] || 0) + 1;
+        seatCount[seat.seatTypeId] = (seatCount[seat.seatTypeId] || 0) + 1
       }
-    });
+    })
 
     // Kiểm tra xem tổng số ghế có vượt quá maxQuantity của từng loại vé không
     for (const seatTypeId in seatCount) {
-      const ticket = tickets.find((ticket) => ticket.id === seatTypeId);
+      const ticket = tickets.find((ticket) => ticket.id === seatTypeId)
       if (ticket && seatCount[seatTypeId] > ticket.maxQuantity) {
-        toast.error(
-          `Số vé được mua tối đa của ghế ${ticket.name} là ${ticket.maxQuantity}`
-        );
-        return false; // Nếu vượt quá maxQuantity, trả về false
+        toast.error(`Số vé được mua tối đa của ghế ${ticket.name} là ${ticket.maxQuantity}`)
+        return false // Nếu vượt quá maxQuantity, trả về false
       }
     }
 
-    return true; // Nếu không có lỗi, trả về true
-  };
+    return true // Nếu không có lỗi, trả về true
+  }
 
   // Function to show login prompt
   const showLoginPrompt = () => {
-    setShowLoginDialog(true);
-  };
+    setShowLoginDialog(true)
+  }
 
   // Function to handle login redirect
   const handleLoginRedirect = () => {
     // Save current page URL to return after login
-    localStorage.setItem(
-      "redirectAfterLogin",
-      window.location.pathname + window.location.search
-    );
+    localStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search)
     // Redirect to login page
-    navigate("/auth/signin");
-  };
+    navigate("/auth/signin")
+  }
 
   // Function to get the seat color based on selection status
   const getSeatColor = (seat: ISeat): string => {
     // Nếu seat.status là falsy (null, undefined, false, ""), dùng màu xám
     if (!seat.status) {
-      return "#d1d5db"; // gray-300, bạn có thể chọn màu khác như "#9ca3af" (gray-400)
+      return "#d1d5db" // gray-300, bạn có thể chọn màu khác như "#9ca3af" (gray-400)
     }
 
     // Nếu ghế đang được chọn thì dùng màu highlight
-    const isSelected = selectedSeats.some((s) => s.id === seat.id);
+    const isSelected = selectedSeats.some((s) => s.id === seat.id)
     if (isSelected) {
-      return "#059669"; // green-600
+      return "#059669" // green-600
     }
 
     // Dùng màu của loại ghế nếu có, ngược lại dùng màu mặc định
-    const seatType = seatTypes.find((type) => type.id == seat.seatTypeId);
-    return seatType ? seatType.color : "#6b7280"; // gray-500 mặc định
-  };
+    const seatType = seatTypes.find((type) => type.id == seat.seatTypeId)
+    return seatType ? seatType.color : "#6b7280" // gray-500 mặc định
+  }
 
   // Handle seat click
-  const handleSeatClick = (
-    seat: ISeat,
-    sectionName: string,
-    quantityAction?: "increase" | "decrease"
-  ) => {
+  const handleSeatClick = (seat: ISeat, sectionName: string, quantityAction?: "increase" | "decrease") => {
     // Check if user is logged in
     if (!isLoggedIn) {
-      showLoginPrompt();
-      return;
+      showLoginPrompt()
+      return
     }
 
     // Find the section
-    const section = sections.find((s) => s.name === sectionName);
-    const isStandingSection = section?.type === "STANDING";
+    const section = sections.find((s) => s.name === sectionName)
+    const isStandingSection = section?.type === "STANDING"
 
     // For standing sections, we need to handle differently
     if (isStandingSection) {
       // Check if this standing section is already selected
-      const isSelected = selectedSeats.some((s) => s.id === seat.id);
-      const existingSeat = selectedSeats.find((s) => s.id === seat.id);
+      const isSelected = selectedSeats.some((s) => s.id === seat.id)
+      const existingSeat = selectedSeats.find((s) => s.id === seat.id)
 
       // Handle quantity actions for standing sections
       if (isSelected && quantityAction) {
         setSelectedSeats((prev) =>
           prev.map((s) => {
             if (s.id === seat.id) {
-              const currentQuantity = s.quantity || 1;
-              let newQuantity = currentQuantity;
+              const currentQuantity = s.quantity || 1
+              let newQuantity = currentQuantity
 
               if (quantityAction === "increase") {
                 // Check if we're at capacity
                 if (section?.capacity && currentQuantity >= section.capacity) {
-                  toast.error(
-                    `Số lượng tối đa cho khu vực này là ${section.capacity} vé`
-                  );
-                  return s;
+                  toast.error(`Số lượng tối đa cho khu vực này là ${section.capacity} vé`)
+                  return s
                 }
-                newQuantity = currentQuantity + 1;
+                newQuantity = currentQuantity + 1
               } else if (quantityAction === "decrease") {
                 if (currentQuantity <= 1) {
                   // If quantity would go below 1, remove the section entirely
-                  return s;
+                  return s
                 }
-                newQuantity = currentQuantity - 1;
+                newQuantity = currentQuantity - 1
               }
 
-              return { ...s, quantity: newQuantity };
+              return { ...s, quantity: newQuantity }
             }
-            return s;
-          })
-        );
+            return s
+          }),
+        )
 
         // If quantity is decreased to 0, remove the section
-        if (
-          quantityAction === "decrease" &&
-          (existingSeat?.quantity || 1) <= 1
-        ) {
-          setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
+        if (quantityAction === "decrease" && (existingSeat?.quantity || 1) <= 1) {
+          setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id))
         }
 
-        return;
+        return
       }
 
       if (isSelected && !quantityAction) {
         // Remove the standing section if already selected and no quantity action
-        setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
-        return;
+        setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id))
+        return
       } else if (!isSelected) {
         // Find seat type info for standing section
-        const seatType = seatTypes.find((type) => type.id === section.priceId);
+        const seatType = seatTypes.find((type) => type.id === section.priceId)
 
         // Get zoneId from the section
-        const zoneId =
-          section.zoneActivityId || Number.parseInt(section.id || "0");
+        const zoneId = section.zoneActivityId || Number.parseInt(section.id || "0")
 
         // Create the seat info for standing section
         const seatInfo: SelectedSeatInfo = {
@@ -613,39 +538,36 @@ const TicketBooking = () => {
           ticketId: seatType?.ticketId,
           zoneId: zoneId,
           quantity: 1, // Initialize with quantity 1
-        };
+        }
 
         // Add the standing section
-        setSelectedSeats((prev) => [...prev, seatInfo]);
-        console.log("Selected standing section:", seatInfo);
-        return;
+        setSelectedSeats((prev) => [...prev, seatInfo])
+        console.log("Selected standing section:", seatInfo)
+        return
       }
     }
 
     // For regular seats, continue with the existing logic
     // Find seat type info
-    const seatType = seatTypes.find((type) => type.id === seat.seatTypeId);
+    const seatType = seatTypes.find((type) => type.id === seat.seatTypeId)
 
     // Find the corresponding ticket by matching seatTypeId with ticket id in the seatTypes array
     // In this case, the seatTypeId is the same as the ticket id
-    const ticket = seatTypes.find((type) => type.id === seat.seatTypeId);
-    const ticketId = ticket ? ticket.ticketId : undefined;
-    console.log("ticketId:", ticketId);
+    const ticket = seatTypes.find((type) => type.id === seat.seatTypeId)
+    const ticketId = ticket ? ticket.ticketId : undefined
+    console.log("ticketId:", ticketId)
 
     // Get zoneId from the section or from the seat if available
-    const zoneId =
-      seat.zoneActivityId ||
-      section?.zoneActivityId ||
-      Number.parseInt(section?.id || "0");
+    const zoneId = seat.zoneActivityId || section?.zoneActivityId || Number.parseInt(section?.id || "0")
 
-    const rcCode = seat.id.split("-").slice(1).join("-");
+    const rcCode = seat.id.split("-").slice(1).join("-")
 
-    console.log("Found section:", section);
-    console.log("Zone ID:", zoneId);
-    console.log("Ticket ID:", ticketId);
+    console.log("Found section:", section)
+    console.log("Zone ID:", zoneId)
+    console.log("Ticket ID:", ticketId)
 
     // Create the correct seat label using our helper function
-    const seatLabel = generateSeatLabel(seat.row, seat.column);
+    const seatLabel = generateSeatLabel(seat.row, seat.column)
 
     // Create rich seat info object
     const seatInfo: SelectedSeatInfo = {
@@ -657,21 +579,21 @@ const TicketBooking = () => {
       rcCode: rcCode, // Store the seat coordinate
       ticketId: ticketId, // Add the ticketId to the seat info
       zoneId: zoneId, // Add the zoneId to the seat info
-    };
+    }
 
     // Check if seat is already selected
-    const isSelected = selectedSeats.some((s) => s.id === seat.id);
+    const isSelected = selectedSeats.some((s) => s.id === seat.id)
 
-    console.log("seat ID:", seat.seatId);
+    console.log("seat ID:", seat.seatId)
 
     if (isSelected) {
       // Remove the seat if already selected
-      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id));
-      console.log("Unselected seat:", seatInfo);
+      setSelectedSeats((prev) => prev.filter((s) => s.id !== seat.id))
+      console.log("Unselected seat:", seatInfo)
     } else {
       // Add the seat if not already selected
-      setSelectedSeats((prev) => [...prev, seatInfo]);
-      console.log("Selected seat:", seatInfo);
+      setSelectedSeats((prev) => [...prev, seatInfo])
+      console.log("Selected seat:", seatInfo)
     }
 
     // Log the full seat info for debugging
@@ -687,41 +609,41 @@ const TicketBooking = () => {
       formattedPrice: formatCurrency(seatType?.price || 0),
       ticketId: ticketId, // Log the ticketId
       zoneId: zoneId, // Log the zoneId
-    });
-  };
+    })
+  }
 
   // Tính tổng tiền từ các ghế đã chọn
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seat) => {
-      const seatType = seatTypes.find((type) => type.id === seat.seatTypeId);
-      const quantity = seat.quantity || 1;
-      return total + (seatType?.price || 0) * quantity;
-    }, 0);
-  };
+      const seatType = seatTypes.find((type) => type.id === seat.seatTypeId)
+      const quantity = seat.quantity || 1
+      return total + (seatType?.price || 0) * quantity
+    }, 0)
+  }
 
   // Hàm xử lý việc chuyển đến trang thanh toán
   const handleProceedToPayment = async () => {
-    if (selectedSeats.length === 0) return;
-    if (!validateSeatQuantity(selectedSeats, tickets)) return;
+    if (selectedSeats.length === 0) return
+    if (!validateSeatQuantity(selectedSeats, tickets)) return
 
     // Check if user is logged in
     if (!isLoggedIn) {
-      showLoginPrompt();
-      return;
+      showLoginPrompt()
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     try {
       // Prepare ticket purchase requests
       const ticketPurchaseRequests = selectedSeats.map((seat) => {
         // Check if this is a standing section (id starts with "standing-")
-        const isStandingSection = seat.id.startsWith("standing-");
+        const isStandingSection = seat.id.startsWith("standing-")
 
         // For standing sections, we need to use a different format
         if (isStandingSection) {
-          const sectionId = seat.id.replace("standing-", "");
-          const section = sections.find((s) => s.id === sectionId);
+          const sectionId = seat.id.replace("standing-", "")
+          const section = sections.find((s) => s.id === sectionId)
 
           return {
             zoneId: seat.zoneId || 0,
@@ -732,7 +654,7 @@ const TicketBooking = () => {
             quantity: seat.quantity || 1,
             isStanding: true,
             price: section?.price || 0,
-          };
+          }
         }
 
         // Regular seated section
@@ -743,27 +665,21 @@ const TicketBooking = () => {
           ticketId: seat.ticketId,
           eventId: Number(eventId),
           quantity: 1,
-        };
-      });
+        }
+      })
 
-      console.log(
-        "Ticket purchase requests:",
-        JSON.stringify(ticketPurchaseRequests, null, 2)
-      );
+      console.log("Ticket purchase requests:", JSON.stringify(ticketPurchaseRequests, null, 2))
 
       // Call the API to create the ticket purchase
       const response = await ticketPurchaseApi.createTicketPurchase(
         { ticketPurchaseRequests },
-        localStorage.getItem("accessToken") || ""
-      );
+        localStorage.getItem("accessToken") || "",
+      )
 
-      console.log("Ticket purchase response:", response);
+      console.log("Ticket purchase response:", response)
 
       // Kiểm tra thông báo phản hồi thay vì chỉ kiểm tra trạng thái success
-      if (
-        response.message &&
-        response.message.toLowerCase().includes("successfully")
-      ) {
+      if (response.message && response.message.toLowerCase().includes("successfully")) {
         // LƯU Ý: Nếu API trả về thành công với message chứa "successfully",
         // chúng ta coi đó là thành công dù response.success có thể là false
 
@@ -776,8 +692,7 @@ const TicketBooking = () => {
             eventInfo: {
               id: eventId,
               activityId: eventActivityId,
-              name:
-                eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+              name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
               location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
               date: "19:30, 12 tháng 4, 2025",
             },
@@ -786,15 +701,15 @@ const TicketBooking = () => {
               seats: selectedSeats,
               purchase: response,
             },
-          })
-        );
+          }),
+        )
 
         // Show success message
-        toast.success("Đã tạo đơn hàng thành công!");
+        toast.success("Đã tạo đơn hàng thành công!")
 
         // Chuyển đến trang thanh toán
-        navigate(`/payment?eventId=${eventId}`);
-        return; // Kết thúc sớm nếu thành công
+        navigate(`/payment?eventId=${eventId}`)
+        return // Kết thúc sớm nếu thành công
       }
 
       // Nếu có success attribute và nó là true
@@ -808,8 +723,7 @@ const TicketBooking = () => {
             eventInfo: {
               id: eventId,
               activityId: eventActivityId,
-              name:
-                eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+              name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
               location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
               date: "19:30, 12 tháng 4, 2025",
             },
@@ -818,27 +732,23 @@ const TicketBooking = () => {
               seats: selectedSeats,
               purchase: response,
             },
-          })
-        );
+          }),
+        )
 
-        toast.success("Đã tạo đơn hàng thành công!");
-        navigate("/payment");
-        return;
+        toast.success("Đã tạo đơn hàng thành công!")
+        navigate("/payment")
+        return
       }
 
       // Nếu không có message success và success không phải true, coi như lỗi
-      throw new Error(response.message || "Không thể tạo đơn hàng");
+      throw new Error(response.message || "Không thể tạo đơn hàng")
     } catch (error) {
-      console.error("Error creating ticket purchase:", error);
+      console.error("Error creating ticket purchase:", error)
 
       // Kiểm tra nội dung lỗi - nếu chứa "successfully" thì đó có thể là thành công
-      if (
-        error instanceof Error &&
-        error.message &&
-        error.message.toLowerCase().includes("successfully")
-      ) {
+      if (error instanceof Error && error.message && error.message.toLowerCase().includes("successfully")) {
         // Dù ở trong catch block nhưng message cho thấy đây là thành công
-        toast.success("Đã tạo đơn hàng thành công!");
+        toast.success("Đã tạo đơn hàng thành công!")
 
         // Lưu trữ dữ liệu cho trang thanh toán và chuyển hướng
         localStorage.setItem(
@@ -849,8 +759,7 @@ const TicketBooking = () => {
             eventInfo: {
               id: eventId,
               activityId: eventActivityId,
-              name:
-                eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
+              name: eventInfor?.eventName || "Nhà Hát Kịch IDECAF: MÁ ƠI ÚT DÌA!",
               location: eventInfor?.locationName || "Nhà Hát Kịch IDECAF",
               date: "19:30, 12 tháng 4, 2025",
             },
@@ -858,19 +767,19 @@ const TicketBooking = () => {
               ticket: seatTypes,
               seats: selectedSeats,
             },
-          })
-        );
+          }),
+        )
 
-        navigate("/payment");
+        navigate("/payment")
       } else if (error instanceof Error) {
-        toast.error(`Lỗi: ${error.message}`);
+        toast.error(`Lỗi: ${error.message}`)
       } else {
-        toast.error("Đã xảy ra lỗi khi tạo đơn hàng");
+        toast.error("Đã xảy ra lỗi khi tạo đơn hàng")
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handlechangeTicket = async () => {
     const ticketPurchaseRequests = selectedSeats.map((seat) => {
@@ -883,19 +792,19 @@ const TicketBooking = () => {
         ticketId: seat.ticketId,
         eventId: Number(eventId),
         quantity: 1,
-      };
-    });
+      }
+    })
     try {
       const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
         ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
         caseTicket: oldTicketPurchase.caseTicket,
-      });
-      const paymentUrl = res.data.result.data.checkoutUrl;
-      window.location.href = paymentUrl;
+      })
+      const paymentUrl = res.data.result.data.checkoutUrl
+      window.location.href = paymentUrl
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <div className="h-screen w-full text-black">
@@ -906,15 +815,10 @@ const TicketBooking = () => {
             id="mapContainer"
             className="relative w-[1200px] h-[800px] bg-gray-100 border border-gray-300 rounded overflow-hidden"
           >
-            <div className="absolute top-0 left-0 right-0 p-5 bg-gray-800 text-white text-center">
-              STAGE
-            </div>
+            <div className="absolute top-0 left-0 right-0 p-5 bg-gray-800 text-white text-center">STAGE</div>
             {changeTicket == true && (
               <div className="absolute top-4 left-5">
-                <button
-                  onClick={handleOpenOldTicket}
-                  className=" bg-black text-white px-3 py-1 rounded-md shadow-box"
-                >
+                <button onClick={handleOpenOldTicket} className=" bg-black text-white px-3 py-1 rounded-md shadow-box">
                   Xem vé muốn đổi
                 </button>
               </div>
@@ -926,9 +830,7 @@ const TicketBooking = () => {
                 section={section}
                 seatTypes={seatTypes}
                 getSeatColor={getSeatColor}
-                onSeatClick={(seat, sectionName, quantityAction) =>
-                  handleSeatClick(seat, sectionName, quantityAction)
-                }
+                onSeatClick={(seat, sectionName, quantityAction) => handleSeatClick(seat, sectionName, quantityAction)}
                 selectedSeats={selectedSeats}
                 isLoggedIn={isLoggedIn}
                 showLoginPrompt={showLoginPrompt}
@@ -939,45 +841,31 @@ const TicketBooking = () => {
         <div className="fixed flex flex-col top-0 right-0 h-full w-80 pt-[70px] bg-white shadow-md border border-gray-200">
           <div className="overflow-y-auto flex-1 p-6">
             <div className="mb-4 space-y-4">
-              <div className="text-[18px] font-semibold">
-                {eventInfor?.eventName}
-              </div>
+              <div className="text-[18px] font-semibold">{eventInfor?.eventName}</div>
               <div className="flex items-center gap-1 font-medium">
                 <span>
-                  <Calendar
-                    size={20}
-                    fill="white"
-                    className="text-pse-green-second"
-                  />
+                  <Calendar size={20} fill="white" className="text-pse-green-second" />
                 </span>
                 {eventInfor?.eventActivityDTOList != undefined &&
                   formatTimeFe(
-                    eventInfor.eventActivityDTOList.find(
-                      (x) => x.eventActivityId == Number(eventActivityId)
-                    )?.startTimeEvent
+                    eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
+                      ?.startTimeEvent,
                   ) +
                     ` - ` +
                     formatTimeFe(
-                      eventInfor.eventActivityDTOList.find(
-                        (x) => x.eventActivityId == Number(eventActivityId)
-                      )?.endTimeEvent
+                      eventInfor.eventActivityDTOList.find((x) => x.eventActivityId == Number(eventActivityId))
+                        ?.endTimeEvent,
                     ) +
                     `, ` +
                     formatDateVietnamese(
                       eventInfor.eventActivityDTOList
-                        .find(
-                          (x) => x.eventActivityId == Number(eventActivityId)
-                        )
-                        ?.dateEvent.toString()
+                        .find((x) => x.eventActivityId == Number(eventActivityId))
+                        ?.dateEvent.toString(),
                     )}
               </div>
               <div className="flex items-center gap-1">
                 <span>
-                  <MapPin
-                    size={20}
-                    fill="white"
-                    className="text-pse-green-second"
-                  />
+                  <MapPin size={20} fill="white" className="text-pse-green-second" />
                 </span>
                 {eventInfor?.locationName}
               </div>
@@ -985,31 +873,22 @@ const TicketBooking = () => {
             <CustomDivider />
 
             <div className="space-y-3">
-              <h3 className="text-black font-semibold mb-4">
-                Chú thích loại ghế
-              </h3>
+              <h3 className="text-black font-semibold mb-4">Chú thích loại ghế</h3>
               {/* Map mảng ticketType ở đây */}
               {seatTypes.map((seatType) => (
                 <div
                   key={seatType.id}
                   className="flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200"
                 >
-                  <div
-                    className="w-8 h-8 rounded-lg shadow-md mr-3"
-                    style={{ backgroundColor: seatType.color }}
-                  ></div>
+                  <div className="w-8 h-8 rounded-lg shadow-md mr-3" style={{ backgroundColor: seatType.color }}></div>
                   <div>
                     <div className="flex items-center font-medium text-gray-900">
                       <p>
                         {seatType.name}{" "}
-                        <span className="text-xs text-pse-gray ml-auto">
-                          (Tối đa {seatType.maxQuantity} vé)
-                        </span>
+                        <span className="text-xs text-pse-gray ml-auto">(Tối đa {seatType.maxQuantity} vé)</span>
                       </p>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {formatCurrency(seatType.price)}
-                    </div>
+                    <div className="text-sm text-gray-600">{formatCurrency(seatType.price)}</div>
                   </div>
                 </div>
               ))}
@@ -1020,22 +899,15 @@ const TicketBooking = () => {
               {selectedSeats.length > 0 ? (
                 <div className="space-y-2">
                   {selectedSeats.map((seat) => (
-                    <div
-                      key={seat.id}
-                      className="bg-gray-50 p-3 rounded-lg border border-gray-200"
-                    >
+                    <div key={seat.id} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
                       <div className="flex justify-between items-center">
                         <div className="font-medium">
                           {seat.sectionName}: {seat.rcCode}
                         </div>
-                        <div className="text-sm font-semibold text-gray-700">
-                          {seat.formattedPrice}
-                        </div>
+                        <div className="text-sm font-semibold text-gray-700">{seat.formattedPrice}</div>
                       </div>
                       <div className="flex justify-between items-center">
-                        <div className="text-sm text-gray-600">
-                          {seat.typeName}
-                        </div>
+                        <div className="text-sm text-gray-600">{seat.typeName}</div>
 
                         {/* Add quantity controls for standing sections */}
                         {seat.id.startsWith("standing-") && (
@@ -1043,14 +915,9 @@ const TicketBooking = () => {
                             <button
                               className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
                               onClick={() => {
-                                const sectionId = seat.id.replace(
-                                  "standing-",
-                                  ""
-                                );
-                                const section = sections.find(
-                                  (s) => s.id === sectionId
-                                );
-                                if (!section) return;
+                                const sectionId = seat.id.replace("standing-", "")
+                                const section = sections.find((s) => s.id === sectionId)
+                                if (!section) return
 
                                 const standingSeat: ISeat = {
                                   id: `standing-${section.id}`,
@@ -1061,30 +928,19 @@ const TicketBooking = () => {
                                   price: section.price || 0,
                                   seatTypeId: section.priceId || "",
                                   zoneActivityId: section.zoneActivityId,
-                                };
-                                handleSeatClick(
-                                  standingSeat,
-                                  section.name,
-                                  "decrease"
-                                );
+                                }
+                                handleSeatClick(standingSeat, section.name, "decrease")
                               }}
                             >
                               <span className="text-sm font-bold">-</span>
                             </button>
-                            <span className="text-sm font-semibold">
-                              {seat.quantity || 1}
-                            </span>
+                            <span className="text-sm font-semibold">{seat.quantity || 1}</span>
                             <button
                               className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
                               onClick={() => {
-                                const sectionId = seat.id.replace(
-                                  "standing-",
-                                  ""
-                                );
-                                const section = sections.find(
-                                  (s) => s.id === sectionId
-                                );
-                                if (!section) return;
+                                const sectionId = seat.id.replace("standing-", "")
+                                const section = sections.find((s) => s.id === sectionId)
+                                if (!section) return
 
                                 const standingSeat: ISeat = {
                                   id: `standing-${section.id}`,
@@ -1095,12 +951,8 @@ const TicketBooking = () => {
                                   price: section.price || 0,
                                   seatTypeId: section.priceId || "",
                                   zoneActivityId: section.zoneActivityId,
-                                };
-                                handleSeatClick(
-                                  standingSeat,
-                                  section.name,
-                                  "increase"
-                                );
+                                }
+                                handleSeatClick(standingSeat, section.name, "increase")
                               }}
                             >
                               <span className="text-sm font-bold">+</span>
@@ -1110,22 +962,16 @@ const TicketBooking = () => {
                       </div>
 
                       {/* Show total price for standing sections with multiple tickets */}
-                      {seat.id.startsWith("standing-") &&
-                        seat.quantity &&
-                        seat.quantity > 1 && (
-                          <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200">
-                            <div className="text-xs text-gray-500">
-                              Tổng ({seat.quantity} vé):
-                            </div>
-                            <div className="text-sm font-medium">
-                              {formatCurrency(
-                                (seatTypes.find(
-                                  (type) => type.id === seat.seatTypeId
-                                )?.price || 0) * seat.quantity
-                              )}
-                            </div>
+                      {seat.id.startsWith("standing-") && seat.quantity && seat.quantity > 1 && (
+                        <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200">
+                          <div className="text-xs text-gray-500">Tổng ({seat.quantity} vé):</div>
+                          <div className="text-sm font-medium">
+                            {formatCurrency(
+                              (seatTypes.find((type) => type.id === seat.seatTypeId)?.price || 0) * seat.quantity,
+                            )}
                           </div>
-                        )}
+                        </div>
+                      )}
                     </div>
                   ))}
                   <div className="flex justify-between font-medium mt-2 pt-2 border-t border-gray-200">
@@ -1144,27 +990,16 @@ const TicketBooking = () => {
             <div className="mb-2 flex items-center text-xs gap-1">
               <Ticket fill="white" className="text-pse-black-light" />
               {selectedSeats.length > 0
-                ? selectedSeats
-                    .map(
-                      (seat) =>
-                        `(${seat.sectionName} ${parseSeatCode(seat.rcCode)})`
-                    )
-                    .join(", ")
+                ? selectedSeats.map((seat) => `(${seat.sectionName} ${parseSeatCode(seat.rcCode)})`).join(", ")
                 : "Chưa chọn ghế"}
             </div>
 
             <Button
               className={`w-full ${
-                selectedSeats.length != 0
-                  ? "bg-pse-green text-white"
-                  : "bg-white text-pse-gray"
+                selectedSeats.length != 0 ? "bg-pse-green text-white" : "bg-white text-pse-gray"
               }  font-semibold hover:bg-opacity-70 transition-all duration-300`}
               disabled={selectedSeats.length === 0 || isLoading}
-              onClick={
-                changeTicket == true
-                  ? handlechangeTicket
-                  : handleProceedToPayment
-              }
+              onClick={changeTicket == true ? handlechangeTicket : handleProceedToPayment}
             >
               {isLoading ? (
                 <>
@@ -1186,14 +1021,11 @@ const TicketBooking = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Đăng nhập để tiếp tục</DialogTitle>
-            <DialogDescription>
-              Bạn cần đăng nhập để có thể đặt vé cho sự kiện này.
-            </DialogDescription>
+            <DialogDescription>Bạn cần đăng nhập để có thể đặt vé cho sự kiện này.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
             <p className="text-center text-sm text-muted-foreground">
-              Vui lòng đăng nhập để tiếp tục quá trình đặt vé. Sau khi đăng
-              nhập, bạn sẽ được chuyển trở lại trang này.
+              Vui lòng đăng nhập để tiếp tục quá trình đặt vé. Sau khi đăng nhập, bạn sẽ được chuyển trở lại trang này.
             </p>
           </div>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
@@ -1216,43 +1048,29 @@ const TicketBooking = () => {
       >
         <div className="overflow-x-hidden text-black">
           <div className="flex flex-col justify-center items-center">
-            <img src={ticket?.banner} alt="" className="w-40 h-20 rounded-md" />
-            <div className="font-semibold mt-1 text-black text-xl text-center break-words">
-              {ticket?.eventName}
-            </div>
+            <img src={ticket?.banner || "/placeholder.svg"} alt="" className="w-40 h-20 rounded-md" />
+            <div className="font-semibold mt-1 text-black text-xl text-center break-words">{ticket?.eventName}</div>
             <div className="flex gap-1 items-center">
-              <span className="text-pse-gray font-medium">
-                {ticket?.ticketType}
-              </span>
+              <span className="text-pse-gray font-medium">{ticket?.ticketType}</span>
               <p
                 style={{
-                  backgroundColor: eventTypes.find(
-                    (x) => x.id == ticket?.eventCategoryId
-                  )?.color,
+                  backgroundColor: eventTypes.find((x) => x.id == ticket?.eventCategoryId)?.color,
                 }}
                 className="text-white text-xs text-center font-medium rounded-md w-fit px-2 py-1"
               >
-                {
-                  eventTypes.find((x) => x.id == ticket?.eventCategoryId)
-                    ?.vietnamName
-                }
+                {eventTypes.find((x) => x.id == ticket?.eventCategoryId)?.vietnamName}
               </p>
             </div>
           </div>
           <DashDivider />
           <div className="space-y-2">
             <p className="break-words">
-              <span className="text-pse-green font-semibold">
-                {ticket?.locationName}
-              </span>{" "}
-              {"- "}
+              <span className="text-pse-green font-semibold">{ticket?.locationName}</span> {"- "}
               {ticket?.location}
             </p>
             <p className="w-full truncate">
               Giờ bắt đầu: {formatTimeFe(ticket?.eventStartTime)} {"-"}
-              <span className="font-semibold">
-                {formatDateVietnamese(ticket?.eventDate.toString())}
-              </span>
+              <span className="font-semibold">{formatDateVietnamese(ticket?.eventDate.toString())}</span>
             </p>
           </div>
           <DashDivider />
@@ -1260,9 +1078,7 @@ const TicketBooking = () => {
             <div>
               <div>
                 Ghế {"- "}
-                <span className="font-bold">
-                  {parseSeatCode(ticket?.seatCode)}
-                </span>{" "}
+                <span className="font-bold">{parseSeatCode(ticket?.seatCode)}</span>{" "}
               </div>
               <div>
                 Khu vực {"- "}
@@ -1271,12 +1087,7 @@ const TicketBooking = () => {
             </div>
           )}
           <div className="flex justify-center mt-4">
-            <QRCodeSVG
-              value={ticket?.qrCode as string}
-              size={140}
-              bgColor={"#FFFFFF"}
-              level={"M"}
-            />
+            <QRCodeSVG value={ticket?.qrCode as string} size={140} bgColor={"#FFFFFF"} level={"M"} />
           </div>
           <DashDivider />
           <section className="flex justify-between text-black">
@@ -1290,15 +1101,13 @@ const TicketBooking = () => {
             </div>
             <div>
               <h1 className="text-right">Giá</h1>
-              <p className="text-right font-bold">
-                {formatMoney(ticket?.price)}
-              </p>
+              <p className="text-right font-bold">{formatMoney(ticket?.price)}</p>
             </div>
           </section>
         </div>
       </Popup>
     </div>
-  );
-};
+  )
+}
 
-export default TicketBooking;
+export default TicketBooking
