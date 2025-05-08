@@ -1,4 +1,5 @@
 export interface TicketResponse {
+  ticketId: number;
   eventId: number;
   eventActivityId: number;
   ticketPurchaseId: number;
