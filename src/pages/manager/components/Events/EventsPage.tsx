@@ -15,7 +15,7 @@ import {
 import * as pdfjs from "pdfjs-dist";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "../../../../components/ui/button";
 import {
@@ -51,10 +51,10 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
+import { EventStatus } from "../../../../interface/EventInterface";
 import type { EventResponse } from "../../../../interface/manager/EventType";
 import managerApi from "../../../../services/manager/ManagerApi";
 import { ManagerHeader } from "../ManagerHeader";
-import { EventStatus } from "../../../../interface/EventInterface";
 
 const customStyles = `
   .description-scrollbar::-webkit-scrollbar {
@@ -240,6 +240,7 @@ export default function EventsPage() {
 
       if (res.data && res.data.result) {
         toast.success("Contract uploaded successfully");
+        fetchEventList(); 
         // Refresh related contracts if needed
         if (selectedEvent) {
           await fetchRelatedContracts(selectedEvent.eventId);
