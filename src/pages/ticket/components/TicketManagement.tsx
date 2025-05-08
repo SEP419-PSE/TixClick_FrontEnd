@@ -6,7 +6,7 @@ import { eventTypes } from "../../../constants/constants";
 import DashDivider from "../../../components/Divider/DashDivider";
 import { formatMoney } from "../../DataTranfer";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
-import { TicketResponse } from "../../../interface/ticket/Ticket";
+import { SortType, TicketResponse } from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
   formatTimeFe,
@@ -20,6 +20,7 @@ import {
 } from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
 import Pagination from "../../../components/Pagination/Pagination";
 import { useNavigate } from "react-router";
+import TicketFilter from "./TicketFilter";
 
 export default function TicketManagement() {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ export default function TicketManagement() {
     loading,
     pagination: { currentPage, totalPages, totalElements, pageSize },
     setPage,
+    sort,
+    setSort,
   } = useTicketsPurchases();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -88,7 +91,13 @@ export default function TicketManagement() {
           <span className="text-white">Vé đã mua</span>
         </nav>
       </div>
-      <h1 className="text-xl mt-4 font-semibold">Vé đã mua </h1>
+      <div className="flex justify-between items-center mt-2">
+        <h1 className="text-xl font-semibold">Vé đã mua </h1>
+        <TicketFilter
+          sort={sort}
+          setSort={(e: string) => setSort(e as SortType)}
+        />
+      </div>
       <section className="mt-auto">
         <TicketList
           ticketList={ticketPurchases}

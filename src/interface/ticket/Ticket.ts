@@ -40,3 +40,10 @@ export interface ChangeTicket {
   ticketPurchaseId: number;
   caseTicket: string | null;
 }
+
+export interface TicketParams {
+  page: number;
+  sortDirection: SortType;
+}
+
+export type SortType = "ASC" | "DESC";
