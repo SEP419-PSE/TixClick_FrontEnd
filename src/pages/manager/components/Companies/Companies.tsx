@@ -61,14 +61,14 @@ export default function CompanyApprovalsPage() {
 
       await fetchCompaniesList()
 
-      toast.success("Company Approved", {
-        description: `${selectedCompany?.companyName} has been approved. An email notification has been sent to the company.`,
+      toast.success("Công ty đã được duyệt", {
+        description: `${selectedCompany?.companyName} đã được xets duyệt. Sẽ sớm có thông báo qua email.`,
       })
       setIsReviewModalOpen(false)
     } catch (error) {
       console.error("Approval failed:", error)
-      toast.error("Approval failed", {
-        description: "There was an error approving the company. Please try again.",
+      toast.error("Công ty không được duyệt", {
+        description: "Có lỗi xảy ra trong quá trình duyệt công ty. Vui lòng thử lại.",
       })
     } finally {
       setIsApproving(false)
@@ -83,14 +83,14 @@ export default function CompanyApprovalsPage() {
 
       await fetchCompaniesList()
 
-      toast.success("Company Rejected", {
-        description: `${selectedCompany?.companyName} has been rejected. An email notification has been sent to the company.`,
+      toast.success("Công ty đã bị từ chối", {
+        description: `${selectedCompany?.companyName} đã bị từ chối. Sẽ sớm có thông báo qua email.`,
       })
       setIsReviewModalOpen(false)
     } catch (error) {
       console.error("❌ Rejection failed:", error)
-      toast.error("Rejection failed", {
-        description: "There was an error rejecting the company. Please try again.",
+      toast.error("Từ chối công ty thất bại ", {
+        description: "Có lỗi xảy ra trong quá trình từ chối công ty. Vui lòng thử lại.",
       })
     } finally {
       setIsRejecting(false)
@@ -435,7 +435,7 @@ export default function CompanyApprovalsPage() {
                             className="hover:bg-[#333333] cursor-pointer"
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            Review company details
+                            Xem chi tiết
                           </DropdownMenuItem>
                           <DropdownMenuSeparator className="bg-[#444444]" />
                           {company.companyDocument && company.companyDocument.length > 0 && (
@@ -444,7 +444,7 @@ export default function CompanyApprovalsPage() {
                               className="hover:bg-[#333333] cursor-pointer"
                             >
                               <FileText className="mr-2 h-4 w-4" />
-                              View documents
+                              Xem tài liệu
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -502,7 +502,7 @@ export default function CompanyApprovalsPage() {
               </span>
             </DialogTitle>
             <DialogDescription>
-              Review the company details and decide whether to approve or reject the application.
+              Xem xét thông tin công ty và quyết định xem có nên phê duyệt hay từ chối đơn đăng ký hay không.
             </DialogDescription>
           </DialogHeader>
 
@@ -515,10 +515,10 @@ export default function CompanyApprovalsPage() {
             >
               <TabsList className="grid grid-cols-2 mb-6 bg-[#333333]">
                 <TabsTrigger value="company-info" className="data-[state=active]:bg-[#00B14F]">
-                  Company Information
+                  Thông tin công ty
                 </TabsTrigger>
                 <TabsTrigger value="documents" className="data-[state=active]:bg-[#00B14F]">
-                  Documents ({selectedCompany.companyDocument?.length || 0})
+                  Tài liệu ({selectedCompany.companyDocument?.length || 0})
                 </TabsTrigger>
               </TabsList>
 
@@ -527,29 +527,29 @@ export default function CompanyApprovalsPage() {
                   <div className="bg-[#1E1E1E] p-4 rounded-lg border border-[#333333]">
                     <h3 className="text-lg font-semibold mb-4 flex items-center">
                       <Building2 className="mr-2 h-5 w-5 text-[#00B14F]" />
-                      Company Overview
+                      Tổng quan công ty
                     </h3>
 
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Company Name</label>
+                        <label className="text-sm font-medium text-gray-400">Tên công ty:</label>
                         <div className="text-base font-semibold">{selectedCompany.companyName}</div>
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Tax Code</label>
+                        <label className="text-sm font-medium text-gray-400">Mã số thuế:</label>
                         <div className="text-base">{selectedCompany.codeTax}</div>
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Company email</label>
+                        <label className="text-sm font-medium text-gray-400">Email công ty:</label>
                         <div className="text-base">{selectedCompany.email}</div>
                       </div>
 
                      
 
                       <div>
-                        <label className="text-sm font-medium text-gray-400">National ID</label>
+                        <label className="text-sm font-medium text-gray-400">CCCD:</label>
                         <div className="text-base">{selectedCompany.nationalId}</div>
                       </div>
                     </div>
@@ -558,17 +558,17 @@ export default function CompanyApprovalsPage() {
                   <div className="bg-[#1E1E1E] p-4 rounded-lg border border-[#333333]">
                     <h3 className="text-lg font-semibold mb-4 flex items-center">
                       <MapPin className="mr-2 h-5 w-5 text-[#00B14F]" />
-                      Location & Contact
+                      Địa chỉ & Liên hệ
                     </h3>
 
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Address</label>
+                        <label className="text-sm font-medium text-gray-400">Địa chỉ</label>
                         <div className="text-base">{selectedCompany.address}</div>
                       </div>
 
                       <div className="pt-2 border-t border-[#333333] mt-3">
-                        <label className="text-sm font-medium text-gray-400">Contact Person</label>
+                        <label className="text-sm font-medium text-gray-400">Người Contact</label>
                         <div className="text-base font-semibold">
                           {selectedCompany.customAccount.lastName} {selectedCompany.customAccount.firstName}
                         </div>
@@ -587,26 +587,26 @@ export default function CompanyApprovalsPage() {
                   </div>
 
                   <div className="bg-[#1E1E1E] p-4 rounded-lg border border-[#333333]">
-                    <h3 className="text-lg font-semibold mb-4">Banking Information</h3>
+                    <h3 className="text-lg font-semibold mb-4">Thông tin ngân hàng</h3>
 
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Bank Name</label>
+                        <label className="text-sm font-medium text-gray-400">Tên ngân hàng</label>
                         <div className="text-base">{selectedCompany.bankingName}</div>
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Bank Account Number</label>
+                        <label className="text-sm font-medium text-gray-400">Số tài khoản</label>
                         <div className="text-base font-mono">{selectedCompany.bankingCode}</div>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-[#1E1E1E] p-4 rounded-lg border border-[#333333]">
-                    <h3 className="text-lg font-semibold mb-4">Company Description</h3>
+                    <h3 className="text-lg font-semibold mb-4">Mô tả công ty</h3>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-400">About</label>
+                      <label className="text-sm font-medium text-gray-400">Về công ty</label>
                       <div className="text-base mt-1 whitespace-pre-wrap">{selectedCompany.description}</div>
                     </div>
                   </div>
