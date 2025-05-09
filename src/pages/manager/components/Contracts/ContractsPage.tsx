@@ -391,7 +391,7 @@ export default function ContractsPage() {
                       {contract.contractName}
                     </TableCell>
                     <TableCell className="text-white">
-                      Company {contract.companyId}
+                      {contract.companyName}
                     </TableCell>
                     <TableCell className="text-white">
                       {contract.contractType}
