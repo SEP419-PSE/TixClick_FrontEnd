@@ -263,7 +263,7 @@ export default function Consumer() {
                           <p className="text-gray-400 text-sm">Doanh thu</p>
                           <p className="text-[#00B14F] font-medium">
                             {event.totalRevenue != null
-                              ? event.totalRevenue
+                              ? formatMoney(event.totalRevenue)
                               : formatMoney(0)}
                           </p>
                         </div>
