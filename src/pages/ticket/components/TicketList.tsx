@@ -15,13 +15,12 @@ type Props = {
 
 const TicketList: React.FC<Props> = ({
   clickOpenPopup,
-  ticketList = [], 
+  ticketList = [],
   onClickSelectTicket,
   loading,
 }) => {
-
   return (
-    <div className="mx-20 my-5">
+    <div className="mx-10 my-5">
       {loading ? (
         <div className="flex flex-col mt-8 gap-2">
           {[...Array(3)].map((_, i) => (
@@ -50,10 +49,10 @@ const TicketList: React.FC<Props> = ({
                 className="w-32 h-16 rounded-md"
               />
               <div>
-                <div className="font-semibold text-black text-xl w-60 truncate">
+                <div className="font-semibold text-black text-xl w-80 truncate">
                   {ticket.eventName}
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex text-sm items-center gap-1">
                   <span className="text-pse-gray font-medium">
                     {ticket.ticketType}
                   </span>
@@ -70,6 +69,9 @@ const TicketList: React.FC<Props> = ({
                         ?.vietnamName
                     }
                   </p>
+                </div>
+                <div className="text-xs">
+                  Thời gian mua: {ticket.timeBuyTicket}
                 </div>
               </div>
             </div>
@@ -99,7 +101,7 @@ const TicketList: React.FC<Props> = ({
         ))
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TicketList
+export default TicketList;

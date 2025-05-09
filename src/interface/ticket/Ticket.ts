@@ -7,6 +7,7 @@ export interface TicketResponse {
   eventName: string;
   eventDate: Date;
   eventStartTime: string;
+  timeBuyTicket: string;
   locationName: string;
   location: string;
   price: number;
