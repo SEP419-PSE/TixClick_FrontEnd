@@ -13,7 +13,7 @@ import {
   parseSeatCode,
 } from "../../../lib/utils";
 import { Button } from "../../../components/ui/button";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import {
   CaseTicketType,
   setTicketPurchase,

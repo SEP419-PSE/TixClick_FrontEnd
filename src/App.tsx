@@ -12,11 +12,18 @@ import AdminCompany from "./pages/admin/companies/AdminCompany";
 import AdminEvent from "./pages/admin/events/AdminEvent";
 import AccountsPage from "./pages/admin/ManagerAccPage";
 import RevenuePage from "./pages/admin/revenue/Revenues";
+import LoginGoogleSucces from "./pages/auth/LoginGoogleSucces";
 import SignInPage from "./pages/auth/SignInPage";
 import ChatApp from "./pages/chat/ChatApp";
 import CreateCompany from "./pages/company/CreateCompany";
 import Consumer from "./pages/consumer/components/Consumer";
+import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
 import EventManagement from "./pages/consumer/components/Event/EventManagement";
+import Order from "./pages/consumer/components/Event/Order/Order";
+import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
+import SummaryRevenue from "./pages/consumer/components/Event/Summary/SummaryRevenue";
+import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
+import Voucher from "./pages/consumer/components/Event/Voucher/Voucher";
 import Information from "./pages/consumer/components/Information/Information";
 import Member from "./pages/consumer/components/Member/Member";
 import Policy from "./pages/consumer/components/Policy/Policy";
@@ -42,14 +49,6 @@ import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
-import SummaryRevenue from "./pages/consumer/components/Event/Summary/SummaryRevenue";
-import Order from "./pages/consumer/components/Event/Order/Order";
-import Revenue from "./pages/consumer/components/Event/Revenue/Revenue";
-import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
-import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
-import Voucher from "./pages/consumer/components/Event/Voucher/Voucher";
-import LoginGoogleSucces from "./pages/auth/LoginGoogleSucces";
-import CallbackPayment from "./pages/payment/QueueLoading/CallbackPayment";
 
 export default function App() {
   return (
@@ -59,8 +58,14 @@ export default function App() {
         <Route element={<RootLayout />}>
           <Route index element={<HomePage />} />
           <Route path="event-detail/:id" element={<EventDetail />} />
+          <Route path="/manager-dashboard/events/event-detail/:id/manager" element={<EventDetail />} />
+
           <Route
             path="event-detail/:id/booking-ticket"
+            element={<TicketBooking />}
+          />
+          <Route
+            path="/manager-dashboard/events/event-detail/:id/manager/booking-ticket"
             element={<TicketBooking />}
           />
           <Route path="create-event" element={<CreateEvent />} />
@@ -81,6 +86,10 @@ export default function App() {
 
         <Route
           path="event-detail/:id/booking-ticket-no-seatmap"
+          element={<TicketBookingNoneSeatmap />}
+        />
+        <Route
+          path="/manager-dashboard/events/event-detail/:id/manager/booking-ticket-no-seatmap"
           element={<TicketBookingNoneSeatmap />}
         />
         <Route path="login-google-success" element={<LoginGoogleSucces />} />
