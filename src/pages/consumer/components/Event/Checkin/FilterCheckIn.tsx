@@ -31,6 +31,7 @@ const FilterCheckIn = ({
         </span>
       </div>
       <Select
+        value={selectedEventActId}
         onValueChange={(e: string) => {
           setSelectedEventActId(e);
         }}

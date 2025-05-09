@@ -116,9 +116,9 @@ const CreateVoucher = ({ onCreated }: Props) => {
               {...register("discount", {
                 required: "Vui lòng nhập phần trăm giảm",
                 min: { value: 1, message: "Giảm ít nhất 1%" },
-                max: { value: 100, message: "Không được quá 100%" },
+                max: { value: 80, message: "Không được quá 80%" },
               })}
-              placeholder="Nhập số từ 1 đến 100"
+              placeholder="Nhập số từ 1 đến 80"
             />
             {errors.discount && (
               <p className="text-red-500 text-sm mt-1">
@@ -147,7 +147,12 @@ const CreateVoucher = ({ onCreated }: Props) => {
 
           {/* Ngày bắt đầu */}
           <div>
-            <Label htmlFor="startDate">Ngày bắt đầu áp dụng </Label>
+            <Label className="flex flex-col gap-1" htmlFor="startDate">
+              Ngày bắt đầu áp dụng
+              <span className="text-xs text-pse-gray">
+                Hệ thống sẽ tự động kích hoạt khi đến ngày bắt đầu
+              </span>
+            </Label>
             <Controller
               control={control}
               name="startDate"
@@ -169,7 +174,12 @@ const CreateVoucher = ({ onCreated }: Props) => {
 
           {/* Ngày kết thúc */}
           <div>
-            <Label htmlFor="endDate">Ngày hết hiệu lực</Label>
+            <Label className="flex flex-col gap-1" htmlFor="endDate">
+              Ngày hết hiệu lực
+              <span className="text-xs text-pse-gray">
+                Hệ thống sẽ tự động vô hiệu hóa khi đến ngày kết thúc
+              </span>
+            </Label>
             <Controller
               control={control}
               name="endDate"

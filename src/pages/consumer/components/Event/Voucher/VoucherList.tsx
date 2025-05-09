@@ -8,9 +8,10 @@ import VoucherCard from "./VoucherCard";
 type Props = {
   vouchers: VoucherResponse[];
   onChangeStatus: (voucherId: number, newStatus: VoucherStatus) => void;
+  deleteVoucher: (voucher: VoucherResponse) => void;
 };
 
-const VoucherList = ({ vouchers, onChangeStatus }: Props) => {
+const VoucherList = ({ vouchers, onChangeStatus, deleteVoucher }: Props) => {
   if (vouchers.length == 0) return <EmptyList label="Chưa có voucher nào" />;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -19,6 +20,7 @@ const VoucherList = ({ vouchers, onChangeStatus }: Props) => {
           key={voucher.voucherId}
           voucher={voucher}
           onChangeStatus={onChangeStatus}
+          deleteVoucher={deleteVoucher}
         />
       ))}
     </div>

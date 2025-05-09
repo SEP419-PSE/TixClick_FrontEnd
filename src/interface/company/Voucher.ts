@@ -15,4 +15,4 @@ export interface VoucherResponse extends VoucherRequest {
   accountId: number;
 }
 
-export type VoucherStatus = "ACTIVE" | "INACTIVE";
+export type VoucherStatus = "ALL" | "ACTIVE" | "INACTIVE" | "EXPIRED";

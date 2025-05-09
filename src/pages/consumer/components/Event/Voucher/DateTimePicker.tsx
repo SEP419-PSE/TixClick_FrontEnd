@@ -52,6 +52,7 @@ export function DateTimePicker({ date, onChange, placeholder }: Props) {
               setOpen(false);
             }
           }}
+          disabled={{ before: new Date() }}
           initialFocus
         />
       </PopoverContent>

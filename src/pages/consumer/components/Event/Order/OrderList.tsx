@@ -25,30 +25,20 @@ import { Badge } from "../../../../../components/ui/badge";
 import { Search } from "lucide-react";
 import { TransactionResponse } from "../../../../../interface/company/Transaction";
 import { formatDateVietnamese } from "../../../../../lib/utils";
+import { SortType } from "../../../../../interface/ticket/Ticket";
 
 type Props = {
   transactions?: TransactionResponse[];
+  sort: SortType;
+  setSort: (e: string) => void;
 };
 
-export function OrderList({ transactions }: Props) {
+export function OrderList({ transactions, sort, setSort }: Props) {
   console.log(JSON.stringify(transactions, null, 2));
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const filteredData = transactions?.filter((tx) => {
-    const matchesSearch =
-      tx.accountName.toLowerCase().includes(search.toLowerCase()) ||
-      tx.transactionCode.toLowerCase().includes(search.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" ||
-      tx.status.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
 
   return (
-    <Card className="bg-background text-foreground shadow-md rounded-2xl border">
+    <Card className="bg-background min-h-[50vh] text-foreground shadow-md rounded-2xl border">
       <CardHeader>
         <CardTitle>Danh sách giao dịch</CardTitle>
       </CardHeader>
@@ -66,17 +56,13 @@ export function OrderList({ transactions }: Props) {
             />
           </div>
 
-          <Select
-            onValueChange={(value) => setStatusFilter(value)}
-            value={statusFilter}
-          >
+          <Select value={sort} onValueChange={(e) => setSort(e)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="success">SUCCESS</SelectItem>
-              <SelectItem value="failed">FAILED</SelectItem>
+              <SelectItem value="DESC">Mới nhất</SelectItem>
+              <SelectItem value="ASC">Cũ nhất</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -95,14 +81,14 @@ export function OrderList({ transactions }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData !== undefined ? (
-                filteredData?.map((tx, index) => (
+              {transactions !== undefined ? (
+                transactions?.map((tx, index) => (
                   <TableRow key={index}>
                     <TableCell>{tx.transactionCode}</TableCell>
                     <TableCell className="font-medium">
                       {tx.accountName}
                     </TableCell>
-                    <TableCell>{tx.transactionType}</TableCell>
+                    <TableCell>{tx.note}</TableCell>
                     <TableCell
                       className={
                         tx.amount < 0 ? "text-red-500" : "text-green-600"
