@@ -12,14 +12,14 @@ const EventManagement = ({ children }: { children?: ReactNode }) => {
   return (
     <>
       <Header />
-      <div className="flex h-screen pt-16 bg-[#1a1a1a]">
+      <div className="flex min-h-[calc(100vh-64px)] pt-16 bg-white">
         <aside className="fixed top-16 bottom-0">
           <EventSidebar />
         </aside>
 
         <main
           className={cn(
-            "flex-1 transition-all duration-300",
+            "flex-1 min-h-[calc(100vh-64px)] transition-all duration-300",
             context?.isCollapsed == true ? "ml-20" : "ml-60"
           )}
         >

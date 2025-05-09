@@ -37,7 +37,6 @@ import PaymentsPage from "./pages/manager/components/payments/Payments";
 import VietQRGenerator from "./pages/manager/components/VietQRGenerator";
 import OrganizerCenter from "./pages/organizer";
 import PaymentPage from "./pages/payment/PaymentPage";
-import PaymentQueuePage from "./pages/payment/QueueLoading/QueueLoading";
 import ProfileForm from "./pages/profile/ProfileForm";
 import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
@@ -50,6 +49,7 @@ import CheckIn from "./pages/consumer/components/Event/Checkin/CheckIn";
 import Tasks from "./pages/consumer/components/Event/Tasks/Tasks";
 import Voucher from "./pages/consumer/components/Event/Voucher/Voucher";
 import LoginGoogleSucces from "./pages/auth/LoginGoogleSucces";
+import CallbackPayment from "./pages/payment/QueueLoading/CallbackPayment";
 
 export default function App() {
   return (
@@ -88,7 +88,7 @@ export default function App() {
         <Route>
           <Route path="organizerCenter" element={<OrganizerCenter />} />
           <Route path="payment" element={<PaymentPage />} />
-          <Route path="payment/queue" element={<PaymentQueuePage />} />
+          <Route path="payment/queue" element={<CallbackPayment />} />
 
           {/* MANAGER DASHBOARD */}
           <Route path="manager-dashboard" element={<DashboardLayout />}>

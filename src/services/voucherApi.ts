@@ -20,6 +20,10 @@ const voucherApi = {
     const url = `${voucherUrl}/check/${voucherCode}/${eventId}`;
     return axiosClient.get(url);
   },
+  delete(voucherId: number) {
+    const url = `${voucherUrl}/delete/${voucherId}`;
+    return axiosClient.delete(url);
+  },
 };
 
 export default voucherApi;

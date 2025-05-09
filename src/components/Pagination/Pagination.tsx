@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-type PaginationProps = {
+export type PaginationProps = {
   currentPage: number;
   totalPages: number;
   totalElements: number;

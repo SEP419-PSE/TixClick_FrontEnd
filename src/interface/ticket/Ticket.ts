@@ -34,6 +34,7 @@ export interface TicketCheckin {
   price: number;
   checkedIn: number;
   total: number;
+  totalTicket: number;
   percentage: number;
 }
 
