@@ -89,6 +89,16 @@ export default function ContractsPage() {
   // Add a state to track the selected contract detail
   const [selectedContractDetail, setSelectedContractDetail] = useState<ContractDetail | null>(null)
 
+  const [qrData, setQrData] = useState<{
+    bankID: string
+    accountID: string
+    amount: number
+    dueDate: string
+    description: string
+    status: string
+  } | null>(null)
+  const [isLoadingQR, setIsLoadingQR] = useState(false)
+
   const fetchContractDetails = async (contractId: number) => {
     try {
       const response = await managerApi.getContractDetails(contractId)
@@ -111,6 +121,27 @@ export default function ContractsPage() {
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const fetchContractDetailQR = async (contractId: number) => {
+    if (!contractId) return
+
+    setIsLoadingQR(true)
+    try {
+      const response = await managerApi.getQrByContractId(contractId)
+      console.log("Contract Detail QR Response:", response)
+
+      if (response.data && response.data.result) {
+        setQrData(response.data.result)
+      } else {
+        toast.error("Failed to fetch QR data")
+      }
+    } catch (error) {
+      console.error("Error fetching contract detail QR:", error)
+      toast.error("Error loading QR data")
+    } finally {
+      setIsLoadingQR(false)
     }
   }
 
@@ -709,49 +740,104 @@ export default function ContractsPage() {
                                       variant="outline"
                                       size="sm"
                                       className="h-8 w-8 p-0"
-                                      onClick={() => setSelectedContractDetail(detail)}
+                                      onClick={() => {
+                                        setSelectedContractDetail(detail)
+                                        // We'll handle the API call when the dialog opens
+                                      }}
                                     >
                                       <DollarSign className="h-4 w-4 text-black" />
                                       <span className="sr-only">Show VietQR</span>
                                     </Button>
                                   </DialogTrigger>
-                                  <DialogContent className="bg-[#2A2A2A] text-white max-w-md">
+                                  <DialogContent
+                                    className="bg-[#2A2A2A] text-white max-w-md"
+                                    onOpenAutoFocus={(e) => {
+                                      e.preventDefault()
+                                      // Fetch QR data for the specific contract detail when dialog opens
+                                      if (selectedContractDetail) {
+                                        fetchContractDetailQR(selectedContractDetail.contractId)
+                                      }
+                                    }}
+                                  >
                                     <DialogHeader>
                                       <DialogTitle>Payment QR Code</DialogTitle>
                                       <DialogDescription>
-                                        Scan this QR code to pay for {detail.contractDetailName}
+                                        Scan this QR code to pay for {selectedContractDetail?.contractDetailName}
                                       </DialogDescription>
                                     </DialogHeader>
                                     <div className="flex flex-col items-center justify-center p-4">
                                       <div className="bg-white p-4 rounded-lg mb-4">
-                                        <img
-                                          src={`https://img.vietqr.io/image/${
-                                            paymentInfor?.bankID
-                                              ? banks.find((x) => x.bankName == paymentInfor?.bankID)?.id
-                                              : "BIDV"
-                                          }-${paymentInfor?.accountID || "31410001689304"}-compact.png?amount=${
-                                            detail.contractAmount || 0
-                                          }&addInfo=${encodeURIComponent(
-                                            `Payment for ${detail.contractDetailName} - Contract #${selectedContract?.contractId} - ${detail.contractDetailCode}`,
-                                          )}&accountName=Contract%20Payment`}
-                                          alt="VietQR Payment Code"
-                                          width={200}
-                                          height={200}
-                                          className="w-48 h-48"
-                                        />
+                                        {isLoadingQR ? (
+                                          <div className="w-48 h-48 flex items-center justify-center">
+                                            <svg
+                                              className="animate-spin h-8 w-8 text-gray-800"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              fill="none"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <circle
+                                                className="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                strokeWidth="4"
+                                              ></circle>
+                                              <path
+                                                className="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                              ></path>
+                                            </svg>
+                                          </div>
+                                        ) : qrData ? (
+                                          <img
+                                            src={`https://img.vietqr.io/image/${
+                                              qrData.bankID
+                                                ? banks.find((x) => x.bankName === qrData.bankID)?.id || qrData.bankID
+                                                : "BIDV"
+                                            }-${qrData.accountID || "31410001689304"}-compact.png?amount=${
+                                              selectedContractDetail?.contractAmount || qrData.amount || 0
+                                            }&addInfo=${encodeURIComponent(
+                                              qrData.description || "",
+                                            )}&accountName=Contract%20Payment`}
+                                            alt="VietQR Payment Code"
+                                            width={200}
+                                            height={200}
+                                            className="w-48 h-48"
+                                          />
+                                        ) : (
+                                          <div className="w-48 h-48 flex items-center justify-center text-gray-800">
+                                            No QR data available
+                                          </div>
+                                        )}
                                       </div>
                                       <div className="text-center space-y-2">
                                         <p className="text-sm">
                                           <span className="text-gray-400">Amount:</span> $
-                                          {detail.contractAmount?.toLocaleString() || "0"}
+                                          {qrData?.amount?.toLocaleString() ||
+                                            selectedContractDetail?.contractAmount?.toLocaleString() ||
+                                            "0"}
                                         </p>
                                         <p className="text-sm">
                                           <span className="text-gray-400">Due Date:</span>{" "}
-                                          {detail.contractPayDate || "N/A"}
+                                          {qrData?.dueDate || selectedContractDetail?.contractPayDate || "N/A"}
+                                        </p>
+                                        {/* <p className="text-sm">
+                                          <span className="text-gray-400">Bank:</span> {qrData?.bankID || "N/A"}
+                                        </p> */}
+                                        <p className="text-sm">
+                                          <span className="text-gray-400">Account:</span> {qrData?.accountID || "N/A"}
                                         </p>
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Reference:</span> {detail.contractDetailCode}
+                                          <span className="text-gray-400">Reference:</span>{" "}
+                                          {selectedContractDetail?.contractDetailCode || "N/A"}
                                         </p>
+                                        {qrData?.description && (
+                                          <p className="text-sm">
+                                            <span className="text-gray-400">Description:</span> {qrData.description}
+                                          </p>
+                                        )}
                                       </div>
                                     </div>
                                     <DialogFooter className="flex flex-col gap-2 items-stretch">
