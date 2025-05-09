@@ -1,11 +1,10 @@
 import { Card } from "../../../../../components/ui/card";
-import { Switch } from "../../../../../components/ui/switch";
 import {
   VoucherResponse,
   VoucherStatus,
 } from "../../../../../interface/company/Voucher";
 import { formatDateVietnamese } from "../../../../../lib/utils";
-import { TicketMinus } from "lucide-react";
+import { TicketMinus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const MotionCard = motion(Card);
@@ -13,13 +12,38 @@ const MotionCard = motion(Card);
 type Props = {
   voucher: VoucherResponse;
   onChangeStatus: (voucher: number, newStatus: VoucherStatus) => void;
+  deleteVoucher: (voucher: VoucherResponse) => void;
 };
 
-const VoucherCard = ({ voucher, onChangeStatus }: Props) => {
-  const handleToggle = () => {
-    const newStatus = voucher.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-    console.log(voucher.voucherId, newStatus);
-    onChangeStatus(voucher.voucherId, newStatus);
+const VoucherCard = ({ voucher, deleteVoucher }: Props) => {
+  const handleToggle = (voucher: VoucherResponse) => {
+    deleteVoucher(voucher);
+  };
+
+  const renderStatus = (status: VoucherStatus) => {
+    const baseClass = "text-xs font-semibold px-2 py-1 rounded";
+    switch (status) {
+      case "ACTIVE":
+        return (
+          <span className={`${baseClass} text-green-600 bg-green-100`}>
+            Đang hoạt động
+          </span>
+        );
+      case "INACTIVE":
+        return (
+          <span className={`${baseClass} text-gray-600 bg-gray-100`}>
+            Vô hiệu hóa
+          </span>
+        );
+      case "EXPIRED":
+        return (
+          <span className={`${baseClass} text-red-600 bg-red-100`}>
+            Hết hạn
+          </span>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -35,7 +59,9 @@ const VoucherCard = ({ voucher, onChangeStatus }: Props) => {
         <p className="font-semibold">{voucher.discount}%</p>
       </div>
       <div className="flex flex-col">
-        <p className="font-bold text-base mb-1">{voucher.voucherCode}</p>
+        <p className="flex items-center gap-4 font-bold text-base mb-1">
+          {voucher.voucherCode} <p>{renderStatus(voucher.status)}</p>
+        </p>
         <p className="font-bold text-sm max-w-sm truncate">
           {voucher.voucherName}
         </p>
@@ -47,12 +73,12 @@ const VoucherCard = ({ voucher, onChangeStatus }: Props) => {
           </span>
         </p>
       </div>
-      <div className="flex flex-col ml-auto items-center">
-        <Switch
-          checked={voucher.status === "ACTIVE"}
-          onCheckedChange={handleToggle}
-        />
-      </div>
+      <button
+        onClick={() => handleToggle(voucher)}
+        className="flex flex-col ml-auto items-center"
+      >
+        <Trash2 />
+      </button>
     </MotionCard>
   );
 };

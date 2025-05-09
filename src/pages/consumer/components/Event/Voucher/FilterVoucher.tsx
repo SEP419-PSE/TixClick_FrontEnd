@@ -21,8 +21,10 @@ const FilterVoucher = ({ status, onChange }: Props) => {
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="inactive">Vô hiệu hóa</SelectItem>
+            <SelectItem value="active">Đang hoạt động</SelectItem>
+            <SelectItem value="expired">Hết hạn</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

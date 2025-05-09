@@ -13,12 +13,16 @@ const useVouchers = (eventId: number, status: VoucherStatus) => {
     setError(null);
     try {
       const response = await voucherApi.getAll(eventId, status);
-
-      setData(response.data.result);
+      if (response.data.result.length > 0) {
+        setData(response.data.result);
+      } else {
+        setData([]);
+      }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       console.log(axiosError);
       setError("Có lỗi xảy ra khi tải dữ liệu");
+      setData([]);
     } finally {
       setLoading(false);
     }

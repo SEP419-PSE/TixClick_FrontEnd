@@ -1,34 +1,35 @@
-import { useEffect, useState } from "react";
 import { OrderList } from "./OrderList";
-import { TransactionResponse } from "../../../../../interface/company/Transaction";
 import { useParams } from "react-router";
-import transactionApi from "../../../../../services/transactionApi";
+import useTransactionByEventId from "../../../../../hooks/useTransactionByEventId";
+import Pagination from "../../../../../components/Pagination/Pagination";
+import { SortType } from "../../../../../interface/ticket/Ticket";
 
 const Order = () => {
   const { eventId } = useParams();
-  const [transactions, setTransactions] = useState<TransactionResponse[]>();
-
-  const fetchTransaction = async () => {
-    try {
-      const response = await transactionApi.getByEventId(Number(eventId));
-      if (response.data.result.length != 0) {
-        setTransactions(response.data.result);
-      } else {
-        setTransactions([]);
-      }
-    } catch (error) {
-      console.log(error);
-      setTransactions([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchTransaction();
-  }, [eventId]);
+  const {
+    transactions,
+    setPage,
+    sort,
+    setSort,
+    pagination: { currentPage, pageSize, totalElements, totalPages },
+  } = useTransactionByEventId(Number(eventId));
   return (
-    <div className="p-6 bg-white w-auto min-h-screen">
+    <div className="flex flex-col p-6 bg-white w-auto min-h-[calc(100vh-64px)]]">
       <p className="font-bold text-foreground text-3xl"></p>
-      <OrderList transactions={transactions} />
+      <OrderList
+        sort={sort}
+        setSort={(e: string) => setSort(e as SortType)}
+        transactions={transactions}
+      />
+      <section className="mt-auto">
+        <Pagination
+          currentPage={currentPage + 1}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={pageSize}
+          onPageChange={(newPage) => setPage(newPage - 1)}
+        />
+      </section>
     </div>
   );
 };

@@ -7,6 +7,7 @@ export interface TicketResponse {
   eventName: string;
   eventDate: Date;
   eventStartTime: string;
+  timeBuyTicket: string;
   locationName: string;
   location: string;
   price: number;
@@ -33,6 +34,7 @@ export interface TicketCheckin {
   price: number;
   checkedIn: number;
   total: number;
+  totalTicket: number;
   percentage: number;
 }
 

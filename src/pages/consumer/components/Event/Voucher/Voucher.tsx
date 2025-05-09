@@ -4,13 +4,19 @@ import FilterVoucher from "./FilterVoucher";
 import VoucherList from "./VoucherList";
 import useVouchers from "../../../../../hooks/useVouchers";
 import { useState } from "react";
-import { VoucherStatus } from "../../../../../interface/company/Voucher";
+import {
+  VoucherResponse,
+  VoucherStatus,
+} from "../../../../../interface/company/Voucher";
 import LoadingFullScreen from "../../../../../components/Loading/LoadingFullScreen";
 import voucherApi from "../../../../../services/voucherApi";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { TOAST_MESSAGE } from "../../../../../constants/constants";
 
 const Voucher = () => {
   const { eventId } = useParams();
-  const [status, setStatus] = useState<VoucherStatus>("ACTIVE");
+  const [status, setStatus] = useState<VoucherStatus>("ALL");
   const { data, loading, error, refetch } = useVouchers(
     Number(eventId),
     status
@@ -33,6 +39,19 @@ const Voucher = () => {
     }
   };
 
+  const deleteVoucher = async (voucher: VoucherResponse) => {
+    try {
+      const res = await voucherApi.delete(voucher.voucherId);
+      if (res.data.code == 200)
+        toast.success(TOAST_MESSAGE.deleteVoucherSuccess);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      console.log(axiosError.response?.data.message);
+    } finally {
+      await refetch();
+    }
+  };
+
   if (error) return <div>Lỗi fetch API</div>;
 
   return (
@@ -44,7 +63,11 @@ const Voucher = () => {
         <FilterVoucher status={status} onChange={onChangeStatusVoucher} />
       </div>
 
-      <VoucherList vouchers={data} onChangeStatus={handleChangeStatus} />
+      <VoucherList
+        deleteVoucher={deleteVoucher}
+        vouchers={data}
+        onChangeStatus={handleChangeStatus}
+      />
     </div>
   );
 };

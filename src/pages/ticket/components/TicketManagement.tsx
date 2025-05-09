@@ -186,9 +186,9 @@ export default function TicketManagement() {
           <div className="flex justify-center mt-4">
             <QRCodeSVG
               value={selectedTicket?.qrCode as string}
-              size={140}
+              size={160}
               bgColor={"#FFFFFF"}
-              level={"M"}
+              level={"H"}
             />
           </div>
           <DashDivider />
