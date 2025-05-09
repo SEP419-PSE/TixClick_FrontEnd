@@ -7,7 +7,7 @@ import {
   Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
@@ -182,11 +182,6 @@ export default function ContractsPage() {
         toast.error("No payment selected")
         return
       }
-
-      console.log("Sending payment confirmation with:", {
-        transactionCode: paymentCode,
-        paymentId: selectedDetailId,
-      })
 
       console.log("Sending payment confirmation with:", {
         transactionCode: paymentCode,
@@ -700,26 +695,26 @@ export default function ContractsPage() {
           {selectedContract && (
             <Tabs defaultValue="contractDetails" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="contractDetails">Payment Schedule</TabsTrigger>
+                <TabsTrigger value="contractDetails">Lịch thanh toán</TabsTrigger>
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
               </TabsList>
 
               <TabsContent value="contractDetails">
                 <div className="py-4">
-                  <h3 className="text-lg font-semibold mb-4">Payment Schedule</h3>
+                  <h3 className="text-lg font-semibold mb-4">Lịch thanh toán</h3>
 
                   {contractDetails && contractDetails.length > 0 ? (
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
                           <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-                            <TableHead className="text-white">Payment Name</TableHead>
+                            <TableHead className="text-white">Tên thanh toán</TableHead>
                             <TableHead className="text-white">Code</TableHead>
-                            <TableHead className="text-white">Amount</TableHead>
-                            <TableHead className="text-white">Due Date</TableHead>
-                            <TableHead className="text-white">Description</TableHead>
-                            <TableHead className="text-white">Status</TableHead>
-                            <TableHead className="text-white">Payment</TableHead>
+                            <TableHead className="text-white">Số tiền</TableHead>
+                            <TableHead className="text-white">Vào ngày</TableHead>
+                            <TableHead className="text-white">Mô tả</TableHead>
+                            <TableHead className="text-white">Trạng thái</TableHead>
+                            <TableHead className="text-white">Thanh toán</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -742,7 +737,7 @@ export default function ContractsPage() {
                                       className="h-8 w-8 p-0"
                                       onClick={() => {
                                         setSelectedContractDetail(detail)
-                                        // We'll handle the API call when the dialog opens
+
                                       }}
                                     >
                                       <DollarSign className="h-4 w-4 text-black" />
@@ -759,6 +754,8 @@ export default function ContractsPage() {
                                       }
                                     }}
                                   >
+                                    <Toaster position="top-center" />
+
                                     <DialogHeader>
                                       <DialogTitle>Payment QR Code</DialogTitle>
                                       <DialogDescription>
@@ -808,7 +805,8 @@ export default function ContractsPage() {
                                           />
                                         ) : (
                                           <div className="w-48 h-48 flex items-center justify-center text-gray-800">
-                                            No QR data available
+                                            No QR code available
+
                                           </div>
                                         )}
                                       </div>
@@ -842,10 +840,10 @@ export default function ContractsPage() {
                                     </div>
                                     <DialogFooter className="flex flex-col gap-2 items-stretch">
                                       <div className="p-4 bg-[#1E1E1E] rounded-lg">
-                                        <h4 className="text-md font-medium mb-2">Confirm Payment</h4>
+                                        <h4 className="text-md font-medium mb-2">Xác thực thanh toán</h4>
                                         <div className="space-y-3">
                                           <p className="text-sm text-gray-400">
-                                            After completing payment, enter the confirmation code below:
+                                            Nhập mã thanh toán để xác nhận giao dịch. 
                                           </p>
                                           <div className="flex space-x-2">
                                             <Input
@@ -854,7 +852,7 @@ export default function ContractsPage() {
                                               onChange={(e) => setPaymentCode(e.target.value)}
                                               className="bg-[#2A2A2A]"
                                             />
-                                            <Button onClick={handlePaymentConfirmation}>Confirm</Button>
+                                            <Button onClick={handlePaymentConfirmation}>Xác nhận</Button>
                                           </div>
                                         </div>
                                       </div>
@@ -869,22 +867,24 @@ export default function ContractsPage() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
-                      <p className="mb-4 text-gray-400">No payment schedule available for this contract.</p>
+                      <p className="mb-4 text-gray-400">
+                        Không có lịch thanh toán nào cho hợp đồng này.
+                      </p>
                     </div>
                   )}
 
                   {contractDetails && contractDetails.length > 0 && (
                     <div className="mt-6 p-4 bg-[#1E1E1E] rounded-lg">
-                      <h4 className="text-md font-medium mb-3">Payment Summary</h4>
+                      <h4 className="text-md font-medium mb-3">Tổng hợp thanh toán</h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-400">Total Contract Value:</p>
+                          <p className="text-sm text-gray-400">Tổng giá trị hợp đồng:</p>
                           <p className="text-lg font-semibold">
                             ${selectedContract?.totalAmount?.toLocaleString() || "0"}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-400">Total Payments:</p>
+                          <p className="text-sm text-gray-400">Tổng thanh toán:</p>
                           <p className="text-lg font-semibold">
                             $
                             {contractDetails
@@ -893,7 +893,7 @@ export default function ContractsPage() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-400">Paid Amount:</p>
+                          <p className="text-sm text-gray-400">Số đã thanh toán:</p>
                           <p className="text-lg font-semibold text-green-500">
                             $
                             {contractDetails
@@ -903,7 +903,7 @@ export default function ContractsPage() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-400">Pending Amount:</p>
+                          <p className="text-sm text-gray-400">Còn lại:</p>
                           <p className="text-lg font-semibold text-yellow-500">
                             $
                             {contractDetails
