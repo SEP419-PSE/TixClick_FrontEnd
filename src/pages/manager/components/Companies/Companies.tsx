@@ -1,6 +1,7 @@
-import { Building2, Check, Eye, FileText, Mail, MapPin, MoreHorizontal, Phone, X } from "lucide-react"
+import { Building2, Check, Eye, FileText, Mail, MapPin, MoreHorizontal, Phone, Search, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Badge } from "../../../../components/ui/badge"
 import { Button } from "../../../../components/ui/button"
 import {
   Dialog,
@@ -30,6 +31,11 @@ export default function CompanyApprovalsPage() {
 
   const [selectedCompany, setSelectedCompany] = useState<Company>()
   const [searchTerm, setSearchTerm] = useState("")
+  const [searchFilter, setSearchFilter] = useState<"all" | "name" | "tax" | "email" | "status">("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchHistory, setSearchHistory] = useState<string[]>([])
+  const [showSearchHistory, setShowSearchHistory] = useState(false)
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false)
@@ -91,7 +97,6 @@ export default function CompanyApprovalsPage() {
     }
   }
 
-
   const handleViewDocuments = (company: Company) => {
     setSelectedCompany(company)
     setIsDocumentModalOpen(true)
@@ -117,12 +122,64 @@ export default function CompanyApprovalsPage() {
     initUseEffect()
   }, [])
 
-  const filteredCompanies = companies.filter(
-    (company) =>
-      company.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.codeTax?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.customAccount.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const handleSearch = () => {
+    setIsSearching(true)
+
+    // Add to search history if not empty and not already in history
+    if (searchTerm && !searchHistory.includes(searchTerm)) {
+      setSearchHistory((prev) => [searchTerm, ...prev].slice(0, 5))
+    }
+
+    setTimeout(() => {
+      setIsSearching(false)
+    }, 500)
+  }
+
+  const handleSelectSearchHistory = (term: string) => {
+    setSearchTerm(term)
+    setShowSearchHistory(false)
+    handleSearch()
+  }
+
+  const clearSearch = () => {
+    setSearchTerm("")
+    setSearchFilter("all")
+    setStatusFilter("all")
+  }
+
+  const filteredCompanies = companies.filter((company) => {
+    // First filter by status if selected
+    if (statusFilter !== "all" && company.status !== statusFilter) {
+      return false
+    }
+
+    // If search term is empty, return all companies that passed the status filter
+    if (!searchTerm.trim()) {
+      return true
+    }
+
+    const term = searchTerm.toLowerCase()
+
+    // Then filter by search term according to the selected filter
+    switch (searchFilter) {
+      case "name":
+        return company.companyName?.toLowerCase().includes(term)
+      case "tax":
+        return company.codeTax?.toLowerCase().includes(term)
+      case "email":
+        return company.customAccount.email?.toLowerCase().includes(term)
+      case "status":
+        return company.status?.toLowerCase().includes(term)
+      case "all":
+      default:
+        return (
+          company.companyName?.toLowerCase().includes(term) ||
+          company.codeTax?.toLowerCase().includes(term) ||
+          company.customAccount.email?.toLowerCase().includes(term) ||
+          company.status?.toLowerCase().includes(term)
+        )
+    }
+  })
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A"
@@ -140,15 +197,149 @@ export default function CompanyApprovalsPage() {
     <>
       <ManagerHeader heading="Xét duyệt công ty" text="Xem và xét duyệt các tài khoẻn công ty" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
-        <div className="flex justify-between items-center mb-6">
-          <Input
-            className="w-[300px] bg-[#2A2A2A] text-white"
-            placeholder="Tìm kiếm công ty ..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <div className="relative">
+                <Input
+                  className="w-full bg-[#2A2A2A] text-white pl-10 pr-10"
+                  placeholder="Tìm kiếm công ty ..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch()
+                    }
+                  }}
+                  onFocus={() => searchHistory.length > 0 && setShowSearchHistory(true)}
+                  onBlur={() => setTimeout(() => setShowSearchHistory(false), 200)}
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                {searchTerm && (
+                  <button
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-white"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Search history dropdown */}
+              {showSearchHistory && searchHistory.length > 0 && (
+                <div className="absolute z-10 mt-1 w-full bg-[#2A2A2A] border border-[#333333] rounded-md shadow-lg">
+                  <div className="p-2 text-xs text-gray-400">Tìm kiếm gần đây</div>
+                  {searchHistory.map((term, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 hover:bg-[#333333] cursor-pointer text-white flex items-center"
+                      onClick={() => handleSelectSearchHistory(term)}
+                    >
+                      <Search className="h-3 w-3 mr-2 text-gray-400" />
+                      {term}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+          
+
+            
+
+              <Button
+                variant="outline"
+                className="bg-[#2A2A2A] text-white border-[#333333] hover:bg-[#333333]"
+                onClick={handleSearch}
+                disabled={isSearching}
+              >
+                {isSearching ? (
+                  <div className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Đang tìm...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Search className="mr-2 h-4 w-4" />
+                    Tìm kiếm
+                  </div>
+                )}
+              </Button>
+
+              {(searchTerm || statusFilter !== "all" || searchFilter !== "all") && (
+                <Button variant="ghost" className="text-white hover:bg-[#333333]" onClick={clearSearch}>
+                  <X className="mr-2 h-4 w-4" />
+                  Xóa bộ lọc
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Active filters */}
+          {(searchTerm || statusFilter !== "all" || searchFilter !== "all") && (
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm text-gray-400">Bộ lọc đang áp dụng:</span>
+              {searchTerm && (
+                <Badge className="bg-[#333333] text-white hover:bg-[#444444]">
+                  Từ khóa: {searchTerm}
+                  <button className="ml-1" onClick={() => setSearchTerm("")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {searchFilter !== "all" && (
+                <Badge className="bg-[#333333] text-white hover:bg-[#444444]">
+                  Tìm theo:{" "}
+                  {searchFilter === "name"
+                    ? "Tên công ty"
+                    : searchFilter === "tax"
+                      ? "Mã số thuế"
+                      : searchFilter === "email"
+                        ? "Email"
+                        : "Trạng thái"}
+                  <button className="ml-1" onClick={() => setSearchFilter("all")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+              {statusFilter !== "all" && (
+                <Badge className="bg-[#333333] text-white hover:bg-[#444444]">
+                  Trạng thái: {statusFilter}
+                  <button className="ml-1" onClick={() => setStatusFilter("all")}>
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between items-center mb-4">
           <div className="text-white text-sm">
             Tổng: <span className="font-semibold">{filteredCompanies.length}</span> công ty
+            {filteredCompanies.length !== companies.length && (
+              <span className="text-gray-400"> (trong tổng số {companies.length})</span>
+            )}
           </div>
         </div>
 
@@ -266,7 +457,12 @@ export default function CompanyApprovalsPage() {
                   <TableCell colSpan={8} className="h-24 text-center text-white">
                     <div className="flex flex-col items-center justify-center">
                       <FileText className="h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-gray-400">No companies found</p>
+                      <p className="text-gray-400">Không tìm thấy công ty nào</p>
+                      {(searchTerm || statusFilter !== "all" || searchFilter !== "all") && (
+                        <Button variant="link" className="text-[#00B14F] mt-2" onClick={clearSearch}>
+                          Xóa bộ lọc và hiển thị tất cả
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
