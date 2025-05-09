@@ -388,8 +388,8 @@ export default function CompanyApprovalsPage() {
                       {company.customAccount.lastName} {company.customAccount.firstName}
                     </TableCell>
                     <TableCell className="text-white">
-                      <div className="max-w-[180px] truncate" title={company.customAccount.email}>
-                        {company.customAccount.email}
+                      <div className="max-w-[180px] truncate" title={company.email}>
+                        {company.email}
                       </div>
                     </TableCell>
                     <TableCell className="text-white">
@@ -542,14 +542,11 @@ export default function CompanyApprovalsPage() {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium text-gray-400">Company ID</label>
-                        <div className="text-base">{selectedCompany.companyId}</div>
+                        <label className="text-sm font-medium text-gray-400">Company email</label>
+                        <div className="text-base">{selectedCompany.email}</div>
                       </div>
 
-                      <div>
-                        <label className="text-sm font-medium text-gray-400">Verification ID</label>
-                        <div className="text-base">{selectedCompany.companyVerificationId}</div>
-                      </div>
+                     
 
                       <div>
                         <label className="text-sm font-medium text-gray-400">National ID</label>

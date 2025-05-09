@@ -35,6 +35,7 @@ export interface CustomAccount {
 
 export interface Company {
   address: string
+  email: string
   bankingCode: string
   bankingName: string
   codeTax: string
