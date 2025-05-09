@@ -27,11 +27,15 @@ import { Label } from "../../components/ui/label";
 import { Separator } from "../../components/ui/separator";
 import { AuthContext } from "../../contexts/AuthProvider";
 import type { EventDetailResponse } from "../../interface/EventInterface";
+<<<<<<< HEAD
 import {
   formatDateVietnamese,
   formatTimeFe,
   parseSeatCode,
 } from "../../lib/utils";
+=======
+import { formatDateVietnamese, formatTimeFe, parseSeatCode } from "../../lib/utils";
+>>>>>>> d788506eff53ac21aa0482a7cf6d0c0d3f960175
 import eventApi from "../../services/eventApi";
 import voucherApi from "../../services/voucherApi";
 import { AxiosError } from "axios";
@@ -1063,8 +1067,12 @@ export default function PaymentPage() {
                           {seat.quantity || 1}x
                         </div>
                         <div>
+<<<<<<< HEAD
                           {seat.sectionName} - {parseSeatCode(seat.rcCode)} (
                           {seat.typeName})
+=======
+                          {seat.sectionName} - {parseSeatCode(seat.rcCode)} ({seat.typeName})
+>>>>>>> d788506eff53ac21aa0482a7cf6d0c0d3f960175
                         </div>
                       </div>
                       <div className="font-medium">{seat.formattedPrice}</div>
@@ -1213,8 +1221,12 @@ export default function PaymentPage() {
                         {seat.quantity || 1}x
                       </div>
                       <div>
+<<<<<<< HEAD
                         {seat.sectionName} - {parseSeatCode(seat.rcCode)} (
                         {seat.typeName})
+=======
+                        {seat.sectionName} - {parseSeatCode(seat.rcCode)} ({seat.typeName})
+>>>>>>> d788506eff53ac21aa0482a7cf6d0c0d3f960175
                       </div>
                     </div>
                   ))

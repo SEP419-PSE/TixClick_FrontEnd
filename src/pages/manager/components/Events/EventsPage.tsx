@@ -76,16 +76,6 @@ const customStyles = `
   }
 `;
 
-const eventTypes = [
-  "Conference",
-  "Seminar",
-  "Workshop",
-  "Networking",
-  "Product Launch",
-  "Trade Show",
-  "Webinar",
-  "Hackathon",
-];
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -378,7 +368,7 @@ export default function EventsPage() {
       case EventStatus.SCHEDULED:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
-            Scheduled
+            Đã lên lịch
           </span>
         );
 
@@ -429,14 +419,14 @@ export default function EventsPage() {
 
   return (
     <>
-      <ManagerHeader heading="Events" text="Manage and view all events" />
+      <ManagerHeader heading="Sự kiện" text="Xem và quản lý các sự kiện" />
       <main className="flex-1 overflow-y-auto bg-[#1E1E1E] p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Search className="text-gray-400" />
             <Input
               className="w-[300px] bg-[#2A2A2A] text-white"
-              placeholder="Search events..."
+              placeholder="Tìm kiếm sự kiện ..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -447,30 +437,18 @@ export default function EventsPage() {
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="SCHEDULED">Đã lên lịch</SelectItem>
                 <SelectItem value="CONFIRMED">Confirmed</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px] bg-[#2A2A2A] text-white">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {eventTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="bg-[#2A2A2A] text-white">
                   <Filter className="mr-2 h-4 w-4" />
-                  Sort by
+                  Xếp theo
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -549,7 +527,7 @@ export default function EventsPage() {
                             setIsEventModalOpen(true);
                           }}
                         >
-                          View details
+                          Xem chi tiết
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() =>
@@ -559,14 +537,14 @@ export default function EventsPage() {
                             )
                           }
                         >
-                          Go to event page
+                          Đến trang event này
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleViewRelatedContracts}>
-                          View associated contracts
+                          Xem hợp đồng
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-500">
-                          Cancel event
+                          Hủy sự kiện
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -581,25 +559,25 @@ export default function EventsPage() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-gray-400">
-                  Showing{" "}
+                  Hiển thị{" "}
                   <span className="font-medium text-white">
                     {Math.min(
                       (currentPage - 1) * itemsPerPage + 1,
                       filteredEvents.length
                     )}
                   </span>{" "}
-                  to{" "}
+                  từ{" "}
                   <span className="font-medium text-white">
                     {Math.min(
                       currentPage * itemsPerPage,
                       filteredEvents.length
                     )}
                   </span>{" "}
-                  of{" "}
+                  đến{" "}
                   <span className="font-medium text-white">
                     {filteredEvents.length}
                   </span>{" "}
-                  events
+                  sự kiện
                 </p>
               </div>
 
@@ -615,10 +593,10 @@ export default function EventsPage() {
                     <SelectValue placeholder="Per page" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="5">5 per page</SelectItem>
-                    <SelectItem value="10">10 per page</SelectItem>
-                    <SelectItem value="15">15 per page</SelectItem>
-                    <SelectItem value="20">20 per page</SelectItem>
+                    <SelectItem value="5">5 / trang</SelectItem>
+                    <SelectItem value="10">10 / trang</SelectItem>
+                    <SelectItem value="15">15 / trang</SelectItem>
+                    <SelectItem value="20">20 / trang</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -965,7 +943,7 @@ export default function EventsPage() {
                         />
                       ) : (
                         <div className="text-gray-400 italic">
-                          No description available
+                          Không có thông tin mô tả cho sự kiện này.
                         </div>
                       )}
                     </div>
@@ -986,7 +964,7 @@ export default function EventsPage() {
                 }
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                <Eye className="mr-2 h-4 w-4" /> View Event Page
+                <Eye className="mr-2 h-4 w-4" /> Đến trang sự kiện này
               </Button>
 
               <div className="flex gap-2">
@@ -1025,7 +1003,7 @@ export default function EventsPage() {
                         </span>
                       ) : (
                         <>
-                          <CheckCircle className="mr-2 h-4 w-4" /> Confirm
+                          <CheckCircle className="mr-2 h-4 w-4" /> Xác nhận
                         </>
                       )}
                     </Button>
@@ -1061,7 +1039,7 @@ export default function EventsPage() {
                         </span>
                       ) : (
                         <>
-                          <XCircle className="mr-2 h-4 w-4" /> Reject
+                          <XCircle className="mr-2 h-4 w-4" /> Từ chối
                         </>
                       )}
                     </Button>
@@ -1073,13 +1051,13 @@ export default function EventsPage() {
                       onClick={handleCreateContract}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      <FileText className="mr-2 h-4 w-4" /> Upload Contract
+                      <FileText className="mr-2 h-4 w-4" /> Tải hợp đồng
                     </Button>
                     <Button
                       onClick={handleViewRelatedContracts}
                       className="bg-purple-600 hover:bg-purple-700 text-white"
                     >
-                      <FileText className="mr-2 h-4 w-4" /> View Contracts
+                      <FileText className="mr-2 h-4 w-4" /> Xem hợp đồng
                     </Button>
                   </>
                 )}
@@ -1094,14 +1072,14 @@ export default function EventsPage() {
           <DialogHeader>
             <div className="flex justify-between items-center w-full">
               <div className="text-left">
-                <DialogTitle>Upload Contract</DialogTitle>
+                <DialogTitle>Tải hợp đồng</DialogTitle>
                 <DialogDescription>
-                  Upload a contract document for: {selectedEvent?.eventName}
+                  Đăng tải hợp đồng cho sự kiện: {selectedEvent?.eventName}
                 </DialogDescription>
               </div>
               <Button onClick={handleDownloadContractTemplate}>
-                Contract template
-              </Button>
+                Tải mẫu hợp đồng
+                </Button>
             </div>
           </DialogHeader>
 
@@ -1118,10 +1096,10 @@ export default function EventsPage() {
                 <input {...getInputProps()} />
                 <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-1">
-                  Drag & drop your contract
+                Kéo và thả hợp đồng của bạn
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Support for PDF files only (max 10MB)
+                Chỉ hỗ trợ tệp PDF (tối đa 10MB)
                 </p>
                 <Button
                   type="button"
@@ -1142,7 +1120,7 @@ export default function EventsPage() {
                   }}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  Browse Files
+                  Chọn tệp
                 </Button>
               </div>
             ) : (
@@ -1185,7 +1163,7 @@ export default function EventsPage() {
                     }}
                     disabled={isUploading}
                   >
-                    Cancel
+                    Hủy bỏ
                   </Button>
                   <Button
                     onClick={uploadContract}
@@ -1215,9 +1193,9 @@ export default function EventsPage() {
       >
         <DialogContent className="bg-[#2A2A2A] text-white max-w-4xl max-h-[80vh] flex flex-col">
           <DialogHeader className="border-b border-[#333333] pb-4">
-            <DialogTitle>Related Contracts</DialogTitle>
+            <DialogTitle>Hợp đồng</DialogTitle>
             <DialogDescription>
-              Contracts associated with: {selectedEvent?.eventName}
+              Hợp đồng liên quan đên sự kiện: {selectedEvent?.eventName}
             </DialogDescription>
           </DialogHeader>
 
@@ -1228,19 +1206,19 @@ export default function EventsPage() {
                   <TableHeader>
                     <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
                       <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
-                        File Name
+                        Tên File
                       </TableHead>
                       <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
-                        File Type
+                        Loại File
                       </TableHead>
                       <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
-                        Status
+                        Trạng thái
                       </TableHead>
                       <TableHead className="text-white sticky top-0 bg-[#2A2A2A] z-10">
-                        Upload Date
+                        Ngày tải lên
                       </TableHead>
                       <TableHead className="text-white text-right sticky top-0 bg-[#2A2A2A] z-10">
-                        Actions
+                        Tác vụ
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -1268,7 +1246,7 @@ export default function EventsPage() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">Mở menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -1276,7 +1254,7 @@ export default function EventsPage() {
                               align="end"
                               className="bg-[#2A2A2A] text-white"
                             >
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                               {document.fileURL && (
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -1284,7 +1262,7 @@ export default function EventsPage() {
                                   }
                                 >
                                   <Eye className="mr-2 h-4 w-4" />
-                                  View Document
+                                  Xem tài liệu
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem
@@ -1293,7 +1271,7 @@ export default function EventsPage() {
                                 }
                               >
                                 <Download className="mr-2 h-4 w-4" />
-                                Download
+                                Tải về máy
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1307,11 +1285,10 @@ export default function EventsPage() {
               <div className="py-8 text-center">
                 <FileText className="w-12 h-12 mx-auto text-gray-500 mb-4" />
                 <h3 className="text-lg font-medium mb-2">
-                  No Contract Documents Found
+                  Không có hợp đồng nào được tải lên
                 </h3>
                 <p className="text-sm text-gray-400 mb-4">
-                  There are no contract documents associated with this event
-                  yet.
+                  Chưa có hợp đồng nào được tải lên cho sự kiện này.
                 </p>
                 {selectedEvent?.status === "APPROVED" && (
                   <Button
@@ -1320,7 +1297,7 @@ export default function EventsPage() {
                       handleCreateContract();
                     }}
                   >
-                    <FileText className="mr-2 h-4 w-4" /> Create Contract
+                    <FileText className="mr-2 h-4 w-4" /> Tải hợp đồng
                   </Button>
                 )}
               </div>
@@ -1334,10 +1311,10 @@ export default function EventsPage() {
                 className="bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={selectedEvent?.status !== "APPROVED"}
               >
-                <FileText className="mr-2 h-4 w-4" /> Add New Contract
+                <FileText className="mr-2 h-4 w-4" /> Tải hợp đồng
               </Button>
               <Button onClick={() => setIsRelatedContractsModalOpen(false)}>
-                Close
+                Đóng
               </Button>
             </div>
           </DialogFooter>

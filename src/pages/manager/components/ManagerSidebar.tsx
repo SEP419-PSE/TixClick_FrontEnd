@@ -559,7 +559,7 @@ export function DashboardSidebar() {
             <SidebarMenuButton asChild className={cn(isActive("") && "bg-orange-100 text-orange-600 font-medium")}>
               <Link to="" className="flex items-center">
                 <LayoutDashboard className="mr-2 h-5 w-5" />
-                <span>Overview</span>
+                <span>Tổng quan</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -571,7 +571,7 @@ export function DashboardSidebar() {
             >
               <Link to="company-approvals" className="flex items-center">
                 <UserCheck className="mr-2 h-5 w-5" />
-                <span>Company Approvals</span>
+                <span>Xét duyệt công ty</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -583,7 +583,7 @@ export function DashboardSidebar() {
             >
               <Link to="events" className="flex items-center">
                 <CalendarDays className="mr-2 h-5 w-5" />
-                <span>Event Approvals</span>
+                <span>Xét duyệt sự kiện</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -595,7 +595,7 @@ export function DashboardSidebar() {
             >
               <Link to="contracts" className="flex items-center">
                 <ClipboardSignature className="mr-2 h-5 w-5" />
-                <span>Contracts</span>
+                <span>Hợp đồng</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -607,7 +607,7 @@ export function DashboardSidebar() {
             >
               <Link to="payments" className="flex items-center">
                 <CreditCard className="mr-2 h-5 w-5" />
-                <span>Payments</span>
+                <span>Thanh toán</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -673,7 +673,7 @@ export function DashboardSidebar() {
           </Dialog>
           <Button variant="ghost" className="w-full justify-start px-2" onClick={handleLogout}>
             <LogOut className="mr-2 h-5 w-5" />
-            <span>Logout</span>
+            <span>Đăng xuất</span>
           </Button>
         </div>
         <p className="text-xs text-gray-400 mt-4">© 2025 TixClick</p>
