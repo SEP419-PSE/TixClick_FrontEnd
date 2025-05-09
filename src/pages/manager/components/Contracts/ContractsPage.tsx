@@ -737,6 +737,7 @@ export default function ContractsPage() {
                                       className="h-8 w-8 p-0"
                                       onClick={() => {
                                         setSelectedContractDetail(detail)
+
                                       }}
                                     >
                                       <DollarSign className="h-4 w-4 text-black" />
@@ -754,6 +755,7 @@ export default function ContractsPage() {
                                     }}
                                   >
                                     <Toaster position="top-center" />
+
                                     <DialogHeader>
                                       <DialogTitle>Payment QR Code</DialogTitle>
                                       <DialogDescription>
@@ -804,6 +806,7 @@ export default function ContractsPage() {
                                         ) : (
                                           <div className="w-48 h-48 flex items-center justify-center text-gray-800">
                                             No QR code available
+
                                           </div>
                                         )}
                                       </div>
@@ -818,6 +821,9 @@ export default function ContractsPage() {
                                           <span className="text-gray-400">Due Date:</span>{" "}
                                           {qrData?.dueDate || selectedContractDetail?.contractPayDate || "N/A"}
                                         </p>
+                                        {/* <p className="text-sm">
+                                          <span className="text-gray-400">Bank:</span> {qrData?.bankID || "N/A"}
+                                        </p> */}
                                         <p className="text-sm">
                                           <span className="text-gray-400">Account:</span> {qrData?.accountID || "N/A"}
                                         </p>
