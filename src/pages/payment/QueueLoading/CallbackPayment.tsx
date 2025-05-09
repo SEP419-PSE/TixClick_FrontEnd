@@ -1,4 +1,4 @@
-import { Navigate, NavLink, useLocation, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { Button } from "../../../components/ui/button";
 import { useEffect } from "react";
 import paymentApi from "../../../services/paymentApi";
@@ -6,7 +6,6 @@ import { CheckCircle, XCircle } from "lucide-react";
 import Header from "../../../components/Header/Header";
 
 const CallbackPayment = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const status = searchParams.get("status");

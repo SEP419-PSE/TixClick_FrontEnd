@@ -49,6 +49,7 @@ import SuperLogin from "./pages/superlogin/SuperLogin";
 import TicketPage from "./pages/ticket/TicketPage";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
+import CallbackPayment from "./pages/payment/QueueLoading/CallbackPayment";
 
 export default function App() {
   return (
@@ -58,7 +59,10 @@ export default function App() {
         <Route element={<RootLayout />}>
           <Route index element={<HomePage />} />
           <Route path="event-detail/:id" element={<EventDetail />} />
-          <Route path="/manager-dashboard/events/event-detail/:id/manager" element={<EventDetail />} />
+          <Route
+            path="/manager-dashboard/events/event-detail/:id/manager"
+            element={<EventDetail />}
+          />
 
           <Route
             path="event-detail/:id/booking-ticket"
