@@ -57,7 +57,6 @@ import managerApi from "../../../../services/manager/ManagerApi";
 import { banks } from "../../../company/CreateCompany";
 import { formatMoney } from "../../../DataTranfer";
 import { ManagerHeader } from "../ManagerHeader";
-
 interface ContractDetail {
   contractDetailId: number
   contractDetailName: string
@@ -130,7 +129,7 @@ export default function ContractsPage() {
   //   const encodedDescription = encodeURIComponent(
   //     paymentInfor.description || ""
   //   );
-  //   const amount = paymentInfor.amount
+  //   const amount = paymentInfor
   //     ? paymentInfor.amount
   //     : paymentInfor?.amount;
 
@@ -153,8 +152,21 @@ export default function ContractsPage() {
         return
       }
 
+      console.log("Sending payment confirmation with:", {
+        transactionCode: paymentCode,
+        paymentId: selectedDetailId,
+      })
+
+      // Check if the token exists
+      const token = localStorage.getItem("accessToken2")
+      if (!token) {
+        toast.error("Authentication token not found. Please log in again.")
+        return
+      }
+
       // Call the API to confirm payment with the correct parameter format
       const response = await managerApi.confirmContractPaymentPay(paymentCode, selectedDetailId)
+      console.log("Payment confirmation response:", response)
 
       if (response.data.success) {
         toast.success("Payment confirmed", {
@@ -167,12 +179,34 @@ export default function ContractsPage() {
         }
 
         setPaymentCode("")
+
+        // Close the dialog after successful confirmation
+        const closeButton = document.querySelector("[data-dialog-close]")
+        if (closeButton instanceof HTMLElement) {
+          closeButton.click()
+        }
       } else {
         toast.error(response.data.message || "Failed to confirm payment")
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error confirming payment:", error)
-      toast.error("Failed to confirm payment. Please try again.")
+
+      // More detailed error handling
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error response data:", error.response.data)
+        console.error("Error response status:", error.response.status)
+        toast.error(`Server error: ${error.response.status} - ${error.response.data.message || "Unknown error"}`)
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Error request:", error.request)
+        toast.error("No response from server. Please check your internet connection.")
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", error.message)
+        toast.error(`Error: ${error.message}`)
+      }
     }
   }
 
@@ -199,10 +233,10 @@ export default function ContractsPage() {
     }
   }
 
-  const filterContracts = (contracts:any) => {
+  const filterContracts = (contracts: any) => {
     if (!searchTerm.trim()) return contracts
 
-    return contracts.filter((contractItem:any) => {
+    return contracts.filter((contractItem: any) => {
       const contract = contractItem.contractDTO
       return (
         (contract.contractName && contract.contractName.toLowerCase().includes(searchTerm.toLowerCase())) ||
