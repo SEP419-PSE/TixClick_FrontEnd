@@ -16,6 +16,10 @@ const voucherApi = {
     const url = `${voucherUrl}/change-status/${voucherId}`;
     return axiosClient.put(url, null, { params: { status } });
   },
+  check(voucherCode: string, eventId: number) {
+    const url = `${voucherUrl}/check/${voucherCode}/${eventId}`;
+    return axiosClient.get(url);
+  },
 };
 
 export default voucherApi;

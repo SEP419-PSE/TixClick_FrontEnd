@@ -21,7 +21,7 @@ const ticketPurchase = {
     return axiosClient.post(url, data, { params: params });
   },
   getAll(params: TicketParams) {
-    const url = `${ticketPurchaseUrl}/all_of_account`;
+    const url = `${ticketPurchaseUrl}/search`;
     return axiosClient.get(url, { params: params });
   },
   getOne(ticketPurchaseId: number) {

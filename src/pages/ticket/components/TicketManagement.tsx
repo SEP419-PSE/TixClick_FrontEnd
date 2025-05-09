@@ -13,7 +13,7 @@ import {
   parseSeatCode,
 } from "../../../lib/utils";
 import { Button } from "../../../components/ui/button";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch } from "../../../redux/hooks";
 import {
   CaseTicketType,
   setTicketPurchase,
@@ -31,6 +31,8 @@ export default function TicketManagement() {
     setPage,
     sort,
     setSort,
+    searchEventName,
+    setSearchEventName,
   } = useTicketsPurchases();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
@@ -82,20 +84,19 @@ export default function TicketManagement() {
   };
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
-      <div className="border-b border-gray-800">
+      <div className="border-b mb-4 border-gray-800">
         <nav className="text-sm text-gray-400 mb-2">
           <span className="hover:text-white">Trang chủ</span>
           <span className="mx-2">/</span>
           <span className="text-white">Vé đã mua</span>
         </nav>
       </div>
-      <div className="flex justify-between items-center mt-2">
-        <h1 className="text-xl font-semibold">Vé đã mua </h1>
-        <TicketFilter
-          sort={sort}
-          setSort={(e: string) => setSort(e as SortType)}
-        />
-      </div>
+      <TicketFilter
+        sort={sort}
+        setSort={(e: string) => setSort(e as SortType)}
+        search={searchEventName}
+        setSearch={setSearchEventName}
+      />
       <section className="mt-auto">
         <TicketList
           ticketList={ticketPurchases}

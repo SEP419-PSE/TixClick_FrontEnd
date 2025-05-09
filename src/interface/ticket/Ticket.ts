@@ -44,6 +44,7 @@ export interface ChangeTicket {
 export interface TicketParams {
   page: number;
   sortDirection: SortType;
+  eventName: string;
 }
 
 export type SortType = "ASC" | "DESC";
