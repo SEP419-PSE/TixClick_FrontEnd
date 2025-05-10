@@ -38,6 +38,8 @@ import TimeInput from "../../Input/TimeInput";
 import Popup from "../../Popup/Popup";
 import { TOAST_MESSAGE } from "../../../constants/constants";
 import eventActivityApi from "../../../services/eventActivityApi";
+import { EventStatus } from "../../../interface/EventInterface";
+import { AxiosError } from "axios";
 
 interface TicketType {
   ticketCode: string;
@@ -104,6 +106,7 @@ const StepTwo: React.FC<StepProps> = ({
   const [searchParams] = useSearchParams();
   const eventId = Number(searchParams.get("id"));
   const navigate = useNavigate();
+  const contractCode = searchParams.get("contractCode");
   // console.log(activities);
 
   const fetchData = async () => {
@@ -241,49 +244,62 @@ const StepTwo: React.FC<StepProps> = ({
   };
 
   const submitActivity = async () => {
-    if (isUpdate) {
-      setIsLoading(true);
-      const formatActivities = activities.map((activity) => ({
-        ...activity,
-        eventActivityId: activity.eventActivityId,
-        dateEvent: formatDate(activity.dateEvent),
-        startTicketSale: formatDateTime(activity.startTicketSale),
-        endTicketSale: formatDateTime(activity.endTicketSale),
-        startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
-        endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
-      })) as any; // Any tạm thời
+    try {
+      if (isUpdate) {
+        setIsLoading(true);
 
-      console.log(JSON.stringify(formatActivities, null, 2));
-      const response = await eventApi.createEventActivity(formatActivities);
-      console.log("Update response", response);
-      setIsLoading(false);
-      toast.success(response.data.message);
-      const queryParams = new URLSearchParams({
-        id: eventId.toString(),
-        step: hasSeatMap ? "3" : "4",
-      }).toString();
-      await navigate(`?${queryParams}`);
-    } else {
-      setIsLoading(true);
-      const formatActivities = activities.map((activity) => ({
-        ...activity,
-        dateEvent: formatDate(activity.dateEvent),
-        startTicketSale: formatDateTime(activity.startTicketSale),
-        endTicketSale: formatDateTime(activity.endTicketSale),
-        startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
-        endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
-      })) as any; // Any tạm thời
+        const formatActivities = activities.map((activity) => ({
+          ...activity,
+          eventActivityId: activity.eventActivityId,
+          dateEvent: formatDate(activity.dateEvent),
+          startTicketSale: formatDateTime(activity.startTicketSale),
+          endTicketSale: formatDateTime(activity.endTicketSale),
+          startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
+          endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
+        })) as any; // Any tạm thời
 
-      console.log(JSON.stringify(formatActivities, null, 2));
-      const response = await eventApi.createEventActivity(formatActivities);
-      console.log("Create response", response);
-      setIsLoading(false);
-      toast.success(response.data.message);
-      const queryParams = new URLSearchParams({
-        id: eventId.toString(),
-        step: hasSeatMap ? "3" : "4",
-      }).toString();
-      await navigate(`?${queryParams}`);
+        console.log(JSON.stringify(formatActivities, null, 2));
+        const response = await eventApi.createEventActivity(
+          formatActivities,
+          event?.status == EventStatus.SCHEDULED ? contractCode : ""
+        );
+        console.log("Update response", response);
+        setIsLoading(false);
+        toast.success(response.data.message);
+        const queryParams = new URLSearchParams({
+          id: eventId.toString(),
+          step: hasSeatMap ? "3" : "4",
+        }).toString();
+        await navigate(`?${queryParams}`);
+      } else {
+        setIsLoading(true);
+        const formatActivities = activities.map((activity) => ({
+          ...activity,
+          dateEvent: formatDate(activity.dateEvent),
+          startTicketSale: formatDateTime(activity.startTicketSale),
+          endTicketSale: formatDateTime(activity.endTicketSale),
+          startTimeEvent: convertHHMMtoHHMMSS(activity.startTimeEvent),
+          endTimeEvent: convertHHMMtoHHMMSS(activity.endTimeEvent),
+        })) as any; // Any tạm thời
+
+        console.log(JSON.stringify(formatActivities, null, 2));
+        const response = await eventApi.createEventActivity(
+          formatActivities,
+          event?.status == EventStatus.SCHEDULED ? contractCode : ""
+        );
+        console.log("Create response", response);
+        setIsLoading(false);
+        toast.success(response.data.message);
+        const queryParams = new URLSearchParams({
+          id: eventId.toString(),
+          step: hasSeatMap ? "3" : "4",
+        }).toString();
+        await navigate(`?${queryParams}`);
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      console.log(axiosError.response?.data);
+      toast.error(axiosError.response?.data.message);
     }
   };
 
