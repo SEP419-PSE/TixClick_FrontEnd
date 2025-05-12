@@ -11,6 +11,7 @@ import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import Logo from "../../assets/Logo.png";
 import GoogleImg from "../../assets/google.png";
 import { LoaderCircle } from "lucide-react";
+import { ROLE_CONSUMER, ROLE_ORGANIZER } from "../../constants/constants";
 // import { TOAST_MESSAGE } from "../../constants/constants";
 // import { ERROR_RESPONSE } from "../../constants/constants";
 
@@ -36,6 +37,20 @@ const SignInForm = () => {
       setRememberMe(true);
     }
   }, []);
+
+  const navigateByRole = (role: string) => {
+    switch (role) {
+      case ROLE_ORGANIZER:
+        navigate("/company");
+        break;
+      case ROLE_CONSUMER:
+        navigate("/");
+        break;
+      default:
+        navigate("/");
+        break;
+    }
+  };
 
   const onChangeShowPassword = () => {
     setIsShowPassword(!isShowPassword);
@@ -78,7 +93,7 @@ const SignInForm = () => {
           }
 
           toast.success("Đăng nhập thành công");
-          navigate("/");
+          navigateByRole(response.data.result.roleName);
         } else {
           navigate("/auth/code", { state: response.data.result.email });
           toast.error("Bạn cần phải kích hoạt tài khoản");
