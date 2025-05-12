@@ -103,11 +103,11 @@ const SearchPage = () => {
       </section>
       <section className="col-span-12">
         <Pagination
-          currentPage={pagination.currentPage}
+          currentPage={pagination.currentPage + 1}
           pageSize={pagination.pageSize}
           totalElements={pagination.totalElements}
-          totalPages={pagination.totalElements}
-          onPageChange={(newPage) => setPage(newPage + 1)}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) => setPage(newPage - 1)}
         />
       </section>
     </div>
