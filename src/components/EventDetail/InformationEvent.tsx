@@ -7,6 +7,7 @@ import {
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
+import DashDivider from "../Divider/DashDivider";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
@@ -23,8 +24,9 @@ const InformationEvent: React.FC<InforEventType> = ({
   isSaleTicket,
 }) => {
   return (
-    <div className="mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-[#1E1E1E] ">
-      <div>
+    <div className="relative mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-[#1E1E1E]">
+      <div className="relative">
+        <div className="absolute left-1 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1e1e1e] w-6 h-10 rounded-r-full"></div>
         <img
           src={eventDetail?.bannerURL}
           loading="lazy"
@@ -87,6 +89,8 @@ const InformationEvent: React.FC<InforEventType> = ({
             {isSaleTicket ? "Chọn lịch diễn" : "Chưa mở bán vé"}
           </button>
         </div>
+
+        <div className="absolute right-1 top-1/2 translate-x-1/2 -translate-y-1/2 bg-[#1e1e1e] w-6 h-10 rounded-l-full"></div>
       </div>
     </div>
   );
