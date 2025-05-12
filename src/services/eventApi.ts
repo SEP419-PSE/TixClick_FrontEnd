@@ -40,6 +40,7 @@ const eventApi = {
     eventCategoryId: number;
     minPrice: number;
     city: string | null;
+    page: number;
   }) => {
     const url = `${baseURL}/search`;
     return axiosClient.get(url, { params: params });

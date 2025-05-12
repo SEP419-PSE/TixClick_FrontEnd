@@ -23,6 +23,7 @@ import { Tabs, TabsContent } from "../../components/ui/tabs";
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 import { getCroppedImg } from "./imageUtils";
+import { ROLE_ID } from "../../constants/constants";
 
 interface ExtendedProfile extends Profile {
   fullName?: string;
@@ -204,6 +205,29 @@ export default function ProfileForm() {
     }
   };
 
+  const renderRoleName = (roleId: number | undefined): JSX.Element => {
+    const role = ROLE_ID.find((r) => r.id === roleId);
+    if (!role) {
+      return <span className="text-gray-500 italic">Không rõ</span>;
+    }
+    const roleColorMap: Record<string, string> = {
+      ADMIN: "text-red-500",
+      BUYER: "text-green-500",
+      ORGANIZER: "text-pse-green",
+      MANAGER: "text-purple-500",
+    };
+
+    return (
+      <span
+        className={`font-semibold text-sm ${
+          roleColorMap[role?.roleName] || "text-black"
+        }`}
+      >
+        {role.roleVi}
+      </span>
+    );
+  };
+
   return (
     <>
       <div className="min-h-screen bg-[#1E1E1E] text-gray-200 flex flex-col">
@@ -254,8 +278,9 @@ export default function ProfileForm() {
                     </div>
                   </div>
 
-                  <h2 className="mt-4 text-xl font-bold text-white">
-                    {profile?.userName || "Người dùng"}
+                  <h2 className="flex flex-col items-center mt-4 text-xl font-bold text-white">
+                    {profile?.userName || "Người dùng"}{" "}
+                    {renderRoleName(profile?.roleId)}
                   </h2>
 
                   <div className="w-full mt-6 space-y-4">

@@ -71,10 +71,9 @@ export const FilterEvent = ({
         <div className="space-y-2">
           <Label className="text-sm text-gray-300">Khoảng giá (đ)</Label>
           <Slider
-            defaultValue={[50000]}
-            min={50000}
+            min={0}
             max={2000000}
-            step={50000}
+            step={10000}
             value={priceRange}
             onValueChange={(val) => onChangePriceRange(val)}
             className="slider-custom"

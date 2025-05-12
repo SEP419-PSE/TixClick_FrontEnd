@@ -13,7 +13,14 @@ import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { TOAST_MESSAGE } from "../../constants/constants";
+import { ROLE_CONSUMER, TOAST_MESSAGE } from "../../constants/constants";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const schema = yup.object({
   userName: yup
@@ -31,6 +38,7 @@ const schema = yup.object({
     .email("Email không hợp lệ"),
   firstName: yup.string().required("Tên không được để trống"),
   lastName: yup.string().required("Họ không được để trống"),
+  roleName: yup.string().required("Vui lòng chọn vai trò"),
 });
 
 const SignUpForm = () => {
@@ -42,21 +50,28 @@ const SignUpForm = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<RegisterRequest>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      roleName: ROLE_CONSUMER,
+    },
   });
 
   const onChangeShowPassword = () => setIsShowPassword(!isShowPassword);
 
   const onSubmit = (data: RegisterRequest) => {
     setIsLoading(true);
+    const payload: RegisterRequest = {
+      ...data,
+      roleName: data.roleName,
+    };
+
     authApi
-      .signUp(data)
+      .signUp(payload)
       .then((response) => {
         console.log(response);
-        const isSuccess =
-          response.data.code === 200 && TOAST_MESSAGE.signUpSucces;
-        toast.success(isSuccess);
+        toast.success(TOAST_MESSAGE.signUpSucces);
         navigate("/auth/code", { state: data.email });
       })
       .catch((error) => {
@@ -72,7 +87,7 @@ const SignUpForm = () => {
       initial={{ x: 500 }}
       animate={{ x: 0 }}
       transition={{ duration: 1.5 }}
-      className="px-3 pt-6 pb-20 lg:px-8 lg:py-12 w-[550px] h-auto"
+      className="px-3 pt-6 pb-10 lg:px-8 lg:py-5 w-[550px] h-auto"
     >
       <div className="hidden lg:flex items-center gap-2 font-bold text-[20px]">
         <img src={Logo} width={64} />
@@ -158,6 +173,24 @@ const SignUpForm = () => {
                 </p>
               )}
             </div>
+          </div>
+
+          <div>
+            <Select
+              onValueChange={(value) => setValue("roleName", value)}
+              defaultValue={ROLE_CONSUMER}
+            >
+              <SelectTrigger className="w-full bg-[#e5e5e5] text-[#808080] border-none">
+                <SelectValue placeholder="Chọn vai trò" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BUYER">Người mua</SelectItem>
+                <SelectItem value="ORGANIZER">Ban tổ chức</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.roleName && (
+              <p className="text-red-500 text-sm">{errors.roleName.message}</p>
+            )}
           </div>
         </div>
 

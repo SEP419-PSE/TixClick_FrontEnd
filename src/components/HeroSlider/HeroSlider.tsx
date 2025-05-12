@@ -10,6 +10,7 @@ import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { AuthContext } from "../../contexts/AuthProvider";
 import companyApi from "../../services/companyApi";
+import { ROLE_CONSUMER, ROLE_ORGANIZER } from "../../constants/constants";
 
 const HeroSlider = () => {
   const authContext = useContext(AuthContext);
@@ -102,26 +103,34 @@ const HeroSlider = () => {
           <div className="hidden md:block ml-auto">
             {authContext?.isLogin ? (
               <ul className="flex gap-4 font-medium">
-                <NavLink to="/ticketManagement">
-                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
-                    Vé của tôi
-                  </li>
-                </NavLink>
-                <NavLink to="/company">
-                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
-                    Sự kiện của tôi
-                  </li>
-                </NavLink>
+                {authContext.role == ROLE_CONSUMER && (
+                  <NavLink to="/ticketManagement">
+                    <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                      Vé của tôi
+                    </li>
+                  </NavLink>
+                )}
+                {authContext.role == ROLE_ORGANIZER && (
+                  <NavLink to="/company">
+                    <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                      Sự kiện của tôi
+                    </li>
+                  </NavLink>
+                )}
+
                 <NavLink to="/profileForm">
                   <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
                     Trang cá nhân
                   </li>
                 </NavLink>
-                <button onClick={hanldeClickCreateEvent}>
-                  <li className="px-4 py-2 border border-white text-white rounded-md hover:bg-white hover:text-black transition-all duration-300">
-                    Tạo sự kiện
-                  </li>
-                </button>
+                {authContext.role == ROLE_ORGANIZER && (
+                  <button onClick={hanldeClickCreateEvent}>
+                    <li className="px-4 py-2 border border-white text-white rounded-md hover:bg-white hover:text-black transition-all duration-300">
+                      Tạo sự kiện
+                    </li>
+                  </button>
+                )}
+
                 <li
                   onClick={() => authContext?.logout()}
                   className="px-4 py-2 border rounded-md bg-white text-black hover:opacity-80 transition-all cursor-pointer duration-300"
