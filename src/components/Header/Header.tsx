@@ -10,6 +10,7 @@ import { AuthContext } from "../../contexts/AuthProvider";
 import companyApi from "../../services/companyApi";
 import SearchBar from "../SearchBar/SearchBar";
 import useMyProfile from "../../hooks/useMyProfile";
+import { ROLE_CONSUMER, ROLE_ORGANIZER } from "../../constants/constants";
 
 const Header = () => {
   const location = useLocation();
@@ -69,13 +70,15 @@ const Header = () => {
         <span className="lg:hidden p-[6px] border rounded-full">
           <LuSearch size={24} />
         </span>
+        {authContext?.role == ROLE_ORGANIZER && (
+          <button
+            onClick={hanldeClickCreateEvent}
+            className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500"
+          >
+            Tạo sự kiện
+          </button>
+        )}
 
-        <button
-          onClick={hanldeClickCreateEvent}
-          className="hidden md:block px-4 py-2 rounded-lg bg-pse-green text-white font-semibold hover:scale-110 transition-all duration-500"
-        >
-          Tạo sự kiện
-        </button>
         <div className="font-semibold flex items-center cursor-pointer">
           {authContext?.isLogin ? (
             <div
@@ -96,18 +99,24 @@ const Header = () => {
                 } top-10 right-0 bg-white rounded-lg text-black w-[200px] transition-all duration-500 z-10`}
               >
                 <ul className="rounded-lg">
-                  <Link to="/ticketManagement">
-                    <li className="flex items-center gap-2 p-3 hover:bg-pse-gray/50 rounded-tl-lg rounded-tr-lg">
-                      <LuTicketCheck size={24} />
-                      Vé đã mua
-                    </li>
-                  </Link>
-                  <Link to="/company">
-                    <li className="flex items-center p-3 gap-2 hover:bg-pse-gray/50">
-                      <RiCalendarEventLine size={24} />
-                      Sự kiện của tôi
-                    </li>
-                  </Link>
+                  {authContext.role == ROLE_CONSUMER && (
+                    <Link to="/ticketManagement">
+                      <li className="flex items-center gap-2 p-3 hover:bg-pse-gray/50 rounded-tl-lg rounded-tr-lg">
+                        <LuTicketCheck size={24} />
+                        Vé của tôi
+                      </li>
+                    </Link>
+                  )}
+
+                  {authContext.role == ROLE_ORGANIZER && (
+                    <Link to="/company">
+                      <li className="flex items-center p-3 gap-2 hover:bg-pse-gray/50">
+                        <RiCalendarEventLine size={24} />
+                        Sự kiện của tôi
+                      </li>
+                    </Link>
+                  )}
+
                   <Link to="/profileForm">
                     <li className="flex items-center p-3 gap-2 hover:bg-pse-gray/50">
                       <CgProfile size={24} />

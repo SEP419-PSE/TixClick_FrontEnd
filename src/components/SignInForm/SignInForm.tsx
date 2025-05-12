@@ -59,7 +59,14 @@ const SignInForm = () => {
         if (response.data.result.status == true) {
           localStorage.clear();
           console.log(response.data);
-          localStorage.setItem("accessToken", response.data.result.accessToken);
+          authContext?.login(
+            response.data.result.accessToken,
+            response.data.result.roleName
+          );
+          authContext?.setTokenForAxios(
+            "user",
+            response.data.result.accessToken
+          );
           localStorage.setItem(
             "refreshToken",
             response.data.result.refreshToken
@@ -69,11 +76,7 @@ const SignInForm = () => {
             localStorage.setItem("userName", formData.userName);
             localStorage.setItem("password", formData.password);
           }
-          authContext?.login(response.data.result.accessToken);
-          authContext?.setTokenForAxios(
-            "user",
-            response.data.result.accessToken
-          );
+
           toast.success("Đăng nhập thành công");
           navigate("/");
         } else {

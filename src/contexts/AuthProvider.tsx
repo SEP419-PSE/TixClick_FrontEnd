@@ -9,11 +9,12 @@ type Props = {
 interface AuthInterface {
   isLogin: boolean;
   isSuperLogin: boolean;
-  login: (token: string) => void;
+  login: (token: string, role: string) => void;
   superLogin: (token: string) => void;
   logout: () => void;
   accessToken: string | null;
   accessToken2: string | null;
+  role: string;
   setTokenForAxios: (tokenType: "user" | "super", token: string) => void;
 }
 
@@ -24,7 +25,7 @@ const AuthProvider = ({ children }: Props) => {
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
-
+  const [role, setRole] = useState<string>();
   const [isSuperLogin, setIsSuperLogin] = useState<boolean>(false);
   const [accessToken2, setAccessToken2] = useState<string | null>(
     localStorage.getItem("accessToken2")
@@ -33,6 +34,10 @@ const AuthProvider = ({ children }: Props) => {
   // Kiểm tra token khi load trang
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    const role = localStorage.getItem("roleName");
+    if (role) {
+      setRole(role);
+    }
     if (token) {
       setIsLogin(true);
       setAccessToken(token);
@@ -43,21 +48,21 @@ const AuthProvider = ({ children }: Props) => {
       setIsSuperLogin(true);
       setAccessToken2(superToken);
     }
-  }, []);
+  });
 
   // Đặt token theo loại login
   const setTokenForAxios = (tokenType: "user" | "super", token: string) => {
     axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   };
 
-  const login = (token: string) => {
+  const login = (token: string, role: string) => {
     localStorage.setItem("accessToken", token);
+    localStorage.setItem("roleName", role);
     setIsLogin(true);
     setAccessToken(token);
   };
 
   const superLogin = (token: string) => {
-    
     localStorage.setItem("accessToken2", token);
     setIsSuperLogin(true);
     setAccessToken2(token);
@@ -79,6 +84,7 @@ const AuthProvider = ({ children }: Props) => {
     accessToken2,
     isLogin,
     isSuperLogin,
+    role,
     login,
     superLogin,
     logout,

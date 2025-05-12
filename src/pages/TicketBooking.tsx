@@ -44,6 +44,7 @@ import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+import { TicketPurchaseRequest } from "./TicketBookingNoneSeatmap";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -718,38 +719,33 @@ const TicketBooking = () => {
     setIsLoading(true);
 
     try {
-      // Prepare ticket purchase requests
-      const ticketPurchaseRequests = selectedSeats.map((seat) => {
-        // Check if this is a standing section (id starts with "standing-")
-        const isStandingSection = seat.id.startsWith("standing-");
+      const ticketPurchaseRequests: TicketPurchaseRequest = {
+        ticketPurchaseRequests: selectedSeats.map((seat) => {
+          const isStandingSection = seat.id.startsWith("standing-");
 
-        // For standing sections, we need to use a different format
-        if (isStandingSection) {
-          const sectionId = seat.id.replace("standing-", "");
-          const section = sections.find((s) => s.id === sectionId);
+          // For standing sections
+          if (isStandingSection) {
+            return {
+              zoneId: seat.zoneId || 0,
+              seatId: 0, // dùng 0 thay vì null để đúng kiểu number
+              eventActivityId: Number(eventActivityId),
+              ticketId: seat.ticketId ?? 0,
+              eventId: Number(eventId),
+              quantity: seat.quantity || 1,
+            };
+          }
 
+          // Regular seated section
           return {
             zoneId: seat.zoneId || 0,
-            seatId: null, // Use null instead of 0 for standing sections
+            seatId: seat.seatId,
             eventActivityId: Number(eventActivityId),
-            ticketId: seat.ticketId,
+            ticketId: seat.ticketId ?? 0,
             eventId: Number(eventId),
-            quantity: seat.quantity || 1,
-            isStanding: true,
-            price: section?.price || 0,
+            quantity: 1,
           };
-        }
-
-        // Regular seated section
-        return {
-          zoneId: seat.zoneId || 0,
-          seatId: seat.seatId,
-          eventActivityId: Number(eventActivityId),
-          ticketId: seat.ticketId,
-          eventId: Number(eventId),
-          quantity: 1,
-        };
-      });
+        }),
+      };
 
       console.log(
         "Ticket purchase requests:",

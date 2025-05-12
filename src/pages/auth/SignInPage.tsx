@@ -4,7 +4,7 @@ import { Outlet } from "react-router";
 
 const SignInPage = () => {
   return (
-    <div className="flex justify-center bg-white text-pse-black text-[16px] h-auto">
+    <div className="flex justify-center bg-white text-pse-black text-[16px] h-auto max-h-screen">
       <motion.div
         initial={{ x: -1000 }} // Vị trí ban đầu bên trái ngoài màn hình
         animate={{ x: 0 }} // Vị trí cuối cùng
