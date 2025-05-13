@@ -12,9 +12,9 @@ type Props = {
 };
 
 const VoucherList = ({ vouchers, onChangeStatus, deleteVoucher }: Props) => {
-  if (vouchers.length == 0) return <EmptyList label="Chưa có voucher nào" />;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {!vouchers && <EmptyList label="Chưa có voucher nào" />}
       {vouchers.map((voucher) => (
         <VoucherCard
           key={voucher.voucherId}

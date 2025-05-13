@@ -180,7 +180,7 @@ export default function Consumer() {
                     </div>
 
                     <div className="p-4">
-                      <h3 className="text-lg font-semibold text-white line-clamp-2">
+                      <h3 className="text-lg font-semibold text-white w-full truncate">
                         {event.eventName}
                       </h3>
 

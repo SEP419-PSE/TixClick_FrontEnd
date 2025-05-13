@@ -6,6 +6,7 @@ import TicketsRevenuePieChart from "./TicketsRevenuePieChart";
 import { RevenueReponse } from "../../../../../interface/revenue/Revenue";
 import { useParams } from "react-router";
 import eventApi from "../../../../../services/eventApi";
+import EmptyList from "../../../../../components/EmptyList/EmptyList";
 
 const Revenue = () => {
   const { eventId } = useParams();
@@ -21,6 +22,13 @@ const Revenue = () => {
   useEffect(() => {
     fetchRevenue();
   }, [eventId]);
+
+  if (!revenue)
+    return (
+      <div className="text-black flex items-center justify-center h-[calc(100vh-70px)]">
+        <EmptyList label="Chưa có doanh thu cho sự kiện này" />
+      </div>
+    );
 
   return (
     <div className="p-6 bg-white min-h-screen text-black">
