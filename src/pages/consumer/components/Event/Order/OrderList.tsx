@@ -26,6 +26,7 @@ import { Search } from "lucide-react";
 import { TransactionResponse } from "../../../../../interface/company/Transaction";
 import { formatDateVietnamese } from "../../../../../lib/utils";
 import { SortType } from "../../../../../interface/ticket/Ticket";
+import EmptyList from "../../../../../components/EmptyList/EmptyList";
 
 type Props = {
   transactions?: TransactionResponse[];
@@ -81,7 +82,7 @@ export function OrderList({ transactions, sort, setSort }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions !== undefined ? (
+              {transactions && transactions?.length > 0 ? (
                 transactions?.map((tx, index) => (
                   <TableRow key={index}>
                     <TableCell>{tx.transactionCode}</TableCell>
@@ -117,7 +118,7 @@ export function OrderList({ transactions, sort, setSort }: Props) {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-4">
-                    Không tìm thấy giao dịch phù hợp.
+                    <EmptyList label="Chưa có giao dịch nào" />
                   </TableCell>
                 </TableRow>
               )}

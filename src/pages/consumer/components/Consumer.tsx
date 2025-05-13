@@ -180,7 +180,7 @@ export default function Consumer() {
                     </div>
 
                     <div className="p-4">
-                      <h3 className="text-lg font-semibold text-white line-clamp-2">
+                      <h3 className="text-lg font-semibold text-white w-full truncate">
                         {event.eventName}
                       </h3>
 
@@ -273,7 +273,7 @@ export default function Consumer() {
                 ))}
               </div>
             )}
-            {!loading && filteredEvents?.length == 0 && (
+            {!loading && events?.length == 0 && (
               <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
                 <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
                   <img

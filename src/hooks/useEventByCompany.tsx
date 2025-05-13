@@ -17,6 +17,7 @@ const useEventByCompany = (companyId: number | undefined) => {
   });
 
   const fetchEvents = async (companyId: number | undefined, page: number) => {
+    if (!companyId) return;
     setLoading(true);
     try {
       const res = await eventApi.getAllByCompany(companyId, page);

@@ -155,7 +155,26 @@ const Tasks = () => {
     <div className="p-6 bg-background text-foreground border min-h-screen">
       <p className="text-2xl font-bold mb-8">Phân chia công việc</p>
       <div>
-        {tasks.length !== 0 ? (
+        {!tasks && (
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+            <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
+              <img
+                src={NoEvent || "/placeholder.svg"}
+                alt="No events"
+                className="w-16 h-16 opacity-50"
+              />
+            </div>
+            <p className="text-black/60">
+              Không có hoạt động nào của sự kiện này
+            </p>
+            <NavLink to={`/create-event?id=${eventId}&step=2`}>
+              <Button className="my-2 bg-black hover:bg-pse-green transition-all duration-300">
+                Thêm hoạt động
+              </Button>
+            </NavLink>
+          </div>
+        )}
+        {tasks.length != 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tasks.map((activity) => (
               <Card
@@ -261,24 +280,6 @@ const Tasks = () => {
                 </div> */}
               </Card>
             ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-            <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-4">
-              <img
-                src={NoEvent || "/placeholder.svg"}
-                alt="No events"
-                className="w-16 h-16 opacity-50"
-              />
-            </div>
-            <p className="text-black/60">
-              Không có hoạt động nào của sự kiện này
-            </p>
-            <NavLink to={`/create-event?id=${eventId}&step=2`}>
-              <Button className="my-2 bg-black hover:bg-pse-green transition-all duration-300">
-                Thêm hoạt động
-              </Button>
-            </NavLink>
           </div>
         )}
       </div>
