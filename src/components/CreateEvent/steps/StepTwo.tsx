@@ -648,15 +648,13 @@ const StepTwo: React.FC<StepProps> = ({
                             ? new Date(activity.dateEvent)
                             : undefined;
 
-                          // Nếu không có eventDate thì chỉ cần check > now
                           if (!eventDate) {
+                            // Nếu chưa có ngày sự kiện thì chỉ cần chọn sau ngày hiện tại
                             return date < now;
                           }
 
-                          const eventLimit = new Date(eventDate);
-                          eventLimit.setDate(eventLimit.getDate() - 1);
-
-                          return date < now || date >= eventLimit;
+                          // Cho chọn từ hôm nay tới ngày diễn ra sự kiện
+                          return date < now || date > eventDate;
                         }}
                         mode="single"
                         selected={
@@ -666,7 +664,9 @@ const StepTwo: React.FC<StepProps> = ({
                         }
                         onSelect={(date) => {
                           if (!date) return;
+
                           const updated = [...activities];
+
                           const old = new Date(
                             activity.endTicketSale || Date.now()
                           );
@@ -690,21 +690,13 @@ const StepTwo: React.FC<StepProps> = ({
                                   "Ngày kết thúc bán vé phải sau ngày bắt đầu",
                               },
                             }));
-                          } else if (
-                            eventDate &&
-                            old >=
-                              new Date(
-                                eventDate.getFullYear(),
-                                eventDate.getMonth(),
-                                eventDate.getDate() - 1
-                              )
-                          ) {
+                          } else if (eventDate && old > eventDate) {
                             setErrors((prev) => ({
                               ...prev,
                               [index]: {
                                 ...prev[index],
                                 endTicketSale:
-                                  "Phải kết thúc bán vé trước ngày diễn ra sự kiện 1 ngày",
+                                  "Không được kết thúc bán vé sau ngày diễn ra sự kiện",
                               },
                             }));
                           } else {
@@ -717,6 +709,7 @@ const StepTwo: React.FC<StepProps> = ({
                           }
                         }}
                       />
+
                       <Input
                         type="time"
                         value={
@@ -751,21 +744,13 @@ const StepTwo: React.FC<StepProps> = ({
                                   "Ngày kết thúc bán vé phải sau ngày bắt đầu",
                               },
                             }));
-                          } else if (
-                            eventDate &&
-                            date >=
-                              new Date(
-                                eventDate.getFullYear(),
-                                eventDate.getMonth(),
-                                eventDate.getDate() - 1
-                              )
-                          ) {
+                          } else if (eventDate && date > eventDate) {
                             setErrors((prev) => ({
                               ...prev,
                               [index]: {
                                 ...prev[index],
                                 endTicketSale:
-                                  "Phải kết thúc bán vé trước ngày diễn ra sự kiện 1 ngày",
+                                  "Không được kết thúc bán vé sau ngày diễn ra sự kiện",
                               },
                             }));
                           } else {
