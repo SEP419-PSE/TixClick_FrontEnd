@@ -17,6 +17,7 @@ const useEventByCompany = (companyId: number | undefined) => {
   });
 
   const fetchEvents = async (companyId: number | undefined, page: number) => {
+    if (!companyId) return;
     setLoading(true);
     try {
       const res = await eventApi.getAllByCompany(companyId, page);
@@ -38,7 +39,6 @@ const useEventByCompany = (companyId: number | undefined) => {
   };
 
   useEffect(() => {
-    if (!companyId) return;
     fetchEvents(companyId, page);
   }, [companyId, page]);
 
