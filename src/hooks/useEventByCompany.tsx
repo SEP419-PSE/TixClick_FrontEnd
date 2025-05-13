@@ -38,6 +38,7 @@ const useEventByCompany = (companyId: number | undefined) => {
   };
 
   useEffect(() => {
+    if (!companyId) return;
     fetchEvents(companyId, page);
   }, [companyId, page]);
 
