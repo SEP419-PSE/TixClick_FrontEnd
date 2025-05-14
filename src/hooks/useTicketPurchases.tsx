@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { SortType, TicketResponse } from "../interface/ticket/Ticket";
+import {
+  OrderResponse,
+  SortType,
+  TicketResponse,
+} from "../interface/ticket/Ticket";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 import useDebounce from "../hooks/useDebounce"; // 🔄 Nhớ sửa đường dẫn nếu khác
 
@@ -11,7 +15,7 @@ export type Pagination = {
 };
 
 const useTicketsPurchases = () => {
-  const [ticketPurchases, setTicketPurchases] = useState<TicketResponse[]>([]);
+  const [ticketPurchases, setTicketPurchases] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
   const [sort, setSort] = useState<SortType>("DESC");
@@ -26,15 +30,13 @@ const useTicketsPurchases = () => {
 
   const fetchTicketPurchases = async (
     pageToFetch: number,
-    sortToFetch: SortType,
-    eventName: string
+    sortToFetch: SortType
   ) => {
     setLoading(true);
     try {
       const res = await ticketPurchase.getAll({
         page: pageToFetch,
         sortDirection: sortToFetch,
-        eventName,
       });
       const result = res.data.result;
 
@@ -54,8 +56,8 @@ const useTicketsPurchases = () => {
   };
 
   useEffect(() => {
-    fetchTicketPurchases(page, sort, debouncedSearch);
-  }, [page, sort, debouncedSearch]);
+    fetchTicketPurchases(page, sort);
+  }, [page, sort]);
 
   return {
     ticketPurchases,
@@ -67,7 +69,7 @@ const useTicketsPurchases = () => {
     setSort,
     searchEventName,
     setSearchEventName,
-    refetch: () => fetchTicketPurchases(page, sort, debouncedSearch),
+    refetch: () => fetchTicketPurchases(page, sort),
   };
 };
 

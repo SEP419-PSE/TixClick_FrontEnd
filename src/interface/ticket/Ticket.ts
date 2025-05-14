@@ -46,7 +46,38 @@ export interface ChangeTicket {
 export interface TicketParams {
   page: number;
   sortDirection: SortType;
-  eventName: string;
 }
 
 export type SortType = "ASC" | "DESC";
+
+export interface OrderResponse {
+  orderId: number;
+  orderCode: string;
+  orderDate: string;
+  totalPrice: number;
+  totalDiscount: number;
+  eventId: number;
+  eventActivityId: number;
+  eventCategoryId: number;
+  eventName: string;
+  eventDate: Date;
+  eventStartTime: string;
+  timeBuyOrder: string;
+  locationName: string;
+  location: string;
+  qrCode: string;
+  logo: string;
+  banner: string;
+  ishaveSeatmap: boolean;
+  quantityOrdered: number;
+  ticketPurchases: TicketPurchase[];
+}
+
+export interface TicketPurchase {
+  ticketPurchaseId: number;
+  price: number;
+  seatCode: null | string;
+  ticketType: string;
+  zoneName: string;
+  quantity: number;
+}
