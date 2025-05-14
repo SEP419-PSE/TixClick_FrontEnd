@@ -13,8 +13,7 @@ interface AuthInterface {
   superLogin: (token: string) => void;
   logout: () => void;
   accessToken: string | null;
-  accessToken2: string | null;
-  role: string;
+  role: string | undefined;
   setTokenForAxios: (tokenType: "user" | "super", token: string) => void;
 }
 
@@ -22,35 +21,32 @@ const AuthContext = createContext<AuthInterface | undefined>(undefined);
 
 const AuthProvider = ({ children }: Props) => {
   const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [isSuperLogin, setIsSuperLogin] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
-  const [role, setRole] = useState<string>();
-  const [isSuperLogin, setIsSuperLogin] = useState<boolean>(false);
   const [accessToken2, setAccessToken2] = useState<string | null>(
-    localStorage.getItem("accessToken2")
+    localStorage.getItem("accessToken")
   );
+  const [role, setRole] = useState<string | undefined>(localStorage.getItem("roleName") || undefined);
 
   // Kiểm tra token khi load trang
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    const role = localStorage.getItem("roleName");
-    if (role) {
-      setRole(role);
-    }
+    const savedRole = localStorage.getItem("roleName");
+
     if (token) {
       setIsLogin(true);
       setAccessToken(token);
-    }
-
-    const superToken = localStorage.getItem("accessToken2");
-    if (superToken) {
       setIsSuperLogin(true);
-      setAccessToken2(superToken);
+      setAccessToken2(token);
     }
-  });
 
-  // Đặt token theo loại login
+    if (savedRole) {
+      setRole(savedRole);
+    }
+  }, []);
+
   const setTokenForAxios = (tokenType: "user" | "super", token: string) => {
     axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   };
@@ -60,28 +56,29 @@ const AuthProvider = ({ children }: Props) => {
     localStorage.setItem("roleName", role);
     setIsLogin(true);
     setAccessToken(token);
+    setRole(role);
   };
 
   const superLogin = (token: string) => {
-    localStorage.setItem("accessToken2", token);
+    localStorage.setItem("accessToken", token);
     setIsSuperLogin(true);
     setAccessToken2(token);
   };
 
   const logout = async () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("accessToken2");
+    localStorage.removeItem("roleName");
     delete axiosClient.defaults.headers.common["Authorization"];
     setAccessToken(null);
     setAccessToken2(null);
     setIsLogin(false);
     setIsSuperLogin(false);
+    setRole(undefined);
     toast.success("Đăng xuất thành công");
   };
 
-  const value = {
+  const value: AuthInterface = {
     accessToken,
-    accessToken2,
     isLogin,
     isSuperLogin,
     role,
@@ -95,3 +92,4 @@ const AuthProvider = ({ children }: Props) => {
 };
 
 export { AuthContext, AuthProvider };
+
