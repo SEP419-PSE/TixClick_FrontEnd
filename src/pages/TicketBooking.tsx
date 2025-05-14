@@ -754,7 +754,7 @@ const TicketBooking = () => {
 
       // Call the API to create the ticket purchase
       const response = await ticketPurchaseApi.createTicketPurchase(
-        { ticketPurchaseRequests },
+        ticketPurchaseRequests,
         localStorage.getItem("accessToken") || ""
       );
 
@@ -963,7 +963,7 @@ const TicketBooking = () => {
             className="relative w-[1200px] h-[800px] bg-gray-100 border border-gray-300 rounded overflow-hidden"
           >
             <div className="absolute top-0 left-0 right-0 p-5 bg-gray-800 text-white text-center">
-              STAGE
+              Sân khấu
             </div>
             {changeTicket == true && (
               <div className="absolute top-4 left-5">

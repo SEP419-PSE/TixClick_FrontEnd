@@ -131,9 +131,9 @@ export default function TicketManagement() {
               {selectedTicket?.eventName}
             </div>
             <div className="flex gap-1 items-center">
-              <span className="text-pse-gray font-medium">
+              {/* <span className="text-pse-gray font-medium">
                 {selectedTicket?.ticketType}
-              </span>
+              </span> */}
               <p
                 style={{
                   backgroundColor: eventTypes.find(

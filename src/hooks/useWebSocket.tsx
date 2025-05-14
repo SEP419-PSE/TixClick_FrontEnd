@@ -24,9 +24,10 @@ const useWebSocket = () => {
     client.activate();
 
     return () => {
-      client.deactivate();
+      // client.deactivate();
+      setMessage(null);
     };
-  }, []);
+  });
 
   return message;
 };

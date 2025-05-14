@@ -46,6 +46,10 @@ const companyApi = {
       },
     });
   },
+  getListCompany() {
+    const url = `${baseUrl}/get-list-company-by-account-id`;
+    return axiosClient.get(url);
+  },
 };
 
 export default companyApi;

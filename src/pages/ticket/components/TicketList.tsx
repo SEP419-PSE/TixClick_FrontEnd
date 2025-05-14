@@ -53,9 +53,9 @@ const TicketList: React.FC<Props> = ({
                   {ticket.eventName}
                 </div>
                 <div className="flex text-sm items-center gap-1">
-                  <span className="text-pse-gray font-medium">
+                  {/* <span className="text-pse-gray font-medium">
                     {ticket.ticketType}
-                  </span>
+                  </span> */}
                   <p
                     style={{
                       backgroundColor: eventTypes.find(

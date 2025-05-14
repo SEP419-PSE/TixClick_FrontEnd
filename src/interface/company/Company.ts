@@ -15,3 +15,12 @@ export interface Company {
 }
 
 export type CompanyStatus = "ACTIVE" | "PENDING" | "REJECTED";
+
+interface CompanyList extends Company {
+  subRole: string;
+}
+
+export interface CompanyListResponse {
+  myCompany: CompanyList;
+  listCompany: CompanyList[];
+}

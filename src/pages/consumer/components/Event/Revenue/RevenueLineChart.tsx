@@ -133,9 +133,6 @@ export function RevenueLineChart({ data }: Props) {
       </CardContent>
 
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Tăng 5,2% so với ngày hôm trước <TrendingUp className="h-4 w-4" />
-        </div>
         <div className="leading-none text-muted-foreground">
           Tổng doanh thu theo từng hoạt động
         </div>

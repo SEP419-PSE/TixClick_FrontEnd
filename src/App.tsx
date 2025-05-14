@@ -50,6 +50,9 @@ import TicketPage from "./pages/ticket/TicketPage";
 import TicketBooking from "./pages/TicketBooking";
 import TicketBookingNoneSeatmap from "./pages/TicketBookingNoneSeatmap";
 import CallbackPayment from "./pages/payment/QueueLoading/CallbackPayment";
+import MyTask from "./pages/task/MyTask";
+import TaskList from "./pages/task/components/TaskList";
+import Cooperations from "./pages/task/components/Cooperations";
 
 export default function App() {
   return (
@@ -73,6 +76,7 @@ export default function App() {
             element={<TicketBooking />}
           />
           <Route path="create-event" element={<CreateEvent />} />
+
           {/* Authitencation route */}
           <Route path="auth" element={<SignInPage />}>
             <Route index path="signin" element={<SignInForm />} />
@@ -97,6 +101,12 @@ export default function App() {
           element={<TicketBookingNoneSeatmap />}
         />
         <Route path="login-google-success" element={<LoginGoogleSucces />} />
+
+        {/* My task route */}
+        <Route path="my-task" element={<MyTask />}>
+          <Route index element={<TaskList />} />
+          <Route path="cooperations" element={<Cooperations />} />
+        </Route>
 
         <Route>
           <Route path="organizerCenter" element={<OrganizerCenter />} />
