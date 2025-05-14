@@ -5,14 +5,12 @@ import {
   ChevronRight,
   FileText,
   Contact,
-  CircleDollarSign,
   Building2,
 } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link, useLocation } from "react-router";
 import { cn } from "../../../lib/utils";
 import { useLanguage } from "../../organizer/components/LanguageContext";
-import { FaTasks } from "react-icons/fa";
 import { SidebarContext } from "../../../contexts/SideBarContext";
 
 export function ConsumerSidebar() {

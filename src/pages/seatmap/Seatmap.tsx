@@ -324,7 +324,7 @@ const SeatMapContainer: React.FC<SeatMapContainerProps> = ({
         className="relative w-[1200px] h-[800px] bg-gray-100 border border-gray-300 rounded overflow-hidden"
       >
         <div className="absolute top-0 left-0 right-0 p-5 bg-gray-800 text-white text-center">
-          STAGE
+          Sân khấu
         </div>
 
         {sections.map((section) => (

@@ -111,13 +111,19 @@ const HeroSlider = () => {
                   </NavLink>
                 )}
                 {authContext.role == ROLE_ORGANIZER && (
-                  <NavLink to="/company">
-                    <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
-                      Sự kiện của tôi
-                    </li>
-                  </NavLink>
+                  <>
+                    <NavLink to="/company">
+                      <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                        Sự kiện của tôi
+                      </li>
+                    </NavLink>
+                  </>
                 )}
-
+                <NavLink to="/my-task">
+                  <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
+                    Công việc của tôi
+                  </li>
+                </NavLink>
                 <NavLink to="/profileForm">
                   <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
                     Trang cá nhân
