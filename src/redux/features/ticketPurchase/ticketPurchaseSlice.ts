@@ -1,17 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface OldTicketPurchase {
-  ticketPurchaseId: number;
+  orderCode: string;
+  ticketPurchaseId: number[];
   quantity: number;
-  caseTicket: CaseTicketType;
 }
 
-export type CaseTicketType = "noSeatMap" | "changeSeat" | "changeZone" | null;
-
 const initialState: OldTicketPurchase = {
-  ticketPurchaseId: 0,
+  orderCode: "",
+  ticketPurchaseId: [],
   quantity: 0,
-  caseTicket: null,
 };
 
 const ticketPurchase = createSlice({

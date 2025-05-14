@@ -53,6 +53,7 @@ import CallbackPayment from "./pages/payment/QueueLoading/CallbackPayment";
 import MyTask from "./pages/task/MyTask";
 import TaskList from "./pages/task/components/TaskList";
 import Cooperations from "./pages/task/components/Cooperations";
+import ChangeTicket from "./pages/changeTicket/ChangeTicket";
 
 export default function App() {
   return (
@@ -170,6 +171,7 @@ export default function App() {
         {/* Chat app */}
         <Route path="chat" element={<ChatApp />} />
         <Route path="template" element={<ContractTemplate />} />
+        <Route path="change-ticket" element={<ChangeTicket />} />
       </Routes>
     </div>
   );
