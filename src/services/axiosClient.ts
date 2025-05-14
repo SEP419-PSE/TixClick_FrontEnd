@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import authApi from "./authApi";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "https://tixclick.site/api",
   // httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }),
   headers: {
     "Content-Type": "application/json",
