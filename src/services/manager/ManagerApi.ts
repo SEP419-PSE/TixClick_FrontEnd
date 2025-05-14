@@ -4,7 +4,7 @@ import axiosClient from "../axiosClient";
 const managerApi = {
   getAllCompany() {
     const url = "/company/manager";
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
     return axiosClient.get(url, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -14,7 +14,7 @@ const managerApi = {
 
   getAllContract() {
     const url = "/contract/all";
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -25,7 +25,7 @@ const managerApi = {
 
   getContractDetails(contractId: number) {
     const url = `/contract-detail/get/${contractId}`;
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -37,7 +37,7 @@ const managerApi = {
 
   confirmContractPaymentPay(transactionCode: string, paymentId: number) {
     const url = `/contract-payment/pay?transactionCode=${transactionCode}&paymentId=${paymentId}`;
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -48,7 +48,7 @@ const managerApi = {
 
   getAllPayment() {
     const url = "/contract-payment/get";
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -59,7 +59,7 @@ const managerApi = {
 
   getAllEvent() {
     const url = "/event/all_scheduled_pending_approved";
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -71,7 +71,7 @@ const managerApi = {
 
   getContractsByEventId(eventId: number) {
     const url = `/contract-document/all_by_event/${eventId}`;
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.get(url, {
       headers: {
@@ -84,7 +84,7 @@ const managerApi = {
   approveCompany(status: string, companyVerificationId: number) {
     const url = `/company-verification/${companyVerificationId}/approve?status=${status}`;
 
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.patch(url, {
       params: { status },
@@ -98,7 +98,7 @@ const managerApi = {
   approveEvent(status: string, eventId: number) {
     const url = `/event/approve/${eventId}/${status}`;
 
-    const token = localStorage.getItem("accessToken2");
+    const token = localStorage.getItem("accessToken");
 
     return axiosClient.post(
       url,
@@ -146,7 +146,7 @@ const managerApi = {
 
     uploadContractManager(file: File) {
       const url = "/contract/createContractAndContractDetail"
-      const token = localStorage.getItem("accessToken2")
+      const token = localStorage.getItem("accessToken")
   
       // Create FormData and append the file with the exact key name "file"
       const formData = new FormData()

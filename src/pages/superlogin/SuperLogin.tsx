@@ -63,8 +63,8 @@ export default function SuperLogin() {
       const result = response.data?.result;
       if (result?.status === true && result?.accessToken) {
         // Lưu token vào localStorage
-        localStorage.setItem("accessToken2", result.accessToken);
-        localStorage.setItem("refreshToken2", result.refreshToken);
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
 
         // Gọi superLogin với token
         authContext?.superLogin(result.accessToken);
