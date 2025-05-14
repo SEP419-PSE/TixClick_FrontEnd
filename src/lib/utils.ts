@@ -59,7 +59,7 @@ export const equalIgnoreCase = (a: string, b: string): boolean => {
 };
 
 export const parseSeatCode = (raw: string | null | undefined): string => {
-  if (typeof raw != "string") return "Không có ghế";
+  if (typeof raw != "string") return "Vé đứng";
   const match = raw.match(/r(\d+)-c(\d+)/);
   if (!match) return "";
 

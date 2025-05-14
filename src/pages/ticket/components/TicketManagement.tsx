@@ -6,7 +6,11 @@ import { eventTypes } from "../../../constants/constants";
 import DashDivider from "../../../components/Divider/DashDivider";
 import { formatMoney } from "../../DataTranfer";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
-import { SortType, TicketResponse } from "../../../interface/ticket/Ticket";
+import {
+  OrderResponse,
+  SortType,
+  TicketResponse,
+} from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
   formatTimeFe,
@@ -36,51 +40,20 @@ export default function TicketManagement() {
   } = useTicketsPurchases();
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
-  const [selectedTicket, setSelectedTicket] = useState<TicketResponse>();
+  const [selectedTicket, setSelectedTicket] = useState<OrderResponse>();
   const dispatch = useAppDispatch();
 
   const handleOpenPopup = () => {
     setOpenPopup(true);
   };
 
-  const handleSelectedTicket = (ticket: TicketResponse) => {
+  const handleSelectedTicket = (ticket: OrderResponse) => {
     setSelectedTicket(ticket);
     handleOpenPopup();
   };
 
-  const saveTicketPurchaseId = (ticket: TicketResponse | undefined) => {
-    let urlNavigate = "";
-    if (!ticket) {
-      throw new Error("Don't have any ticket");
-    } else {
-      let payloadCaseTicket: CaseTicketType = null;
-
-      if (ticket.ishaveSeatmap == false) {
-        payloadCaseTicket = "noSeatMap";
-        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket-no-seatmap?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
-      }
-      if (ticket.ishaveSeatmap && ticket.seatCode != null) {
-        payloadCaseTicket = "changeSeat";
-        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
-      } else if (ticket.ishaveSeatmap && ticket.seatCode == null) {
-        payloadCaseTicket = "changeZone";
-        urlNavigate = `/event-detail/${ticket.eventId}/booking-ticket?eventId=${ticket.eventId}&eventActivityId=${ticket.eventActivityId}`;
-      }
-
-      dispatch(
-        setTicketPurchase({
-          ticketPurchaseId: ticket.ticketPurchaseId,
-          quantity: ticket.quantity,
-          caseTicket: payloadCaseTicket,
-        })
-      );
-      navigate(urlNavigate, {
-        state: {
-          changeTicket: true,
-        },
-      });
-    }
-    // Navigate to select change
+  const saveTicketPurchaseId = (ticket: OrderResponse | undefined) => {
+    console.log(ticket);
   };
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
@@ -121,7 +94,18 @@ export default function TicketManagement() {
         onClose={() => setOpenPopup(false)}
       >
         <div className="overflow-x-hidden text-black">
-          <div className="flex flex-col justify-center items-center">
+          <div className="relative flex flex-col justify-center items-center">
+            <button
+              onClick={() => saveTicketPurchaseId(selectedTicket)}
+              className="absolute top-2 right-0 bg-black hover:bg-opacity-80 text-white px-2 py-1 rounded-md"
+            >
+              Đổi vé
+            </button>
+            {selectedTicket?.totalDiscount && (
+              <div className="absolute top-0 left-0 -rotate-45 translate-y-8 text-white bg-pse-green-second rounded-md px-2 z-10">
+                Đã áp mã
+              </div>
+            )}
             <img
               src={selectedTicket?.banner}
               alt=""
@@ -167,22 +151,26 @@ export default function TicketManagement() {
             </p>
           </div>
           <DashDivider />
-          {selectedTicket?.ishaveSeatmap && (
-            <div>
+          {selectedTicket?.ticketPurchases.map((item) => (
+            <div className="flex gap-2 mb-1 items-center">
+              <p className="bg-pse-green text-white rounded-full px-1">
+                x{item.quantity}
+              </p>
+              {/* <p className="text-sm font-semibold">{item.ticketType}</p> */}
               <div>
-                Ghế {"- "}
+                Ghế:{" "}
                 <span className="font-bold">
-                  {parseSeatCode(selectedTicket?.seatCode)}
+                  {parseSeatCode(item?.seatCode)}
+                  {" - "}
+                  <span className="font-semibold">{item.zoneName}</span>
                 </span>{" "}
               </div>
-              <div>
-                Khu vực {"- "}
-                <span className="font-bold">
-                  {selectedTicket.zoneName}
-                </span>{" "}
+
+              <div className="ml-auto">
+                <span className="font-bold">{formatMoney(item.price)}</span>{" "}
               </div>
             </div>
-          )}
+          ))}
           <div className="flex justify-center mt-4">
             <QRCodeSVG
               value={selectedTicket?.qrCode as string}
@@ -195,27 +183,34 @@ export default function TicketManagement() {
           <section className="flex justify-between text-black">
             <div>
               <h1 className="text-left">Mã vé</h1>
-              <p className="text-left font-bold">
-                {selectedTicket?.ticketPurchaseId}
-              </p>
+              <p className="text-left font-bold">{selectedTicket?.orderId}</p>
             </div>
             <div>
               <h1 className="text-center">Số lượng</h1>
               <p className="text-center font-bold">
-                {selectedTicket?.quantity}
+                {selectedTicket?.quantityOrdered}
               </p>
             </div>
             <div>
               <h1 className="text-right">Giá</h1>
               <p className="text-right font-bold">
-                {formatMoney(selectedTicket?.price)}
+                {selectedTicket?.totalDiscount ? (
+                  <p className="flex flex-col">
+                    <span className="line-through text-pse-gray/70 font-medium">
+                      {formatMoney(selectedTicket.totalPrice)}
+                    </span>
+                    <span>{formatMoney(selectedTicket?.totalDiscount)}</span>
+                  </p>
+                ) : (
+                  <span>{formatMoney(selectedTicket?.totalPrice)}</span>
+                )}
               </p>
             </div>
           </section>
-          <DashDivider />
-          <Button onClick={() => saveTicketPurchaseId(selectedTicket)}>
+          {/* <DashDivider /> */}
+          {/* <Button onClick={() => saveTicketPurchaseId(selectedTicket)}>
             Đổi vé
-          </Button>
+          </Button> */}
         </div>
       </Popup>
     </div>

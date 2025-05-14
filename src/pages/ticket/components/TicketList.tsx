@@ -1,15 +1,15 @@
 import React from "react";
 import { Card } from "../../../components/ui/card";
 import { eventTypes } from "../../../constants/constants";
-import { TicketResponse } from "../../../interface/ticket/Ticket";
+import { OrderResponse } from "../../../interface/ticket/Ticket";
 import { formatDateVietnamese, formatTimeFe } from "../../../lib/utils";
 import EmptyList from "../../../assets/no content backup.png";
 import TicketCardSkeleton from "./TicketCardSkeleton";
 
 type Props = {
   clickOpenPopup: () => void;
-  ticketList: TicketResponse[];
-  onClickSelectTicket: (ticket: TicketResponse) => void;
+  ticketList: OrderResponse[];
+  onClickSelectTicket: (ticket: OrderResponse) => void;
   loading: boolean;
 };
 
@@ -37,10 +37,16 @@ const TicketList: React.FC<Props> = ({
       ) : (
         ticketList.map((ticket) => (
           <Card
-            key={ticket.ticketPurchaseId}
+            key={ticket.orderId}
             onClick={() => onClickSelectTicket(ticket)}
             className="relative flex items-center px-6 py-3 mb-10 w-auto shadow-box hover:scale-105 transition-all duration-300 cursor-pointer"
           >
+            {ticket.totalDiscount && (
+              <div className="absolute top-0 left-0 -translate-x-8 -rotate-45 text-white bg-pse-green-second rounded-md px-2">
+                Đã áp mã
+              </div>
+            )}
+
             <div className="absolute left-1 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1e1e1e] w-3 h-5 rounded-r-full"></div>
             <div className="flex gap-4 items-center">
               <img
@@ -70,9 +76,7 @@ const TicketList: React.FC<Props> = ({
                     }
                   </p>
                 </div>
-                <div className="text-xs">
-                  Thời gian mua: {ticket.timeBuyTicket}
-                </div>
+                <div className="text-xs">Thời gian mua: {ticket.orderDate}</div>
               </div>
             </div>
             <div className="ml-auto w-80">
