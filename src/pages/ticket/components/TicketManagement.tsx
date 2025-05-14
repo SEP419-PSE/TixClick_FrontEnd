@@ -41,7 +41,6 @@ export default function TicketManagement() {
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<OrderResponse>();
-  const dispatch = useAppDispatch();
 
   const handleOpenPopup = () => {
     setOpenPopup(true);
@@ -54,6 +53,7 @@ export default function TicketManagement() {
 
   const saveTicketPurchaseId = (ticket: OrderResponse | undefined) => {
     console.log(ticket);
+    navigate("/change-ticket", { state: ticket });
   };
   return (
     <div className="min-h-[calc(100vh-64px)] flex flex-col p-6 bg-[#1e1e1e]">
@@ -176,7 +176,7 @@ export default function TicketManagement() {
               value={selectedTicket?.qrCode as string}
               size={160}
               bgColor={"#FFFFFF"}
-              level={"H"}
+              level={"L"}
             />
           </div>
           <DashDivider />
