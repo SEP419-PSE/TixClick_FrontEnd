@@ -192,12 +192,12 @@ const SignInForm = () => {
       <div className="my-8">
         <CustomDivider />
       </div>
-      <a href="https://tixclick.site/login/oauth2/code/google">
+    {/* <a href="https://tixclick.site/login/oauth2/code/google">
         <button className="bg-[#333333] flex justify-center items-center font-light gap-2 text-white w-full rounded-md py-2 hover:opacity-80">
           <img src={GoogleImg} width={24} />
           Hoặc đăng nhập bằng Goolge
         </button>
-      </a>
+      </a> */}
       <div className="my-4 text-center font-light">
         Chưa có tài khoản?{" "}
         <NavLink to="/auth/signup">
