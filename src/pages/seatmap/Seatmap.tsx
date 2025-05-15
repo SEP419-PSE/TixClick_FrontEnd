@@ -183,13 +183,14 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
         ) : (
           <div className="bg-gray-100 p-3 rounded-lg">
             {Array.from({ length: section.rows }).map((_, rowIndex) => (
-              <div key={rowIndex} className="flex text-gray-700 gap-2.5 mb-2.5">
+              <div key={rowIndex} className="flex text-gray-700 gap-1.5 mb-1.5">
                 <div
                   style={{
-                    width: `30px`,
+                    width: `25px`,
                     textAlign: "center",
-                    height: "30px",
+                    height: "25px",
                     display: "flex",
+                    fontSize: "12px",
                     alignItems: "center",
                     justifyContent: "center",
                     fontWeight: "600",
@@ -208,8 +209,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                       <div
                         key={colIndex}
                         style={{
-                          width: `30px`,
-                          height: `30px`,
+                          width: `25px`,
+                          height: `25px`,
                           marginRight: "5px",
                         }}
                       ></div>
@@ -222,9 +223,9 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                       key={colIndex}
                       className="flex items-center justify-center rounded-md shadow-sm transition-all duration-200 hover:shadow-md"
                       style={{
-                        width: `30px`,
-                        height: `30px`,
-                        fontSize: `14px`,
+                        width: `25px`,
+                        height: `25px`,
+                        fontSize: `12px`,
                         backgroundColor:
                           // seat.status == "disabled" ? "#f3f4f6" : seatColor,
                           seatColor,
@@ -1277,7 +1278,7 @@ const SeatChartDesigner: React.FC<StepProps> = ({ step, updateStep }) => {
             {seatTypes.map((seat) => (
               <li
                 key={seat.id}
-                className="flex justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200"
+                className="flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200"
               >
                 <div className="flex items-center space-x-4">
                   <div

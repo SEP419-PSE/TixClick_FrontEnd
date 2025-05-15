@@ -276,9 +276,10 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
               <div key={rowIndex} className="flex text-gray-700 gap-2.5 mb-2.5">
                 <div
                   style={{
-                    width: `30px`,
+                    width: `25px`,
                     textAlign: "center",
-                    height: "30px",
+                    height: "25px",
+                    fontSize: "12px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -298,8 +299,8 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                       <div
                         key={colIndex}
                         style={{
-                          width: `30px`,
-                          height: `30px`,
+                          width: `25px`,
+                          height: `25px`,
                           marginRight: "5px",
                         }}
                       ></div>
@@ -312,9 +313,9 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
                       key={colIndex}
                       className="flex items-center justify-center rounded-md shadow-sm transition-all duration-200 hover:shadow-md"
                       style={{
-                        width: `30px`,
-                        height: `30px`,
-                        fontSize: `14px`,
+                        width: `25px`,
+                        height: `25px`,
+                        fontSize: `12px`,
                         backgroundColor: seatColor,
                         color:
                           seatTypes.find((type) => type.id == seat.seatTypeId)
