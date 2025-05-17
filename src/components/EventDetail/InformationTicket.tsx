@@ -6,11 +6,13 @@ import {
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import clsx from "clsx";
 
 const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
   const [activeShowTicket, setActiveShowTicket] = useState<number | null>(null);
+  const location = useLocation()
+  const isManagerView = location.pathname.includes("manager")
 
   const onChangeActiveTicket = (id: number) => {
     setActiveShowTicket(activeShowTicket === id ? null : id);
@@ -59,7 +61,7 @@ const InformationTicket: React.FC<EventDetailProps> = ({ eventDetail }) => {
                 </p>
 
                 {/* Nút trạng thái */}
-                {isSoldOut || isBeforeSale || isAfterSale ? (
+                {isSoldOut || isBeforeSale || isAfterSale && !isManagerView ? (
                   <p
                     className={clsx(
                       "ml-auto flex w-fit h-fit px-2 py-1 rounded-md",
