@@ -1,13 +1,13 @@
 import React from "react";
 import { CiCalendar } from "react-icons/ci";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { useLocation } from "react-router";
 import { EventDetailResponse } from "../../interface/EventInterface";
 import {
   formatDateVietnamese,
   formatMoney,
   formatTimeFe,
 } from "../../lib/utils";
-import DashDivider from "../Divider/DashDivider";
 
 export type EventDetailProps = {
   eventDetail: Partial<EventDetailResponse> | undefined;
@@ -18,11 +18,16 @@ type InforEventType = EventDetailProps & {
   isSaleTicket: boolean;
 };
 
+
+
 const InformationEvent: React.FC<InforEventType> = ({
   eventDetail,
   scrollToSelectTicket,
   isSaleTicket,
 }) => {
+
+  const location = useLocation()
+  const isManagerView = location.pathname.includes("manager")
   return (
     <div className="relative mx-3 mt-24 mb-8 lg:flex lg:justify-center bg-[#1E1E1E]">
       <div className="relative">
@@ -86,7 +91,7 @@ const InformationEvent: React.FC<InforEventType> = ({
                 : `bg-pse-gray cursor-not-allowed`
             }   text-white w-full rounded-lg font-semibold transition-all duration-500`}
           >
-            {isSaleTicket ? "Chọn lịch diễn" : "Chưa mở bán vé"}
+            {isSaleTicket && !isManagerView ? "Chọn lịch diễn" : "Chưa mở bán vé"}
           </button>
         </div>
 

@@ -28,7 +28,7 @@ const revenueData = {
       { name: "Sat", value: 21300 },
       { name: "Sun", value: 22400 },
     ],
-    total: "$45,231.89",
+    total: "45,231.89 VND",
     change: "+20.1%",
   },
   "1M": {
@@ -38,7 +38,7 @@ const revenueData = {
       { name: "Week 3", value: 54200 },
       { name: "Week 4", value: 61800 },
     ],
-    total: "$206,500.00",
+    total: "206,500.00 VND",
     change: "+15.3%",
   },
   "3M": {
@@ -51,7 +51,7 @@ const revenueData = {
       { name: "Jun", value: 239000 },
       { name: "Jul", value: 349000 },
     ],
-    total: "$1,955,000.00",
+    total: "1,955,000.00 VND",
     change: "+8.7%",
   },
   "1Y": {
@@ -69,7 +69,7 @@ const revenueData = {
       { name: "Nov", value: 510000 },
       { name: "Dec", value: 580000 },
     ],
-    total: "$4,265,000.00",
+    total: "4,265,000.00 VND",
     change: "+12.5%",
   },
 }
@@ -131,7 +131,7 @@ export default function ManagerOverview() {
               <CreditCard className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-800">$1,429,242</div>
+              <div className="text-2xl font-bold text-gray-800">1,429,242 VND</div>
               <p className="text-xs text-gray-600">
                 <span className="text-green-500 font-medium">+12.5%</span> from last month
               </p>
@@ -147,7 +147,7 @@ export default function ManagerOverview() {
             <CardContent>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-2xl font-bold text-gray-800">$45,231.89</p>
+                  <p className="text-2xl font-bold text-gray-800">45,231.89 VND</p>
                   <p className="text-sm text-gray-600">
                     <span className="text-green-500 font-medium">+20.1%</span> from previous period
                   </p>

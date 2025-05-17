@@ -93,7 +93,7 @@ const TicketBookingNoneSeatmap = () => {
   const state = location.state
   const changeTicket = state?.changeTicket ?? false
   const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase)
-  const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId)
+  // const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId)
   const [openOldTicket, setOpenOldTicket] = useState<boolean>(false)
   const [searchParams] = useSearchParams()
   const eventId = searchParams.get("eventId")
@@ -311,26 +311,26 @@ const TicketBookingNoneSeatmap = () => {
       return
     }
 
-    try {
-      const res = await ticketPurchase.changeTicket(ticketRequests, {
-        ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
-        caseTicket: oldTicketPurchase.caseTicket,
-      })
-      console.log(res.data)
+    // try {
+    //   const res = await ticketPurchase.changeTicket(ticketRequests, {
+    //     ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
+    //     caseTicket: oldTicketPurchase.caseTicket,
+    //   })
+    //   console.log(res.data)
 
-      if (res.data.result.data) {
-        const paymentUrl = res.data.result.data.checkoutUrl
-        window.location.href = paymentUrl
-      } else if (res.data.result.data == null) {
-        toast.success(res.data.result.message, {
-          onAutoClose: () => {
-            navigate("/ticketManagement")
-          },
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
+    //   if (res.data.result.data) {
+    //     const paymentUrl = res.data.result.data.checkoutUrl
+    //     window.location.href = paymentUrl
+    //   } else if (res.data.result.data == null) {
+    //     toast.success(res.data.result.message, {
+    //       onAutoClose: () => {
+    //         navigate("/ticketManagement")
+    //       },
+    //     })
+    //   }
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
 
   return (
@@ -474,7 +474,7 @@ const TicketBookingNoneSeatmap = () => {
           </Button>
         </div>
       </div>
-      <Popup isOpen={openOldTicket} onClose={closeOldTicket} className="w-auto max-w-sm p-4">
+      {/* <Popup isOpen={openOldTicket} onClose={closeOldTicket} className="w-auto max-w-sm p-4">
         <div className="overflow-x-hidden text-black">
           <div className="flex flex-col justify-center items-center">
             <img src={ticket?.banner || "/placeholder.svg"} alt="" className="w-40 h-20 rounded-md" />
@@ -534,7 +534,7 @@ const TicketBookingNoneSeatmap = () => {
             </div>
           </section>
         </div>
-      </Popup>
+      </Popup> */}
       <Toaster position="top-center" />
     </div>
   )
