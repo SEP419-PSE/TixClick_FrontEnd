@@ -106,6 +106,7 @@ export default function ContractsPage() {
       console.log("Contract Details:", response.data.result)
       if (response.data.result) {
         setContractDetails(response.data.result)
+        formatMoney
       }
     } catch (error) {
       console.error("Error fetching contract details:", error)
@@ -389,8 +390,8 @@ export default function ContractsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="active">Hoạt động</SelectItem>
+                <SelectItem value="pending">Đang xử lý</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="expired">Expired</SelectItem>
               </SelectContent>
@@ -427,19 +428,19 @@ export default function ContractsPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">Mở menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-[#2A2A2A] text-white">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => openContractModal(contract)}>View details</DropdownMenuItem>
+                          <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => openContractModal(contract)}>Xem chi tiết</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-yellow-500">
                             <Bell className="mr-2 h-4 w-4" />
                             Set reminder
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-500">Terminate contract</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-500">Chấm dứt hợp đồng</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -881,7 +882,7 @@ export default function ContractsPage() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-400">Tổng thanh toán:</p>
+                          <p className="text-sm text-gray-400">Tổng phải thanh toán:</p>
                           <p className="text-lg font-semibold">
                             $
                             {contractDetails

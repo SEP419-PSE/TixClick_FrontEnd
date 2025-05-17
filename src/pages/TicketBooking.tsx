@@ -8,15 +8,12 @@ import {
   MapPin,
   Ticket,
 } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import CustomDivider from "../components/Divider/CustomDivider";
-import DashDivider from "../components/Divider/DashDivider";
 import Header from "../components/Header/Header";
-import Popup from "../components/Popup/Popup";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -26,11 +23,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { eventTypes } from "../constants/constants";
 import useTicketByEventId, {
   type TicketResponse,
 } from "../hooks/useTicketByEventId";
-import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+// import Popup from "../components/Popup/Popup";
+// import DashDivider from "../components/Divider/DashDivider";
+// import { eventTypes } from "../constants/constants";
+// import { QRCodeSVG } from "qrcode.react";
+// import useTicketPurchaseById from "../hooks/useTicketPurchaseById";
+// import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+
 import useWebSocket from "../hooks/useWebSocket";
 import type { EventDetailResponse } from "../interface/EventInterface";
 import {
@@ -43,7 +45,6 @@ import { useAppSelector } from "../redux/hooks";
 import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
-import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 import { TicketPurchaseRequest } from "./TicketBookingNoneSeatmap";
 
 // type SeatStatus = "available" | "disabled"
@@ -414,7 +415,7 @@ const TicketBooking = () => {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const { tickets } = useTicketByEventId(Number(eventId));
   const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
-  const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId);
+  // const { ticket } = useTicketPurchaseById(oldTicketPurchase.ticketPurchaseId);
   const [openOldTicket, setOpenOldTicket] = useState<boolean>(false);
   const [loadingChangeTicket, setLoadingChangeTicket] =
     useState<boolean>(false);
@@ -920,22 +921,22 @@ const TicketBooking = () => {
     }
 
     try {
-      const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
-        ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
-        caseTicket: oldTicketPurchase.caseTicket,
-      });
-      console.log(res.data);
+      // const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
+      //   ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
+      //   caseTicket: oldTicketPurchase.caseTicket,
+      // });
+      // console.log(res.data);
 
-      if (res.data.result.data) {
-        const paymentUrl = res.data.result.data.checkoutUrl;
-        window.location.href = paymentUrl;
-      } else if (res.data.result.data == null) {
-        toast.success(res.data.result.message, {
-          onAutoClose: () => {
-            navigate("/ticketManagement");
-          },
-        });
-      }
+      // if (res.data.result.data) {
+      //   const paymentUrl = res.data.result.data.checkoutUrl;
+      //   window.location.href = paymentUrl;
+      // } else if (res.data.result.data == null) {
+      //   toast.success(res.data.result.message, {
+      //     onAutoClose: () => {
+      //       navigate("/ticketManagement");
+      //     },
+      //   });
+      // }
     } catch (error) {
       console.log(error);
     } finally {
@@ -1267,7 +1268,7 @@ const TicketBooking = () => {
         </DialogContent>
       </Dialog>
 
-      <Popup
+      {/* <Popup
         isOpen={openOldTicket}
         onClose={closeOldTicket}
         className="w-auto max-w-sm p-4"
@@ -1358,7 +1359,7 @@ const TicketBooking = () => {
             </div>
           </section>
         </div>
-      </Popup>
+      </Popup> */}
     </div>
   );
 };
