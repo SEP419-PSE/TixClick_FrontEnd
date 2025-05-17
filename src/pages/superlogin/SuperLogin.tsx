@@ -41,52 +41,73 @@ export default function SuperLogin() {
     }))
   }
 
+  // Thay đổi hàm handleLogin để hiển thị thông báo lỗi từ API
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
-    localStorage.removeItem("accessToken");
+    e.preventDefault()
+    localStorage.removeItem("accessToken")
 
     // Kiểm tra dữ liệu đầu vào
     if (!credentials.userName || !credentials.password) {
-      setFormTouched({ userName: true, password: true });
-      setError("Please fill in all required fields");
-      return;
+      setFormTouched({ userName: true, password: true })
+      setError("Please fill in all required fields")
+      return
     }
 
-    setIsLoading(true);
-    setError("");
+    setIsLoading(true)
+    setError("")
 
     try {
-      console.log("Submitting credentials:", credentials);
-      const response = await superLoginApi.login(credentials);
-      console.log("API Response:", response);
+      console.log("Submitting credentials:", credentials)
+      const response = await superLoginApi.login(credentials)
+      console.log("API Response:", response)
 
-      const result = response.data?.result;
+      const result = response.data?.result
       if (result?.status === true && result?.accessToken) {
         // Lưu token vào localStorage
-        localStorage.setItem("accessToken", result.accessToken);
-        localStorage.setItem("refreshToken", result.refreshToken);
+        localStorage.setItem("accessToken", result.accessToken)
+        localStorage.setItem("refreshToken", result.refreshToken)
 
         // Gọi superLogin với token
-        authContext?.superLogin(result.accessToken);
+        authContext?.superLogin(result.accessToken)
 
         // Đặt token cho Axios
-        authContext?.setTokenForAxios("super", result.accessToken);
+        authContext?.setTokenForAxios("super", result.accessToken)
 
         // Điều hướng sau khi đăng nhập thành công
-        toast.success("Login successful", { duration: 2000 });
+        toast.success("Login successful", { duration: 2000 })
         setTimeout(() => {
-          navigate(result.roleName === "ADMIN" ? "/proAdmin" : "/manager-dashboard");
-        }, 1000);
+          navigate(result.roleName === "ADMIN" ? "/proAdmin" : "/manager-dashboard")
+        }, 1000)
       } else {
-        setError("Access denied");
+        // Hiển thị thông báo lỗi từ API nếu có
+        setError(response.data?.message || "Access denied")
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Invalid username or password");
+    } catch (error: any) {
+      console.error("Login error:", error)
+
+      // Hiển thị thông báo lỗi từ API response nếu có
+      if (error.response && error.response.data) {
+        // Kiểm tra các trường hợp khác nhau của cấu trúc response
+        if (error.response.data.message) {
+          setError(error.response.data.message)
+        } else if (error.response.data.error) {
+          setError(error.response.data.error)
+        } else if (typeof error.response.data === "string") {
+          setError(error.response.data)
+        } else {
+          setError("Invalid username or password")
+        }
+      } else if (error.message) {
+        // Nếu có lỗi từ JavaScript/network
+        setError(error.message)
+      } else {
+        // Fallback cho trường hợp không có thông tin lỗi cụ thể
+        setError("Invalid username or password")
+      }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#121212] to-[#1E1E1E] p-4">
