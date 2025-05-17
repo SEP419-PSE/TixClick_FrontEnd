@@ -812,10 +812,11 @@ export default function ContractsPage() {
                                       </div>
                                       <div className="text-center space-y-2">
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Amount:</span> $
+                                          <span className="text-gray-400">Amount:</span> 
                                           {qrData?.amount?.toLocaleString() ||
                                             selectedContractDetail?.contractAmount?.toLocaleString() ||
                                             "0"}
+                                            &nbsp;VND
                                         </p>
                                         <p className="text-sm">
                                           <span className="text-gray-400">Due Date:</span>{" "}
@@ -878,36 +879,40 @@ export default function ContractsPage() {
                         <div>
                           <p className="text-sm text-gray-400">Tổng giá trị hợp đồng:</p>
                           <p className="text-lg font-semibold">
-                            ${selectedContract?.totalAmount?.toLocaleString() || "0"}
+                            {selectedContract?.totalAmount?.toLocaleString() || "0"}
+                            &nbsp;VND
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-400">Tổng phải thanh toán:</p>
                           <p className="text-lg font-semibold">
-                            $
+                            
                             {contractDetails
                               .reduce((sum, detail) => sum + (detail.contractAmount || 0), 0)
-                              .toLocaleString()}
+                              .toLocaleString()} 
+                              &nbsp;VND
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-400">Số đã thanh toán:</p>
                           <p className="text-lg font-semibold text-green-500">
-                            $
+                            
                             {contractDetails
                               .filter((detail) => detail.status === "PAID")
                               .reduce((sum, detail) => sum + (detail.contractAmount || 0), 0)
                               .toLocaleString()}
+                              &nbsp;VND
                           </p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-400">Còn lại:</p>
                           <p className="text-lg font-semibold text-yellow-500">
-                            $
+                            
                             {contractDetails
                               .filter((detail) => detail.status === "PENDING")
                               .reduce((sum, detail) => sum + (detail.contractAmount || 0), 0)
                               .toLocaleString()}
+                              &nbsp;VND
                           </p>
                         </div>
                       </div>
