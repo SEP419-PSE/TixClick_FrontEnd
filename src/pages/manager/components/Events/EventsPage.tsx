@@ -338,13 +338,13 @@ export default function EventsPage() {
         )
       case EventStatus.PENDING:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Đang xử lý</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap">Đang xử lý</span>
         )
       case EventStatus.REJECTED:
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">Rejected</span>
+        return <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">Rejected</span>
       case EventStatus.SCHEDULED:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Đã lên lịch</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">Đã lên lịch</span>
         )
 
       default:
