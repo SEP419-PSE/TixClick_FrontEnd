@@ -68,6 +68,7 @@ interface ContractDetail {
   contractId: number;
 }
 
+
 export default function ContractsPage() {
   const [contracts, setContracts] = useState<any[]>([])
   const [contractDocument, setContractDocument] = useState<ContractDocumentDTO[]>([])
@@ -149,25 +150,7 @@ export default function ContractsPage() {
     fetchQr()
   }, [selectedContract])
 
-  // const generateVietQRUrl = () => {
-  //   const xBankId = banks.find((x) => x.bankName == paymentInfor?.bankID)?.id;
-  //   console.log(xBankId);
 
-  //   if (!paymentInfor?.bankID || !paymentInfor?.accountID) {
-  //     return null;
-  //   }
-
-  //   const encodedDescription = encodeURIComponent(
-  //     paymentInfor.description || ""
-  //   );
-  //   const amount = paymentInfor
-  //     ? paymentInfor.amount
-  //     : paymentInfor?.amount;
-
-  //   return `https://img.vietqr.io/image/${xBankId}-${paymentInfor.accountID}-compact.png?amount=${amount}&addInfo=${encodedDescription}&accountName=Contract%20Payment`;
-  // };
-
-  // Replace the existing handlePaymentConfirmation function with this implementation:
   const handlePaymentConfirmation = async () => {
     if (paymentCode.trim() === "") {
       toast.error("Please enter a payment confirmation code")
@@ -320,15 +303,29 @@ export default function ContractsPage() {
   const getStatusBadge = (status: any) => {
     switch (status) {
       case "APPROVED":
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Approved</span>
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">
+            Đã duyệt
+          </span>
+        )
       case "PENDING":
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Đang xử lý</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap">
+            Đang xử lý
+          </span>
         )
       case "Expired":
-        return <span className="px-2 py-1 rounded-lg bg-red-500/20 text-red-500">Expired</span>
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Hết hạn
+          </span>
+        )
       default:
-        return <span className="px-2 py-1 rounded-lg bg-gray-500/20 text-gray-500">{status}</span>
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-gray-900/70 text-gray-300 whitespace-nowrap">
+            {status}
+          </span>
+        )
     }
   }
 
@@ -338,19 +335,23 @@ export default function ContractsPage() {
 
     switch (status) {
       case "PAID":
-        style = "bg-green-900 text-green-300 border border-green-800 rounded px-2 py-0.5 text-sm"
+        style =
+          "inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap"
         label = "Paid"
         break
       case "PENDING":
-        style = "bg-yellow-900 text-yellow-300 border border-yellow-800 rounded px-2 py-0.5 text-sm"
+        style =
+          "inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap"
         label = "Pending"
         break
       case "OVERDUE":
-        style = "bg-red-900 text-red-300 border border-red-800 rounded px-2 py-0.5 text-sm"
+        style =
+          "inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap"
         label = "Overdue"
         break
       default:
-        style = "bg-gray-500/20 text-gray-500 rounded px-2 py-0.5 text-sm"
+        style =
+          "inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-gray-900/70 text-gray-300 whitespace-nowrap"
         label = status
         break
     }
@@ -737,7 +738,6 @@ export default function ContractsPage() {
                                       className="h-8 w-8 p-0"
                                       onClick={() => {
                                         setSelectedContractDetail(detail)
-
                                       }}
                                     >
                                       <DollarSign className="h-4 w-4 text-black" />
@@ -806,7 +806,6 @@ export default function ContractsPage() {
                                         ) : (
                                           <div className="w-48 h-48 flex items-center justify-center text-gray-800">
                                             No QR code available
-
                                           </div>
                                         )}
                                       </div>
@@ -843,7 +842,7 @@ export default function ContractsPage() {
                                         <h4 className="text-md font-medium mb-2">Xác thực thanh toán</h4>
                                         <div className="space-y-3">
                                           <p className="text-sm text-gray-400">
-                                            Nhập mã thanh toán để xác nhận giao dịch. 
+                                            Nhập mã thanh toán để xác nhận giao dịch.
                                           </p>
                                           <div className="flex space-x-2">
                                             <Input
@@ -867,9 +866,7 @@ export default function ContractsPage() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-lg">
-                      <p className="mb-4 text-gray-400">
-                        Không có lịch thanh toán nào cho hợp đồng này.
-                      </p>
+                      <p className="mb-4 text-gray-400">Không có lịch thanh toán nào cho hợp đồng này.</p>
                     </div>
                   )}
 
@@ -969,3 +966,4 @@ export default function ContractsPage() {
     </>
   )
 }
+
