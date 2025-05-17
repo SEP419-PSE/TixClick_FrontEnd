@@ -41,7 +41,7 @@ const TicketList: React.FC<Props> = ({
             onClick={() => onClickSelectTicket(ticket)}
             className="relative flex items-center px-6 py-3 mb-10 w-auto shadow-box hover:scale-105 transition-all duration-300 cursor-pointer"
           >
-            {ticket.totalDiscount && (
+            {ticket.totalDiscount != ticket.totalPrice && (
               <div className="absolute top-0 left-0 -translate-x-8 -rotate-45 text-white bg-pse-green-second rounded-md px-2">
                 Đã áp mã
               </div>
