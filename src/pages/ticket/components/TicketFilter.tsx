@@ -44,7 +44,7 @@ const TicketFilter: React.FC<TicketFilterProps> = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="DESC">Mới nhất</SelectItem>
-          <SelectItem value="ASC">Lâu nhất</SelectItem>
+          <SelectItem value="ASC">Cũ nhất</SelectItem>
         </SelectContent>
       </Select>
     </div>
