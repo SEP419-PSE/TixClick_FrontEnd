@@ -10,7 +10,7 @@ import {
   MoreHorizontal,
   Search,
   Upload,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import * as pdfjs from "pdfjs-dist";
 import { useCallback, useEffect, useState } from "react";
@@ -74,11 +74,10 @@ const customStyles = `
   .description-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #444444;
   }
-`;
-
+`
 
 // Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 export default function EventsPage() {
   const [events, setEvents] = useState<EventResponse[]>([])
@@ -186,9 +185,15 @@ export default function EventsPage() {
   }
 
   const handleUploadContract = async (file: File) => {
-    // if (!file || !selectedEvent) return
+    if (!file || !selectedEvent) return
 
-    // let progressInterval: NodeJS.Timeout | undefined
+    // Check if a contract with the same name already exists
+    const existingContract = relatedContracts.find((contract) => contract.fileName === file.name)
+
+    if (existingContract) {
+      toast.error("Hợp đồng với tên này đã tồn tại. Vui lòng chọn tên khác hoặc cập nhật hợp đồng hiện có.")
+      return
+    }
 
     try {
       setIsUploading(true)
@@ -305,6 +310,15 @@ export default function EventsPage() {
   // Upload contract file
   const uploadContract = async () => {
     if (!file || !selectedEvent) return
+
+    // Check if a contract with the same name already exists
+    const existingContract = relatedContracts.find((contract) => contract.fileName === file.name)
+
+    if (existingContract) {
+      toast.error("Hợp đồng với tên này đã tồn tại. Vui lòng chọn tên khác hoặc cập nhật hợp đồng hiện có.")
+      return
+    }
+
     await handleUploadContract(file)
   }
 
@@ -334,17 +348,27 @@ export default function EventsPage() {
     switch (status) {
       case EventStatus.CONFIRMED:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-900 text-orange-300">Đã xác nhận</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-orange-900/70 text-orange-300 whitespace-nowrap">
+            Đã xác nhận
+          </span>
         )
       case EventStatus.PENDING:
         return (
-          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap">Đang xử lý</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap">
+            Đang xử lý
+          </span>
         )
       case EventStatus.REJECTED:
-        return <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">Rejected</span>
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Rejected
+          </span>
+        )
       case EventStatus.SCHEDULED:
         return (
-          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">Đã lên lịch</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">
+            Đã lên lịch
+          </span>
         )
 
       default:
@@ -352,7 +376,11 @@ export default function EventsPage() {
     }
   }
 
-  const handleCreateContract = () => {
+  const handleCreateContract = async () => {
+    if (selectedEvent) {
+      // Fetch related contracts first to ensure we have the latest data
+      await fetchRelatedContracts(selectedEvent.eventId)
+    }
     setIsContractModalOpen(true)
     setFile(null)
     setUploadProgress(0)
@@ -414,8 +442,8 @@ export default function EventsPage() {
               <SelectContent>
                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
                 <SelectItem value="SCHEDULED">Đã lên lịch</SelectItem>
-                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
+                <SelectItem value="PENDING">Đang xử lý</SelectItem>
               </SelectContent>
             </Select>
 
@@ -481,11 +509,13 @@ export default function EventsPage() {
                           </DropdownMenuItem>
                         )}
                         {event.status === "PENDING" && (
-                          <DropdownMenuItem onClick={() => navigate(`/manager-dashboard/events/event-detail/${event.eventId}/manager`)}>
+                          <DropdownMenuItem
+                            onClick={() => navigate(`/manager-dashboard/events/event-detail/${event.eventId}/manager`)}
+                          >
                             Đi đến event này
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem onClick={handleViewRelatedContracts}>Xem hợp đồng</DropdownMenuItem>
+                        {/* <DropdownMenuItem onClick={handleViewRelatedContracts}>Xem hợp đồng</DropdownMenuItem> */}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-500">Hủy sự kiện</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -1170,4 +1200,3 @@ export default function EventsPage() {
     </>
   )
 }
-
