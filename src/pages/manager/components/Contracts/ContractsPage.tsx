@@ -418,7 +418,7 @@ export default function ContractsPage() {
                 return (
                   <TableRow key={contract.contractId} className="border-[#333333] hover:bg-[#2A2A2A]">
                     <TableCell className="font-medium text-white">{contract.contractName}</TableCell>
-                    <TableCell className="text-white">Company {contract.companyId}</TableCell>
+                    <TableCell className="text-white">Company {contract.companyName}</TableCell>
                     <TableCell className="text-white">{contract.contractType}</TableCell>
                     <TableCell className="text-white">{contract.startDate || "N/A"}</TableCell>
                     <TableCell className="text-white">{contract.endDate || "N/A"}</TableCell>
