@@ -30,9 +30,8 @@ const COLORS = [
 ];
 
 // Custom tooltip để hiển thị % và số tiền
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload, total }: any) => {
   if (active && payload && payload.length > 0) {
-    const total = payload.reduce((acc: number, cur: any) => acc + cur.value, 0);
     const value = payload[0].value;
     const name = payload[0].name;
     const percent = ((value / total) * 100).toFixed(1);
@@ -49,8 +48,9 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const TicketsRevenuePieChart = ({ data }: Props) => {
-  // console.log(data);
+  console.log(JSON.stringify(data, null, 2));
   if (data == undefined) return <>Không có dữ liệu</>;
+  const totalRevenue = data.reduce((acc, cur) => acc + cur.value, 0);
   return (
     <Card className="bg-background text-foreground shadow-md rounded-2xl mt-8 border">
       <CardHeader>
@@ -76,7 +76,7 @@ const TicketsRevenuePieChart = ({ data }: Props) => {
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip total={totalRevenue} />} />
           </PieChart>
         </ResponsiveContainer>
       </CardContent>

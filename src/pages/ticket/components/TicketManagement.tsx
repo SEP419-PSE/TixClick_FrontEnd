@@ -6,25 +6,15 @@ import { eventTypes } from "../../../constants/constants";
 import DashDivider from "../../../components/Divider/DashDivider";
 import { formatMoney } from "../../DataTranfer";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
-import {
-  OrderResponse,
-  SortType,
-  TicketResponse,
-} from "../../../interface/ticket/Ticket";
+import { OrderResponse, SortType } from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
   formatTimeFe,
   parseSeatCode,
 } from "../../../lib/utils";
-import { Button } from "../../../components/ui/button";
-import { useAppDispatch } from "../../../redux/hooks";
-import {
-  CaseTicketType,
-  setTicketPurchase,
-} from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
-import Pagination from "../../../components/Pagination/Pagination";
 import { useNavigate } from "react-router";
 import TicketFilter from "./TicketFilter";
+import Pagination from "../../../components/Pagination/Pagination";
 
 export default function TicketManagement() {
   const navigate = useNavigate();

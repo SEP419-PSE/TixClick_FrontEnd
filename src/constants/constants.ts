@@ -103,5 +103,6 @@ export const TOAST_MESSAGE = {
   createCompanySuccess: "Tạo công ty thành công",
   updateCompanySuccess: "Cập nhật thông tin công ty thành công",
   deleteVoucherSuccess: "Đã xóa mã giảm",
+  emptyActivity: "Chưa chọn họat động",
   error: "Đã có lỗi xảy ra",
 };
