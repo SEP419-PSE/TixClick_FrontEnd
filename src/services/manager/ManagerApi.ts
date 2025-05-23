@@ -106,6 +106,45 @@ const managerApi = {
   getQrByContractId(contractId: number | undefined) {
     return authorizedRequest("get", `/contract-detail/qr/${contractId}`);
   },
-};
+
+   exportRefund(eventId: number) {
+    return authorizedRequest("get", `/payment/export_refund/${eventId}`, null, {
+      responseType: "blob",
+      headers: { Accept: "*/*" },
+    }).then(response => {
+      // Create a blob URL and trigger download
+      const contentDisposition = response.headers['content-disposition'];
+      let filename = 'refund_data.xlsx';
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch && filenameMatch.length === 2) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create a blob URL and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      return response;
+    });
+  },
+
+  importRefund(file: FormData) {
+  
+    return authorizedRequest("post", "/payment/import_refund", file, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
+}
+
+
 
 export default managerApi;
