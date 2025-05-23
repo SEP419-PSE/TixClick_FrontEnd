@@ -1,30 +1,23 @@
-import { useState } from "react";
-import TicketList from "./TicketList";
-import Popup from "../../../components/Popup/Popup";
 import { QRCodeSVG } from "qrcode.react";
-import { eventTypes } from "../../../constants/constants";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import DashDivider from "../../../components/Divider/DashDivider";
-import { formatMoney } from "../../DataTranfer";
+import Pagination from "../../../components/Pagination/Pagination";
+import Popup from "../../../components/Popup/Popup";
+import { eventTypes } from "../../../constants/constants";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
 import {
   OrderResponse,
-  SortType,
-  TicketResponse,
+  SortType
 } from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
   formatTimeFe,
   parseSeatCode,
 } from "../../../lib/utils";
-import { Button } from "../../../components/ui/button";
-import { useAppDispatch } from "../../../redux/hooks";
-import {
-  CaseTicketType,
-  setTicketPurchase,
-} from "../../../redux/features/ticketPurchase/ticketPurchaseSlice";
-import Pagination from "../../../components/Pagination/Pagination";
-import { useNavigate } from "react-router";
+import { formatMoney } from "../../DataTranfer";
 import TicketFilter from "./TicketFilter";
+import TicketList from "./TicketList";
 
 export default function TicketManagement() {
   const navigate = useNavigate();
@@ -39,6 +32,7 @@ export default function TicketManagement() {
     setSearchEventName,
   } = useTicketsPurchases();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<OrderResponse>();
 
@@ -172,12 +166,36 @@ export default function TicketManagement() {
             </div>
           ))}
           <div className="flex justify-center mt-4">
-            <QRCodeSVG
-              value={selectedTicket?.qrCode as string}
-              size={160}
-              bgColor={"#FFFFFF"}
-              level={"L"}
-            />
+            <div
+              onClick={() => setIsModalOpen(true)}
+              className="cursor-pointer"
+            >
+              <QRCodeSVG
+                value={selectedTicket?.qrCode as string}
+                size={160}
+                bgColor={"#FFFFFF"}
+                level={"L"}
+              />
+            </div>
+
+            {isModalOpen && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                onClick={() => setIsModalOpen(false)}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-white p-4 rounded-lg shadow-lg"
+                >
+                  <QRCodeSVG
+                    value={selectedTicket?.qrCode as string}
+                    size={320}
+                    bgColor={"#FFFFFF"}
+                    level={"L"}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <DashDivider />
           <section className="flex justify-between text-black">
