@@ -31,6 +31,7 @@ export default function TicketManagement() {
 
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<OrderResponse>();
+  const [showZoomedQR, setShowZoomedQR] = useState(false);
 
   const handleOpenPopup = () => {
     setOpenPopup(true);
@@ -79,6 +80,7 @@ export default function TicketManagement() {
       </section>
 
       <Popup
+        key={"order-detail"}
         className="w-auto max-w-sm p-4"
         isOpen={openPopup}
         onClose={() => setOpenPopup(false)}
@@ -167,8 +169,11 @@ export default function TicketManagement() {
               size={160}
               bgColor={"#FFFFFF"}
               level={"L"}
+              className="cursor-pointer"
+              onClick={() => setShowZoomedQR(true)}
             />
           </div>
+
           <DashDivider />
           <section className="flex justify-between text-black">
             <div>
@@ -201,6 +206,23 @@ export default function TicketManagement() {
           {/* <Button onClick={() => saveTicketPurchaseId(selectedTicket)}>
             Đổi vé
           </Button> */}
+        </div>
+      </Popup>
+
+      <Popup
+        key={"show-qr"}
+        isOpen={showZoomedQR}
+        onClose={() => setShowZoomedQR(false)}
+        className="p-4"
+      >
+        <div className="flex flex-col items-center justify-center text-black">
+          <h2 className="text-lg font-semibold mb-2">Mã QR của bạn</h2>
+          <QRCodeSVG
+            value={selectedTicket?.qrCode as string}
+            size={300}
+            bgColor={"#FFFFFF"}
+            level={"L"}
+          />
         </div>
       </Popup>
     </div>
