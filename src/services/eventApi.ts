@@ -77,6 +77,16 @@ const eventApi = {
     const url = `${baseURL}/consumer/top-10`;
     return axiosClient.get(url);
   },
+  getBuyers: (eventActivityId: number | undefined) => {
+    const url = `${baseURL}/list-consumer/${eventActivityId}`;
+    return axiosClient.get(url);
+  },
+  exportConsumers: (eventActivityId: number | undefined) => {
+    const url = `${baseURL}/export-consumers/${eventActivityId}`;
+    return axiosClient.get(url, {
+      responseType: "blob",
+    });
+  },
 };
 
 export default eventApi;

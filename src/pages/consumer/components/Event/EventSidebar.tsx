@@ -5,6 +5,7 @@ import {
   CircleCheck,
   CircleDollarSign,
   ClipboardList,
+  NotebookTabs,
   PieChart,
   TicketMinus,
 } from "lucide-react";
@@ -20,6 +21,7 @@ export function EventSidebar() {
   const navigation = [
     { name: "Tổng kết", href: "summary-revenue", icon: PieChart },
     { name: "Danh sách đơn hàng", href: "orders", icon: ClipboardList },
+    { name: "Danh sách khách hàng", href: "buyers", icon: NotebookTabs },
     { name: "Checkin", href: "check-in", icon: CircleCheck },
     {
       name: "Doanh thu",

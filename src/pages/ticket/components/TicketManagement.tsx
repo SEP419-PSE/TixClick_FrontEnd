@@ -1,22 +1,19 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import DashDivider from "../../../components/Divider/DashDivider";
-import Pagination from "../../../components/Pagination/Pagination";
 import Popup from "../../../components/Popup/Popup";
 import { eventTypes } from "../../../constants/constants";
 import useTicketsPurchases from "../../../hooks/useTicketPurchases";
-import {
-  OrderResponse,
-  SortType
-} from "../../../interface/ticket/Ticket";
+import { OrderResponse, SortType } from "../../../interface/ticket/Ticket";
 import {
   formatDateVietnamese,
   formatTimeFe,
   parseSeatCode,
 } from "../../../lib/utils";
+import { useNavigate } from "react-router";
 import { formatMoney } from "../../DataTranfer";
 import TicketFilter from "./TicketFilter";
+import Pagination from "../../../components/Pagination/Pagination";
 import TicketList from "./TicketList";
 
 export default function TicketManagement() {

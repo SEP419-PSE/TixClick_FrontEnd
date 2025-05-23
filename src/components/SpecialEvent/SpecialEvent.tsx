@@ -59,7 +59,7 @@ const SpecialEvent: React.FC<Props> = ({ specialEvents }) => {
           {specialEvents.map((events, index) => (
             <div key={index}>
               <NavLink to={`/event-detail/${events.eventId}`}>
-                <div className="relative group w-[352px] h-[450px] overflow-hidden cursor-pointer rounded-xl">
+                <div className="relative group w-[352px] h-full overflow-hidden cursor-pointer rounded-xl">
                   {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-[1] opacity-0 group-hover:opacity-90 transition-opacity"></div> */}
                   <img
                     src={events.logoURL || "/placeholder.svg"}

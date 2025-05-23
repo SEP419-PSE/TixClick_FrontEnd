@@ -54,6 +54,7 @@ import MyTask from "./pages/task/MyTask";
 import TaskList from "./pages/task/components/TaskList";
 import Cooperations from "./pages/task/components/Cooperations";
 import ChangeTicket from "./pages/changeTicket/ChangeTicket";
+import Buyers from "./pages/consumer/components/Event/Buyers/Buyers";
 
 export default function App() {
   return (
@@ -143,6 +144,7 @@ export default function App() {
           <Route path="/company/events/:eventId" element={<EventManagement />}>
             <Route index path="summary-revenue" element={<SummaryRevenue />} />
             <Route path="orders" element={<Order />} />
+            <Route path="buyers" element={<Buyers />} />
             <Route path="revenue" element={<Revenue />} />
             <Route path="check-in" element={<CheckIn />} />
             <Route path="tasks" element={<Tasks />} />
