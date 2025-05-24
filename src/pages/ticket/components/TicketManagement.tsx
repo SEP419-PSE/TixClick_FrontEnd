@@ -88,12 +88,12 @@ export default function TicketManagement() {
       >
         <div className="overflow-x-hidden text-black">
           <div className="relative flex flex-col justify-center items-center">
-            {/* <button
+            <button
               onClick={() => saveTicketPurchaseId(selectedTicket)}
               className="absolute top-2 right-0 bg-black hover:bg-opacity-80 text-white px-2 py-1 rounded-md"
             >
               Đổi vé
-            </button> */}
+            </button>
             {selectedTicket?.totalDiscount != selectedTicket?.totalPrice && (
               <div className="absolute top-0 left-0 -rotate-45 translate-y-8 text-white bg-pse-green-second rounded-md px-2 z-10">
                 Đã áp mã

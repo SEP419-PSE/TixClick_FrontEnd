@@ -1,17 +1,26 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import Header from "../../components/Header/Header";
 import { OrderResponse } from "../../interface/ticket/Ticket";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox } from "../../components/ui/checkbox";
 import { formatMoney, parseSeatCode } from "../../lib/utils";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setTicketPurchase } from "../../redux/features/ticketPurchase/ticketPurchaseSlice";
+import {
+  clearTicketPurchase,
+  setTicketPurchase,
+} from "../../redux/features/ticketPurchase/ticketPurchaseSlice";
+import { Button } from "../../components/ui/button";
 
 const ChangeTicket = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const state: OrderResponse = location.state;
   const oldTicketPurchase = useAppSelector((state) => state.ticketPurchase);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(clearTicketPurchase());
+  }, []);
 
   const handleToggle = (ticketId: number, checked: boolean) => {
     const updatedIds = checked
@@ -38,11 +47,33 @@ const ChangeTicket = () => {
     );
   };
 
+  const submitChangeSeatmap = () => {
+    if (state.ishaveSeatmap) {
+      navigate(
+        `/event-detail/${state.eventId}/booking-ticket?eventId=${state.eventId}&eventActivityId=${state.eventActivityId}`,
+        {
+          state: {
+            changeTicket: true,
+          },
+        }
+      );
+    } else {
+      navigate(
+        `/event-detail/${state.eventId}/booking-ticket-no-seatmap?eventId=${state.eventId}&eventActivityId=${state.eventActivityId}`,
+        {
+          state: {
+            changeTicket: true,
+          },
+        }
+      );
+    }
+  };
+
   console.log(JSON.stringify(oldTicketPurchase, null, 2));
   return (
-    <div className="mt-20 px-4 lg:px-14">
+    <div className="grid grid-cols-12 mt-20 px-4">
       <Header />
-      <div className="space-y-4">
+      <div className="col-span-12 lg:col-start-4 lg:col-span-6 space-y-4">
         <h2 className="text-xl font-semibold">
           Danh sách vé đã mua trong đơn hàng: {state.orderCode}
         </h2>
@@ -78,6 +109,18 @@ const ChangeTicket = () => {
         <div className="mt-4 text-sm text-muted-foreground">
           Vé đã chọn:{" "}
           {oldTicketPurchase.ticketPurchaseId.join(", ") || "Không có"}
+        </div>
+
+        <div className="flex justify-between">
+          <Button className="bg-black shadow-box hover:bg-black/80">
+            Quay lại
+          </Button>
+          <Button
+            onClick={submitChangeSeatmap}
+            className="bg-white text-black shadow-box hover:bg-white/80"
+          >
+            Xác nhận
+          </Button>
         </div>
       </div>
     </div>

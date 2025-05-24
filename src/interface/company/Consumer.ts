@@ -8,6 +8,7 @@ export interface Consumer {
 }
 
 interface TicketPurchase {
+  orderId: number;
   orderCode: string;
   ticketPurchases: TicketPurchase2[];
   haveCheckin: boolean;

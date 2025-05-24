@@ -10,6 +10,7 @@ import ExportBuyers from "./ExportBuyers";
 import eventApi from "../../../../../services/eventApi";
 import { toast } from "sonner";
 import { TOAST_MESSAGE } from "../../../../../constants/constants";
+import { CircleCheck, CircleX } from "lucide-react";
 
 const Buyers = () => {
   const { eventId } = useParams();
@@ -74,6 +75,16 @@ const Buyers = () => {
           selectedActivity={selectedActivity}
           onChangeActivity={onChanngeActivity}
         />
+        <div className="flex gap-4">
+          <span className="flex flex-col items-center">
+            <CircleCheck className="stroke-green-700" />
+            <p className="text-green-700 font-bold">Đã checkin</p>
+          </span>
+          <span className="flex flex-col items-center">
+            <CircleX className="stroke-red-700" />
+            <p className="text-red-700 font-bold">Chưa checkin</p>
+          </span>
+        </div>
         <ExportBuyers exportExcelFile={exportExcelFile} />
       </div>
       <BuyerList
