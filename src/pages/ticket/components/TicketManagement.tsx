@@ -32,6 +32,7 @@ export default function TicketManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openPopup, setOpenPopup] = useState<boolean>(false);
   const [selectedTicket, setSelectedTicket] = useState<OrderResponse>();
+  const [showZoomedQR, setShowZoomedQR] = useState(false);
 
   const handleOpenPopup = () => {
     setOpenPopup(true);
@@ -80,18 +81,19 @@ export default function TicketManagement() {
       </section>
 
       <Popup
+        key={"order-detail"}
         className="w-auto max-w-sm p-4"
         isOpen={openPopup}
         onClose={() => setOpenPopup(false)}
       >
         <div className="overflow-x-hidden text-black">
           <div className="relative flex flex-col justify-center items-center">
-            {/* <button
+            <button
               onClick={() => saveTicketPurchaseId(selectedTicket)}
               className="absolute top-2 right-0 bg-black hover:bg-opacity-80 text-white px-2 py-1 rounded-md"
             >
               Đổi vé
-            </button> */}
+            </button>
             {selectedTicket?.totalDiscount != selectedTicket?.totalPrice && (
               <div className="absolute top-0 left-0 -rotate-45 translate-y-8 text-white bg-pse-green-second rounded-md px-2 z-10">
                 Đã áp mã
@@ -194,6 +196,7 @@ export default function TicketManagement() {
               </div>
             )}
           </div>
+
           <DashDivider />
           <section className="flex justify-between text-black">
             <div>
@@ -226,6 +229,23 @@ export default function TicketManagement() {
           {/* <Button onClick={() => saveTicketPurchaseId(selectedTicket)}>
             Đổi vé
           </Button> */}
+        </div>
+      </Popup>
+
+      <Popup
+        key={"show-qr"}
+        isOpen={showZoomedQR}
+        onClose={() => setShowZoomedQR(false)}
+        className="p-4"
+      >
+        <div className="flex flex-col items-center justify-center text-black">
+          <h2 className="text-lg font-semibold mb-2">Mã QR của bạn</h2>
+          <QRCodeSVG
+            value={selectedTicket?.qrCode as string}
+            size={300}
+            bgColor={"#FFFFFF"}
+            level={"L"}
+          />
         </div>
       </Popup>
     </div>

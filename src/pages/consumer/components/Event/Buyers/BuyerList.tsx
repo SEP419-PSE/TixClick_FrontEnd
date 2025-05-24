@@ -89,7 +89,7 @@ const BuyerList = ({
                           <AccordionTrigger>
                             <div className="flex gap-2 items-center">
                               <p>{renderCheckin(item.haveCheckin)} </p>
-                              <p>Mã vé: {item.orderCode}</p>
+                              <p>Mã vé: {item.orderId}</p>
                             </div>
                           </AccordionTrigger>
                           <AccordionContent>

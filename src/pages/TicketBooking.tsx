@@ -46,6 +46,7 @@ import eventApi from "../services/eventApi";
 import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 import { TicketPurchaseRequest } from "./TicketBookingNoneSeatmap";
+import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -421,6 +422,8 @@ const TicketBooking = () => {
     useState<boolean>(false);
   const message = useWebSocket();
 
+  console.log("old ticket redux", JSON.stringify(oldTicketPurchase, null, 2));
+
   const handleOpenOldTicket = () => {
     setOpenOldTicket(true);
   };
@@ -458,12 +461,12 @@ const TicketBooking = () => {
         const ticketResponse = await ticketApi.getTicketsByEventId(
           Number(eventId)
         );
-        console.log("ticket:", ticketResponse.data.result);
+        // console.log("ticket:", ticketResponse.data.result);
         if (ticketResponse.data.result.length != 0) {
           setSeatTypes(ticketResponse.data.result);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     fetchSeatmap();
@@ -625,7 +628,7 @@ const TicketBooking = () => {
 
         // Add the standing section
         setSelectedSeats((prev) => [...prev, seatInfo]);
-        console.log("Selected standing section:", seatInfo);
+        // console.log("Selected standing section:", seatInfo);
         return;
       }
     }
@@ -638,7 +641,7 @@ const TicketBooking = () => {
     // In this case, the seatTypeId is the same as the ticket id
     const ticket = seatTypes.find((type) => type.id === seat.seatTypeId);
     const ticketId = ticket ? ticket.ticketId : undefined;
-    console.log("ticketId:", ticketId);
+    // console.log("ticketId:", ticketId);
 
     // Get zoneId from the section or from the seat if available
     const zoneId =
@@ -648,9 +651,9 @@ const TicketBooking = () => {
 
     const rcCode = seat.id.split("-").slice(1).join("-");
 
-    console.log("Found section:", section);
-    console.log("Zone ID:", zoneId);
-    console.log("Ticket ID:", ticketId);
+    // console.log("Found section:", section);
+    // console.log("Zone ID:", zoneId);
+    // console.log("Ticket ID:", ticketId);
 
     // Create the correct seat label using our helper function
     const seatLabel = generateSeatLabel(seat.row, seat.column);
@@ -670,7 +673,7 @@ const TicketBooking = () => {
     // Check if seat is already selected
     const isSelected = selectedSeats.some((s) => s.id === seat.id);
 
-    console.log("seat ID:", seat.seatId);
+    // console.log("seat ID:", seat.seatId);
 
     if (isSelected) {
       // Remove the seat if already selected
@@ -683,19 +686,19 @@ const TicketBooking = () => {
     }
 
     // Log the full seat info for debugging
-    console.log("Seat details:", {
-      id: seat.id,
-      seatId: seat.seatId,
-      row: seat.row,
-      column: seat.column,
-      seatLabel: seatLabel,
-      section: sectionName,
-      seatType: seatType?.name,
-      price: seatType?.price,
-      formattedPrice: formatCurrency(seatType?.price || 0),
-      ticketId: ticketId, // Log the ticketId
-      zoneId: zoneId, // Log the zoneId
-    });
+    // console.log("Seat details:", {
+    //   id: seat.id,
+    //   seatId: seat.seatId,
+    //   row: seat.row,
+    //   column: seat.column,
+    //   seatLabel: seatLabel,
+    //   section: sectionName,
+    //   seatType: seatType?.name,
+    //   price: seatType?.price,
+    //   formattedPrice: formatCurrency(seatType?.price || 0),
+    //   ticketId: ticketId, // Log the ticketId
+    //   zoneId: zoneId, // Log the zoneId
+    // });
   };
 
   // Tính tổng tiền từ các ghế đã chọn
@@ -749,10 +752,10 @@ const TicketBooking = () => {
         }),
       };
 
-      console.log(
-        "Ticket purchase requests:",
-        JSON.stringify(ticketPurchaseRequests, null, 2)
-      );
+      // console.log(
+      //   "Ticket purchase requests:",
+      //   JSON.stringify(ticketPurchaseRequests, null, 2)
+      // );
 
       // Call the API to create the ticket purchase
       const response = await ticketPurchaseApi.createTicketPurchase(
@@ -921,22 +924,26 @@ const TicketBooking = () => {
     }
 
     try {
-      // const res = await ticketPurchase.changeTicket(ticketPurchaseRequests, {
-      //   ticketPurchaseId: oldTicketPurchase.ticketPurchaseId,
-      //   caseTicket: oldTicketPurchase.caseTicket,
-      // });
-      // console.log(res.data);
-
-      // if (res.data.result.data) {
-      //   const paymentUrl = res.data.result.data.checkoutUrl;
-      //   window.location.href = paymentUrl;
-      // } else if (res.data.result.data == null) {
-      //   toast.success(res.data.result.message, {
-      //     onAutoClose: () => {
-      //       navigate("/ticketManagement");
-      //     },
-      //   });
-      // }
+      const payload = {
+        ticketPurchaseRequests: oldTicketPurchase.ticketPurchaseId.map(
+          (id) => ({ ticketPurchaseId: id })
+        ),
+        ticketChange: ticketPurchaseRequests,
+        orderCode: oldTicketPurchase.orderCode,
+      };
+      console.log("payload changeticket", payload);
+      const res = await ticketPurchase.changeTicket(payload);
+      console.log(res.data);
+      if (res.data.result.data) {
+        const paymentUrl = res.data.result.data.checkoutUrl;
+        window.location.href = paymentUrl;
+      } else if (res.data.result.data == null) {
+        toast.success(res.data.result.message, {
+          onAutoClose: () => {
+            navigate("/ticketManagement");
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {

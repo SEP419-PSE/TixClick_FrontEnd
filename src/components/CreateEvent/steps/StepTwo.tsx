@@ -7,6 +7,7 @@ import {
   CalendarIcon,
   Plus,
   Trash2,
+  LoaderCircle,
 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import {
@@ -270,7 +271,11 @@ const StepTwo: React.FC<StepProps> = ({
           id: eventId.toString(),
           step: hasSeatMap ? "3" : "4",
         }).toString();
-        await navigate(`?${queryParams}`);
+        if (event?.status == EventStatus.SCHEDULED) {
+          await navigate("/manager-dashboard/events");
+        } else {
+          await navigate(`?${queryParams}`);
+        }
       } else {
         setIsLoading(true);
         const formatActivities = activities.map((activity) => ({
@@ -300,6 +305,8 @@ const StepTwo: React.FC<StepProps> = ({
       const axiosError = error as AxiosError<{ message: string }>;
       console.log(axiosError.response?.data);
       toast.error(axiosError.response?.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -906,7 +913,13 @@ const StepTwo: React.FC<StepProps> = ({
           onClick={nextStep}
           disabled={isLoading}
         >
-          Tiếp tục
+          {isLoading ? (
+            <div className="animate-spin">
+              <LoaderCircle />
+            </div>
+          ) : (
+            "Tiếp tục"
+          )}
         </button>
       </div>
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
