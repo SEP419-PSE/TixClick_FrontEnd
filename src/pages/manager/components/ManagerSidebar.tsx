@@ -66,9 +66,9 @@ export function DashboardSidebar() {
 
   // Extract username from token
   useEffect(() => {
-    if (context?.accessToken2) {
+    if (context?.accessToken) {
       try {
-        const tokenParts = context.accessToken2.split(".")
+        const tokenParts = context.accessToken.split(".")
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]))
           setCurrentUser(payload.sub || "unknown")
@@ -77,19 +77,19 @@ export function DashboardSidebar() {
         console.error("Error parsing token:", e)
       }
     }
-  }, [context?.accessToken2])
+  }, [context?.accessToken])
 
   // Connect to WebSocket for real-time notifications
   useEffect(() => {
     const connectWebSocket = () => {
-      if (!context?.accessToken2 || currentUser === "unknown") {
+      if (!context?.accessToken || currentUser === "unknown") {
         return
       }
 
       const client = new Client({
         brokerURL: "wss://tixclick.site/ws",
         connectHeaders: {
-          Authorization: `Bearer ${context.accessToken2}`,
+          Authorization: `Bearer ${context.accessToken}`,
         },
         debug: (str) => {
           console.log("STOMP: " + str)
@@ -145,19 +145,19 @@ export function DashboardSidebar() {
         stompClient.current.deactivate()
       }
     }
-  }, [currentUser, context?.accessToken2])
+  }, [currentUser, context?.accessToken])
 
   // Fetch initial notifications
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!context?.accessToken2) return
+      if (!context?.accessToken) return
 
       try {
         setLoading(true)
         const response = await fetch("https://tixclick.site/api/notification/notifications", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${context.accessToken2}`,
+            Authorization: `Bearer ${context.accessToken}`,
           },
         })
 
@@ -190,7 +190,7 @@ export function DashboardSidebar() {
     }
 
     fetchNotifications()
-  }, [context?.accessToken2])
+  }, [context?.accessToken])
 
   const formatNotificationTime = (createdAt?: string) => {
     if (!createdAt) return "Unknown time"
@@ -211,7 +211,7 @@ export function DashboardSidebar() {
 
   // Add this function to mark notifications as read
   const markAllAsRead = async () => {
-    if (!context?.accessToken2) return
+    if (!context?.accessToken) return
 
     try {
       // You would typically call an API endpoint to mark all as read

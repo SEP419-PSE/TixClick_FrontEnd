@@ -33,7 +33,6 @@ export interface VietQR {
   accountID: string;
   amount: number;
   description: string;
-  contractPaymentId?: number;
   dueDate?: string;
   status?: ContractPaymentStatus;
 }

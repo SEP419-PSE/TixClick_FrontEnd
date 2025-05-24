@@ -213,10 +213,10 @@ const SignUpForm = () => {
         <CustomDivider />
       </div>
 
-      <button className="bg-[#333333] flex justify-center items-center font-light gap-2 text-white w-full rounded-md py-2 hover:opacity-80">
+     {/* <button className="bg-[#333333] flex justify-center items-center font-light gap-2 text-white w-full rounded-md py-2 hover:opacity-80">
         <img src={GoogleImg} width={24} />
         Hoặc đăng kí bằng Google
-      </button>
+      </button> */}
 
       <div className="my-4 text-center font-light">
         Bạn đã có tài khoản?{" "}

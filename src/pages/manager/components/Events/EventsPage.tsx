@@ -10,10 +10,10 @@ import {
   MoreHorizontal,
   Search,
   Upload,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import * as pdfjs from "pdfjs-dist";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -74,11 +74,10 @@ const customStyles = `
   .description-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #444444;
   }
-`;
-
+`
 
 // Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 export default function EventsPage() {
   const [events, setEvents] = useState<EventResponse[]>([])
@@ -105,6 +104,12 @@ export default function EventsPage() {
 
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
+
+  const [isCancelEventModalOpen, setCancelEventModalOpen] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const [importFile, setImportFile] = useState<File | null>(null)
+  const [importProgress, setImportProgress] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchEventList = async () => {
     try {
@@ -186,9 +191,15 @@ export default function EventsPage() {
   }
 
   const handleUploadContract = async (file: File) => {
-    // if (!file || !selectedEvent) return
+    if (!file || !selectedEvent) return
 
-    // let progressInterval: NodeJS.Timeout | undefined
+    // Check if a contract with the same name already exists
+    const existingContract = relatedContracts.find((contract) => contract.fileName === file.name)
+
+    if (existingContract) {
+      toast.error("Hợp đồng với tên này đã tồn tại. Vui lòng chọn tên khác hoặc cập nhật hợp đồng hiện có.")
+      return
+    }
 
     try {
       setIsUploading(true)
@@ -305,6 +316,15 @@ export default function EventsPage() {
   // Upload contract file
   const uploadContract = async () => {
     if (!file || !selectedEvent) return
+
+    // Check if a contract with the same name already exists
+    const existingContract = relatedContracts.find((contract) => contract.fileName === file.name)
+
+    if (existingContract) {
+      toast.error("Hợp đồng với tên này đã tồn tại. Vui lòng chọn tên khác hoặc cập nhật hợp đồng hiện có.")
+      return
+    }
+
     await handleUploadContract(file)
   }
 
@@ -334,17 +354,27 @@ export default function EventsPage() {
     switch (status) {
       case EventStatus.CONFIRMED:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-900 text-orange-300">Đã xác nhận</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-orange-900/70 text-orange-300 whitespace-nowrap">
+            Đã xác nhận
+          </span>
         )
       case EventStatus.PENDING:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-300">Đang xử lý</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-900/70 text-yellow-300 whitespace-nowrap">
+            Đang xử lý
+          </span>
         )
       case EventStatus.REJECTED:
-        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-900 text-red-300">Rejected</span>
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Rejected
+          </span>
+        )
       case EventStatus.SCHEDULED:
         return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">Đã lên lịch</span>
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">
+            Đã lên lịch
+          </span>
         )
 
       default:
@@ -352,7 +382,11 @@ export default function EventsPage() {
     }
   }
 
-  const handleCreateContract = () => {
+  const handleCreateContract = async () => {
+    if (selectedEvent) {
+      // Fetch related contracts first to ensure we have the latest data
+      await fetchRelatedContracts(selectedEvent.eventId)
+    }
     setIsContractModalOpen(true)
     setFile(null)
     setUploadProgress(0)
@@ -392,6 +426,82 @@ export default function EventsPage() {
     }
   }, [])
 
+  const handleExportCustomers = async () => {
+    if (!selectedEvent) return
+
+    try {
+      toast.info("Đang xuất dữ liệu khách hàng...")
+      await managerApi.exportRefund(selectedEvent.eventId)
+      // The file download is handled in the exportRefund function
+      toast.success("Xuất dữ liệu thành công")
+    } catch (error) {
+      console.error("Error exporting customer data:", error)
+      toast.error("Không thể xuất dữ liệu khách hàng")
+    }
+  }
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      // Check if file is Excel
+      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+        toast.error("Vui lòng chọn file Excel (.xlsx hoặc .xls)")
+        return
+      }
+      setImportFile(file)
+    }
+  }
+
+  const handleImportSubmit = async () => {
+    if (!importFile) {
+      toast.error("Vui lòng chọn file để import")
+      return
+    }
+
+    try {
+      setIsImporting(true)
+      setImportProgress(0)
+
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setImportProgress((prev) => {
+          if (prev >= 95) {
+            clearInterval(progressInterval)
+            return 95
+          }
+          return prev + 5
+        })
+      }, 200)
+
+      const formData = new FormData()
+      formData.append("file", importFile)
+
+      const res = await managerApi.importRefund(formData)
+      console.log("Import response:", res)
+
+      clearInterval(progressInterval)
+      setImportProgress(100)
+
+      if (res.data && res.data.result) {
+        toast.success("Import dữ liệu thành công")
+        await fetchEventList()
+      } else {
+        toast.error("Import dữ liệu thất bại")
+      }
+
+      setTimeout(() => {
+        setImportFile(null)
+        setImportProgress(0)
+        setIsImporting(false)
+        setCancelEventModalOpen(false)
+      }, 1000)
+    } catch (error) {
+      console.error("Error importing data:", error)
+      toast.error("Không thể import dữ liệu")
+      setIsImporting(false)
+    }
+  }
+
   return (
     <>
       <ManagerHeader heading="Sự kiện" text="Xem và quản lý các sự kiện" />
@@ -414,8 +524,8 @@ export default function EventsPage() {
               <SelectContent>
                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
                 <SelectItem value="SCHEDULED">Đã lên lịch</SelectItem>
-                <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="CONFIRMED">Đã xác nhận</SelectItem>
+                <SelectItem value="PENDING">Đang xử lý</SelectItem>
               </SelectContent>
             </Select>
 
@@ -481,13 +591,23 @@ export default function EventsPage() {
                           </DropdownMenuItem>
                         )}
                         {event.status === "PENDING" && (
-                          <DropdownMenuItem onClick={() => navigate(`/manager-dashboard/events/event-detail/${event.eventId}/manager`)}>
+                          <DropdownMenuItem
+                            onClick={() => navigate(`/manager-dashboard/events/event-detail/${event.eventId}/manager`)}
+                          >
                             Đi đến event này
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem onClick={handleViewRelatedContracts}>Xem hợp đồng</DropdownMenuItem>
+                        {/* <DropdownMenuItem onClick={handleViewRelatedContracts}>Xem hợp đồng</DropdownMenuItem> */}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-500">Hủy sự kiện</DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-500"
+                          onClick={() => {
+                            setSelectedEvent(event)
+                            setCancelEventModalOpen(true)
+                          }}
+                        >
+                          Hủy sự kiện
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -1167,7 +1287,94 @@ export default function EventsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cancel Event Dialog */}
+      <Dialog open={isCancelEventModalOpen} onOpenChange={setCancelEventModalOpen}>
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Hủy sự kiện</DialogTitle>
+            <DialogDescription>Bạn có chắc chắn muốn hủy sự kiện: {selectedEvent?.eventName}?</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="flex flex-col gap-4">
+              <Button onClick={handleExportCustomers} className="w-full bg-blue-600 hover:bg-blue-700">
+                <Download className="mr-2 h-4 w-4" />
+                Export danh sách khách hàng
+              </Button>
+
+              <div className="border border-dashed border-gray-500 rounded-md p-4">
+                <p className="text-sm text-gray-400 mb-2">Import file Excel</p>
+
+                {!importFile ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImportFile}
+                      accept=".xlsx,.xls"
+                      className="hidden"
+                    />
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full text-black hover:text-white hover:bg-black">
+                      <Upload className="mr-2 h-4 w-4 hover:text-white hover:bg-black" />
+                      Chọn file Excel
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 p-2 bg-[#1E1E1E] rounded-lg">
+                      <FileText className="w-5 h-5 text-blue-400" />
+                      <div className="flex-1 truncate">
+                        <p className="font-medium truncate">{importFile.name}</p>
+                        <p className="text-xs text-gray-400">{(importFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setImportFile(null)}
+                        className="text-gray-400 hover:text-white"
+                        disabled={isImporting}
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {isImporting && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span>Uploading...</span>
+                          <span>{importProgress}%</span>
+                        </div>
+                        <Progress value={importProgress} className="h-1" />
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={handleImportSubmit}
+                      disabled={isImporting}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                    >
+                      {isImporting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Importing...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Import
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
-

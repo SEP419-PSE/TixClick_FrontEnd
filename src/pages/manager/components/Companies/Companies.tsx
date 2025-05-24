@@ -789,7 +789,7 @@ export default function CompanyApprovalsPage() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => window.open(doc.fileURL, "_blank")}
-                                  className="border-[#444444] hover:bg-[#333333]"
+                                  className="border-[#444444] text-black hover:bg-[#333333]"
                                 >
                                   <Eye className="h-4 w-4" />
                                 </Button>
@@ -815,7 +815,7 @@ export default function CompanyApprovalsPage() {
             <Button
               variant="outline"
               onClick={() => setIsDocumentModalOpen(false)}
-              className="text-white border-[#444444] hover:bg-[#333333]"
+              className="text-black border-[#444444] hover:bg-[#333333]"
             >
               Close
             </Button>
