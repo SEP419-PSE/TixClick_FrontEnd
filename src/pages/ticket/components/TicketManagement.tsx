@@ -165,16 +165,6 @@ export default function TicketManagement() {
             </div>
           ))}
           <div className="flex justify-center mt-4">
-<<<<<<< HEAD
-            <QRCodeSVG
-              value={selectedTicket?.qrCode as string}
-              size={160}
-              bgColor={"#FFFFFF"}
-              level={"L"}
-              className="cursor-pointer"
-              onClick={() => setShowZoomedQR(true)}
-            />
-=======
             <div
               onClick={() => setIsModalOpen(true)}
               className="cursor-pointer"
@@ -205,7 +195,6 @@ export default function TicketManagement() {
                 </div>
               </div>
             )}
->>>>>>> 78c2a8bf3cf4466f010b9142ab0127b169b238d5
           </div>
 
           <DashDivider />
