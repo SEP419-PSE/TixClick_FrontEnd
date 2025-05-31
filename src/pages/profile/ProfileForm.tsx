@@ -25,19 +25,15 @@ import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 import { getCroppedImg } from "./imageUtils";
 
-interface ExtendedProfile extends Profile {
-  fullName?: string
-  bankName?: string
-  bankAccountNumber?: string
-  bankAccountHolder?: string
+interface CroppedAreaPixels {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
-// Define crop area pixels interface
-interface CroppedAreaPixels {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+interface ProfileFormData extends Omit<Profile, "dob"> {
+  dob: string
 }
 
 export default function ProfileForm() {
@@ -47,7 +43,7 @@ export default function ProfileForm() {
   const [zoom, setZoom] = useState(1)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [editMode, setEditMode] = useState(false)
-  const [formData, setFormData] = useState<ExtendedProfile>({} as ExtendedProfile)
+  const [formData, setFormData] = useState<ProfileFormData>({} as ProfileFormData)
   const [loading, setLoading] = useState(false)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null)
 
@@ -69,9 +65,11 @@ export default function ProfileForm() {
 
   useEffect(() => {
     if (profile) {
-      setFormData({
+      const formattedProfile: ProfileFormData = {
         ...profile,
-      })
+        dob: profile.dob ? new Date(profile.dob).toISOString().split("T")[0] : "",
+      }
+      setFormData(formattedProfile)
     }
   }, [profile])
 
@@ -87,27 +85,13 @@ export default function ProfileForm() {
     try {
       setLoading(true)
 
-      // Convert blob to File object with an appropriate name and type
       const avatarFile = new File([croppedImageBlob], "avatar.jpg", {
         type: "image/jpeg",
       })
 
-      // Call the API with current profile data and the new avatar file
-      // Need to update ProfileApi.updateProfile to accept File or null
       const response = await profileApi.updateProfile(profile as Profile, avatarFile as File)
 
-      console.log(response)
-
       if (response.data.result) {
-        // Update local state with the response from server
-        // if (profile) {
-        //   setProfile({
-        //     ...profile,
-        //     avatarURL:
-        //       response.data.result?.avatarURL ||
-        //       URL.createObjectURL(croppedImageBlob),
-        //   });
-        // }
         location.reload()
       } else {
         toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại")
@@ -117,7 +101,7 @@ export default function ProfileForm() {
       toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.")
     } finally {
       setLoading(false)
-      setImage(null) // Close the cropper modal
+      setImage(null)
     }
   }
 
@@ -125,14 +109,10 @@ export default function ProfileForm() {
     try {
       if (!image) return
 
-      // Show loading state
       setLoading(true)
-
-      // Get the cropped image as a blob
       const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0)
 
       if (croppedImage) {
-        // Upload the cropped image using the updated function
         await uploadProfileImage(croppedImage)
       }
     } catch (error) {
@@ -165,34 +145,47 @@ export default function ProfileForm() {
         throw new Error("Missing account ID")
       }
 
-      // Extract only the fields accepted by the API
       const updateData: Profile = {
-        ...profile,
+        accountId: profile.accountId,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
+        userName: profile.userName, 
         phone: formData.phone || "",
         email: formData.email || "",
-        dob: formData.dob || "",
-        bankName: formData.bankName || "",
-        bankAccountNumber: formData.bankAccountNumber || "",
-        bankAccountHolder: formData.bankAccountHolder || "",
+        dob: formData.dob ? new Date(formData.dob) : profile.dob,
+        roleId: profile.roleId, 
+        avatarURL: profile.avatarURL, 
+        bankingName: formData.bankingName || "",
+        bankingCode: formData.bankingCode || "",
+        ownerCard: formData.ownerCard || "",
       }
 
-      // Call API with form data but no avatar file (null)
+      console.log("Sending update data:", JSON.stringify(updateData, null, 2)) 
+
       const response = await profileApi.updateProfile(updateData, null)
 
-      if (response.data && response.data.success) {
-        // Update profile state with response data
-        const updatedProfile = response.data.result || {
-          ...profile,
-          ...updateData,
+      console.log("API Response:", JSON.stringify(response.data, null, 2))
+
+      if (response.data) {
+        if (response.data.result) {
+          setProfile(response.data.result)
+          toast.success("Cập nhật thông tin thành công!")
+        } else {
+          setProfile({
+            ...profile,
+            ...updateData,
+          })
+          toast.success("Đã lưu thông tin!")
         }
 
-        setProfile(updatedProfile)
-        toast.success("Cập nhật thông tin thành công!")
+        setTimeout(() => {
+          fetchProfile()
+        }, 500)
+
         setEditMode(false)
       } else {
-        toast.error(response.data?.message || "Cập nhật thất bại")
+        console.error("API response has no data:", response)
+        toast.error("Cập nhật thất bại: Không nhận được phản hồi từ máy chủ")
       }
     } catch (error) {
       console.error("Error updating profile:", error)
@@ -287,6 +280,20 @@ export default function ProfileForm() {
                       <Mail className="h-5 w-5 mr-3 text-[#FF8A00]" />
                       <span>{profile?.email || "Chưa cập nhật"}</span>
                     </div>
+
+                    {/* Display banking info in sidebar */}
+                    {(profile?.bankingName || profile?.bankingCode) && (
+                      <div className="pt-4 border-t border-[#3A3A3A]">
+                        <h5 className="text-sm font-medium text-gray-300 mb-2">Thông tin ngân hàng</h5>
+                        {profile?.bankingName && (
+                          <div className="text-xs text-gray-400 mb-1">Ngân hàng: {profile.bankingName}</div>
+                        )}
+                        {profile?.bankingCode && (
+                          <div className="text-xs text-gray-400 mb-1">STK: {profile.bankingCode}</div>
+                        )}
+                        {profile?.ownerCard && <div className="text-xs text-gray-400">Chủ TK: {profile.ownerCard}</div>}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -301,10 +308,6 @@ export default function ProfileForm() {
                     transition={{ duration: 0.3 }}
                     className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 border border-[#2A2A2A]"
                   >
-                    {/* <h3 className="text-xl font-bold text-white mb-6">
-                      {editMode ? "Chỉnh sửa thông tin" : "Thông tin cá nhân"}
-                    </h3> */}
-
                     <form onSubmit={handleSubmit} className="space-y-8">
                       <div className="space-y-4">
                         <h4 className="text-lg font-semibold text-white border-b border-[#3A3A3A] pb-2">
@@ -369,7 +372,7 @@ export default function ProfileForm() {
                               <Input
                                 name="dob"
                                 type="date"
-                                value={typeof formData.dob === "string" ? formData.dob : ""}
+                                value={formData.dob}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
@@ -407,8 +410,8 @@ export default function ProfileForm() {
                           <label className="text-sm font-medium text-gray-300">Tên ngân hàng</label>
                           <div className="relative">
                             <Input
-                              name="bankName"
-                              value={formData.bankName || ""}
+                              name="bankingName"
+                              value={formData.bankingName || ""}
                               onChange={handleInputChange}
                               disabled={!editMode}
                               placeholder="Ví dụ: Vietcombank, BIDV, Techcombank..."
@@ -437,8 +440,8 @@ export default function ProfileForm() {
                             <label className="text-sm font-medium text-gray-300">Số tài khoản ngân hàng</label>
                             <div className="relative">
                               <Input
-                                name="bankAccountNumber"
-                                value={formData.bankAccountNumber || ""}
+                                name="bankingCode"
+                                value={formData.bankingCode || ""}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 placeholder="Nhập số tài khoản"
@@ -466,8 +469,8 @@ export default function ProfileForm() {
                             <label className="text-sm font-medium text-gray-300">Tên chủ tài khoản</label>
                             <div className="relative">
                               <Input
-                                name="bankAccountHolder"
-                                value={formData.bankAccountHolder || ""}
+                                name="ownerCard"
+                                value={formData.ownerCard || ""}
                                 onChange={handleInputChange}
                                 disabled={!editMode}
                                 placeholder="Tên chủ tài khoản ngân hàng"
@@ -545,7 +548,6 @@ export default function ProfileForm() {
                     cropShape="round"
                     showGrid={false}
                     onCropComplete={(_, croppedAreaPixels) => {
-                      // Store the crop data for later use
                       setCroppedAreaPixels(croppedAreaPixels)
                     }}
                   />
