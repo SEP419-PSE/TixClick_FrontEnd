@@ -1,7 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { useEffect, useMemo, useState } from "react";
 import {
   ChartConfig,
@@ -52,12 +51,12 @@ export function RevenueLineChart({ data }: Props) {
     return data.map((activity) => ({
       label: activity.eventActivityName,
       value: activity.eventActivityName,
-      revenueData: activity.eventActivityDateReportResponseList.map(
-        (entry) => ({
+      revenueData: activity.eventActivityDateReportResponseList
+        .filter((entry) => entry.revenue > 0) // Chỉ lấy ngày có doanh thu
+        .map((entry) => ({
           date: entry.date,
           revenue: entry.revenue,
-        })
-      ),
+        })),
     }));
   }, [data]);
 
@@ -115,14 +114,7 @@ export function RevenueLineChart({ data }: Props) {
                 strokeWidth={2}
                 dot={{ fill: "var(--color-revenue)" }}
                 activeDot={{ r: 6 }}
-              >
-                <LabelList
-                  position="top"
-                  offset={12}
-                  className="fill-foreground"
-                  fontSize={12}
-                />
-              </Line>
+              />
             </LineChart>
           </ChartContainer>
         ) : (
