@@ -111,6 +111,10 @@ export default function EventsPage() {
   const [importProgress, setImportProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // New state for confirmation dialog
+  const [isCancelConfirmModalOpen, setCancelConfirmModalOpen] = useState(false)
+  const [isCancelling, setIsCancelling] = useState(false)
+
   const fetchEventList = async () => {
     try {
       const res = await managerApi.getAllEvent()
@@ -187,6 +191,35 @@ export default function EventsPage() {
       toast.error("Failed to reject event. Please try again.")
     } finally {
       setIsRejecting(false)
+    }
+  }
+
+  // New function to handle cancel event confirmation
+  const handleCancelEventConfirm = async () => {
+    if (!selectedEvent) return
+
+    try {
+      console.log("Cancelling event:", "CANCELLED", "| eventId:", selectedEvent.eventId)
+
+      setIsCancelling(true)
+
+      const res = await managerApi.approveEvent("CANCELLED", selectedEvent.eventId)
+      console.log("Cancel response:", res)
+
+      if (res.data && res.data.result === true) {
+        toast.success("Sự kiện đã được hủy thành công")
+        await fetchEventList()
+        setCancelConfirmModalOpen(false)
+        // Show the import/export modal after successful cancellation
+        setCancelEventModalOpen(true)
+      } else {
+        toast.error("Không thể hủy sự kiện")
+      }
+    } catch (error) {
+      console.error("Error cancelling event:", error)
+      toast.error("Không thể hủy sự kiện. Vui lòng thử lại.")
+    } finally {
+      setIsCancelling(false)
     }
   }
 
@@ -374,6 +407,12 @@ export default function EventsPage() {
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-green-900/70 text-green-300 whitespace-nowrap">
             Đã lên lịch
+          </span>
+        )
+      case EventStatus.CANCELLED:
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Đã hủy
           </span>
         )
 
@@ -603,10 +642,16 @@ export default function EventsPage() {
                           className="text-red-500"
                           onClick={() => {
                             setSelectedEvent(event)
-                            setCancelEventModalOpen(true)
+                            // Nếu event đã bị cancelled, mở trực tiếp modal import/export
+                            // Nếu chưa, mở modal xác nhận trước
+                            if (event.status === "CANCELLED") {
+                              setCancelEventModalOpen(true)
+                            } else {
+                              setCancelConfirmModalOpen(true)
+                            }
                           }}
                         >
-                          Hủy sự kiện
+                          {event.status === "CANCELLED" ? "Quản lý hoàn tiền" : "Hủy sự kiện"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -1288,12 +1333,81 @@ export default function EventsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Cancel Event Dialog */}
+      {/* Cancel Event Confirmation Dialog */}
+      <Dialog open={isCancelConfirmModalOpen} onOpenChange={setCancelConfirmModalOpen}>
+        <DialogContent className="bg-[#2A2A2A] text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-400">
+              <XCircle className="h-5 w-5" />
+              Xác nhận hủy sự kiện
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Bạn có chắc chắn muốn hủy sự kiện{" "}
+              <span className="font-semibold text-white">"{selectedEvent?.eventName}"</span> không?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                </div>
+                <div className="text-sm">
+                  <p className="text-red-300 font-medium mb-1">Lưu ý quan trọng:</p>
+                  <ul className="text-red-200 space-y-1 text-xs">
+                    <li>• Sự kiện sẽ được đánh dấu là đã hủy</li>
+                    <li>• Bạn sẽ có thể xuất danh sách khách hàng để hoàn tiền</li>
+                    <li>• Hành động này không thể hoàn tác</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelConfirmModalOpen(false)}
+              disabled={isCancelling}
+              className="text-gray-300 border-gray-600 hover:bg-gray-700"
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              onClick={handleCancelEventConfirm}
+              disabled={isCancelling}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isCancelling ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Đang hủy...
+                </>
+              ) : (
+                <>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Xác nhận hủy
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Event Dialog (Import/Export) */}
       <Dialog open={isCancelEventModalOpen} onOpenChange={setCancelEventModalOpen}>
         <DialogContent className="bg-[#2A2A2A] text-white max-w-md">
           <DialogHeader>
             <DialogTitle>Hủy sự kiện</DialogTitle>
-            <DialogDescription>Bạn có chắc chắn muốn hủy sự kiện: {selectedEvent?.eventName}?</DialogDescription>
+            <DialogDescription>Quản lý hoàn tiền cho sự kiện: {selectedEvent?.eventName}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -1315,7 +1429,11 @@ export default function EventsPage() {
                       accept=".xlsx,.xls"
                       className="hidden"
                     />
-                    <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full text-black hover:text-white hover:bg-black">
+                    <Button
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full text-black hover:text-white hover:bg-black"
+                    >
                       <Upload className="mr-2 h-4 w-4 hover:text-white hover:bg-black" />
                       Chọn file Excel
                     </Button>
@@ -1372,7 +1490,11 @@ export default function EventsPage() {
             </div>
           </div>
 
-          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelEventModalOpen(false)} className="text-black">
+              Đóng
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

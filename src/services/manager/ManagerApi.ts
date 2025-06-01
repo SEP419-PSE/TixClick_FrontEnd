@@ -107,7 +107,15 @@ const managerApi = {
     return authorizedRequest("get", `/contract-detail/qr/${contractId}`);
   },
 
-   exportRefund(eventId: number) {
+  cancelEvent(eventId: number, status: string) {
+    return authorizedRequest("post", `/event/approve/${eventId}/${status}`, {}, {
+      headers: { Accept: "*/*" },
+      timeout: 10000,
+    });
+  },
+
+  // tôi muốn có một box để hiện lên khi bấm nút hủy sự kiên để xác nhận bànj có chắc hủy sự kiện hay không và nêú xác nhận thì call api trong hình và nếu thành công thì mới hiện hộp hủy sự kiện chứa import với export
+  exportRefund(eventId: number) {
     return authorizedRequest("get", `/payment/export_refund/${eventId}`, null, {
       responseType: "blob",
       headers: { Accept: "*/*" },
