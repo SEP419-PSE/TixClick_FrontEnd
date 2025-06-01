@@ -315,6 +315,12 @@ export default function ContractsPage() {
             Đang xử lý
           </span>
         )
+         case "CANCELLED":
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Đã hủy
+          </span>
+        )
       case "Expired":
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
