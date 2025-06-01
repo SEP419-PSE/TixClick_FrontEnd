@@ -35,7 +35,7 @@ export default function TicketTable({ data }: TicketTableProps) {
                 <TableHead>Loại vé</TableHead>
                 <TableHead>Giá</TableHead>
                 <TableHead>Đã check-in</TableHead>
-                <TableHead>Lượng vé chưa bán</TableHead>
+                <TableHead>Tỉ lệ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
