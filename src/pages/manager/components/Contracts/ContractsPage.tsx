@@ -764,9 +764,9 @@ export default function ContractsPage() {
                                     <Toaster position="top-center" />
 
                                     <DialogHeader>
-                                      <DialogTitle>Payment QR Code</DialogTitle>
+                                      <DialogTitle>Thanh toán mã QR</DialogTitle>
                                       <DialogDescription>
-                                        Scan this QR code to pay for {selectedContractDetail?.contractDetailName}
+                                        Quét QR này để thanh toán cho {selectedContractDetail?.contractDetailName}
                                       </DialogDescription>
                                     </DialogHeader>
                                     <div className="flex flex-col items-center justify-center p-4">
@@ -812,41 +812,41 @@ export default function ContractsPage() {
                                           />
                                         ) : (
                                           <div className="w-48 h-48 flex items-center justify-center text-gray-800">
-                                            No QR code available
+                                            Không có QR nào để hiển thị
                                           </div>
                                         )}
                                       </div>
                                       <div className="text-center space-y-2">
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Amount:</span> 
+                                          <span className="text-gray-400">Tổng tiền:</span> 
                                           {qrData?.amount?.toLocaleString() ||
                                             selectedContractDetail?.contractAmount?.toLocaleString() ||
                                             "0"}
                                             &nbsp;VND
                                         </p>
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Due Date:</span>{" "}
+                                          <span className="text-gray-400">Ngày:</span>{" "}
                                           {qrData?.dueDate || selectedContractDetail?.contractPayDate || "N/A"}
                                         </p>
                                         {/* <p className="text-sm">
                                           <span className="text-gray-400">Bank:</span> {qrData?.bankID || "N/A"}
                                         </p> */}
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Account:</span> {qrData?.accountID || "N/A"}
+                                          <span className="text-gray-400">Tài khoản:</span> {qrData?.accountID || "N/A"}
                                         </p>
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Reference:</span>{" "}
+                                          <span className="text-gray-400">Mã:</span>{" "}
                                           {selectedContractDetail?.contractDetailCode || "N/A"}
                                         </p>
                                         {qrData?.description && (
                                           <p className="text-sm">
-                                            <span className="text-gray-400">Description:</span> {qrData.description}
+                                            <span className="text-gray-400">Nội dung:</span> {qrData.description}
                                           </p>
                                         )}
                                       </div>
                                     </div>
-                                    <DialogFooter className="flex flex-col gap-2 items-stretch">
-                                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
+                                    <DialogFooter className="p-0 flex flex-col gap-2 items-stretch">
+                                      <div className="w-full bg-[#1E1E1E] rounded-lg p-4">
                                         <h4 className="text-md font-medium mb-2">Xác thực thanh toán</h4>
                                         <div className="space-y-3">
                                           <p className="text-sm text-gray-400">
