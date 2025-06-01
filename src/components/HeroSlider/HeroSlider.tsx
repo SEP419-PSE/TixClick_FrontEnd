@@ -119,11 +119,11 @@ const HeroSlider = () => {
                     </NavLink>
                   </>
                 )}
-                <NavLink to="/my-task">
+                {/* <NavLink to="/my-task">
                   <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
                     Công việc của tôi
                   </li>
-                </NavLink>
+                </NavLink> */}
                 <NavLink to="/profileForm">
                   <li className="px-4 py-2 hover:text-[#FF8A00] transition-colors">
                     Trang cá nhân
