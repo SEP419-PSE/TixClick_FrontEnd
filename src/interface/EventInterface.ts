@@ -100,4 +100,5 @@ export enum EventStatus {
   REJECTED = "REJECTED",
   CONFIRMED = "CONFIRMED",
   CANCELLED = "CANCELLED",
+  ENDED = "ENDED",
 }
