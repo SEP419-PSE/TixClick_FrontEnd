@@ -47,6 +47,7 @@ import seatmapApi from "../services/seatmapApi";
 import ticketApi from "../services/ticketApi";
 import { TicketPurchaseRequest } from "./TicketBookingNoneSeatmap";
 import ticketPurchase from "../services/TicketPurchase/ticketPurchase";
+import axios, { AxiosError } from "axios";
 
 // type SeatStatus = "available" | "disabled"
 // type ToolType = "select" | "add" | "remove" | "edit" | "move" | "addSeatType"
@@ -835,8 +836,6 @@ const TicketBooking = () => {
       // Nếu không có message success và success không phải true, coi như lỗi
       throw new Error(response.message || "Không thể tạo đơn hàng");
     } catch (error) {
-      console.error("Error creating ticket purchase:", error);
-
       // Kiểm tra nội dung lỗi - nếu chứa "successfully" thì đó có thể là thành công
       if (
         error instanceof Error &&
@@ -869,7 +868,7 @@ const TicketBooking = () => {
 
         navigate("/payment");
       } else if (error instanceof Error) {
-        toast.error(`Lỗi: ${error.message}`);
+        toast.error(`Bạn không có quyền mua vé`);
       } else {
         toast.error("Đã xảy ra lỗi khi tạo đơn hàng");
       }
