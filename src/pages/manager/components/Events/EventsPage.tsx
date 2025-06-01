@@ -16,7 +16,7 @@ import * as pdfjs from "pdfjs-dist";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useNavigate } from "react-router";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
@@ -913,6 +913,7 @@ export default function EventsPage() {
               <span className="text-gray-400">ID: {selectedEvent?.eventId}</span>
             </DialogDescription>
           </DialogHeader>
+                                    <Toaster position="top-center" />
 
           {selectedEvent && (
             <div className="flex-1 overflow-y-auto py-4 pr-2">

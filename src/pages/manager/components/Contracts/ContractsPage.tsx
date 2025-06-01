@@ -1,10 +1,9 @@
 import {
-  Bell,
   ChevronLeft,
   ChevronRight,
   DollarSign,
   MoreHorizontal,
-  Search,
+  Search
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
@@ -442,10 +441,10 @@ export default function ContractsPage() {
                           <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => openContractModal(contract)}>Xem chi tiết</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-yellow-500">
+                          {/* <DropdownMenuItem className="text-yellow-500">
                             <Bell className="mr-2 h-4 w-4" />
                             Set reminder
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuItem className="text-red-500">Chấm dứt hợp đồng</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -889,10 +888,10 @@ export default function ContractsPage() {
                             &nbsp;VND
                           </p>
                         
-                           <p className="text-sm text-gray-400">Tiền lợi nhuận:</p>
+                           <p className="text-sm text-gray-400">Phần trăm lợi nhuận:</p>
                           <p className="text-lg font-semibold">
                             {selectedContract?.commission?.toLocaleString() || "0"}
-                            &nbsp;VND
+                            &nbsp;%
                           </p>
                         </div>
                         
