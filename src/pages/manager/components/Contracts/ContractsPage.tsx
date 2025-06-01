@@ -888,7 +888,14 @@ export default function ContractsPage() {
                             {selectedContract?.totalAmount?.toLocaleString() || "0"}
                             &nbsp;VND
                           </p>
+                        
+                           <p className="text-sm text-gray-400">Tiền lợi nhuận:</p>
+                          <p className="text-lg font-semibold">
+                            {selectedContract?.commission?.toLocaleString() || "0"}
+                            &nbsp;VND
+                          </p>
                         </div>
+                        
                         <div>
                           <p className="text-sm text-gray-400">Tổng phải thanh toán:</p>
                           <p className="text-lg font-semibold">
