@@ -172,7 +172,7 @@ export default function ContractsPage() {
       })
 
       // Check if the token exists
-      const token = localStorage.getItem("accessToken2")
+      const token = localStorage.getItem("accessToken")
       if (!token) {
         toast.error("Authentication token not found. Please log in again.")
         return

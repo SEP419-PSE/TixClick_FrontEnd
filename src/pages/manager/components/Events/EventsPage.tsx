@@ -400,7 +400,7 @@ export default function EventsPage() {
       case EventStatus.REJECTED:
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
-            Rejected
+            Đã từ chối
           </span>
         )
       case EventStatus.SCHEDULED:
@@ -412,6 +412,18 @@ export default function EventsPage() {
       case EventStatus.CANCELLED:
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Đã hủy
+          </span>
+        )
+      case EventStatus.ENDED:
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-amber-900/70 text-white whitespace-nowrap">
+            Đã kết thúc
+          </span>
+        )
+       case EventStatus.COMPLETED:
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-blue-900/70 text-blue-300 whitespace-nowrap">
             Đã hủy
           </span>
         )
@@ -642,8 +654,6 @@ export default function EventsPage() {
                           className="text-red-500"
                           onClick={() => {
                             setSelectedEvent(event)
-                            // Nếu event đã bị cancelled, mở trực tiếp modal import/export
-                            // Nếu chưa, mở modal xác nhận trước
                             if (event.status === "CANCELLED") {
                               setCancelEventModalOpen(true)
                             } else {
@@ -913,7 +923,7 @@ export default function EventsPage() {
               <span className="text-gray-400">ID: {selectedEvent?.eventId}</span>
             </DialogDescription>
           </DialogHeader>
-                                    <Toaster position="top-center" />
+        <Toaster position="top-center" />
 
           {selectedEvent && (
             <div className="flex-1 overflow-y-auto py-4 pr-2">
@@ -1140,6 +1150,7 @@ export default function EventsPage() {
       </Dialog>
 
       <Dialog open={isContractModalOpen} onOpenChange={setIsContractModalOpen}>
+        <Toaster position="top-center" />
         <DialogContent className="bg-[#2A2A2A] text-white max-w-2xl">
           <DialogHeader>
             <div className="flex justify-between items-center w-full">
