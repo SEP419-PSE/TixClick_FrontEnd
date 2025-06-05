@@ -45,7 +45,7 @@ const BuyerList = ({
   return (
     <>
       {!selectedActivity ? (
-        <div className="flex justify-center items-center h-[calc(100vh - 190px)]">
+        <div className="flex justify-center items-center min-h-[calc(100vh - 190px)] h-auto">
           <EmptyList label="Chưa chọn hoạt động" />
         </div>
       ) : (
@@ -81,7 +81,7 @@ const BuyerList = ({
               <EmptyList label="Chọn khách hàng để xem chi tiết" />
             ) : (
               <>
-                <div className=" h-full w-full">
+                <div className="h-full w-full overflow-y-auto px-2">
                   {selectedConsumer.ticketPurchases.map((item) => (
                     <>
                       <Accordion type="single" collapsible className="w-full">
