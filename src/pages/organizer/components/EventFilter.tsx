@@ -14,6 +14,8 @@ export function EventFilter({ onFilterChange }: any) {
     { key: "SCHEDULED", label: t.filters.scheduled },
     { key: "COMPLETED", label: t.filters.completed },
     { key: "REJECTED", label: t.filters.rejected },
+    { key: "CANCELLED", label: t.filters.cancelled },
+    { key: "ENDED", label: t.filters.ended },
   ];
 
   return (

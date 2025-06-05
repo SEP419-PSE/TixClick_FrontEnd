@@ -152,6 +152,9 @@ export default function Consumer() {
                               "bg-pse-gray": event.status === EventStatus.DRAFT,
                               "bg-pse-success":
                                 event.status === EventStatus.COMPLETED,
+                              "bg-cyan-500":
+                                event.status === EventStatus.CANCELLED,
+                              "bg-red-500": event.status === EventStatus.ENDED,
                             }
                           )}
                         >
@@ -168,12 +171,18 @@ export default function Consumer() {
                             "Đang diễn ra":
                               (event.status as EventStatus) ===
                               EventStatus.SCHEDULED,
-                            "Đã diễn ra":
+                            "Đã thanh toán":
                               (event.status as EventStatus) ===
                               EventStatus.COMPLETED,
-                            "Bị hủy":
+                            "Từ chối":
                               (event.status as EventStatus) ===
                               EventStatus.REJECTED,
+                            "Bị hủy":
+                              (event.status as EventStatus) ===
+                              EventStatus.CANCELLED,
+                            "Đã qua":
+                              (event.status as EventStatus) ===
+                              EventStatus.ENDED,
                           })}
                         </span>
                       </div>
