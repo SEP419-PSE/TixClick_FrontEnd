@@ -28,7 +28,7 @@ const revenueData = {
       { name: "Sat", value: 21300 },
       { name: "Sun", value: 22400 },
     ],
-    total: "45,231.89 VND",
+    total: "5,231.89 VND",
     change: "+20.1%",
   },
   "1M": {
@@ -100,9 +100,9 @@ export default function ManagerOverview() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">128</div>
-              <p className="text-xs text-gray-600">
+              {/* <p className="text-xs text-gray-600">
                 <span className="text-green-500 font-medium">+5.4%</span> from last month
-              </p>
+              </p> */}
             </CardContent>
           </Card>
           <Card className="bg-white">
@@ -112,7 +112,7 @@ export default function ManagerOverview() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">15</div>
-              <p className="text-xs text-gray-600">Next event in 3 days</p>
+              {/* <p className="text-xs text-gray-600">Next event in 3 days</p> */}
             </CardContent>
           </Card>
           <Card className="bg-white">
@@ -122,7 +122,7 @@ export default function ManagerOverview() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">92</div>
-              <p className="text-xs text-gray-600">3 pending approval</p>
+              {/* <p className="text-xs text-gray-600">3 pending approval</p> */}
             </CardContent>
           </Card>
           <Card className="bg-white">
@@ -133,7 +133,7 @@ export default function ManagerOverview() {
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">1,429,242 VND</div>
               <p className="text-xs text-gray-600">
-                <span className="text-green-500 font-medium">+12.5%</span> from last month
+                {/* <span className="text-green-500 font-medium">+12.5%</span> from last month */}
               </p>
             </CardContent>
           </Card>
@@ -147,9 +147,9 @@ export default function ManagerOverview() {
             <CardContent>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-2xl font-bold text-gray-800">45,231.89 VND</p>
+                  <p className="text-2xl font-bold text-gray-800">5,231.89 VND</p>
                   <p className="text-sm text-gray-600">
-                    <span className="text-green-500 font-medium">+20.1%</span> from previous period
+                    {/* <span className="text-green-500 font-medium">+20.1%</span> from previous period */}
                   </p>
                 </div>
                 <div className="flex space-x-2">
@@ -206,9 +206,9 @@ export default function ManagerOverview() {
               <CardTitle className="text-gray-800">New Users</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-800">573</div>
+              <div className="text-2xl font-bold text-gray-800">57</div>
               <p className="text-sm text-gray-600 mb-4">
-                <span className="text-green-500 font-medium">+11.4%</span> from last month
+                {/* <span className="text-green-500 font-medium">+11.4%</span> from last month */}
               </p>
               <Progress value={57} className="h-2" />
             </CardContent>
@@ -220,7 +220,7 @@ export default function ManagerOverview() {
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">3.6%</div>
               <p className="text-sm text-gray-600 mb-4">
-                <span className="text-red-500 font-medium">-0.8%</span> from last month
+                {/* <span className="text-red-500 font-medium">-0.8%</span> from last month */}
               </p>
               <Progress value={36} className="h-2" />
             </CardContent>
@@ -232,7 +232,7 @@ export default function ManagerOverview() {
             <CardContent>
               <div className="text-2xl font-bold text-gray-800">98.2%</div>
               <p className="text-sm text-gray-600 mb-4">
-                <span className="text-green-500 font-medium">+2.1%</span> from last month
+                {/* <span className="text-green-500 font-medium">+2.1%</span> from last month */}
               </p>
               <Progress value={98} className="h-2" />
             </CardContent>
