@@ -226,29 +226,10 @@ export default function EventsPage() {
   const handleUploadContract = async (file: File) => {
     if (!file || !selectedEvent) return
 
-    // Check if a contract with the same name already exists
-    const existingContract = relatedContracts.find((contract) => contract.fileName === file.name)
-
-    if (existingContract) {
-      toast.error("Hợp đồng với tên này đã tồn tại. Vui lòng chọn tên khác hoặc cập nhật hợp đồng hiện có.")
-      return
-    }
-
     try {
       setIsUploading(true)
       setUploadProgress(0)
 
-      // progressInterval = setInterval(() => {
-      //   setUploadProgress((prev) => {
-      //     if (prev >= 95) {
-      //       if (progressInterval) clearInterval(progressInterval)
-      //       return 95
-      //     }
-      //     return prev + 5
-      //   })
-      // }, 200)
-
-      // Log the file details before upload
       console.log("Uploading file:", {
         name: file.name,
         size: file.size,
@@ -256,22 +237,18 @@ export default function EventsPage() {
         lastModified: new Date(file.lastModified).toISOString(),
       })
 
-      // Make the API call
       const res = await managerApi.uploadContractManager(file)
       console.log("Upload contract response:", res)
 
-      // if (progressInterval) clearInterval(progressInterval)
-      // setUploadProgress(100)
-
       if (res.data && res.data.result) {
-        toast.success("Contract uploaded successfully")
+        // Chỉ hiển thị một toast success
+        toast.success("Hợp đồng đã được tải lên thành công")
         fetchEventList()
-        // Refresh related contracts if needed
         if (selectedEvent) {
           await fetchRelatedContracts(selectedEvent.eventId)
         }
       } else {
-        toast.error("Failed to upload contract")
+        toast.error("Không thể tải lên hợp đồng")
         console.error("Upload failed with response:", res)
       }
 
@@ -282,37 +259,25 @@ export default function EventsPage() {
         setIsUploading(false)
       }, 1000)
     } catch (error: any) {
-      // Type assertion to any to handle error properties
       console.error("Error uploading contract:", error)
 
-      // More detailed error logging
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error("Error response data:", error.response.data)
-        console.error("Error response status:", error.response.status)
-        console.error("Error response headers:", error.response.headers)
-
-        toast.error(`Upload Error: ${error.response.status}`, {
+        toast.error(`Lỗi tải lên: ${error.response.status}`, {
           description:
             (error.response.data?.message as string) ||
-            "Server rejected the request. Please check file format and size.",
+            "Server từ chối yêu cầu. Vui lòng kiểm tra định dạng và kích thước file.",
         })
       } else if (error.request) {
-        // The request was made but no response was received
-        console.error("Error request:", error.request)
-        toast.error("Upload Error", {
-          description: "No response received from server. Please check your connection.",
+        toast.error("Lỗi tải lên", {
+          description: "Không nhận được phản hồi từ server. Vui lòng kiểm tra kết nối.",
         })
       } else {
-        // Something happened in setting up the request that triggered an Error
-        toast.error("Upload Error", {
-          description: (error.message as string) || "There was an error uploading the contract. Please try again.",
+        toast.error("Lỗi tải lên", {
+          description: (error.message as string) || "Có lỗi xảy ra khi tải lên hợp đồng. Vui lòng thử lại.",
         })
       }
 
       setIsUploading(false)
-      // if (progressInterval) clearInterval(progressInterval)
     }
   }
 
@@ -421,7 +386,7 @@ export default function EventsPage() {
             Đã kết thúc
           </span>
         )
-       case EventStatus.COMPLETED:
+      case EventStatus.COMPLETED:
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-blue-900/70 text-blue-300 whitespace-nowrap">
             Đã hủy
@@ -923,7 +888,7 @@ export default function EventsPage() {
               <span className="text-gray-400">ID: {selectedEvent?.eventId}</span>
             </DialogDescription>
           </DialogHeader>
-        <Toaster position="top-center" />
+          <Toaster position="top-center" />
 
           {selectedEvent && (
             <div className="flex-1 overflow-y-auto py-4 pr-2">
