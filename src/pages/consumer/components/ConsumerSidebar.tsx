@@ -20,11 +20,11 @@ export function ConsumerSidebar() {
 
   const navigation = [
     { name: t.sidebar.myEvents, href: "/company", icon: FileText },
-    {
-      name: t.sidebar.reports,
-      href: "/company/reports",
-      icon: BarChart3,
-    },
+    // {
+    //   name: t.sidebar.reports,
+    //   href: "/company/reports",
+    //   icon: BarChart3,
+    // },
     { name: t.sidebar.terms, href: "/company/policies", icon: Book },
     { name: t.sidebar.members, href: "/company/members", icon: Contact },
     {
