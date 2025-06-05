@@ -600,7 +600,7 @@ export function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               className={cn(isActive("payments") && "bg-orange-100 text-orange-600 font-medium")}
@@ -610,7 +610,7 @@ export function DashboardSidebar() {
                 <span>Thanh toán</span>
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
 
           {/* Notifications page link - still keep this for navigation
           <SidebarMenuItem>
