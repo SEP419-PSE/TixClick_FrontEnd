@@ -12,8 +12,10 @@ const translations = {
       pending: "Chờ duyệt",
       confirmed: "Chờ hợp đồng",
       scheduled: "Diễn ra",
-      completed: "Đã qua",
-      rejected: "Bị hủy",
+      completed: "Đã nhận tiền",
+      rejected: "Từ chối",
+      cancelled: "Bị hủy",
+      ended: "Đã qua",
     },
     menu: {
       tickets: "Vé đã mua",
@@ -130,6 +132,8 @@ const translations = {
       scheduled: "scheduled",
       completed: "completed",
       rejected: "rejected",
+      cancelled: "cancelled",
+      ended: "ended",
     },
     menu: {
       tickets: "My Tickets",
