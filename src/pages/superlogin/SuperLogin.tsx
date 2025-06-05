@@ -1,113 +1,122 @@
-import { Eye, EyeOff, Lock, LogIn, User } from "lucide-react"
-import type React from "react"
-import { FormEvent, useContext, useState } from "react"
-import { useNavigate } from "react-router"
-import { toast, Toaster } from "sonner"
-import Logo from "../../assets/Logo.png"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { Checkbox } from "../../components/ui/checkbox"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { AuthContext } from "../../contexts/AuthProvider"
-import { LoginRequest } from "../../interface/superLogin/Login"
-import { cn } from "../../lib/utils"
-import superLoginApi from "../../services/superLogin/SuperLoginApi"
-
-
+import { Eye, EyeOff, Lock, LogIn, User } from "lucide-react";
+import type React from "react";
+import { FormEvent, useContext, useState } from "react";
+import { useNavigate } from "react-router";
+import { toast, Toaster } from "sonner";
+import Logo from "../../assets/Logo.png";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { AuthContext } from "../../contexts/AuthProvider";
+import { LoginRequest } from "../../interface/superLogin/Login";
+import { cn } from "../../lib/utils";
+import superLoginApi from "../../services/superLogin/SuperLoginApi";
 
 export default function SuperLogin() {
-  const authContext = useContext(AuthContext)
-  const navigate = useNavigate()
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState<LoginRequest>({
     userName: "",
     password: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formTouched, setFormTouched] = useState({
     userName: false,
     password: false,
-  })
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    console.log(`Updating ${name}:`, value)
+    const { name, value } = e.target;
+    console.log(`Updating ${name}:`, value);
 
     setCredentials((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // Thay đổi hàm handleLogin để hiển thị thông báo lỗi từ API
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault()
-    localStorage.removeItem("accessToken")
+    e.preventDefault();
+    localStorage.removeItem("accessToken");
 
     // Kiểm tra dữ liệu đầu vào
     if (!credentials.userName || !credentials.password) {
-      setFormTouched({ userName: true, password: true })
-      setError("Please fill in all required fields")
-      return
+      setFormTouched({ userName: true, password: true });
+      setError("Please fill in all required fields");
+      return;
     }
 
-    setIsLoading(true)
-    setError("")
+    setIsLoading(true);
+    setError("");
 
     try {
-      console.log("Submitting credentials:", credentials)
-      const response = await superLoginApi.login(credentials)
-      console.log("API Response:", response)
+      console.log("Submitting credentials:", credentials);
+      const response = await superLoginApi.login(credentials);
+      console.log("API Response:", response);
 
-      const result = response.data?.result
+      const result = response.data?.result;
       if (result?.status === true && result?.accessToken) {
         // Lưu token vào localStorage
-        localStorage.setItem("accessToken", result.accessToken)
-        localStorage.setItem("refreshToken", result.refreshToken)
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
 
         // Gọi superLogin với token
-        authContext?.superLogin(result.accessToken)
+        authContext?.superLogin(result.accessToken);
 
         // Đặt token cho Axios
-        authContext?.setTokenForAxios("super", result.accessToken)
+        authContext?.setTokenForAxios("super", result.accessToken);
 
         // Điều hướng sau khi đăng nhập thành công
-        toast.success("Login successful", { duration: 2000 })
+        toast.success("Login successful", { duration: 2000 });
         setTimeout(() => {
-          navigate(result.roleName === "ADMIN" ? "/proAdmin" : "/manager-dashboard")
-        }, 1000)
+          navigate(
+            result.roleName === "ADMIN"
+              ? "/proAdmin"
+              : "/manager-dashboard/company-approvals"
+          );
+        }, 1000);
       } else {
         // Hiển thị thông báo lỗi từ API nếu có
-        setError(response.data?.message || "Access denied")
+        setError(response.data?.message || "Access denied");
       }
     } catch (error: any) {
-      console.error("Login error:", error)
+      console.error("Login error:", error);
 
       // Hiển thị thông báo lỗi từ API response nếu có
       if (error.response && error.response.data) {
         // Kiểm tra các trường hợp khác nhau của cấu trúc response
         if (error.response.data.message) {
-          setError(error.response.data.message)
+          setError(error.response.data.message);
         } else if (error.response.data.error) {
-          setError(error.response.data.error)
+          setError(error.response.data.error);
         } else if (typeof error.response.data === "string") {
-          setError(error.response.data)
+          setError(error.response.data);
         } else {
-          setError("Invalid username or password")
+          setError("Invalid username or password");
         }
       } else if (error.message) {
         // Nếu có lỗi từ JavaScript/network
-        setError(error.message)
+        setError(error.message);
       } else {
         // Fallback cho trường hợp không có thông tin lỗi cụ thể
-        setError("Invalid username or password")
+        setError("Invalid username or password");
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#121212] to-[#1E1E1E] p-4">
@@ -127,20 +136,32 @@ export default function SuperLogin() {
                 <div className="absolute inset-0 " />
 
                 {/* <div className="relative bg-[#FF8A00] text-white p-3 rounded-full"> */}
-                <img src={Logo || "/placeholder.svg"} alt="Logo" className="h-18 w-16" />
+                <img
+                  src={Logo || "/placeholder.svg"}
+                  alt="Logo"
+                  className="h-18 w-16"
+                />
                 {/* </div> */}
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Admin Portal</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Admin Portal
+            </CardTitle>
             <CardDescription className="text-center text-gray-400">
               Enter your credentials to access the management system
             </CardDescription>
           </CardHeader>
 
-          <form onSubmit={handleLogin} className="animate-in fade-in duration-500">
+          <form
+            onSubmit={handleLogin}
+            className="animate-in fade-in duration-500"
+          >
             <CardContent className="space-y-5 pt-2">
               <div className="space-y-2">
-                <Label htmlFor="userName" className="text-gray-300 flex items-center gap-1.5">
+                <Label
+                  htmlFor="userName"
+                  className="text-gray-300 flex items-center gap-1.5"
+                >
                   <User className="h-3.5 w-3.5 text-[#FF8A00]" />
                   Username
                 </Label>
@@ -151,20 +172,27 @@ export default function SuperLogin() {
                     placeholder="Enter your username"
                     className={cn(
                       "bg-[#2A2A2A] border-[#3A3A3A] focus:border-[#FF8A00] focus:ring-[#FF8A00]/10 transition-all",
-                      formTouched.userName && !credentials.userName ? "border-red-500" : "",
+                      formTouched.userName && !credentials.userName
+                        ? "border-red-500"
+                        : ""
                     )}
                     value={credentials.userName}
                     onChange={handleInputChange}
                     autoComplete="username"
                   />
                   {formTouched.userName && !credentials.userName && (
-                    <p className="text-red-400 text-xs mt-1 ml-1">Username is required</p>
+                    <p className="text-red-400 text-xs mt-1 ml-1">
+                      Username is required
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-300 flex items-center gap-1.5">
+                <Label
+                  htmlFor="password"
+                  className="text-gray-300 flex items-center gap-1.5"
+                >
                   <Lock className="h-3.5 w-3.5 text-[#FF8A00]" />
                   Password
                 </Label>
@@ -176,7 +204,9 @@ export default function SuperLogin() {
                     placeholder="Enter your password"
                     className={cn(
                       "bg-[#2A2A2A] border-[#3A3A3A] focus:border-[#FF8A00] focus:ring-[#FF8A00]/10 transition-all",
-                      formTouched.password && !credentials.password ? "border-red-500" : "",
+                      formTouched.password && !credentials.password
+                        ? "border-red-500"
+                        : ""
                     )}
                     value={credentials.password}
                     onChange={handleInputChange}
@@ -189,11 +219,19 @@ export default function SuperLogin() {
                     className="absolute right-1 top-1 h-8 w-8 text-gray-400 hover:text-white"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                   {formTouched.password && !credentials.password && (
-                    <p className="text-red-400 text-xs mt-1 ml-1">Password is required</p>
+                    <p className="text-red-400 text-xs mt-1 ml-1">
+                      Password is required
+                    </p>
                   )}
                 </div>
               </div>
@@ -210,11 +248,17 @@ export default function SuperLogin() {
                     id="remember"
                     className="border-gray-500 text-[#FF8A00] data-[state=checked]:bg-[#FF8A00] data-[state=checked]:border-[#FF8A00]"
                   />
-                  <Label htmlFor="remember" className="text-sm text-gray-300 cursor-pointer">
+                  <Label
+                    htmlFor="remember"
+                    className="text-sm text-gray-300 cursor-pointer"
+                  >
                     Remember me
                   </Label>
                 </div>
-                <a href="#" className="text-sm text-[#FF8A00] hover:text-[#FF9A20] hover:underline transition-colors">
+                <a
+                  href="#"
+                  className="text-sm text-[#FF8A00] hover:text-[#FF9A20] hover:underline transition-colors"
+                >
                   Forgot password?
                 </a>
               </div>
@@ -247,9 +291,5 @@ export default function SuperLogin() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
-
-
