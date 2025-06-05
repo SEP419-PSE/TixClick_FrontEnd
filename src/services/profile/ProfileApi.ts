@@ -38,6 +38,9 @@ const profileApi = {
     if (data.lastName !== null) formData.append("lastName", data.lastName);
     if (data.email !== null) formData.append("email", data.email);
     if (data.phone !== null) formData.append("phone", data.phone);
+    if (data.bankingCode !== null) formData.append("bankingCode", data.bankingCode);
+    if (data.bankingName !== null) formData.append("bankingName", data.bankingName);
+    if (data.ownerCard !== null) formData.append("ownerCard", data.ownerCard);
 
     if (data.dob !== null) {
       const dobValue =

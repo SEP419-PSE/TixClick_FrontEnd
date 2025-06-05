@@ -712,7 +712,7 @@ export function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               className={cn(
@@ -725,7 +725,7 @@ export function DashboardSidebar() {
                 <span>Thanh toán</span>
               </Link>
             </SidebarMenuButton>
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
 
           {/* Notifications page link - still keep this for navigation
           <SidebarMenuItem>

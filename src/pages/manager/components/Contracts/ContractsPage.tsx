@@ -1,10 +1,9 @@
 import {
-  Bell,
   ChevronLeft,
   ChevronRight,
   DollarSign,
   MoreHorizontal,
-  Search,
+  Search
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
@@ -173,7 +172,7 @@ export default function ContractsPage() {
       })
 
       // Check if the token exists
-      const token = localStorage.getItem("accessToken2")
+      const token = localStorage.getItem("accessToken")
       if (!token) {
         toast.error("Authentication token not found. Please log in again.")
         return
@@ -315,6 +314,12 @@ export default function ContractsPage() {
             Đang xử lý
           </span>
         )
+         case "CANCELLED":
+        return (
+          <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
+            Đã hủy
+          </span>
+        )
       case "Expired":
         return (
           <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full bg-red-900/70 text-red-300 whitespace-nowrap">
@@ -436,10 +441,10 @@ export default function ContractsPage() {
                           <DropdownMenuLabel>Tác vụ</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => openContractModal(contract)}>Xem chi tiết</DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-yellow-500">
+                          {/* <DropdownMenuItem className="text-yellow-500">
                             <Bell className="mr-2 h-4 w-4" />
                             Set reminder
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuItem className="text-red-500">Chấm dứt hợp đồng</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -758,9 +763,9 @@ export default function ContractsPage() {
                                     <Toaster position="top-center" />
 
                                     <DialogHeader>
-                                      <DialogTitle>Payment QR Code</DialogTitle>
+                                      <DialogTitle>Thanh toán mã QR</DialogTitle>
                                       <DialogDescription>
-                                        Scan this QR code to pay for {selectedContractDetail?.contractDetailName}
+                                        Quét QR này để thanh toán cho {selectedContractDetail?.contractDetailName}
                                       </DialogDescription>
                                     </DialogHeader>
                                     <div className="flex flex-col items-center justify-center p-4">
@@ -806,41 +811,41 @@ export default function ContractsPage() {
                                           />
                                         ) : (
                                           <div className="w-48 h-48 flex items-center justify-center text-gray-800">
-                                            No QR code available
+                                            Không có QR nào để hiển thị
                                           </div>
                                         )}
                                       </div>
                                       <div className="text-center space-y-2">
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Amount:</span> 
+                                          <span className="text-gray-400">Tổng tiền:</span> 
                                           {qrData?.amount?.toLocaleString() ||
                                             selectedContractDetail?.contractAmount?.toLocaleString() ||
                                             "0"}
                                             &nbsp;VND
                                         </p>
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Due Date:</span>{" "}
+                                          <span className="text-gray-400">Ngày:</span>{" "}
                                           {qrData?.dueDate || selectedContractDetail?.contractPayDate || "N/A"}
                                         </p>
                                         {/* <p className="text-sm">
                                           <span className="text-gray-400">Bank:</span> {qrData?.bankID || "N/A"}
                                         </p> */}
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Account:</span> {qrData?.accountID || "N/A"}
+                                          <span className="text-gray-400">Tài khoản:</span> {qrData?.accountID || "N/A"}
                                         </p>
                                         <p className="text-sm">
-                                          <span className="text-gray-400">Reference:</span>{" "}
+                                          <span className="text-gray-400">Mã:</span>{" "}
                                           {selectedContractDetail?.contractDetailCode || "N/A"}
                                         </p>
                                         {qrData?.description && (
                                           <p className="text-sm">
-                                            <span className="text-gray-400">Description:</span> {qrData.description}
+                                            <span className="text-gray-400">Nội dung:</span> {qrData.description}
                                           </p>
                                         )}
                                       </div>
                                     </div>
-                                    <DialogFooter className="flex flex-col gap-2 items-stretch">
-                                      <div className="p-4 bg-[#1E1E1E] rounded-lg">
+                                    <DialogFooter className="p-0 flex flex-col gap-2 items-stretch">
+                                      <div className="w-full bg-[#1E1E1E] rounded-lg p-4">
                                         <h4 className="text-md font-medium mb-2">Xác thực thanh toán</h4>
                                         <div className="space-y-3">
                                           <p className="text-sm text-gray-400">
@@ -882,7 +887,14 @@ export default function ContractsPage() {
                             {selectedContract?.totalAmount?.toLocaleString() || "0"}
                             &nbsp;VND
                           </p>
+                        
+                           <p className="text-sm text-gray-400">Phần trăm lợi nhuận:</p>
+                          <p className="text-lg font-semibold">
+                            {selectedContract?.commission?.toLocaleString() || "0"}
+                            &nbsp;%
+                          </p>
                         </div>
+                        
                         <div>
                           <p className="text-sm text-gray-400">Tổng phải thanh toán:</p>
                           <p className="text-lg font-semibold">

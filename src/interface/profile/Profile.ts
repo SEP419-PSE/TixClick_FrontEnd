@@ -9,5 +9,9 @@ export interface Profile {
     avatarURL: string | null;
     dob: Date;
     roleId: number;
+    bankingName?: string
+  bankingCode?: string
+  ownerCard?: string
+
   }
   

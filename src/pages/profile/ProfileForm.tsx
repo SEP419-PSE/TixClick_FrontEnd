@@ -20,220 +20,204 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Tabs, TabsContent } from "../../components/ui/tabs";
+import { ROLE_ID } from "../../constants/constants";
 import { Profile } from "../../interface/profile/Profile";
 import profileApi from "../../services/profile/ProfileApi";
 import { getCroppedImg } from "./imageUtils";
-import { ROLE_ID } from "../../constants/constants";
 
-interface ExtendedProfile extends Profile {
-  fullName?: string;
+interface CroppedAreaPixels {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
-// Define crop area pixels interface
-interface CroppedAreaPixels {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+interface ProfileFormData extends Omit<Profile, "dob"> {
+  dob: string
 }
 
 export default function ProfileForm() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [image, setImage] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<ExtendedProfile>(
-    {} as ExtendedProfile
-  );
-  const [loading, setLoading] = useState(false);
-  const [croppedAreaPixels, setCroppedAreaPixels] =
-    useState<CroppedAreaPixels | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [image, setImage] = useState<string | null>(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [editMode, setEditMode] = useState(false)
+  const [formData, setFormData] = useState<ProfileFormData>({} as ProfileFormData)
+  const [loading, setLoading] = useState(false)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null)
 
   const fetchProfile = async () => {
     try {
-      const res = await profileApi.getProfile();
+      const res = await profileApi.getProfile()
       if (res.data.result) {
-        setProfile(res.data.result);
+        setProfile(res.data.result)
       }
     } catch (error) {
-      console.error("Lỗi khi lấy profile:", error);
-      toast.error("Không thể tải thông tin người dùng");
+      console.error("Lỗi khi lấy profile:", error)
+      toast.error("Không thể tải thông tin người dùng")
     }
-  };
+  }
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    fetchProfile()
+  }, [])
 
   useEffect(() => {
     if (profile) {
-      setFormData({
+      const formattedProfile: ProfileFormData = {
         ...profile,
-      });
+        dob: profile.dob ? new Date(profile.dob).toISOString().split("T")[0] : "",
+      }
+      setFormData(formattedProfile)
     }
-  }, [profile]);
+  }, [profile])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
+      const imageUrl = URL.createObjectURL(file)
+      setImage(imageUrl)
     }
-  };
+  }
 
   const uploadProfileImage = async (croppedImageBlob: Blob) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      // Convert blob to File object with an appropriate name and type
       const avatarFile = new File([croppedImageBlob], "avatar.jpg", {
         type: "image/jpeg",
-      });
+      })
 
-      // Call the API with current profile data and the new avatar file
-      // Need to update ProfileApi.updateProfile to accept File or null
-      const response = await profileApi.updateProfile(
-        profile as Profile,
-        avatarFile as File
-      );
-
-      console.log(response);
+      const response = await profileApi.updateProfile(profile as Profile, avatarFile as File)
 
       if (response.data.result) {
-        // Update local state with the response from server
-        // if (profile) {
-        //   setProfile({
-        //     ...profile,
-        //     avatarURL:
-        //       response.data.result?.avatarURL ||
-        //       URL.createObjectURL(croppedImageBlob),
-        //   });
-        // }
-        location.reload();
+        location.reload()
       } else {
-        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại");
+        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại")
       }
     } catch (error) {
-      console.error("Error uploading profile image:", error);
-      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.");
+      console.error("Error uploading profile image:", error)
+      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.")
     } finally {
-      setLoading(false);
-      setImage(null); // Close the cropper modal
+      setLoading(false)
+      setImage(null)
     }
-  };
+  }
 
-  const handleCropComplete = async (
-    _: unknown,
-    croppedAreaPixels: CroppedAreaPixels
-  ) => {
+  const handleCropComplete = async (_: unknown, croppedAreaPixels: CroppedAreaPixels) => {
     try {
-      if (!image) return;
+      if (!image) return
 
-      // Show loading state
-      setLoading(true);
-
-      // Get the cropped image as a blob
-      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0);
+      setLoading(true)
+      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0)
 
       if (croppedImage) {
-        // Upload the cropped image using the updated function
-        await uploadProfileImage(croppedImage);
+        await uploadProfileImage(croppedImage)
       }
     } catch (error) {
-      console.error("Error cropping image:", error);
-      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.");
+      console.error("Error cropping image:", error)
+      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getInitials = (firstName?: string, lastName?: string) => {
-    if (!firstName && !lastName) return "U";
-    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`;
-  };
+    if (!firstName && !lastName) return "U"
+    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
       if (!profile?.accountId) {
-        throw new Error("Missing account ID");
+        throw new Error("Missing account ID")
       }
 
-      // Extract only the fields accepted by the API
       const updateData: Profile = {
-        ...profile,
+        accountId: profile.accountId,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
+        userName: profile.userName, 
         phone: formData.phone || "",
         email: formData.email || "",
-        dob: formData.dob || "",
-      };
+        dob: formData.dob ? new Date(formData.dob) : profile.dob,
+        roleId: profile.roleId, 
+        avatarURL: profile.avatarURL, 
+        bankingName: formData.bankingName || "",
+        bankingCode: formData.bankingCode || "",
+        ownerCard: formData.ownerCard || "",
+      }
 
-      // Call API with form data but no avatar file (null)
-      const response = await profileApi.updateProfile(updateData, null);
+      console.log("Sending update data:", JSON.stringify(updateData, null, 2)) 
 
-      if (response.data && response.data.success) {
-        // Update profile state with response data
-        const updatedProfile = response.data.result || {
-          ...profile,
-          ...updateData,
-        };
+      const response = await profileApi.updateProfile(updateData, null)
 
-        setProfile(updatedProfile);
-        toast.success("Cập nhật thông tin thành công!");
-        setEditMode(false);
+      console.log("API Response:", JSON.stringify(response.data, null, 2))
+
+      if (response.data) {
+        if (response.data.result) {
+          setProfile(response.data.result)
+          toast.success("Cập nhật thông tin thành công!")
+        } else {
+          setProfile({
+            ...profile,
+            ...updateData,
+          })
+          toast.success("Đã lưu thông tin!")
+        }
+
+        setTimeout(() => {
+          fetchProfile()
+        }, 500)
+
+        setEditMode(false)
       } else {
-        toast.error(response.data?.message || "Cập nhật thất bại");
+        console.error("API response has no data:", response)
+        toast.error("Cập nhật thất bại: Không nhận được phản hồi từ máy chủ")
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
+      console.error("Error updating profile:", error)
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const renderRoleName = (roleId: number | undefined): JSX.Element => {
-    const role = ROLE_ID.find((r) => r.id === roleId);
+    const role = ROLE_ID.find((r) => r.id === roleId)
     if (!role) {
-      return <span className="text-gray-500 italic">Không rõ</span>;
+      return <span className="text-gray-500 italic">Không rõ</span>
     }
     const roleColorMap: Record<string, string> = {
       ADMIN: "text-red-500",
       BUYER: "text-green-500",
       ORGANIZER: "text-pse-green",
       MANAGER: "text-purple-500",
-    };
+    }
 
     return (
-      <span
-        className={`font-semibold text-sm ${
-          roleColorMap[role?.roleName] || "text-black"
-        }`}
-      >
-        {role.roleVi}
-      </span>
-    );
-  };
+      <span className={`font-semibold text-sm ${roleColorMap[role?.roleName] || "text-black"}`}>{role.roleVi}</span>
+    )
+  }
 
   return (
     <>
       <div className="min-h-screen bg-[#1E1E1E] text-gray-200 flex flex-col">
         <Header />
         <Toaster />
-        <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-28">
+        <div className="flex-1 container mx-auto px-4 py-8 max-w-5xl mt-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <div className="bg-[#1A1A1A] rounded-2xl shadow-xl overflow-hidden border border-[#2A2A2A]">
@@ -251,10 +235,7 @@ export default function ProfileForm() {
                 <div className="px-6 pb-6 -mt-16 flex flex-col items-center">
                   <div className="relative">
                     <Avatar className="h-32 w-32 border-4 border-[#1A1A1A] shadow-lg">
-                      <AvatarImage
-                        src={profile?.avatarURL || ""}
-                        alt="Avatar"
-                      />
+                      <AvatarImage src={profile?.avatarURL || ""} alt="Avatar" />
                       <AvatarFallback className="text-3xl bg-gradient-to-br from-[#FF8A00] to-[#FF9A20] text-white">
                         {getInitials(profile?.firstName, profile?.lastName)}
                       </AvatarFallback>
@@ -279,8 +260,7 @@ export default function ProfileForm() {
                   </div>
 
                   <h2 className="flex flex-col items-center mt-4 text-xl font-bold text-white">
-                    {profile?.userName || "Người dùng"}{" "}
-                    {renderRoleName(profile?.roleId)}
+                    {profile?.userName || "Người dùng"} {renderRoleName(profile?.roleId)}
                   </h2>
 
                   <div className="w-full mt-6 space-y-4">
@@ -300,6 +280,20 @@ export default function ProfileForm() {
                       <Mail className="h-5 w-5 mr-3 text-[#FF8A00]" />
                       <span>{profile?.email || "Chưa cập nhật"}</span>
                     </div>
+
+                    {/* Display banking info in sidebar */}
+                    {(profile?.bankingName || profile?.bankingCode) && (
+                      <div className="pt-4 border-t border-[#3A3A3A]">
+                        <h5 className="text-sm font-medium text-gray-300 mb-2">Thông tin ngân hàng</h5>
+                        {profile?.bankingName && (
+                          <div className="text-xs text-gray-400 mb-1">Ngân hàng: {profile.bankingName}</div>
+                        )}
+                        {profile?.bankingCode && (
+                          <div className="text-xs text-gray-400 mb-1">STK: {profile.bankingCode}</div>
+                        )}
+                        {profile?.ownerCard && <div className="text-xs text-gray-400">Chủ TK: {profile.ownerCard}</div>}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -314,125 +308,202 @@ export default function ProfileForm() {
                     transition={{ duration: 0.3 }}
                     className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 border border-[#2A2A2A]"
                   >
-                    <h3 className="text-xl font-bold text-white mb-6">
-                      {editMode ? "Chỉnh sửa thông tin" : "Thông tin cá nhân"}
-                    </h3>
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                      <div className="space-y-4">
+                        <h4 className="text-lg font-semibold text-white border-b border-[#3A3A3A] pb-2">
+                          Thông tin cá nhân
+                        </h4>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Họ
-                        </label>
-                        <div className="relative">
-                          <Input
-                            name="lastName"
-                            value={formData.lastName || ""}
-                            onChange={handleInputChange}
-                            disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
-                              !editMode ? "opacity-80" : ""
-                            }`}
-                          />
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Họ</label>
+                            <div className="relative">
+                              <Input
+                                name="lastName"
+                                value={formData.lastName || ""}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Tên</label>
+                            <div className="relative">
+                              <Input
+                                name="firstName"
+                                value={formData.firstName || ""}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Số điện thoại</label>
+                            <div className="relative">
+                              <Input
+                                name="phone"
+                                type="tel"
+                                value={formData.phone || ""}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Ngày sinh</label>
+                            <div className="relative">
+                              <Input
+                                name="dob"
+                                type="date"
+                                value={formData.dob}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-300">Email</label>
+                          <div className="relative">
+                            <Input
+                              name="email"
+                              type="email"
+                              value={formData.email || ""}
+                              onChange={handleInputChange}
+                              disabled
+                              className="pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] opacity-80"
+                            />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          </div>
+                          <p className="text-xs text-gray-500">Email không thể thay đổi</p>
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Tên
-                        </label>
-                        <div className="relative">
-                          <Input
-                            name="firstName"
-                            value={formData.firstName || ""}
-                            onChange={handleInputChange}
-                            disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
-                              !editMode ? "opacity-80" : ""
-                            }`}
-                          />
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        </div>
-                      </div>
 
-                      <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Số điện thoại
-                        </label>
-                        <div className="relative">
-                          <Input
-                            name="phone"
-                            type="tel"
-                            value={formData.phone || ""}
-                            onChange={handleInputChange}
-                            disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
-                              !editMode ? "opacity-80" : ""
-                            }`}
-                          />
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        </div>
-                      </div>
+                      <div className="space-y-4">
+                        <h4 className="text-lg font-semibold text-white border-b border-[#3A3A3A] pb-2">
+                          Thông tin ngân hàng
+                        </h4>
 
-                      <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Email
-                        </label>
-                        <div className="relative">
-                          <Input
-                            name="email"
-                            type="email"
-                            value={formData.email || ""}
-                            onChange={handleInputChange}
-                            disabled
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
-                              !editMode ? "opacity-80" : ""
-                            }`}
-                          />
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <div className="space-y-1">
+                          <label className="text-sm font-medium text-gray-300">Tên ngân hàng</label>
+                          <div className="relative">
+                            <Input
+                              name="bankingName"
+                              value={formData.bankingName || ""}
+                              onChange={handleInputChange}
+                              disabled={!editMode}
+                              placeholder="Ví dụ: Vietcombank, BIDV, Techcombank..."
+                              className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                !editMode ? "opacity-80" : ""
+                              }`}
+                            />
+                            <svg
+                              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              />
+                            </svg>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-300">
-                          Ngày sinh
-                        </label>
-                        <div className="relative">
-                          <Input
-                            name="dob"
-                            type="date"
-                            value={
-                              typeof formData.dob === "string"
-                                ? formData.dob
-                                : ""
-                            }
-                            onChange={handleInputChange}
-                            disabled={!editMode}
-                            className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
-                              !editMode ? "opacity-80" : ""
-                            }`}
-                          />
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Số tài khoản ngân hàng</label>
+                            <div className="relative">
+                              <Input
+                                name="bankingCode"
+                                value={formData.bankingCode || ""}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                placeholder="Nhập số tài khoản"
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <svg
+                                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-sm font-medium text-gray-300">Tên chủ tài khoản</label>
+                            <div className="relative">
+                              <Input
+                                name="ownerCard"
+                                value={formData.ownerCard || ""}
+                                onChange={handleInputChange}
+                                disabled={!editMode}
+                                placeholder="Tên chủ tài khoản ngân hàng"
+                                className={`pl-10 bg-[#2A2A2A] border-[#3A3A3A] text-white focus:ring-[#FF8A00] focus:border-[#FF8A00] ${
+                                  !editMode ? "opacity-80" : ""
+                                }`}
+                              />
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       {editMode && (
-                        <Button
-                          type="submit"
-                          className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <div className="flex items-center">
-                              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                              Đang lưu
-                            </div>
-                          ) : (
-                            <div className="flex items-center">
-                              <Check className="mr-2 h-4 w-4" />
-                              Lưu thông tin
-                            </div>
-                          )}
-                        </Button>
+                        <div className="pt-4 border-t border-[#3A3A3A]">
+                          <Button
+                            type="submit"
+                            className="w-full bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
+                            disabled={loading}
+                          >
+                            {loading ? (
+                              <div className="flex items-center">
+                                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                                Đang lưu
+                              </div>
+                            ) : (
+                              <div className="flex items-center">
+                                <Check className="mr-2 h-4 w-4" />
+                                Lưu thông tin
+                              </div>
+                            )}
+                          </Button>
+                        </div>
                       )}
                     </form>
                   </motion.div>
@@ -440,17 +511,13 @@ export default function ProfileForm() {
 
                 <TabsContent value="security">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">
-                      Tính năng bảo mật sẽ được cập nhật sau
-                    </p>
+                    <p className="text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="preferences">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">
-                      Tính năng tùy chọn sẽ được cập nhật sau
-                    </p>
+                    <p className="text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -466,9 +533,7 @@ export default function ProfileForm() {
               className="bg-[#1A1A1A] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-[#2A2A2A]"
             >
               <div className="p-4 bg-gradient-to-r from-[#FF8A00] to-[#FF9A20] text-white">
-                <h3 className="text-lg font-semibold text-center">
-                  Chỉnh sửa ảnh đại diện
-                </h3>
+                <h3 className="text-lg font-semibold text-center">Chỉnh sửa ảnh đại diện</h3>
               </div>
 
               <div className="p-6">
@@ -483,8 +548,7 @@ export default function ProfileForm() {
                     cropShape="round"
                     showGrid={false}
                     onCropComplete={(_, croppedAreaPixels) => {
-                      // Store the crop data for later use
-                      setCroppedAreaPixels(croppedAreaPixels);
+                      setCroppedAreaPixels(croppedAreaPixels)
                     }}
                   />
                 </div>
@@ -492,12 +556,8 @@ export default function ProfileForm() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <label className="text-sm font-medium text-gray-300">
-                        Phóng to
-                      </label>
-                      <span className="text-sm text-gray-400">
-                        {zoom.toFixed(1)}x
-                      </span>
+                      <label className="text-sm font-medium text-gray-300">Phóng to</label>
+                      <span className="text-sm text-gray-400">{zoom.toFixed(1)}x</span>
                     </div>
                     <div className="flex items-center">
                       <input
@@ -506,9 +566,7 @@ export default function ProfileForm() {
                         max="3"
                         step="0.1"
                         value={zoom}
-                        onChange={(e) =>
-                          setZoom(Number.parseFloat(e.target.value))
-                        }
+                        onChange={(e) => setZoom(Number.parseFloat(e.target.value))}
                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                       />
                     </div>
@@ -524,12 +582,7 @@ export default function ProfileForm() {
                     </Button>
                     <Button
                       className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                      onClick={() =>
-                        handleCropComplete(
-                          null,
-                          croppedAreaPixels as CroppedAreaPixels
-                        )
-                      }
+                      onClick={() => handleCropComplete(null, croppedAreaPixels as CroppedAreaPixels)}
                       disabled={loading}
                     >
                       {loading ? (
@@ -549,5 +602,5 @@ export default function ProfileForm() {
         )}
       </div>
     </>
-  );
+  )
 }
