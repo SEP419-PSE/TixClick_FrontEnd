@@ -26,191 +26,208 @@ import profileApi from "../../services/profile/ProfileApi";
 import { getCroppedImg } from "./imageUtils";
 
 interface CroppedAreaPixels {
-  x: number
-  y: number
-  width: number
-  height: number
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
 interface ProfileFormData extends Omit<Profile, "dob"> {
-  dob: string
+  dob: string;
 }
 
 export default function ProfileForm() {
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [image, setImage] = useState<string | null>(null)
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [editMode, setEditMode] = useState(false)
-  const [formData, setFormData] = useState<ProfileFormData>({} as ProfileFormData)
-  const [loading, setLoading] = useState(false)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState<ProfileFormData>(
+    {} as ProfileFormData
+  );
+  const [loading, setLoading] = useState(false);
+  const [croppedAreaPixels, setCroppedAreaPixels] =
+    useState<CroppedAreaPixels | null>(null);
 
   const fetchProfile = async () => {
     try {
-      const res = await profileApi.getProfile()
+      const res = await profileApi.getProfile();
       if (res.data.result) {
-        setProfile(res.data.result)
+        setProfile(res.data.result);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy profile:", error)
-      toast.error("Không thể tải thông tin người dùng")
+      console.error("Lỗi khi lấy profile:", error);
+      toast.error("Không thể tải thông tin người dùng");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     if (profile) {
       const formattedProfile: ProfileFormData = {
         ...profile,
-        dob: profile.dob ? new Date(profile.dob).toISOString().split("T")[0] : "",
-      }
-      setFormData(formattedProfile)
+        dob: profile.dob
+          ? new Date(profile.dob).toISOString().split("T")[0]
+          : "",
+      };
+      setFormData(formattedProfile);
     }
-  }, [profile])
+  }, [profile]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file)
-      setImage(imageUrl)
+      const imageUrl = URL.createObjectURL(file);
+      setImage(imageUrl);
     }
-  }
+  };
 
   const uploadProfileImage = async (croppedImageBlob: Blob) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       const avatarFile = new File([croppedImageBlob], "avatar.jpg", {
         type: "image/jpeg",
-      })
+      });
 
-      const response = await profileApi.updateProfile(profile as Profile, avatarFile as File)
+      const response = await profileApi.updateProfile(
+        profile as Profile,
+        avatarFile as File
+      );
 
       if (response.data.result) {
-        location.reload()
+        location.reload();
       } else {
-        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại")
+        toast.error(response.data?.message || "Cập nhật ảnh đại diện thất bại");
       }
     } catch (error) {
-      console.error("Error uploading profile image:", error)
-      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.")
+      console.error("Error uploading profile image:", error);
+      toast.error("Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
-      setImage(null)
+      setLoading(false);
+      setImage(null);
     }
-  }
+  };
 
-  const handleCropComplete = async (_: unknown, croppedAreaPixels: CroppedAreaPixels) => {
+  const handleCropComplete = async (
+    _: unknown,
+    croppedAreaPixels: CroppedAreaPixels
+  ) => {
     try {
-      if (!image) return
+      if (!image) return;
 
-      setLoading(true)
-      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0)
+      setLoading(true);
+      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 0);
 
       if (croppedImage) {
-        await uploadProfileImage(croppedImage)
+        await uploadProfileImage(croppedImage);
       }
     } catch (error) {
-      console.error("Error cropping image:", error)
-      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.")
+      console.error("Error cropping image:", error);
+      toast.error("Có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getInitials = (firstName?: string, lastName?: string) => {
-    if (!firstName && !lastName) return "U"
-    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`
-  }
+    if (!firstName && !lastName) return "U";
+    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
       if (!profile?.accountId) {
-        throw new Error("Missing account ID")
+        throw new Error("Missing account ID");
       }
 
       const updateData: Profile = {
         accountId: profile.accountId,
         firstName: formData.firstName || "",
         lastName: formData.lastName || "",
-        userName: profile.userName, 
+        userName: profile.userName,
         phone: formData.phone || "",
         email: formData.email || "",
         dob: formData.dob ? new Date(formData.dob) : profile.dob,
-        roleId: profile.roleId, 
-        avatarURL: profile.avatarURL, 
+        roleId: profile.roleId,
+        avatarURL: profile.avatarURL,
         bankingName: formData.bankingName || "",
         bankingCode: formData.bankingCode || "",
         ownerCard: formData.ownerCard || "",
-      }
+      };
 
-      console.log("Sending update data:", JSON.stringify(updateData, null, 2)) 
+      console.log("Sending update data:", JSON.stringify(updateData, null, 2));
 
-      const response = await profileApi.updateProfile(updateData, null)
+      const response = await profileApi.updateProfile(updateData, null);
 
-      console.log("API Response:", JSON.stringify(response.data, null, 2))
+      console.log("API Response:", JSON.stringify(response.data, null, 2));
 
       if (response.data) {
         if (response.data.result) {
-          setProfile(response.data.result)
-          toast.success("Cập nhật thông tin thành công!")
+          setProfile(response.data.result);
+          toast.success("Cập nhật thông tin thành công!");
         } else {
           setProfile({
             ...profile,
             ...updateData,
-          })
-          toast.success("Đã lưu thông tin!")
+          });
+          toast.success("Đã lưu thông tin!");
         }
 
         setTimeout(() => {
-          fetchProfile()
-        }, 500)
+          fetchProfile();
+        }, 500);
 
-        setEditMode(false)
+        setEditMode(false);
       } else {
-        console.error("API response has no data:", response)
-        toast.error("Cập nhật thất bại: Không nhận được phản hồi từ máy chủ")
+        console.error("API response has no data:", response);
+        toast.error("Cập nhật thất bại: Không nhận được phản hồi từ máy chủ");
       }
     } catch (error) {
-      console.error("Error updating profile:", error)
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại.")
+      console.error("Error updating profile:", error);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const renderRoleName = (roleId: number | undefined): JSX.Element => {
-    const role = ROLE_ID.find((r) => r.id === roleId)
+    const role = ROLE_ID.find((r) => r.id === roleId);
     if (!role) {
-      return <span className="text-gray-500 italic">Không rõ</span>
+      return <span className="text-gray-500 italic">Không rõ</span>;
     }
     const roleColorMap: Record<string, string> = {
       ADMIN: "text-red-500",
       BUYER: "text-green-500",
       ORGANIZER: "text-pse-green",
       MANAGER: "text-purple-500",
-    }
+    };
 
     return (
-      <span className={`font-semibold text-sm ${roleColorMap[role?.roleName] || "text-black"}`}>{role.roleVi}</span>
-    )
-  }
+      <span
+        className={`font-semibold text-sm ${
+          roleColorMap[role?.roleName] || "text-black"
+        }`}
+      >
+        {role.roleVi}
+      </span>
+    );
+  };
 
   return (
     <>
@@ -235,7 +252,10 @@ export default function ProfileForm() {
                 <div className="px-6 pb-6 -mt-16 flex flex-col items-center">
                   <div className="relative">
                     <Avatar className="h-32 w-32 border-4 border-[#1A1A1A] shadow-lg">
-                      <AvatarImage src={profile?.avatarURL || ""} alt="Avatar" />
+                      <AvatarImage
+                        src={profile?.avatarURL || ""}
+                        alt="Avatar"
+                      />
                       <AvatarFallback className="text-3xl bg-gradient-to-br from-[#FF8A00] to-[#FF9A20] text-white">
                         {getInitials(profile?.firstName, profile?.lastName)}
                       </AvatarFallback>
@@ -260,7 +280,8 @@ export default function ProfileForm() {
                   </div>
 
                   <h2 className="flex flex-col items-center mt-4 text-xl font-bold text-white">
-                    {profile?.userName || "Người dùng"} {renderRoleName(profile?.roleId)}
+                    {profile?.userName || "Người dùng"}{" "}
+                    {renderRoleName(profile?.roleId)}
                   </h2>
 
                   <div className="w-full mt-6 space-y-4">
@@ -284,14 +305,24 @@ export default function ProfileForm() {
                     {/* Display banking info in sidebar */}
                     {(profile?.bankingName || profile?.bankingCode) && (
                       <div className="pt-4 border-t border-[#3A3A3A]">
-                        <h5 className="text-sm font-medium text-gray-300 mb-2">Thông tin ngân hàng</h5>
+                        <h5 className="text-sm font-medium text-gray-300 mb-2">
+                          Thông tin ngân hàng
+                        </h5>
                         {profile?.bankingName && (
-                          <div className="text-xs text-gray-400 mb-1">Ngân hàng: {profile.bankingName}</div>
+                          <div className="text-xs text-gray-400 mb-1">
+                            Ngân hàng: {profile.bankingName}
+                          </div>
                         )}
                         {profile?.bankingCode && (
-                          <div className="text-xs text-gray-400 mb-1">STK: {profile.bankingCode}</div>
+                          <div className="text-xs text-gray-400 mb-1">
+                            STK: {profile.bankingCode}
+                          </div>
                         )}
-                        {profile?.ownerCard && <div className="text-xs text-gray-400">Chủ TK: {profile.ownerCard}</div>}
+                        {profile?.ownerCard && (
+                          <div className="text-xs text-gray-400">
+                            Chủ TK: {profile.ownerCard}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -316,7 +347,9 @@ export default function ProfileForm() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Họ</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Họ
+                            </label>
                             <div className="relative">
                               <Input
                                 name="lastName"
@@ -332,7 +365,9 @@ export default function ProfileForm() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Tên</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Tên
+                            </label>
                             <div className="relative">
                               <Input
                                 name="firstName"
@@ -350,7 +385,9 @@ export default function ProfileForm() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Số điện thoại</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Số điện thoại
+                            </label>
                             <div className="relative">
                               <Input
                                 name="phone"
@@ -367,7 +404,9 @@ export default function ProfileForm() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Ngày sinh</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Ngày sinh
+                            </label>
                             <div className="relative">
                               <Input
                                 name="dob"
@@ -385,7 +424,9 @@ export default function ProfileForm() {
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-sm font-medium text-gray-300">Email</label>
+                          <label className="text-sm font-medium text-gray-300">
+                            Email
+                          </label>
                           <div className="relative">
                             <Input
                               name="email"
@@ -397,7 +438,9 @@ export default function ProfileForm() {
                             />
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                           </div>
-                          <p className="text-xs text-gray-500">Email không thể thay đổi</p>
+                          <p className="text-xs text-gray-500">
+                            Email không thể thay đổi
+                          </p>
                         </div>
                       </div>
 
@@ -407,7 +450,9 @@ export default function ProfileForm() {
                         </h4>
 
                         <div className="space-y-1">
-                          <label className="text-sm font-medium text-gray-300">Tên ngân hàng</label>
+                          <label className="text-sm font-medium text-gray-300">
+                            Tên ngân hàng
+                          </label>
                           <div className="relative">
                             <Input
                               name="bankingName"
@@ -437,7 +482,9 @@ export default function ProfileForm() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Số tài khoản ngân hàng</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Số tài khoản ngân hàng
+                            </label>
                             <div className="relative">
                               <Input
                                 name="bankingCode"
@@ -466,7 +513,9 @@ export default function ProfileForm() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-300">Tên chủ tài khoản</label>
+                            <label className="text-sm font-medium text-gray-300">
+                              Tên chủ tài khoản
+                            </label>
                             <div className="relative">
                               <Input
                                 name="ownerCard"
@@ -511,13 +560,17 @@ export default function ProfileForm() {
 
                 <TabsContent value="security">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">Tính năng bảo mật sẽ được cập nhật sau</p>
+                    <p className="text-gray-400">
+                      Tính năng bảo mật sẽ được cập nhật sau
+                    </p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="preferences">
                   <div className="bg-[#1A1A1A] rounded-2xl shadow-xl p-6 min-h-[300px] flex items-center justify-center border border-[#2A2A2A]">
-                    <p className="text-gray-400">Tính năng tùy chọn sẽ được cập nhật sau</p>
+                    <p className="text-gray-400">
+                      Tính năng tùy chọn sẽ được cập nhật sau
+                    </p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -533,7 +586,9 @@ export default function ProfileForm() {
               className="bg-[#1A1A1A] rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-[#2A2A2A]"
             >
               <div className="p-4 bg-gradient-to-r from-[#FF8A00] to-[#FF9A20] text-white">
-                <h3 className="text-lg font-semibold text-center">Chỉnh sửa ảnh đại diện</h3>
+                <h3 className="text-lg font-semibold text-center">
+                  Chỉnh sửa ảnh đại diện
+                </h3>
               </div>
 
               <div className="p-6">
@@ -548,7 +603,7 @@ export default function ProfileForm() {
                     cropShape="round"
                     showGrid={false}
                     onCropComplete={(_, croppedAreaPixels) => {
-                      setCroppedAreaPixels(croppedAreaPixels)
+                      setCroppedAreaPixels(croppedAreaPixels);
                     }}
                   />
                 </div>
@@ -556,8 +611,12 @@ export default function ProfileForm() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <label className="text-sm font-medium text-gray-300">Phóng to</label>
-                      <span className="text-sm text-gray-400">{zoom.toFixed(1)}x</span>
+                      <label className="text-sm font-medium text-gray-300">
+                        Phóng to
+                      </label>
+                      <span className="text-sm text-gray-400">
+                        {zoom.toFixed(1)}x
+                      </span>
                     </div>
                     <div className="flex items-center">
                       <input
@@ -566,7 +625,9 @@ export default function ProfileForm() {
                         max="3"
                         step="0.1"
                         value={zoom}
-                        onChange={(e) => setZoom(Number.parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          setZoom(Number.parseFloat(e.target.value))
+                        }
                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                       />
                     </div>
@@ -582,7 +643,12 @@ export default function ProfileForm() {
                     </Button>
                     <Button
                       className="flex-1 bg-[#FF8A00] hover:bg-[#FF9A20] text-white transition-colors duration-300"
-                      onClick={() => handleCropComplete(null, croppedAreaPixels as CroppedAreaPixels)}
+                      onClick={() =>
+                        handleCropComplete(
+                          null,
+                          croppedAreaPixels as CroppedAreaPixels
+                        )
+                      }
                       disabled={loading}
                     >
                       {loading ? (
@@ -602,5 +668,5 @@ export default function ProfileForm() {
         )}
       </div>
     </>
-  )
+  );
 }
